@@ -74,11 +74,6 @@ dispatch_notify(DBusMessage *message)
 	n->urgency = dbus_message_iter_get_byte(&iter);
 	dbus_message_iter_next(&iter);
 
-	str = dbus_message_iter_get_string(&iter);
-	n->summary = strdup(str);
-	dbus_free(str);
-	dbus_message_iter_next(&iter);
-
 	/* summary */
 	validate( type == DBUS_TYPE_STRING, NULL,
 			  "invalid notify message, second argument is not a string\n" );

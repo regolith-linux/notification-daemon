@@ -1,3 +1,8 @@
+Sun Jul 04 13:45:03 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cpp:
+	  - Don't process the summary twice. It screws up everything.
+
 Sun Jul 04 13:43:26 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/main.cpp:
