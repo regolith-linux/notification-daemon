@@ -70,20 +70,35 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 {
     DBusError *error;
     DBusMessageIter iter;
+	DBusMessage *reply;
     char *str;
 	Notification *n;
     uint replaces;
+	uint id;
 	/* if we create a new notification, ensure it'll be freed if we throw  */
 	std::auto_ptr<Notification> n_holder;
-	
-    /* we could probably use get_args here, at a cost of less fine grained error reporting */
 
+    /*
+	 * we could probably use get_args here, at a cost of less fine grained
+	 * error reporting
+	 */
     dbus_message_iter_init(message, &iter);
 
 #define type dbus_message_iter_get_arg_type(&iter)
 
+	/* app name */
+	validate(type == DBUS_TYPE_STRING || type == DBUS_TYPE_NIL, NULL,
+			 "invalid notify message, app name argument is not a string or nil\n");
+	dbus_message_iter_next(&iter);
+
+	/* app icon */
+	validate(type == DBUS_TYPE_ARRAY || type == DBUS_TYPE_NIL, NULL,
+			 "invalid notify message, app icon argument is not a string or nil\n");
+	dbus_message_iter_next(&iter);
+
     /* replaces */
-    validate( type == DBUS_TYPE_UINT32, NULL, "invalid notify message, replaces argument is not a uint32\n");
+    validate( type == DBUS_TYPE_UINT32, NULL,
+			  "invalid notify message, replaces argument is not a uint32\n");
     replaces = dbus_message_iter_get_uint32(&iter);
     dbus_message_iter_next(&iter);
 
@@ -99,10 +114,17 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
         TRACE("replaces=%d\n", replaces);
 
         n = backend->get(replaces);
-        validate( n != NULL, NULL, "invalid replacement ID (%d) given\n", replaces );
+        validate( n != NULL, NULL, "invalid replacement ID (%d) given\n",
+				  replaces );
     }
 
-    validate( n->connection != NULL, NULL, "backend is not set on notification\n" );
+    validate( n->connection != NULL, NULL,
+			  "backend is not set on notification\n" );
+
+	/* notification type */
+	validate(type == DBUS_TYPE_STRING || type == DBUS_TYPE_NIL, NULL,
+			 "invalid notify message, type argument is not a string or nil\n");
+	dbus_message_iter_next(&iter);
 
     /* urgency */
     validate( type == DBUS_TYPE_BYTE, NULL,
@@ -152,7 +174,7 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 				char *s = dbus_message_iter_get_string(&i);
 
 				n->images.push_back(new Image(s));
-				
+
 				dbus_free(s);
 			}
 			else if (arraytype == DBUS_TYPE_ARRAY)
@@ -169,7 +191,7 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 	}
 
     dbus_message_iter_next(&iter);
-	
+
     /* actions */
 	validate( (type == DBUS_TYPE_DICT) || (type == DBUS_TYPE_NIL), NULL,
 			  "invalid notify message, actions argument is not dict nor nil\n" );
@@ -196,28 +218,37 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 	}
 	dbus_message_iter_next(&iter);
 
-    /* timeout, UINT32 or NIL for no timeout */
-    validate( (type == DBUS_TYPE_UINT32) || (type == DBUS_TYPE_NIL), NULL,
-              "invalid notify message, timeout argument is not int32 nor nil (%c)\n", type );
+	/* hints */
+	validate( (type == DBUS_TYPE_DICT) || (type == DBUS_TYPE_NIL), NULL,
+			  "invalid notify message, actions argument is not dict nor nil\n" );
 
-    if (type != DBUS_TYPE_NIL)
-	{
-        n->use_timeout = true;
-        n->timeout = dbus_message_iter_get_uint32(&iter);
-    }
-	
+	/* expires */
+	validate(type == DBUS_TYPE_UINT32, NULL,
+			 "invalid notify message, expires argument is not uint32");
+
+	n->use_timeout = true;
+
+    /* timeout */
+    validate(type == DBUS_TYPE_UINT32, NULL,
+			 "invalid notify message, timeout argument is not uint32 (%c)\n",
+			 type );
+
+	n->timeout = dbus_message_iter_get_uint32(&iter);
+
 #undef type
-	
+
 	/* end of demarshalling code  */
-	
-    if (replaces) backend->update(n);
-    uint id = replaces ? replaces : backend->notify(n);
+
+    if (replaces)
+		backend->update(n);
+
+    id = replaces ? replaces : backend->notify(n);
 
 	n_holder.release();  /* commit the notification  */
 
     TRACE("id is %d\n", id);
 
-    DBusMessage *reply = dbus_message_new_method_return(message);
+    reply = dbus_message_new_method_return(message);
 
     dbus_message_append_args(reply, DBUS_TYPE_UINT32, id, DBUS_TYPE_INVALID);
 
