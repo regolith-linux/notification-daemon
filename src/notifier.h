@@ -29,19 +29,36 @@
 
 #include <string>
 #include <map>
-using std::string;
+#include <vector>
+using std::string;   // we should be using a Glibmm::ustring for most of this ....
 
 /* some basic utilities */
 #define equal(s1,s2) (s1 && s2 && !strcmp(s1,s2))
-#define $(s) ((char*)s.c_str())    // I can't actually believe that syntax works, but it does ...
+#define S(str) std::string(str)
 #define ifnull(expr1, expr2) (expr1 ? expr1 : expr2)
+#define foreach(type, list) for (type::iterator i = list.begin(); i != list.end(); i++)
 
-struct image {
-    /* fill me in */
+enum image_type
+{
+	IMAGE_TYPE_THEME = 0,
+	IMAGE_TYPE_ABSOLUTE = 1,
+	IMAGE_TYPE_RAW = 2
 };
 
-struct sound {
-    /* fill me in */
+class Image
+{
+public:
+	enum image_type type;
+	char *file;
+	unsigned char *data;
+	size_t datalen;
+
+	Image(char *newfile);
+
+	/* newdata will be owned by this object and freed on destruction */
+	Image(unsigned char *newdata, int newdatalen);
+	
+	virtual ~Image();
 };
 
 /* This class represents a notification. It's a class rather than a struct
@@ -50,31 +67,40 @@ struct sound {
    here.
  */
 
-class Notification {
+typedef std::map<int, char*> ActionsMap;
+typedef std::vector<Image*> ImageList;
+
+class Notification
+{
 public:
     int urgency;              /* Urgency level */
     char *summary;            /* UTF-8 encoded text containing a brief description */
     char *body;               /* UTF-8 encoded body, optionally containing markup */
-    struct image **images;    /* an array of frames in the animated image */
+    ImageList images;         /* an array of frames in the animated image. would this be better as a ptr array? */
     int primary_frame;        /* for notifiers that can't show animations, the still frame to use */
-    char *sound;              /* the sound to play when the notification appears */
     uint timeout;             /* 0 means use heuristics */
     bool use_timeout;         /* should the notification ever time out? */
+
+	ActionsMap actions;       /* the mapping of action ids to action strings */
 
     int id;
 
     /* the connection which generated this notification. used for signal dispatch */
-    DBusConnection *connection; 
-    
+    DBusConnection *connection;
+
     Notification();
+	Notification(const Notification &obj);
     virtual ~Notification();
 
     virtual void update() {;} /* called when the contents have changed */
+
+	virtual void action_invoke(uint aid);
 };
 
 typedef std::map<int, Notification*> NotificationsMap;
 
-class BaseNotifier {
+class BaseNotifier
+{
 protected:
     uint next_id;
     GMainLoop *loop;
@@ -82,7 +108,7 @@ protected:
     void register_timeout(int hz);
 
     void setup_timeout(Notification *n);
-    
+
 public:
     /* All notifications are given a unique, non-repeating id which the client can use
        The mapping between the ids and notification objects is stored here */
@@ -90,7 +116,7 @@ public:
     NotificationsMap notifications;
 
     Notification *get(uint id);
-    
+
     virtual uint notify(Notification *n);
     bool unnotify(uint id);
     virtual bool unnotify(Notification *n);
@@ -101,25 +127,26 @@ public:
 
     /* This can be overriden by base classes to return subclasses of Notification */
     virtual Notification *create_notification();
-    
+
     bool timing;
     virtual bool timeout();
 
-    virtual void invoke(Notification *n, uint actionid);
 };
 
 extern BaseNotifier *notifier;    /* This holds the backend in use. It's set once, at startup. */
 
 
-class ConsoleNotifier : public BaseNotifier {
-public:    
+class ConsoleNotifier : public BaseNotifier
+{
+public:
     virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);
 
     ConsoleNotifier(GMainLoop *loop) : BaseNotifier(loop) {};
 };
 
-class PopupNotifier : public BaseNotifier {
+class PopupNotifier : public BaseNotifier
+{
 private:
     void reflow();
 

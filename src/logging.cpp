@@ -27,9 +27,8 @@
 void log(enum loglevel level, char *s, ...) {
     va_list args;
 
-    /* timestamp here? */
-    fprintf(stderr, "%s: ", getenv("_"));
-    
+	fprintf(stderr, "notification-daemon: ");
+	
     switch (level) {
         case LOG_WARNING: fprintf(stderr, "warning: "); break;
         case LOG_TRACE: fprintf(stderr, "trace: "); break;

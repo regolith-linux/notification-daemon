@@ -1,7 +1,7 @@
 /** -*- mode: c-mode; tab-width: 4; indent-tabs-mode: t; -*-
  * @file notifier.cpp Base class implementations
  *
- * Copyright (C) 2004 Mike Hearn
+ * Copyright (C) 2004 Mike Hearn <mike@navi.cx>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -27,30 +27,61 @@
 
 Notification::Notification()
 {
-    summary = body = sound = NULL;
-    images = NULL;
+    summary = body = NULL;
     primary_frame = -1;
     timeout = 0;
     use_timeout = false;
     id = 0;
 }
 
-Notification::~Notification()
+Notification::Notification(const Notification &obj)
 {
-    if (summary) free(summary);
-    if (body) free(body);
-    // FIXME: free images/sound data
+	if (obj.summary) summary = strdup(obj.summary);
+	if (obj.body) body = strdup(obj.body);
+	primary_frame = obj.primary_frame;
+	timeout = obj.timeout;
+	use_timeout = obj.use_timeout;
+	id = obj.id;
 }
 
+Notification::~Notification()
+{
+	TRACE("~Notification: %s, %s\n", summary, body);
+	
+    if (summary) free(summary);
+    if (body) free(body);
+
+  	foreach( ActionsMap, actions ) free(i->second);
+
+ 	foreach( ImageList, images ) delete *i;
+}
+
+void Notification::action_invoke(uint actionid)
+{
+    DBusMessage *signal = dbus_message_new_signal("/org/freedesktop/Notifications",
+                                                  "org.freedesktop.Notifications",
+                                                  "ActionInvoked");
+
+    TRACE("sending Invoked signal on notification id %d, action id %d\n", id, actionid);
+
+    dbus_message_append_args(signal,
+							 DBUS_TYPE_UINT32, id,
+							 DBUS_TYPE_UINT32, actionid,
+							 DBUS_TYPE_INVALID);
+
+    dbus_connection_send(connection, signal, NULL);
+
+    dbus_message_unref(signal);
+}
 
 /*************************************************************/
 
 BaseNotifier::BaseNotifier(GMainLoop *main_loop)
 {
     loop = main_loop;
-    
+
     g_main_loop_ref(loop);
-    
+
     next_id = 1;
     timing = false;
 }
@@ -64,27 +95,31 @@ BaseNotifier::~BaseNotifier()
 bool BaseNotifier::timeout()
 {
     /* check each notification to see if it timed out yet */
-    NotificationsMap::iterator i = notifications.begin();
     time_t now = time(NULL);
+	bool needed = false;
 
-    while (i != notifications.end()) {
-        if (i->second->timeout <= now) unnotify(i->second);
-        i++;
+	TRACE("timeout\n");
+
+	foreach( NotificationsMap, notifications )
+	{
+		if (i->second->use_timeout) needed = true;
+
+        if (i->second->use_timeout && (i->second->timeout <= now)) unnotify(i->second);
     }
 
     TRACE("heartbeat: %d, %d notifications left\n", now, notifications.size());
-    
-    return !notifications.empty();
+
+    return needed;
 }
 
 /* called by the glib main loop */
 static gboolean timeout_dispatch(gpointer data)
 {
     BaseNotifier *n = (BaseNotifier *) data;
-    
+
     bool ret = n->timeout();
     if (!ret) n->timing = false;
-    
+
     return ret ? TRUE : FALSE;
 }
 
@@ -98,47 +133,49 @@ void BaseNotifier::setup_timeout(Notification *n)
     /* decide a sensible timeout. for now let's just use 5 seconds. in future, based on text length? */
     if (n->use_timeout && (n->timeout == 0)) n->timeout = time(NULL) + 5;
 
-    
+
     /* we don't have a timeout triggering constantly as otherwise n-d
        could never be fully paged out by the kernel. */
-    
-    if (n->use_timeout && !timing) {
+
+    if (n->use_timeout && !timing)
+	{
         register_timeout(1000);
         timing = true; /* set to false when ::timeout returns false */
-    }   
+    }
 }
 
-uint BaseNotifier::notify(Notification *n)
-{   
-    n->id = next_id;
-    
-    next_id++;
 
+uint BaseNotifier::notify(Notification *n)
+{
+    n->id = next_id++;
+
+    update(n);  // can throw
+
+	/* don't commit to the map until after the notification has been able to update */
     notifications[n->id] = n;
 
-    update(n);
-    
     return n->id;
 }
 
 void BaseNotifier::update(Notification *n)
 {
-    setup_timeout(n);   
-    n->update();
+    setup_timeout(n);
+    n->update();  // can throw
 }
 
 bool BaseNotifier::unnotify(uint id)
 {
     Notification *n = get(id);
-    
+
     validate( n != NULL, false, "Given ID (%d) is not valid", id );
-    
+
     return unnotify(n);
 }
 
 bool BaseNotifier::unnotify(Notification *n)
 {
-    if (!notifications.erase(n->id)) {
+    if (!notifications.erase(n->id))
+	{
         WARN("no such notification registered (%p), id=%d\n", n, n->id);
         return false;
     }
@@ -161,17 +198,3 @@ Notification *BaseNotifier::get(uint id)
     return notifications[id];
 }
 
-void BaseNotifier::invoke(Notification *n, uint actionid)
-{
-    DBusMessage *signal = dbus_message_new_signal("/org/freedesktop/Notifications",
-                                                  "org.freedesktop.Notifications",
-                                                  "ActionInvoked");
-
-    TRACE("sending Invoked signal on notification id %d, action id %d\n", n->id, actionid);
-    
-    dbus_message_append_args(signal, DBUS_TYPE_UINT32, n->id, DBUS_TYPE_UINT32, actionid, DBUS_TYPE_INVALID);
-
-    // fixme: this causes us to be disconnected from the bus, for some reason
-    dbus_connection_send(n->connection, signal, NULL);
-    dbus_message_unref(signal);
-}

@@ -1,3 +1,31 @@
+Thu Sep 16 19:51:09 2004  Mike Hearn  <mike@navi.cx>
+	* src/main.cpp (handle_notify): Make exception safe
+
+Wed Sep 15 19:52:37 2004  Mike Hearn  <mike@navi.cx>
+	* src/popup-notifier.cpp (class PopupNotification): Use a hand
+	  cursor for the action hyperlinks
+
+Tue Sep 14 23:03:29 2004  Mike Hearn  <mike@navi.cx>
+	* src/popup-notifier.cpp (class PopupNotification): make gui
+	  construction exception safe	
+
+Mon Sep 13 22:02:42 2004  Mike Hearn  <mike@navi.cx>
+	* src/main.cpp (handle_notify): trap exceptions and convert to
+	  DBUS errors
+	* src/popup-notifier.cpp (class PopupNotification): Make exception
+	  safe, fix some memory leaks, support actions, refactor action_invoke
+	  into base class, throw exceptions on bad images, support images
+
+Wed Sep  8 23:13:40 2004  Mike Hearn  <mike@navi.cx>
+	* src/base-notifier.cpp (Notification): Use new foreach macro
+	* src/notifier.h: Add a foreach macro for iterators
+	* src/main.cpp: Demarshal actions
+	* src/popup-notifier.cpp (class PopupNotification): Fix
+	  positioning bug, make summary bolder, give content area a white
+	  background, basic multi-actions rendering as links, center
+	  summary when no body is supplied.
+	
+
 Thu Jul 29 18:09:30 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/base-notifier.cpp:
