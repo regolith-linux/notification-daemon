@@ -1,3 +1,8 @@
+Sat Jul  3 23:53:09 GMT 2004  Mike Hearn  <mike@navi.cx>
+	* src/notifier.cpp: Rename to base-notifier.cpp
+	* src/base-notifier.cpp, src/notifier.h, src/console-notifier.cpp: change
+	  return type of notify() to uint
+
 Sat Jul  3 20:31:31 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp (dispatch_notify): Dispatch Notify messages to backend
 	* src/notifier.h: Change struct notification to a class so backends can
@@ -7,6 +12,7 @@ Sat Jul  3 20:31:31 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* shell-funcs: Add a simple "notify" function wrapper around dbus-send
 	* src/notifier.cpp: Basic implementation of BaseNotifier, record notifications
 	  and supply unique IDs
+
 	
 Sat Jul  3 17:19:10 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp, src/logging.cpp, src/notifier.h, src/console-notifier.cpp:

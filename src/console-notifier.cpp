@@ -22,7 +22,7 @@
 #include <notifier.h>
 #include <stdio.h>
 
-int
+uint
 ConsoleNotifier::notify(Notification *n)
 {
 	printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");

@@ -46,7 +46,7 @@ BaseNotifier::BaseNotifier()
 	next_id = 0;
 }
 
-int
+uint
 BaseNotifier::notify(Notification *n)
 {
 	/* add to the internal list using the next cookie, increment, return */

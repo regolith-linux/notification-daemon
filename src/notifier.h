@@ -69,7 +69,7 @@ public:
        The mapping between the ids and notification objects is stored here */
     std::map<int, Notification*> notifications;
     
-    virtual int notify(Notification *n);
+    virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);
 
     BaseNotifier();
@@ -85,13 +85,13 @@ extern BaseNotifier *notifier;    /* This holds the backend in use. It's set onc
 
 class ConsoleNotifier : public BaseNotifier {
 public:    
-    virtual int notify(Notification *n);
+    virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);
 };
 
 class PopupNotifier : public BaseNotifier {
 public:
-    virtual int notify(Notification *n);
+    virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);
 };
 
