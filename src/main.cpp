@@ -56,7 +56,7 @@ handle_notify(DBusMessage *message)
 	DBusMessageIter iter;
 	char *str;
 	Notification *n;
-	guint32 replaces;
+	uint replaces;
 
 	/* we could probably use get_args here, at a cost of less fine grained error reporting */
 	
@@ -181,7 +181,7 @@ handle_get_info(DBusMessage *message)
 static DBusMessage*
 handle_close(DBusMessage *message)
 {
-	guint32 id;
+	uint id;
 	DBusError error;
 	
 	if (!dbus_message_get_args(message, &error, DBUS_TYPE_UINT32, &id, DBUS_TYPE_INVALID)) {
