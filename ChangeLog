@@ -1,3 +1,8 @@
+Fri Nov 05 02:01:35 PST 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/PopupNotification.cpp:
+	  - Fix warnings.
+
 Fri Nov 05 01:52:29 PST 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/PopupNotification.cpp:

@@ -172,11 +172,11 @@ _set_cursor(GtkWidget *widget, GdkEventExpose *event,
 
 PopupNotification::PopupNotification(PopupNotifier *n)
 	: Notification(),
-	  m_disp_screen(0),
-	  m_gc(NULL),
+	  m_notifier(n),
 	  m_window(NULL),
+	  m_disp_screen(0),
 	  m_height_offset(0),
-	  m_notifier(n)
+	  m_gc(NULL)
 {
 }
 
@@ -199,7 +199,8 @@ PopupNotification::generate()
 {
 	TRACE("Generating PopupNotification GUI for nid %d\n", id);
 
-	GtkWidget *win = m_window, *bodybox_widget, *vbox, *summary_label, *body_label, *image_widget;
+	GtkWidget *win = m_window, *bodybox_widget, *vbox, *summary_label;
+	GtkWidget *body_label = NULL, *image_widget;
 
 	try
 	{
@@ -571,15 +572,16 @@ PopupNotifier::reflow()
     int offset = 0;
 	int offsub = 0;
 
-    foreach( NotificationsMap, notifications )
-    {
-        PopupNotification *n = dynamic_cast<PopupNotification*> (i->second);
-        assert( n != NULL );
+	for (NotificationsMap::iterator i = notifications.begin();
+		 i != notifications.end();
+		 i++, offsub++)
+	{
+        PopupNotification *n = dynamic_cast<PopupNotification *>(i->second);
+        assert(n != NULL);
 
         n->set_height_offset(offset - offsub);
 
         offset += n->get_height();
-		offsub++;
     }
 }
 
