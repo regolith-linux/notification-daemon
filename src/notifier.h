@@ -24,6 +24,9 @@
 
 #include <glib.h>
 
+#define DBUS_API_SUBJECT_TO_CHANGE
+#include <dbus/dbus.h>
+
 #include <string>
 #include <map>
 using std::string;
@@ -59,7 +62,10 @@ public:
     bool use_timeout;         /* should the notification ever time out? */
 
     int id;
-    
+
+	/* the connection which generated this notification. used for signal dispatch */
+	DBusConnection *connection; 
+	
     Notification();
     virtual ~Notification();
 
@@ -97,7 +103,9 @@ public:
     virtual Notification *create_notification();
 	
 	bool timing;
-	virtual bool timeout();	
+	virtual bool timeout();
+
+	virtual void invoke(Notification *n, uint actionid);
 };
 
 extern BaseNotifier *notifier;    /* This holds the backend in use. It's set once, at startup. */
@@ -120,6 +128,8 @@ public:
     virtual bool unnotify(Notification *n);
 
     virtual Notification *create_notification();
+
+	void handle_button_release(Notification *n);
 
     PopupNotifier(GMainLoop *loop, int *argc, char ***argv);
 };

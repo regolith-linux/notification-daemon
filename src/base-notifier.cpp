@@ -48,6 +48,7 @@ Notification::~Notification()
 BaseNotifier::BaseNotifier(GMainLoop *main_loop)
 {
 	loop = main_loop;
+	
 	g_main_loop_ref(loop);
 	
 	next_id = 1;
@@ -160,4 +161,18 @@ Notification *BaseNotifier::get(uint id)
 {
 	if (notifications.find(id) == notifications.end()) return NULL;
 	return notifications[id];
+}
+
+void BaseNotifier::invoke(Notification *n, uint actionid)
+{
+	DBusMessage *signal = dbus_message_new_signal("org/freedesktop/Notifications",
+												  "org.freedesktop.Notifications",
+												  "ActionInvoked");
+
+	TRACE("sending Invoked signal on notification id %d, action id %d\n", n->id, actionid);
+	
+	dbus_message_append_args(signal, DBUS_TYPE_UINT32, n->id, DBUS_TYPE_UINT32, actionid, DBUS_TYPE_INVALID);
+
+	dbus_connection_send(n->connection, signal, NULL);
+	dbus_message_unref(signal);
 }

@@ -47,10 +47,11 @@ using std::string;
 #include "logging.h"
 
 BaseNotifier *backend;
-GMainLoop *loop;
+static GMainLoop *loop;
+static DBusConnection *dbus_conn;
 
 static DBusMessage*
-handle_notify(DBusMessage *message)
+handle_notify(DBusConnection *incoming, DBusMessage *message)
 {
 	DBusError *error;
 	DBusMessageIter iter;
@@ -69,15 +70,18 @@ handle_notify(DBusMessage *message)
 	replaces = dbus_message_iter_get_uint32(&iter);
 	dbus_message_iter_next(&iter);
 
-	if (replaces == 0)
+	if (replaces == 0) {
 		n = backend->create_notification();
-	else {
+		n->connection = incoming;
+	} else {
 		TRACE("replaces=%d\n", replaces);
 
 		n = backend->get(replaces);
 		validate( n != NULL, NULL, "invalid replacement ID (%d) given\n", replaces );
 	}
 
+	validate( n->connection != NULL, NULL, "backend is not set on notification\n" );
+	
 	/* urgency */
 	validate( type == DBUS_TYPE_BYTE, NULL,
 			  "invalid notify message, second argument (urgency) is not a byte\n" );
@@ -195,7 +199,7 @@ handle_close(DBusMessage *message)
 }
 
 static DBusHandlerResult
-filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
+filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
 {
 	int message_type = dbus_message_get_type(message);
 
@@ -229,19 +233,18 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 
 
 	/* now we know it's on the only valid interface, dispatch the method call */
-
 	DBusMessage *ret = NULL;
 
-	if (equal(dbus_message_get_member(message), "Notify")) ret = handle_notify(message);
+	if (equal(dbus_message_get_member(message), "Notify")) ret = handle_notify(conn, message);
 	else if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = handle_get_caps(message);
 	else if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = handle_get_info(message);
 	else if (equal(dbus_message_get_member(message), "CloseNotification")) ret = handle_close(message);
 	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-
+	
 	/* we always reply to messages, even if it's just empty */
 	if (!ret) ret = dbus_message_new_method_return(message);
 	
-	dbus_connection_send(dbus_conn, ret, NULL);
+	dbus_connection_send(conn, ret, NULL);
 	dbus_message_unref(ret);
 
 	return DBUS_HANDLER_RESULT_HANDLED;
@@ -272,7 +275,7 @@ initialize_backend(int *argc, char ***argv)
 int
 main(int argc, char **argv)
 {
-	DBusConnection *dbus_conn;
+
 	DBusError error;
 
 	dbus_error_init(&error);

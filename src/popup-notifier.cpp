@@ -73,14 +73,23 @@ private:
 
 		return FALSE; // propogate further
 	}
+	
+	PopupNotifier *notifier;
 
+	static gboolean dispatch_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+		PopupNotification *n = (PopupNotification *) user_data;
+		n->notifier->handle_button_release( dynamic_cast<Notification *> (n) );
+		return TRUE;
+	}
+	
 public:
 
-	PopupNotification() {
+	PopupNotification(PopupNotifier *n) {
         Notification::Notification();
 		gc = NULL;
 		window = NULL;
 		height_offset = 0;
+		notifier = n;
     }
 
     ~PopupNotification() {
@@ -95,7 +104,12 @@ public:
 
 		const int image_padding = 15;
 
-		if (!window) window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
+		if (!window) {
+			window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
+			gtk_widget_add_events(GTK_WIDGET(window), GDK_BUTTON_RELEASE_MASK);
+			g_signal_connect(G_OBJECT(window), "button-release-event", G_CALLBACK(dispatch_button_release), this);
+			
+		}
 
         hbox = gtk_hbox_new(FALSE, 4);
         vbox = gtk_vbox_new(FALSE, 2);
@@ -196,8 +210,7 @@ PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv) : Ba
    This may be called many times per second so it should be reasonably fast.
  */
 
-void
-PopupNotifier::reflow()
+void PopupNotifier::reflow()
 {
 	NotificationsMap::iterator i = notifications.begin();
 
@@ -216,8 +229,7 @@ PopupNotifier::reflow()
 	}
 }
 
-uint
-PopupNotifier::notify(Notification *base)
+uint PopupNotifier::notify(Notification *base)
 {
 	uint id = BaseNotifier::notify(base);
     PopupNotification *n = dynamic_cast<PopupNotification*> (base);
@@ -232,16 +244,20 @@ PopupNotifier::notify(Notification *base)
     return id;
 }
 
-bool
-PopupNotifier::unnotify(Notification *n)
+bool PopupNotifier::unnotify(Notification *n)
 {
 	bool ret = BaseNotifier::unnotify(n);
 	reflow();
 	return ret;
 }
 
-Notification*
-PopupNotifier::create_notification()
+Notification* PopupNotifier::create_notification()
 {
-    return new PopupNotification();
+    return new PopupNotification(this);
+}
+
+void PopupNotifier::handle_button_release(Notification *n)
+{
+	TRACE("button release on notification %d\n", n->id);
+	invoke(n, 0);
 }
