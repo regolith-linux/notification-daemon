@@ -23,13 +23,14 @@
 #include <stdio.h>
 
 void
-ConsoleNotifier::notify(struct notification *n)
+ConsoleNotifier::notify(Notification *n)
 {
     printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");
+	delete n;
 }
 
 void
-ConsoleNotifier::unnotify(struct notification *n)
+ConsoleNotifier::unnotify(Notification *n)
 {
     // do nothing here
 }

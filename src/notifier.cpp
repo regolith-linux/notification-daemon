@@ -1,5 +1,5 @@
 /** -*- mode: c-mode; tab-width: 4; indent-tabs-mode: t; -*-
- * @file notifier.cpp Base class for notification backends
+ * @file notifier.cpp Base class implementations
  *
  * Copyright (C) 2004 Mike Hearn
  *
@@ -19,15 +19,26 @@
  * MA  02111-1307  USA
  */
 
-/* This file contains the base class for notification backends.
-   
-   A backend is reponsible for taking a notification and displaying
-   it to the user in some form. For instance, you could have a passive
-   popup notifier, a console notifier, or a notifier that did something
-   entirely different - perhaps a marquee in a panel applet.
- */
+#include "notifier.h"
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+Notification::Notification()
+{
+	summary = body = sound = NULL;
+	images = NULL;
+	primary_frame = -1;
+	timeout = 0;
+	use_timeout = true;
+}
 
+Notification::~Notification()
+{
+	if (this->summary) free(this->summary);
+	if (this->body) free(this->body);
+	// FIXME: free images/sound data
+}
+
+Notification*
+BaseNotifier::create_notification()
+{
+	return new Notification();
+}

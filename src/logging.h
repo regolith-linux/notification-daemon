@@ -25,8 +25,8 @@ enum loglevel {
     LOG_ERROR
 };
 
-#define validate(condition, args...) if (!(condition)) { log(LOG_WARNING, args); return; }
-#define validateret(condition, retval, args...) if (!(condition)) { log(LOG_WARNING, args); return retval; }
+#define void_validate(condition, args...) if (!(condition)) { log(LOG_WARNING, args); return; }
+#define validate(condition, retval, args...) if (!(condition)) { log(LOG_WARNING, args); return retval; }
 void log(enum loglevel level, char *s, ...);
 
 #define TRACE(args...) log(LOG_TRACE, args);

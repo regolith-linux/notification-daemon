@@ -1,3 +1,10 @@
+Sat Jul  3 20:31:31 GMT 2004  Mike Hearn  <mike@navi.cx>
+	* src/main.cpp (dispatch_notify): Dispatch Notify messages to backend
+	* src/notifier.h: Change struct notification to a class so backends can
+	  extend it more easily (to include layout info, for instance). Add method
+	  so backends can create their own Notification instances.
+	* src/logging.h (validate): Rename validateret to validate
+
 Sat Jul  3 17:19:10 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp, src/logging.cpp, src/notifier.h, src/console-notifier.cpp:
 	  Add basic implementation of the server framework

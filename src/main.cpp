@@ -35,37 +35,90 @@ using std::string;
 
 BaseNotifier *backend;
 
-static gboolean
+static bool
 handle_initial_messages(DBusMessage *message)
 {
 	if (equal(dbus_message_get_member(message), "ServiceAcquired")) {
 		TRACE("Discarding ServiceAcquired message\n");
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
+}
+
+static DBusMessage*
+dispatch_notify(DBusMessage *message)
+{
+	DBusError *error;
+	DBusMessageIter iter;
+	Notification *n = backend->create_notification();
+
+	dbus_message_iter_init(message, &iter);
+
+#define type dbus_message_iter_get_arg_type(&iter)
+
+	/* summary */
+	validate( type == DBUS_TYPE_STRING, NULL,
+			  "invalid notify message, first argument is not a string\n" );
+
+	n->summary = dbus_message_iter_get_string(&iter);
+	dbus_message_iter_next(&iter);
+
+	/* body, can be NIL */
+	validate( (type == DBUS_TYPE_STRING) || (type == DBUS_TYPE_NIL), NULL,
+			  "invalid notify message, second argument is not string nor nil\n" );
+
+	if (type == DBUS_TYPE_NIL) dbus_message_iter_next(&iter);
+	else n->body = strdup(dbus_message_iter_get_string(&iter));
+	dbus_message_iter_next(&iter);
+	
+	/* images, array */
+	dbus_message_iter_next(&iter); 	// FIXME: skip this for now
+
+	/* sound: string or NIL */
+	validate( (type == DBUS_TYPE_STRING) || (type == DBUS_TYPE_NIL), NULL,
+			  "invalid notify message, fourth argument is not string nor nil\n" );
+	
+	if (type == DBUS_TYPE_NIL) dbus_message_iter_next(&iter);
+	else n->sound = strdup(dbus_message_iter_get_string(&iter));
+	dbus_message_iter_next(&iter);
+	
+	/* actions */
+	dbus_message_iter_next(&iter); // FIXME: skip this for now
+
+	/* timeout, UINT32 or NIL for no timeout */
+	validate( (type == DBUS_TYPE_UINT32) || (type == DBUS_TYPE_NIL), NULL,
+			  "invalid notify message, sixth argument is not int32 nor nil (%d)\n", type );
+	
+	if (type == DBUS_TYPE_NIL) n->use_timeout = false;
+	else n->timeout = dbus_message_iter_get_uint32(&iter);
+
+	backend->notify(n);
+	
+#undef type
+
+	return NULL;
 }
 
 static DBusHandlerResult
 filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 {
 	/* some quick checks that apply to all backends */
-
 	if (handle_initial_messages(message)) return DBUS_HANDLER_RESULT_HANDLED;
 
 	string s;
 
 	s = dbus_message_get_path(message);
-	validateret( s == "/org/freedesktop/Notifications",
-				 DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
-				 "message received on unknown object '%s'\n", $(s) );
+	validate( s == "/org/freedesktop/Notifications",
+			  DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
+			  "message received on unknown object '%s'\n", $(s) );
 
 
 	s = dbus_message_get_interface(message);
-	validateret( s == "org.freedesktop.Notifications",
-				 DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
-				 "unknown message received: %s.%s\n",
-				 $(s), dbus_message_get_member(message) );
+	validate( s == "org.freedesktop.Notifications",
+			  DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
+			  "unknown message received: %s.%s\n",
+			  $(s), dbus_message_get_member(message) );
 
 
 	/* now we know it's on the only valid interface, dispatch the method call */
@@ -73,18 +126,12 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 
 	TRACE("dispatching %s\n", $(method));
 
-	if (method == "Notify") {
+	DBusMessage *ret = NULL;
 
-		struct notification n;
+	if (method == "Notify") ret = dispatch_notify(message);
+	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-		memset(&n, 0, sizeof(n));
-		n.summary = "bogus summary";
-		n.body = "bogus body";
-
-		backend->notify(&n);
-
-	} else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-
+	// FIXME: return the reply message here
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
 
@@ -148,3 +195,4 @@ main(int argc, char **argv)
 
 	return 0;
 }
+
