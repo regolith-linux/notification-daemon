@@ -1,3 +1,10 @@
+Thu Jul 29 18:09:30 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/base-notifier.cpp:
+	  - Make sure we have a '/' before the object path in messages.
+	    This prevents the Disconnect signal we're getting when we try
+	    to send ActionInvoked.
+
 Thu Jul 29 18:08:31 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	A notification-daemon.conf:

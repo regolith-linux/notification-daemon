@@ -163,7 +163,7 @@ Notification *BaseNotifier::get(uint id)
 
 void BaseNotifier::invoke(Notification *n, uint actionid)
 {
-    DBusMessage *signal = dbus_message_new_signal("org/freedesktop/Notifications",
+    DBusMessage *signal = dbus_message_new_signal("/org/freedesktop/Notifications",
                                                   "org.freedesktop.Notifications",
                                                   "ActionInvoked");
 
