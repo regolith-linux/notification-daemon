@@ -28,7 +28,7 @@
 class PopupNotification : public Notification {
 public:
     GtkWindow *window; /* the popup window. this has a black background to give the border */
-	GtkWidget *hbox, *vbox, *summary, *body, *image;
+	GtkWidget *hbox, *vbox, *summary_label, *body_label, *image;
 
 	void boldify(GtkLabel *label) {
 		PangoAttribute *bold = pango_attr_weight_new(PANGO_WEIGHT_BOLD);		
@@ -46,10 +46,18 @@ public:
 	
     PopupNotification() {
         Notification::Notification();
+    }
 
-        TRACE("initializing new PopupNotification object (%d)\n", id);
+    ~PopupNotification() {
+        TRACE("destroying notification %d\n", id);
+        gtk_widget_hide(GTK_WIDGET(window));
+        g_object_unref(window);
+    }
 
-        const int width = 200;
+	void generate() {
+        TRACE("Generating new PopupNotification GUI for nid %d\n", id);
+
+		const int width = 200;
         const int height = 50;
 
         window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
@@ -63,16 +71,17 @@ public:
         vbox = gtk_vbox_new(FALSE, 2);
         image = gtk_image_new_from_stock(GTK_STOCK_OPEN, GTK_ICON_SIZE_LARGE_TOOLBAR); // FIXME
 
-		summary = gtk_label_new("summary");
-		boldify(GTK_LABEL(summary));
+		summary_label = gtk_label_new(summary);
+		boldify(GTK_LABEL(summary_label));
 		
-		body = gtk_label_new("body");
+		body_label = gtk_label_new(body);
+		gtk_label_set_use_markup(GTK_LABEL(body_label), TRUE);
 		
-		gtk_widget_show(summary);
-		gtk_widget_show(body);
+		gtk_widget_show(summary_label);
+		gtk_widget_show(body_label);
 		
-        gtk_box_pack_start_defaults(GTK_BOX(vbox), summary);
-        gtk_box_pack_end_defaults(GTK_BOX(vbox), body);
+        gtk_box_pack_start_defaults(GTK_BOX(vbox), summary_label);
+        gtk_box_pack_end_defaults(GTK_BOX(vbox), body_label);
         
         gtk_box_pack_end_defaults(GTK_BOX(hbox), vbox);
         gtk_box_pack_start_defaults(GTK_BOX(hbox), image);
@@ -84,14 +93,8 @@ public:
 		gtk_container_add(GTK_CONTAINER(window), hbox);
 
 		TRACE("done\n");
-    }
-
-    ~PopupNotification() {
-        TRACE("destroying notification %d\n", id);
-        gtk_widget_hide(GTK_WIDGET(window));
-        g_object_unref(window);
-    }
-
+	}
+	
 };
 
 PopupNotifier::PopupNotifier(GMainLoop *loop, int *argc, char ***argv)
@@ -104,6 +107,8 @@ PopupNotifier::notify(Notification *base)
 {
     PopupNotification *n = dynamic_cast<PopupNotification*> (base);
 
+	n->generate();
+	
     gtk_widget_show(GTK_WIDGET(n->window));
     
     return BaseNotifier::notify(base);
