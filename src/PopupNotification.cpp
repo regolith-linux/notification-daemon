@@ -54,7 +54,7 @@ private:
     static const int width = 300;     // FIXME: make these relative to screen size
     static const int minheight = 50;
     static const int imagesize = 48;
-    static const int image_padding = 12;
+    static const int image_padding = 10;
 
 	int disp_screen;
 
