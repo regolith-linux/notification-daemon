@@ -2,5 +2,5 @@
 
 function notify() {
     dbus-send --dest='org.freedesktop.Notifications' /org/freedesktop/Notifications org.freedesktop.Notifications.Notify \
-        string:"$1" string:"${2:-no summary}" string:"" string:"sound" uint32:0mai
+        uint32:0 byte:1 string:"$1" string:"${2:-no summary}" string:"" string:"sound"
 }

@@ -64,14 +64,12 @@ bool BaseNotifier::timeout()
 	NotificationsMap::iterator i = notifications.begin();
 	time_t now = time(NULL);
 
-	TRACE("heartbeat: %d, ", now);
-	
 	while (i != notifications.end()) {
 		if (i->second->timeout <= now) unnotify(i->second);
 		i++;
 	}
 
-	TRACE("%d notifications left\n", notifications.size());
+	TRACE("heartbeat: %d, %d notifications left\n", now, notifications.size());
 	
 	return !notifications.empty();
 }
@@ -107,7 +105,10 @@ uint BaseNotifier::notify(Notification *n)
 	
 	notifications[n->id] = n;
 
-	if (!timing) {
+	/* decide a sensible timeout. for now let's just use 5 seconds. in future, based on text length? */
+	if (n->timeout == 0) n->timeout = time(NULL) + 5;
+	
+	if (n->use_timeout && !timing) {
 		register_timeout(1000);
 		timing = true;
 	}
@@ -117,10 +118,12 @@ uint BaseNotifier::notify(Notification *n)
 
 bool BaseNotifier::unnotify(uint id)
 {
-	validate( notifications.find(id) != notifications.end(), false,
+	Notification *n = get(id);
+	
+	validate( n != NULL, false,
 			  "Given ID (%d) is not valid", id );
 	
-	return unnotify(notifications[id]);
+	return unnotify(n);
 }
 
 bool BaseNotifier::unnotify(Notification *n)
@@ -130,7 +133,7 @@ bool BaseNotifier::unnotify(Notification *n)
 		return false;
 	}
 
-	TRACE("deleting n (%p)\n", n);
+	TRACE("deleting due to unnotify (%p)\n", n);
 	delete n;
 	
 	return true;
@@ -139,4 +142,10 @@ bool BaseNotifier::unnotify(Notification *n)
 Notification* BaseNotifier::create_notification()
 {
 	return new Notification();
+}
+
+Notification *BaseNotifier::get(uint id)
+{
+	if (notifications.find(id) == notifications.end()) return NULL;
+	return notifications[id];
 }

@@ -28,9 +28,10 @@
 #include <map>
 using std::string;
 
-/* some basic string utilities */
-#define equal(s1,s2) (!strcmp(s1,s2))
+/* some basic utilities */
+#define equal(s1,s2) (s1 && s2 && !strcmp(s1,s2))
 #define $(s) ((char*)s.c_str())    // I can't actually believe that syntax works, but it does ...
+#define ifnull(expr1, expr2) (expr1 ? expr1 : expr2)
 
 struct image {
     /* fill me in */
@@ -47,14 +48,14 @@ struct sound {
  */
 
 class Notification {
-public:    
+public:
 	int urgency;              /* Urgency level */
     char *summary;            /* UTF-8 encoded text containing a brief description */
     char *body;               /* UTF-8 encoded body, optionally containing markup */
     struct image **images;    /* an array of frames in the animated image */
     int primary_frame;        /* for notifiers that can't show animations, the still frame to use */
     char *sound;              /* the sound to play when the notification appears */
-    uint timeout;              /* 0 means use heuristics */
+    uint timeout;             /* 0 means use heuristics */
     bool use_timeout;         /* should the notification ever time out? */
 
     int id;
@@ -78,7 +79,9 @@ public:
        The mapping between the ids and notification objects is stored here */
 
     NotificationsMap notifications;
-    
+
+	Notification *get(uint id);
+	
     virtual uint notify(Notification *n);
 	
     bool unnotify(uint id);
