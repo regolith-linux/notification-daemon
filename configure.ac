@@ -60,11 +60,28 @@ PKG_CHECK_MODULES(PACKAGE, [$pkg_modules])
 AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)
 
+
+dnl
+dnl Check the D-BUS version.
+dnl
+
+AC_MSG_CHECKING([dbus version])
+DBUS_VERSION=`$PKG_CONFIG --modversion dbus-1`
+DBUS_MAJOR_VER=`echo $DBUS_VERSION | cut -d. -f 1`
+DBUS_MINOR_VER=`echo $DBUS_VERSION | cut -d. -f 2`
+DBUS_MICRO_VER=`echo $DBUS_VERSION | cut -d. -f 3`
+
+AC_MSG_RESULT($DBUS_VERSION)
+AC_DEFINE_UNQUOTED(DBUS_MAJOR_VER, $DBUS_MAJOR_VER, [D-BUS major version.])
+AC_DEFINE_UNQUOTED(DBUS_MINOR_VER, $DBUS_MINOR_VER, [D-BUS minor version.])
+AC_DEFINE_UNQUOTED(DBUS_MICRO_VER, $DBUS_MICRO_VER, [D-BUS micro version.])
+
 AC_DEFINE_UNQUOTED(DBUS_API_SUBJECT_TO_CHANGE, ,DBUS API is subject to change)
 
 
 AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
 AS_AC_EXPAND(LIBDIR, $libdir)
+AS_AC_EXPAND(DATADIR, $datadir)
 
 AC_ARG_WITH(dbus-sys, [  --with-dbus-sys=<dir>   where D-BUS system.d directory is])
 AC_ARG_WITH(dbus-services, [  --with-dbus-services=<dir>   where D-BUS services directory is])
@@ -78,7 +95,14 @@ fi
 if ! test -z "$with_dbus_services" ; then
 	DBUS_SERVICES_DIR="$with_dbus_services"
 else
-	DBUS_SERVICES_DIR="$LIBDIR/dbus-1/services"
+	# D-BUS 0.23 and higher use $prefix/share/dbus-1/services
+	# D-BUS 0.22 and lower use $prefix/lib/dbus-1/services
+	if test "$DBUS_MAJOR_VER" -ge 1 -o \
+	        "$DBUS_MINOR_VER" -ge 23; then
+		DBUS_SERVICES_DIR="$DATADIR/dbus-1/services"
+	else
+		DBUS_SERVICES_DIR="$LIBDIR/dbus-1/services"
+	fi
 fi
 
 AC_SUBST(DBUS_SYS_DIR)

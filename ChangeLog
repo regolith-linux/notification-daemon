@@ -1,3 +1,9 @@
+Sat Feb 12 23:55:15 PST 2005  Christian Hammond <chipx86@gnupdate.org>
+
+	* configure.ac:
+	  - For D-BUS 0.23 and higher, use $datadir/dbus-1/services instead of
+	    $libdir/dbus-1/servics for the service info file.
+
 Sun Jan 16 16:12:18 PST 2005  Christian Hammond <chipx86@gnupdate.org>
 
 	* configure.ac:
