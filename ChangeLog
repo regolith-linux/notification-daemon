@@ -1,3 +1,17 @@
+Thu Sep 30 00:11:19 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	A src/BaseNotification.cpp:
+	A src/ConsoleNotification.cpp:
+	A src/Image.cpp:
+	A src/PopupNotification.cpp:
+	D src/base-notifier.cpp:
+	D src/console-notifier.cpp:
+	D src/image.cpp:
+	D src/popup-notifier.cpp:
+	* ChangeLog:
+	* src/Makefile.am:
+	  - Renamed some filenames to match their class better.
+
 Wed Sep 29 22:29:54 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/main.cpp:

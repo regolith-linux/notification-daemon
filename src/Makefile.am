@@ -1,12 +1,12 @@
 libexec_PROGRAMS = notification-daemon
 
 notification_daemon_SOURCES = \
+	BaseNotification.cpp \
+	ConsoleNotification.cpp \
+	Image.cpp \
+	PopupNotification.cpp \
 	main.cpp \
-	console-notifier.cpp \
-	logging.cpp \
-	base-notifier.cpp \
-	popup-notifier.cpp \
-	image.cpp
+	logging.cpp
 
 notification_daemon_LDADD = $(PACKAGE_LIBS)
 
