@@ -3,45 +3,35 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(gnome-notification-daemon, 0.0.1, chipx86@gnupdate.org)
+AC_INIT(gnotification-daemon, 0.0.1, chipx86@gnupdate.org)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2004 Christian Hammond])
 
-
 dnl ################################################################
 dnl # Version information
 dnl ################################################################
-LIBGALAGO_MAJOR_VERSION=0
-LIBGALAGO_MINOR_VERSION=0
-LIBGALAGO_MICRO_VERSION=1
-LIBGALAGO_DEVEL_VERSION=0
+GNOTD_MAJOR_VERSION=0
+GNOTD_MINOR_VERSION=0
+GNOTD_MICRO_VERSION=1
+GNOTD_DEVEL_VERSION=0
 
-LIBGALAGO_VERSION=$LIBGALAGO_MAJOR_VERSION.$LIBGALAGO_MINOR_VERSION.$LIBGALAGO_MICRO_VERSION
+GNOTD_VERSION=$GNOTD_MAJOR_VERSION.$GNOTD_MINOR_VERSION.$GNOTD_MICRO_VERSION
 
-if test "x$LIBGALAGO_DEVEL_VERSION" != "x0"; then
-	if test "x$LIBGALAGO_MICRO_VERSION" = "x0"; then
-		LIBGALAGO_MICRO_VERSION=$LIBGALAGO_DEVEL_VERSION
-		LIBGALAGO_VERSION=$LIBGALAGO_MAJOR_VERSION.$LIBGALAGO_MINOR_VERSION.$LIBGALAGO_DEVEL_VERSION
+if test "x$GNOTD_DEVEL_VERSION" != "x0"; then
+	if test "x$GNOTD_MICRO_VERSION" = "x0"; then
+		GNOTD_MICRO_VERSION=$GNOTD_DEVEL_VERSION
+		GNOTD_VERSION=$GNOTD_MAJOR_VERSION.$GNOTD_MINOR_VERSION.$GNOTD_DEVEL_VERSION
 	else
-		LIBGALAGO_VERSION=$LIBGALAGO_VERSION.$LIBGALAGO_DEVEL_VERSION
+		GNOTD_VERSION=$GNOTD_VERSION.$GNOTD_DEVEL_VERSION
 	fi
 fi
-
-AC_DEFINE_UNQUOTED(LIBGALAGO_MAJOR_VERSION, $LIBGALAGO_MAJOR_VERSION,
-	[gnome-notification-daemon major version.])
-AC_DEFINE_UNQUOTED(LIBGALAGO_MINOR_VERSION, $LIBGALAGO_MINOR_VERSION,
-	[gnome-notification-daemon minor version.])
-AC_DEFINE_UNQUOTED(LIBGALAGO_MICRO_VERSION, $LIBGALAGO_MICRO_VERSION,
-	[gnome-notification-daemon micro version.])
-AC_DEFINE_UNQUOTED(LIBGALAGO_VERSION, "$LIBGALAGO_VERSION",
-	[gnome-notification-daemon version.])
 
 dnl ################################################################
 dnl # Initialize automake
 dnl ################################################################
-VERSION=$LIBGALAGO_VERSION
-PACKAGE=gnome-notification-daemon
+VERSION=$GNOTD_VERSION
+PACKAGE=gnotification-daemon
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
@@ -95,4 +85,3 @@ echo
 echo "Now type make to compile"
 echo "Then su to root and type: make install"
 echo
-

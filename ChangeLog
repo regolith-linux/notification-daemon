@@ -1,0 +1,15 @@
+Tue Jun 29 15:04:14 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/Makefile.am:
+	* src/main.c:
+	* AUTHORS:
+	A NEWS:
+	* autogen.sh:
+	* configure.ac:
+	  - Renamed gnome-notification-daemon to gnotification-daemon.
+
+Sun Jun 27 22:39:35 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.c:
+	  - Added some base code that compiles.
+
