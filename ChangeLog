@@ -1,3 +1,8 @@
+Sun Jul 04 13:36:59 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cpp:
+	  - Fix the type check for the urgency level.
+
 Sun Jul 04 13:32:06 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/main.cpp:

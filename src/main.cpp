@@ -68,7 +68,7 @@ dispatch_notify(DBusMessage *message)
 #define type dbus_message_iter_get_arg_type(&iter)
 
 	/* urgency */
-	validate( type == DBUS_TYPE_UINT32, NULL,
+	validate( type == DBUS_TYPE_BYTE, NULL,
 			  "invalid notify message, first argument is not a byte\n" );
 	n->urgency = dbus_message_iter_get_byte(&iter);
 	dbus_message_iter_next(&iter);
