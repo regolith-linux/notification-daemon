@@ -78,17 +78,17 @@ dispatch_notify(DBusMessage *message)
 
 	/* summary */
 	validate( type == DBUS_TYPE_STRING, NULL,
-			  "invalid notify message, first argument is not a string\n" );
+			  "invalid notify message, second argument is not a string\n" );
 
 	n->summary = dbus_message_iter_get_string(&iter);
 	dbus_message_iter_next(&iter);
 
 	/* body, can be NIL */
 	validate( (type == DBUS_TYPE_STRING) || (type == DBUS_TYPE_NIL), NULL,
-			  "invalid notify message, second argument is not string nor nil\n" );
+			  "invalid notify message, third argument is not string nor nil\n" );
 
-	if (type == DBUS_TYPE_NIL) dbus_message_iter_next(&iter);
-	else n->body = strdup(dbus_message_iter_get_string(&iter));
+	if (type != DBUS_TYPE_NIL)
+		n->body = strdup(dbus_message_iter_get_string(&iter));
 	dbus_message_iter_next(&iter);
 	
 	/* images, array */
@@ -96,10 +96,10 @@ dispatch_notify(DBusMessage *message)
 
 	/* sound: string or NIL */
 	validate( (type == DBUS_TYPE_STRING) || (type == DBUS_TYPE_NIL), NULL,
-			  "invalid notify message, fourth argument is not string nor nil\n" );
+			  "invalid notify message, fifth argument is not string nor nil\n" );
 	
-	if (type == DBUS_TYPE_NIL) dbus_message_iter_next(&iter);
-	else n->sound = strdup(dbus_message_iter_get_string(&iter));
+	if (type != DBUS_TYPE_NIL)
+		n->sound = strdup(dbus_message_iter_get_string(&iter));
 	dbus_message_iter_next(&iter);
 	
 	/* actions */
@@ -107,7 +107,7 @@ dispatch_notify(DBusMessage *message)
 
 	/* timeout, UINT32 or NIL for no timeout */
 	validate( (type == DBUS_TYPE_UINT32) || (type == DBUS_TYPE_NIL), NULL,
-			  "invalid notify message, sixth argument is not int32 nor nil (%d)\n", type );
+			  "invalid notify message, seventh argument is not int32 nor nil (%d)\n", type );
 	
 	if (type == DBUS_TYPE_NIL) n->use_timeout = false;
 	else n->timeout = dbus_message_iter_get_uint32(&iter);
