@@ -1,4 +1,4 @@
-/** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
+/**
  * @file popup-notifier.cpp GTK+ based popup notifier
  *
  * Copyright (C) 2004 Mike Hearn
@@ -26,116 +26,116 @@
 
 class PopupNotification : public Notification {
 private:
-	static const int width = 300; // FIXME: make these relative to screen size
+    static const int width = 300; // FIXME: make these relative to screen size
 
     GtkWindow *window; /* the popup window. this has a black background to give the border */
-	GtkWidget *hbox, *vbox, *summary_label, *body_label, *image;
+    GtkWidget *hbox, *vbox, *summary_label, *body_label, *image;
 
-	int height_offset;
+    int height_offset;
 
-	void boldify(GtkLabel *label) {
-		PangoAttribute *bold = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
-		PangoAttrList *attrs = pango_attr_list_new();
+    void boldify(GtkLabel *label) {
+        PangoAttribute *bold = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+        PangoAttrList *attrs = pango_attr_list_new();
 
-		bold->start_index = 0;
-		bold->end_index = G_MAXINT;
+        bold->start_index = 0;
+        bold->end_index = G_MAXINT;
 
-		pango_attr_list_insert(attrs, bold);
+        pango_attr_list_insert(attrs, bold);
 
-		gtk_label_set_attributes(label, attrs);
+        gtk_label_set_attributes(label, attrs);
 
-		pango_attr_list_unref(attrs);
-	}
+        pango_attr_list_unref(attrs);
+    }
 
-	void greyify(GtkWidget *widget) {
-		GdkColor color;
-		gdk_color_parse("black", &color);
-		gtk_widget_modify_bg(widget, GTK_STATE_NORMAL, &color);
-	}
+    void greyify(GtkWidget *widget) {
+        GdkColor color;
+        gdk_color_parse("black", &color);
+        gtk_widget_modify_bg(widget, GTK_STATE_NORMAL, &color);
+    }
 
-	GdkGC *gc;
+    GdkGC *gc;
 
-	static gboolean draw_border(GtkWidget *widget, GdkEventExpose *event, gpointer user_data) {
-		PopupNotification *n = (PopupNotification *) user_data;
+    static gboolean draw_border(GtkWidget *widget, GdkEventExpose *event, gpointer user_data) {
+        PopupNotification *n = (PopupNotification *) user_data;
 
-		if (!n->gc) {
-			n->gc = gdk_gc_new(event->window);
+        if (!n->gc) {
+            n->gc = gdk_gc_new(event->window);
 
-			GdkColor color;
-			gdk_color_parse("black", &color);
-			gdk_gc_set_rgb_fg_color(n->gc, &color);
-		}
+            GdkColor color;
+            gdk_color_parse("black", &color);
+            gdk_gc_set_rgb_fg_color(n->gc, &color);
+        }
 
-		int width, height;
-		gdk_drawable_get_size(event->window, &width, &height);
+        int width, height;
+        gdk_drawable_get_size(event->window, &width, &height);
 
-		gdk_draw_rectangle(event->window, n->gc, FALSE, 0, 0, width-1, height-1);
+        gdk_draw_rectangle(event->window, n->gc, FALSE, 0, 0, width-1, height-1);
 
-		return FALSE; // propogate further
-	}
-	
-	PopupNotifier *notifier;
+        return FALSE; // propogate further
+    }
+    
+    PopupNotifier *notifier;
 
-	static gboolean dispatch_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
-		PopupNotification *n = (PopupNotification *) user_data;
-		n->notifier->handle_button_release( dynamic_cast<Notification *> (n) );
-		return TRUE;
-	}
-	
+    static gboolean dispatch_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+        PopupNotification *n = (PopupNotification *) user_data;
+        n->notifier->handle_button_release( dynamic_cast<Notification *> (n) );
+        return TRUE;
+    }
+    
 public:
 
-	PopupNotification(PopupNotifier *n) {
+    PopupNotification(PopupNotifier *n) {
         Notification::Notification();
-		gc = NULL;
-		window = NULL;
-		height_offset = 0;
-		notifier = n;
+        gc = NULL;
+        window = NULL;
+        height_offset = 0;
+        notifier = n;
     }
 
     ~PopupNotification() {
         TRACE("destroying notification %d, windows=%p\n", id, window);
         gtk_widget_hide(GTK_WIDGET(window));
-		g_object_unref(gc);
+        g_object_unref(gc);
         //g_object_unref(G_OBJECT(window));  -- this crashes with an invalid cast in gtk_object_dispose, why?
     }
 
-	void generate() {
+    void generate() {
         TRACE("Generating PopupNotification GUI for nid %d\n", id);
 
-		const int image_padding = 15;
+        const int image_padding = 15;
 
-		if (!window) {
-			window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
-			gtk_widget_add_events(GTK_WIDGET(window), GDK_BUTTON_RELEASE_MASK);
-			g_signal_connect(G_OBJECT(window), "button-release-event", G_CALLBACK(dispatch_button_release), this);
-			
-		}
+        if (!window) {
+            window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
+            gtk_widget_add_events(GTK_WIDGET(window), GDK_BUTTON_RELEASE_MASK);
+            g_signal_connect(G_OBJECT(window), "button-release-event", G_CALLBACK(dispatch_button_release), this);
+            
+        }
 
         hbox = gtk_hbox_new(FALSE, 4);
         vbox = gtk_vbox_new(FALSE, 2);
         image = gtk_image_new_from_stock(GTK_STOCK_OPEN, GTK_ICON_SIZE_LARGE_TOOLBAR); // FIXME
 
-		/* now set up the labels containing the notification text */
-		summary_label = gtk_label_new(summary);
-		boldify(GTK_LABEL(summary_label));
-		gtk_misc_set_alignment(GTK_MISC(summary_label), 0, 0.5);
+        /* now set up the labels containing the notification text */
+        summary_label = gtk_label_new(summary);
+        boldify(GTK_LABEL(summary_label));
+        gtk_misc_set_alignment(GTK_MISC(summary_label), 0, 0.5);
 
-		body_label = gtk_label_new(body);
-		gtk_label_set_use_markup(GTK_LABEL(body_label), TRUE);
-		gtk_label_set_line_wrap(GTK_LABEL(body_label), TRUE);
-		gtk_misc_set_alignment(GTK_MISC(body_label), 0, 0.5);
+        body_label = gtk_label_new(body);
+        gtk_label_set_use_markup(GTK_LABEL(body_label), TRUE);
+        gtk_label_set_line_wrap(GTK_LABEL(body_label), TRUE);
+        gtk_misc_set_alignment(GTK_MISC(body_label), 0, 0.5);
 
-		/* we want to fix the width so the notifications expand upwards but not outwards.
-		   firstly, we need to grab the natural size request of the containing box, then we
-		   need to set the size request of the label to that width so it will always line wrap.
-		 */
+        /* we want to fix the width so the notifications expand upwards but not outwards.
+           firstly, we need to grab the natural size request of the containing box, then we
+           need to set the size request of the label to that width so it will always line wrap.
+         */
 
-		GtkRequisition req;
-		gtk_widget_size_request(image, &req);
-		gtk_widget_set_size_request(body_label, width - (req.width + image_padding) - 10 /* FIXME */, -1);
+        GtkRequisition req;
+        gtk_widget_size_request(image, &req);
+        gtk_widget_set_size_request(body_label, width - (req.width + image_padding) - 10 /* FIXME */, -1);
 
-		gtk_widget_show(summary_label);
-		gtk_widget_show(body_label);
+        gtk_widget_show(summary_label);
+        gtk_widget_show(body_label);
 
         gtk_box_pack_start(GTK_BOX(vbox), summary_label, TRUE, TRUE, 0);
         gtk_box_pack_end(GTK_BOX(vbox), body_label, TRUE, TRUE, 10);
@@ -143,60 +143,60 @@ public:
         gtk_box_pack_end_defaults(GTK_BOX(hbox), vbox);
         gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, image_padding);
 
-		/* now we setup an expose event handler to draw the border */
-		g_signal_connect(G_OBJECT(window), "expose-event", G_CALLBACK(draw_border), this);
-		gtk_widget_set_app_paintable(GTK_WIDGET(window), TRUE);
+        /* now we setup an expose event handler to draw the border */
+        g_signal_connect(G_OBJECT(window), "expose-event", G_CALLBACK(draw_border), this);
+        gtk_widget_set_app_paintable(GTK_WIDGET(window), TRUE);
 
-		gtk_widget_show(image);
-		gtk_widget_show(vbox);
-		gtk_widget_show(hbox);
+        gtk_widget_show(image);
+        gtk_widget_show(vbox);
+        gtk_widget_show(hbox);
 
-		gtk_container_add(GTK_CONTAINER(window), hbox);
+        gtk_container_add(GTK_CONTAINER(window), hbox);
 
         /* FIXME: calculate border offsets from NETWM window geometries */
         gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
-		update_position();
+        update_position();
 
-		TRACE("window is %p\n", window);
-	}
+        TRACE("window is %p\n", window);
+    }
 
-	void show() {
-		if (!window) generate();
-		gtk_widget_show(GTK_WIDGET(window));
-	}
+    void show() {
+        if (!window) generate();
+        gtk_widget_show(GTK_WIDGET(window));
+    }
 
-	/* returns the natural height of the notification. generates the gui if not done so already */
-	int height() {
-		if (!window) generate();
+    /* returns the natural height of the notification. generates the gui if not done so already */
+    int height() {
+        if (!window) generate();
 
-		GtkRequisition req;
-		gtk_widget_size_request(GTK_WIDGET(window), &req);
-		return req.height;
-	}
+        GtkRequisition req;
+        gtk_widget_size_request(GTK_WIDGET(window), &req);
+        return req.height;
+    }
 
-	void update_position() {
-		if (!window) generate();
-		gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height() - height_offset);
-	}
+    void update_position() {
+        if (!window) generate();
+        gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height() - height_offset);
+    }
 
-	void set_height_offset(int value) {
-		height_offset = value;
-		update_position();
-	}
+    void set_height_offset(int value) {
+        height_offset = value;
+        update_position();
+    }
 
-	void update() {
-		/* contents have changed, so scrap current UI and regenerate */
-		TRACE("updating for %d\n", id);
-		
-		if (window) {
-			gtk_container_remove(GTK_CONTAINER(window), hbox);
-			hbox = NULL;
-		}
-		
-		generate();
-		
-		TRACE("updated for %d\n", id);
-	}
+    void update() {
+        /* contents have changed, so scrap current UI and regenerate */
+        TRACE("updating for %d\n", id);
+        
+        if (window) {
+            gtk_container_remove(GTK_CONTAINER(window), hbox);
+            hbox = NULL;
+        }
+        
+        generate();
+        
+        TRACE("updated for %d\n", id);
+    }
 };
 
 PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv) : BaseNotifier(main_loop)
@@ -212,32 +212,32 @@ PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv) : Ba
 
 void PopupNotifier::reflow()
 {
-	NotificationsMap::iterator i = notifications.begin();
+    NotificationsMap::iterator i = notifications.begin();
 
-	/* the height offset is the distance from the top/bottom of the screen to the
-	   nearest edge of the popup */
-	int offset = 0;
+    /* the height offset is the distance from the top/bottom of the screen to the
+       nearest edge of the popup */
+    int offset = 0;
 
-	while (i != notifications.end()) {
-		PopupNotification *n = dynamic_cast<PopupNotification*> (i->second);
+    while (i != notifications.end()) {
+        PopupNotification *n = dynamic_cast<PopupNotification*> (i->second);
 
-		n->set_height_offset(offset);
+        n->set_height_offset(offset);
 
-		offset += n->height();
+        offset += n->height();
 
-		i++;
-	}
+        i++;
+    }
 }
 
 uint PopupNotifier::notify(Notification *base)
 {
-	uint id = BaseNotifier::notify(base);
+    uint id = BaseNotifier::notify(base);
     PopupNotification *n = dynamic_cast<PopupNotification*> (base);
 
-	reflow();
+    reflow();
 
-	if (n->use_timeout) TRACE("timeout in unix-time is %d\n", n->timeout);
-	TRACE("height is %d\n", n->height());
+    if (n->use_timeout) TRACE("timeout in unix-time is %d\n", n->timeout);
+    TRACE("height is %d\n", n->height());
 
     n->show();
 
@@ -246,9 +246,9 @@ uint PopupNotifier::notify(Notification *base)
 
 bool PopupNotifier::unnotify(Notification *n)
 {
-	bool ret = BaseNotifier::unnotify(n);
-	reflow();
-	return ret;
+    bool ret = BaseNotifier::unnotify(n);
+    reflow();
+    return ret;
 }
 
 Notification* PopupNotifier::create_notification()
@@ -258,6 +258,6 @@ Notification* PopupNotifier::create_notification()
 
 void PopupNotifier::handle_button_release(Notification *n)
 {
-	TRACE("button release on notification %d\n", n->id);
-	invoke(n, 0);
+    TRACE("button release on notification %d\n", n->id);
+    invoke(n, 0);
 }

@@ -52,7 +52,7 @@ struct sound {
 
 class Notification {
 public:
-	int urgency;              /* Urgency level */
+    int urgency;              /* Urgency level */
     char *summary;            /* UTF-8 encoded text containing a brief description */
     char *body;               /* UTF-8 encoded body, optionally containing markup */
     struct image **images;    /* an array of frames in the animated image */
@@ -63,13 +63,13 @@ public:
 
     int id;
 
-	/* the connection which generated this notification. used for signal dispatch */
-	DBusConnection *connection; 
-	
+    /* the connection which generated this notification. used for signal dispatch */
+    DBusConnection *connection; 
+    
     Notification();
     virtual ~Notification();
 
-	virtual void update() {;} /* called when the contents have changed */
+    virtual void update() {;} /* called when the contents have changed */
 };
 
 typedef std::map<int, Notification*> NotificationsMap;
@@ -79,33 +79,33 @@ protected:
     uint next_id;
     GMainLoop *loop;
 
-	void register_timeout(int hz);
+    void register_timeout(int hz);
 
-	void setup_timeout(Notification *n);
-	
+    void setup_timeout(Notification *n);
+    
 public:
     /* All notifications are given a unique, non-repeating id which the client can use
        The mapping between the ids and notification objects is stored here */
 
     NotificationsMap notifications;
 
-	Notification *get(uint id);
-	
+    Notification *get(uint id);
+    
     virtual uint notify(Notification *n);
     bool unnotify(uint id);
-	virtual bool unnotify(Notification *n);
-	virtual void update(Notification *n);
+    virtual bool unnotify(Notification *n);
+    virtual void update(Notification *n);
 
     BaseNotifier(GMainLoop *loop);
     virtual ~BaseNotifier();
 
     /* This can be overriden by base classes to return subclasses of Notification */
     virtual Notification *create_notification();
-	
-	bool timing;
-	virtual bool timeout();
+    
+    bool timing;
+    virtual bool timeout();
 
-	virtual void invoke(Notification *n, uint actionid);
+    virtual void invoke(Notification *n, uint actionid);
 };
 
 extern BaseNotifier *notifier;    /* This holds the backend in use. It's set once, at startup. */
@@ -116,7 +116,7 @@ public:
     virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);
 
-	ConsoleNotifier(GMainLoop *loop) : BaseNotifier(loop) {};
+    ConsoleNotifier(GMainLoop *loop) : BaseNotifier(loop) {};
 };
 
 class PopupNotifier : public BaseNotifier {
@@ -129,7 +129,7 @@ public:
 
     virtual Notification *create_notification();
 
-	void handle_button_release(Notification *n);
+    void handle_button_release(Notification *n);
 
     PopupNotifier(GMainLoop *loop, int *argc, char ***argv);
 };
