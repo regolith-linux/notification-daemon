@@ -165,15 +165,15 @@ private:
     /* this ensures that the hyperlinks have a hand cursor. it's done
        in a callback because we have to wait for the window to be
        realized (ie for an X window to be created for the widget)  */
-    
+
     GTK_CALLBACK( _set_cursor, GdkEventExpose *event )
     {
         struct expose_data *data = (struct expose_data *) user_data;
-            
+
         GdkCursor *cursor = gdk_cursor_new(GDK_HAND2);
         gdk_window_set_cursor(event->window, cursor);
         gdk_cursor_unref(cursor);
-        
+
         g_signal_handler_disconnect(data->widget, data->handler_id);
 
         delete data;
@@ -277,20 +277,20 @@ public:
                     TRACE("new from raw: %c%c%c%c\n", image->data[0], image->data[1], image->data[2], image->data[3]);
 
                     GError *error = NULL;
-                    
+
                     GdkPixbufLoader *loader = gdk_pixbuf_loader_new();
                     if (error) throw std::runtime_error( S(error->message) );
-                    
+
                     gdk_pixbuf_loader_write(loader, image->data, image->datalen, &error);
-                    gdk_pixbuf_loader_close(loader, NULL);                    
+                    gdk_pixbuf_loader_close(loader, NULL);
                     if (error)
                     {
                         g_object_unref(loader);
                         throw std::runtime_error( S(error->message) );
                     }
-                    
+
                     GdkPixbuf *buf = gdk_pixbuf_loader_get_pixbuf(loader);
-                    
+
                     image_widget = gtk_image_new_from_pixbuf(buf);
 
                     g_object_unref(loader);
@@ -333,7 +333,7 @@ public:
                 body_label = gtk_label_new(body);
 
                 //process_body_markup(body_label);
-                
+
                 gtk_label_set_line_wrap(GTK_LABEL(body_label), TRUE);
                 gtk_misc_set_alignment(GTK_MISC(body_label), 0, 0.5);
                 gtk_widget_show(body_label);
