@@ -1,0 +1,6 @@
+#!/bin/sh -c 'echo This file should be sourced into your shell, not run'
+
+function notify() {
+    dbus-send --dest='org.freedesktop.Notifications' /org/freedesktop/Notifications org.freedesktop.Notifications.Notify \
+        string:"$1" string:"${2:-no summary}" string:"" string:"sound" uint32:0mai
+}
