@@ -1,3 +1,10 @@
+Sun Jul 04 13:20:14 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* Makefile.am:
+	* configure.ac:
+	A notification-daemon.service.in:
+	  - Added the D-BUS service file, so that we can activate the daemon.
+
 Sun Jul  4 17:35:03 2004  Mike Hearn  <mike@navi.cx>
 	* src/popup-notifier.cpp: Basic GTK popups. Not complete yet.
 

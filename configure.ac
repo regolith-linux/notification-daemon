@@ -62,6 +62,27 @@ AC_SUBST(PACKAGE_LIBS)
 
 AC_DEFINE_UNQUOTED(DBUS_API_SUBJECT_TO_CHANGE, ,DBUS API is subject to change)
 
+
+AC_ARG_WITH(dbus-sys, [  --with-dbus-sys=<dir>   where D-BUS system.d directory is])
+AC_ARG_WITH(dbus-services, [  --with-dbus-services=<dir>   where D-BUS services directory is])
+
+if ! test -z "$with_dbus_sys" ; then
+	DBUS_SYS_DIR="$with_dbus_sys"
+else
+	DBUS_SYS_DIR="$sysconfdir/dbus-1/system.d"
+fi
+
+if ! test -z "$with_dbus_services" ; then
+	DBUS_SERVICES_DIR="$with_dbus_services"
+else
+	DBUS_SERVICES_DIR="$libdir/dbus-1.0/services"
+fi
+
+AC_SUBST(DBUS_SYS_DIR)
+AC_SUBST(DBUS_SERVICES_DIR)
+AC_DEFINE_UNQUOTED(DBUS_SYSTEMD_DIR, "$DBUS_SYS_DIR", [Where system.d dir for DBUS is])
+AC_DEFINE_UNQUOTED(DBUS_SERVICES_DIR, "$DBUS_SERVICES_DIR", [Where services dir for DBUS is])
+
 dnl # Use wall if we have GCC
 if test "x$GCC" = "xyes"; then
 	CFLAGS="$CFLAGS -Wall"
@@ -74,6 +95,7 @@ dnl # Output the Makefiles
 dnl ################################################################
 AC_CONFIG_FILES([
 Makefile
+notification-daemon.service
 src/Makefile
 ])
 
