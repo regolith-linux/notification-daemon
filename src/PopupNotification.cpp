@@ -21,6 +21,14 @@
 
 #define GTK_DISABLE_DEPRECATED
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
+
+#ifndef _WIN32
+# include <X11/Xlib.h>
+# include <X11/Xutil.h>
+# include <X11/Xatom.h>
+# include <gdk/gdkx.h>
+#endif
 
 #include <iostream>
 #include <sstream>
@@ -47,6 +55,8 @@ private:
     static const int minheight = 50;
     static const int imagesize = 48;
     static const int image_padding = 15;
+
+	int disp_screen;
 
     GtkWidget *window;
 
@@ -173,12 +183,14 @@ private:
 
 public:
 
-    PopupNotification(PopupNotifier *n) : Notification()
+    PopupNotification(PopupNotifier *n)
+		: Notification(),
+	      disp_screen(0),
+	      gc(NULL),
+		  window(NULL),
+		  height_offset(0),
+		  notifier(n)
     {
-        gc = NULL;
-        window = NULL;
-        height_offset = 0;
-        notifier = n;
     }
 
     ~PopupNotification()
@@ -420,10 +432,6 @@ public:
             GtkRequisition req;
             gtk_widget_size_request(bodybox_widget, &req);
             gtk_widget_set_size_request(bodybox_widget, -1, MAX(minheight, req.height));
-
-            /* FIXME: calculate border offsets from NETWM window geometries */
-            gtk_window_set_gravity(GTK_WINDOW(win), GDK_GRAVITY_SOUTH_EAST);
-
         }
         catch (...)
         {
@@ -462,10 +470,59 @@ public:
         GtkRequisition req;
         gtk_widget_size_request(window, &req);
 
+		GdkRectangle workarea;
+
+		if (!get_work_area(workarea))
+		{
+			workarea.width  = gdk_screen_width();
+			workarea.height = gdk_screen_height();
+		}
+
         gtk_window_move(GTK_WINDOW(window),
-                        gdk_screen_width() - req.width,
-                        gdk_screen_height() - height() - height_offset);
+                        workarea.x + workarea.width - req.width,
+                        workarea.y + workarea.height - height() - height_offset);
     }
+
+	bool get_work_area(GdkRectangle &rect)
+	{
+#ifndef _WIN32
+		Atom workarea = XInternAtom(GDK_DISPLAY(), "_NET_WORKAREA", True);
+
+		if (workarea == None)
+			return false;
+
+		Window win = XRootWindow(GDK_DISPLAY(), disp_screen);
+
+		Atom type;
+		gint format;
+		gulong num, leftovers;
+		gulong max_len = 4 * 32;
+		guchar *ret_workarea;
+		gint result = XGetWindowProperty(GDK_DISPLAY(), win, workarea, 0,
+										 max_len, False, AnyPropertyType,
+										 &type, &format, &num,
+										 &leftovers, &ret_workarea);
+
+		if (result != Success || type == None || format == 0 ||
+			leftovers || num % 4)
+		{
+			return false;
+		}
+
+		guint32 *workareas = (guint32 *)ret_workarea;
+
+		rect.x      = workareas[disp_screen * 4];
+		rect.y      = workareas[disp_screen * 4 + 1];
+		rect.width  = workareas[disp_screen * 4 + 2];
+		rect.height = workareas[disp_screen * 4 + 3];
+
+		XFree(ret_workarea);
+
+		return true;
+#else /* _WIN32 */
+		return false;
+#endif /* _WIN32 */
+	}
 
     void set_height_offset(int value)
     {
