@@ -48,6 +48,7 @@ struct sound {
 
 class Notification {
 public:    
+	int urgency;              /* Urgency level */
     char *summary;            /* UTF-8 encoded text containing a brief description */
     char *body;               /* UTF-8 encoded body, optionally containing markup */
     struct image **images;    /* an array of frames in the animated image */

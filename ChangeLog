@@ -1,3 +1,10 @@
+Sun Jul 04 13:32:06 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cpp:
+	* src/notifier.h:
+	  - Added an urgency variable to the Notification class.
+	  - Added support for the urgency variable in the Notify message.
+
 Sun Jul 04 13:20:14 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* Makefile.am:
