@@ -6,5 +6,5 @@ EXTRA_DIST = \
 	autogen.sh \
 	configure.ac
 
-dist-hook: libnotify.spec
-	cp libnotify.spec $(distdir)
+dist-hook: notification-daemon.spec
+	cp notification-daemon.spec $(distdir)

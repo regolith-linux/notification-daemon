@@ -3,7 +3,7 @@
 
 DIE=0
 
-PACKAGE=gnotification-daemon
+PACKAGE=notification-daemon
 
 echo "Generating configuration files for $PACKAGE, please wait..."
 

@@ -1,5 +1,5 @@
 /**
- * @file main.c Main GNotification Daemon file.
+ * @file main.c Main Notification Daemon file.
  *
  * Copyright (C) 2004 Christian Hammond.
  *

@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(gnotification-daemon, 0.0.1, chipx86@gnupdate.org)
+AC_INIT(notification-daemon, 0.0.1, chipx86@gnupdate.org)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2004 Christian Hammond])
@@ -11,27 +11,27 @@ AC_COPYRIGHT([Copyright 2004 Christian Hammond])
 dnl ################################################################
 dnl # Version information
 dnl ################################################################
-GNOTD_MAJOR_VERSION=0
-GNOTD_MINOR_VERSION=0
-GNOTD_MICRO_VERSION=1
-GNOTD_DEVEL_VERSION=0
+NOTIFICATION_DAEMON_MAJOR_VERSION=0
+NOTIFICATION_DAEMON_MINOR_VERSION=0
+NOTIFICATION_DAEMON_MICRO_VERSION=1
+NOTIFICATION_DAEMON_DEVEL_VERSION=0
 
-GNOTD_VERSION=$GNOTD_MAJOR_VERSION.$GNOTD_MINOR_VERSION.$GNOTD_MICRO_VERSION
+NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_MICRO_VERSION
 
-if test "x$GNOTD_DEVEL_VERSION" != "x0"; then
-	if test "x$GNOTD_MICRO_VERSION" = "x0"; then
-		GNOTD_MICRO_VERSION=$GNOTD_DEVEL_VERSION
-		GNOTD_VERSION=$GNOTD_MAJOR_VERSION.$GNOTD_MINOR_VERSION.$GNOTD_DEVEL_VERSION
+if test "x$NOTIFICATION_DAEMON_DEVEL_VERSION" != "x0"; then
+	if test "x$NOTIFICATION_DAEMON_MICRO_VERSION" = "x0"; then
+		NOTIFICATION_DAEMON_MICRO_VERSION=$NOTIFICATION_DAEMON_DEVEL_VERSION
+		NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_DEVEL_VERSION
 	else
-		GNOTD_VERSION=$GNOTD_VERSION.$GNOTD_DEVEL_VERSION
+		NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_VERSION.$NOTIFICATION_DAEMON_DEVEL_VERSION
 	fi
 fi
 
 dnl ################################################################
 dnl # Initialize automake
 dnl ################################################################
-VERSION=$GNOTD_VERSION
-PACKAGE=gnotification-daemon
+VERSION=$NOTIFICATION_DAEMON_VERSION
+PACKAGE=notification-daemon
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 

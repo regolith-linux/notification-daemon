@@ -1,9 +1,9 @@
-libexec_PROGRAMS = gnotification-daemon
+libexec_PROGRAMS = notification-daemon
 
-gnotification_daemon_SOURCES = \
+notification_daemon_SOURCES = \
 	main.c
 
-gnotification_daemon_LDADD = $(PACKAGE_LIBS)
+notification_daemon_LDADD = $(PACKAGE_LIBS)
 
 INCLUDES = \
 	$(PACKAGE_CFLAGS)
