@@ -52,14 +52,38 @@ public:
 	
     PopupNotification() {
         Notification::Notification();
+		gc = NULL;
     }
 
     ~PopupNotification() {
         TRACE("destroying notification %d\n", id);
         gtk_widget_hide(GTK_WIDGET(window));
+		g_object_unref(gc);		
         g_object_unref(window);
     }
 
+	GdkGC *gc;
+	
+	static gboolean draw_border(GtkWidget *widget, GdkEventExpose *event, gpointer user_data) {
+		PopupNotification *n = (PopupNotification *) user_data;
+
+		if (!n->gc) {
+			n->gc = gdk_gc_new(event->window);
+			
+			GdkColor color;
+		
+			gdk_color_parse("black", &color);
+			gdk_gc_set_rgb_fg_color(n->gc, &color);
+		}
+
+		int width, height;
+		gdk_drawable_get_size(event->window, &width, &height);
+		
+		gdk_draw_rectangle(event->window, n->gc, FALSE, 0, 0, width-1, height-1);
+		
+		return FALSE; // propogate further
+	}
+	
 	void generate() {
         TRACE("Generating new PopupNotification GUI for nid %d\n", id);
 
@@ -72,7 +96,7 @@ public:
 
         /* FIXME: calculate border offsets from NETWM window geometries */
         gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
-        //gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height);
+        gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height);
 
         hbox = gtk_hbox_new(FALSE, 4);
         vbox = gtk_vbox_new(FALSE, 2);
@@ -95,17 +119,21 @@ public:
 
 		GtkRequisition req;
 		gtk_widget_size_request(image, &req);
-		gtk_widget_set_size_request(body_label, width - (req.width + image_padding), -1);
+		gtk_widget_set_size_request(body_label, width - (req.width + image_padding) - 10 /* FIXME */, -1);
 		
 		gtk_widget_show(summary_label);
 		gtk_widget_show(body_label);
 		
         gtk_box_pack_start(GTK_BOX(vbox), summary_label, TRUE, TRUE, 0);
-        gtk_box_pack_end_defaults(GTK_BOX(vbox), body_label);
+        gtk_box_pack_end(GTK_BOX(vbox), body_label, TRUE, TRUE, 10);
         
         gtk_box_pack_end_defaults(GTK_BOX(hbox), vbox);
         gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, image_padding);
 
+		/* now we setup an expose event handler to draw the border */
+		g_signal_connect(G_OBJECT(window), "expose-event", G_CALLBACK(draw_border), this);
+		gtk_widget_set_app_paintable(GTK_WIDGET(window), TRUE);
+		
 		gtk_widget_show(image);
 		gtk_widget_show(vbox);
 		gtk_widget_show(hbox);
