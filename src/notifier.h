@@ -92,6 +92,8 @@ public:
 };
 
 class PopupNotifier : public BaseNotifier {
+private:
+    void reflow();
 public:
     virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);

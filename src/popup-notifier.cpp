@@ -1,5 +1,5 @@
 /** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
- * @file popup-notifier.cpp Base class for popup notifiers
+ * @file popup-notifier.cpp GTK+ based popup notifier
  *
  * Copyright (C) 2004 Mike Hearn
  *
@@ -26,10 +26,13 @@
 
 
 class PopupNotification : public Notification {
-public:
+private:
+
     GtkWindow *window; /* the popup window. this has a black background to give the border */
 	GtkWidget *hbox, *vbox, *summary_label, *body_label, *image;
 
+	int height_offset;
+	
 	void boldify(GtkLabel *label) {
 		PangoAttribute *bold = pango_attr_weight_new(PANGO_WEIGHT_BOLD);		
 		PangoAttrList *attrs = pango_attr_list_new();
@@ -50,18 +53,6 @@ public:
 		gtk_widget_modify_bg(widget, GTK_STATE_NORMAL, &color);
 	}
 	
-    PopupNotification() {
-        Notification::Notification();
-		gc = NULL;
-    }
-
-    ~PopupNotification() {
-        TRACE("destroying notification %d\n", id);
-        gtk_widget_hide(GTK_WIDGET(window));
-		g_object_unref(gc);		
-        g_object_unref(window);
-    }
-
 	GdkGC *gc;
 	
 	static gboolean draw_border(GtkWidget *widget, GdkEventExpose *event, gpointer user_data) {
@@ -71,7 +62,6 @@ public:
 			n->gc = gdk_gc_new(event->window);
 			
 			GdkColor color;
-		
 			gdk_color_parse("black", &color);
 			gdk_gc_set_rgb_fg_color(n->gc, &color);
 		}
@@ -83,6 +73,22 @@ public:
 		
 		return FALSE; // propogate further
 	}
+
+public:
+	
+	PopupNotification() {
+        Notification::Notification();
+		gc = NULL;
+		height_offset = 0;
+    }
+
+    ~PopupNotification() {
+        TRACE("destroying notification %d\n", id);
+        gtk_widget_hide(GTK_WIDGET(window));
+		g_object_unref(gc);		
+        g_object_unref(window);
+    }
+
 	
 	void generate() {
         TRACE("Generating new PopupNotification GUI for nid %d\n", id);
@@ -96,7 +102,7 @@ public:
 
         /* FIXME: calculate border offsets from NETWM window geometries */
         gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
-        gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height);
+        gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height - height_offset);
 
         hbox = gtk_hbox_new(FALSE, 4);
         vbox = gtk_vbox_new(FALSE, 2);
@@ -142,7 +148,10 @@ public:
 
 		TRACE("done\n");
 	}
-	
+
+	void show() {
+		gtk_widget_show(GTK_WIDGET(window));
+	}
 };
 
 PopupNotifier::PopupNotifier(GMainLoop *loop, int *argc, char ***argv)
@@ -150,16 +159,24 @@ PopupNotifier::PopupNotifier(GMainLoop *loop, int *argc, char ***argv)
     gtk_init(argc, argv);
 }
 
+void
+PopupNotifier::reflow()
+{
+}
+
 uint
 PopupNotifier::notify(Notification *base)
 {
+	uint id = BaseNotifier::notify(base);
     PopupNotification *n = dynamic_cast<PopupNotification*> (base);
 
+	reflow();
+	
 	n->generate();
 	
-    gtk_widget_show(GTK_WIDGET(n->window));
+    n->show();
     
-    return BaseNotifier::notify(base);
+    return id;
 }
 
 bool
