@@ -191,6 +191,9 @@ main(int argc, char **argv)
 
 	initialize_backend(&argc, &argv);
 
+
+	TRACE("started\n");
+	
 	loop = g_main_loop_new(NULL, FALSE);
 
 	g_main_loop_run(loop);

@@ -43,6 +43,12 @@ public:
 		
 		pango_attr_list_unref(attrs);
 	}
+
+	void greyify(GtkWidget *widget) {
+		GdkColor color;
+		gdk_color_parse("black", &color);
+		gtk_widget_modify_bg(widget, GTK_STATE_NORMAL, &color);
+	}
 	
     PopupNotification() {
         Notification::Notification();
@@ -57,8 +63,9 @@ public:
 	void generate() {
         TRACE("Generating new PopupNotification GUI for nid %d\n", id);
 
-		const int width = 200;
-        const int height = 50;
+		const int width = 300; // FIXME: make these relative to screen size
+        const int height = 70;
+		const int image_padding = 15;
 
         window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
         gtk_window_set_default_size(window, width, height);
@@ -73,18 +80,20 @@ public:
 
 		summary_label = gtk_label_new(summary);
 		boldify(GTK_LABEL(summary_label));
+		gtk_misc_set_alignment(GTK_MISC(summary_label), 0, 0.5);
 		
 		body_label = gtk_label_new(body);
 		gtk_label_set_use_markup(GTK_LABEL(body_label), TRUE);
+		gtk_misc_set_alignment(GTK_MISC(body_label), 0, 0.5);
 		
 		gtk_widget_show(summary_label);
 		gtk_widget_show(body_label);
 		
-        gtk_box_pack_start_defaults(GTK_BOX(vbox), summary_label);
+        gtk_box_pack_start(GTK_BOX(vbox), summary_label, TRUE, TRUE, 0);
         gtk_box_pack_end_defaults(GTK_BOX(vbox), body_label);
         
         gtk_box_pack_end_defaults(GTK_BOX(hbox), vbox);
-        gtk_box_pack_start_defaults(GTK_BOX(hbox), image);
+        gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, image_padding);
 
 		gtk_widget_show(image);
 		gtk_widget_show(vbox);
