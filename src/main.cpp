@@ -61,6 +61,7 @@ dispatch_notify(DBusMessage *message)
 {
 	DBusError *error;
 	DBusMessageIter iter;
+	char *str;
 	Notification *n = backend->create_notification();
 
 	dbus_message_iter_init(message, &iter);
@@ -73,14 +74,18 @@ dispatch_notify(DBusMessage *message)
 	n->urgency = dbus_message_iter_get_byte(&iter);
 	dbus_message_iter_next(&iter);
 
-	n->summary = dbus_message_iter_get_string(&iter);
+	str = dbus_message_iter_get_string(&iter);
+	n->summary = strdup(str);
+	dbus_free(str);
 	dbus_message_iter_next(&iter);
 
 	/* summary */
 	validate( type == DBUS_TYPE_STRING, NULL,
 			  "invalid notify message, second argument is not a string\n" );
 
-	n->summary = dbus_message_iter_get_string(&iter);
+	str = dbus_message_iter_get_string(&iter);
+	n->summary = strdup(str);
+	dbus_free(str);
 	dbus_message_iter_next(&iter);
 
 	/* body, can be NIL */
@@ -88,32 +93,41 @@ dispatch_notify(DBusMessage *message)
 			  "invalid notify message, third argument is not string nor nil\n" );
 
 	if (type != DBUS_TYPE_NIL)
-		n->body = strdup(dbus_message_iter_get_string(&iter));
+	{
+		str = dbus_message_iter_get_string(&iter);
+		n->body = strdup(str);
+		dbus_free(str);
+	}
+
 	dbus_message_iter_next(&iter);
-	
+
 	/* images, array */
-	dbus_message_iter_next(&iter); 	// FIXME: skip this for now
+	dbus_message_iter_next(&iter);	// FIXME: skip this for now
 
 	/* sound: string or NIL */
 	validate( (type == DBUS_TYPE_STRING) || (type == DBUS_TYPE_NIL), NULL,
 			  "invalid notify message, fifth argument is not string nor nil\n" );
-	
+
 	if (type != DBUS_TYPE_NIL)
-		n->sound = strdup(dbus_message_iter_get_string(&iter));
+	{
+		str = dbus_message_iter_get_string(&iter);
+		n->sound = strdup(str);
+		dbus_free(str);
+	}
 	dbus_message_iter_next(&iter);
-	
+
 	/* actions */
 	dbus_message_iter_next(&iter); // FIXME: skip this for now
 
 	/* timeout, UINT32 or NIL for no timeout */
 	validate( (type == DBUS_TYPE_UINT32) || (type == DBUS_TYPE_NIL), NULL,
 			  "invalid notify message, seventh argument is not int32 nor nil (%d)\n", type );
-	
+
 	if (type == DBUS_TYPE_NIL) n->use_timeout = false;
 	else n->timeout = dbus_message_iter_get_uint32(&iter);
 
 	backend->notify(n);
-	
+
 #undef type
 
 	return NULL;
@@ -214,7 +228,7 @@ main(int argc, char **argv)
 
 
 	TRACE("started\n");
-	
+
 	loop = g_main_loop_new(NULL, FALSE);
 
 	g_main_loop_run(loop);
