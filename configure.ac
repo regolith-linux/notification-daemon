@@ -89,6 +89,7 @@ AC_DEFINE_UNQUOTED(DBUS_SERVICES_DIR, "$DBUS_SERVICES_DIR", [Where services dir 
 dnl # Use wall if we have GCC
 if test "x$GCC" = "xyes"; then
 	CFLAGS="$CFLAGS -Wall"
+	CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 AC_SUBST(CFLAGS)

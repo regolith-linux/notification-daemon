@@ -1,6 +1,17 @@
+Fri Nov 05 01:52:29 PST 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/PopupNotification.cpp:
+	* src/PopupNotification.h:
+	* src/main.cpp:
+	* acinclude.m4:
+	* configure.ac:
+	  - First step in cleaning up the code. Also fixes whatever changes
+	    caused the notification-daemon to break.
+
 Thu Nov  4 00:03:12 2004  Mike Hearn  <mike@navi.cx>
+
 	* src/main.cpp, src/notifier.h, src/popup-notifier.cpp: Improve
-  	  error handling, get DBUS iterators right (finally), add support
+	  error handling, get DBUS iterators right (finally), add support
 	  for animation demarshalling. Not actually presented using GTK+
 	  frontend yet though.
 

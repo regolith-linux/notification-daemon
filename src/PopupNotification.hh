@@ -1,0 +1,71 @@
+/**
+ * @file PopupNotification.hh GTK+ based popup notifier
+ *
+ * Copyright (C) 2004 Mike Hearn <mike@navi.cx>
+ * Copyright (C) 2004 Christian Hammond <chipx86@chipx86.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA  02111-1307  USA
+ */
+#ifndef _POPUP_NOTIFICATION_HH_
+#define _POPUP_NOTIFICATION_HH_
+
+#include "notifier.h"
+
+class PopupNotification : public Notification
+{
+public:
+	PopupNotification(PopupNotifier *n);
+	~PopupNotification();
+
+	void generate(void);
+	void show(void);
+	void update(void);
+
+	void set_height_offset(int value);
+	int get_height(void);
+
+protected:
+	void update_position(void);
+
+	bool get_work_area(GdkRectangle &rect);
+
+private:
+	void format_summary(GtkLabel *label);
+	void process_body_markup(GtkLabel *label);
+	void linkify(GtkLabel *label);
+	void whiten(GtkWidget *eventbox);
+
+public:
+	void window_button_release(GdkEventButton *event);
+
+private:
+	static const int WIDTH         = 300;
+	static const int MIN_HEIGHT    = 50;
+	static const int IMAGE_SIZE    = 48;
+	static const int IMAGE_PADDING = 10;
+
+	PopupNotifier *m_notifier;
+
+	GtkWidget *m_window;
+	GtkWidget *m_body_box;
+	int m_disp_screen;
+	int m_height_offset;
+
+public:
+	GdkGC *m_gc;
+};
+
+#endif /* _POPUP_NOTIFICATION_HH_ */

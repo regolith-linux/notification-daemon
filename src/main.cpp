@@ -72,7 +72,6 @@ static DBusConnection *dbus_conn;
 static DBusMessage *
 handle_notify(DBusConnection *incoming, DBusMessage *message)
 {
-	DBusError *error;
 	DBusMessageIter iter;
 	DBusMessage *reply;
 	char *str;
@@ -80,7 +79,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     uint replaces;
     /* if we create a new notification, ensure it'll be freed if we throw  */
     std::auto_ptr<Notification> n_holder;
-    
+
 	/*
 	 * We could probably use get_args here, at a cost of less fine grained
 	 * error reporting
@@ -170,6 +169,8 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 		n->body = strdup(str);
 		dbus_free(str);
 	}
+
+	dbus_message_iter_next(&iter);
 
 	/*********************************************************************
 	 * Images
@@ -345,7 +346,6 @@ static DBusMessage *
 handle_close(DBusMessage *message)
 {
 	uint id;
-	DBusError error;
 
 	if (!dbus_message_get_args(message, NULL,
 							   DBUS_TYPE_UINT32, &id,
