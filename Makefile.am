@@ -9,6 +9,9 @@ EXTRA_DIST = \
 
 CLEANFILES = notification-daemon.service
 
+dbusdir        = $(DBUS_SYS_DIR)
+dist_dbus_DATA = notification-daemon.conf
+
 servicedir       = $(DBUS_SERVICES_DIR)
 service_in_files = notification-daemon.service.in
 service_DATA     = notification-daemon.service

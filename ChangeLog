@@ -1,3 +1,9 @@
+Thu Jul 29 18:08:31 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	A notification-daemon.conf:
+	* Makefile.am:
+	  - Added notification-daemon.conf for D-BUS policies.
+
 Thu Jul 29 21:19:26 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp: Implement GetCapabilities, GetServerInfo, CloseNotification
 	* src/logging.cpp (log): Add a FIXME type
