@@ -63,19 +63,22 @@ AC_SUBST(PACKAGE_LIBS)
 AC_DEFINE_UNQUOTED(DBUS_API_SUBJECT_TO_CHANGE, ,DBUS API is subject to change)
 
 
+AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
+AS_AC_EXPAND(LIBDIR, $libdir)
+
 AC_ARG_WITH(dbus-sys, [  --with-dbus-sys=<dir>   where D-BUS system.d directory is])
 AC_ARG_WITH(dbus-services, [  --with-dbus-services=<dir>   where D-BUS services directory is])
 
 if ! test -z "$with_dbus_sys" ; then
 	DBUS_SYS_DIR="$with_dbus_sys"
 else
-	DBUS_SYS_DIR="$sysconfdir/dbus-1/system.d"
+	DBUS_SYS_DIR="$SYSCONFDIR/dbus-1/system.d"
 fi
 
 if ! test -z "$with_dbus_services" ; then
 	DBUS_SERVICES_DIR="$with_dbus_services"
 else
-	DBUS_SERVICES_DIR="$libdir/dbus-1.0/services"
+	DBUS_SERVICES_DIR="$LIBDIR/dbus-1.0/services"
 fi
 
 AC_SUBST(DBUS_SYS_DIR)
@@ -95,7 +98,6 @@ dnl # Output the Makefiles
 dnl ################################################################
 AC_CONFIG_FILES([
 Makefile
-notification-daemon.service
 src/Makefile
 ])
 
@@ -103,6 +105,11 @@ AC_OUTPUT
 
 echo
 echo $PACKAGE v$VERSION
+echo
+
+echo prefix............... : $prefix
+echo dbus-1 system.d dir.. : $DBUS_SYS_DIR
+echo dbus-1 services dir.. : $DBUS_SERVICES_DIR
 
 echo
 echo "Now type make to compile"

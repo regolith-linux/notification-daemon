@@ -1,3 +1,11 @@
+Wed Nov 03 01:14:01 PST 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* Makefile.am:
+	A acinclude.m4:
+	* configure.ac:
+	  - Fixed up the variables in the .service file and for the D-BUS
+	    services and system dir paths.
+
 Thu Sep 30 00:11:19 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	A src/BaseNotification.cpp:
