@@ -1,5 +1,5 @@
-/**
- * @file main.c Main Notification Daemon file.
+/** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
+ * @file main.cpp Main Notification Daemon file.
  *
  * Copyright (C) 2004 Christian Hammond.
  *
@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public
@@ -27,12 +27,84 @@
 #include <dbus/dbus-glib.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
+using std::string;
+
+#include "notifier.h"
+#include "logging.h"
+
+BaseNotifier *backend;
+
+static gboolean
+handle_initial_messages(DBusMessage *message)
+{
+	if (equal(dbus_message_get_member(message), "ServiceAcquired")) {
+		TRACE("Discarding ServiceAcquired message\n");
+		return TRUE;
+	}
+
+	return FALSE;
+}
 
 static DBusHandlerResult
 filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 {
-	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+	/* some quick checks that apply to all backends */
+
+	if (handle_initial_messages(message)) return DBUS_HANDLER_RESULT_HANDLED;
+
+	string s;
+
+	s = dbus_message_get_path(message);
+	validateret( s == "/org/freedesktop/Notifications",
+				 DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
+				 "message received on unknown object '%s'\n", $(s) );
+
+
+	s = dbus_message_get_interface(message);
+	validateret( s == "org.freedesktop.Notifications",
+				 DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
+				 "unknown message received: %s.%s\n",
+				 $(s), dbus_message_get_member(message) );
+
+
+	/* now we know it's on the only valid interface, dispatch the method call */
+	string method = dbus_message_get_member(message);
+
+	TRACE("dispatching %s\n", $(method));
+
+	if (method == "Notify") {
+
+		struct notification n;
+
+		memset(&n, 0, sizeof(n));
+		n.summary = "bogus summary";
+		n.body = "bogus body";
+
+		backend->notify(&n);
+
+	} else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+	return DBUS_HANDLER_RESULT_HANDLED;
 }
+
+
+void
+initialize_backend()
+{
+	/* Currently, the backend desired is chosen using an environment variable.
+	   In future, we could try and figure out the best backend to use in a smarter
+	   way, but let's not get too wrapped up in this. The most common backend will
+	   almost certainly be either PopupNotifier or CompositedPopupNotifier.
+	 */
+
+	char *envvar = getenv("NOTIFICATION_DAEMON_BACKEND");
+	string name = envvar ? envvar : "console";
+
+	if (name == "console") backend = new ConsoleNotifier;
+	// else if (name == "popup") backend = new PopupNotifier;
+}
+
 
 int
 main(int argc, char **argv)
@@ -41,13 +113,14 @@ main(int argc, char **argv)
 	DBusError error;
 	GMainLoop *loop;
 
-	dbus_conn = dbus_bus_get(DBUS_BUS_SESSION, &error);
-
 	dbus_error_init(&error);
+
+	dbus_conn = dbus_bus_get(DBUS_BUS_SESSION, &error);
 
 	if (dbus_conn == NULL)
 	{
-		fprintf(stderr, "Unable to get session bus: %s\n", error.message);
+		fprintf(stderr, "%s: unable to get session bus: %s, perhaps you need to start DBUS?\n",
+				getenv("_"), error.message);
 		exit(1);
 	}
 
@@ -66,6 +139,8 @@ main(int argc, char **argv)
 	}
 
 	dbus_connection_add_filter(dbus_conn, filter_func, NULL, NULL);
+
+	initialize_backend();
 
 	loop = g_main_loop_new(NULL, FALSE);
 

@@ -44,6 +44,7 @@ dnl ################################################################
 dnl # Check for some standard stuff.
 dnl ################################################################
 AC_PROG_CC
+AC_PROG_CXX
 #AC_ARG_PROGRAM
 AC_PROG_CPP
 AC_PROG_MAKE_SET
