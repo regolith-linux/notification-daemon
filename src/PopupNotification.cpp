@@ -107,19 +107,19 @@ PopupNotification::whiten(GtkWidget *eventbox)
 static gboolean
 draw_border(GtkWidget *widget, GdkEventExpose *event, PopupNotification *n)
 {
-    if (!n->m_gc)
+    if (!n->gc)
     {
-        n->m_gc = gdk_gc_new(event->window);
+        n->gc = gdk_gc_new(event->window);
 
         GdkColor color;
         gdk_color_parse("black", &color);
-        gdk_gc_set_rgb_fg_color(n->m_gc, &color);
+        gdk_gc_set_rgb_fg_color(n->gc, &color);
     }
 
     int w, h;
     gdk_drawable_get_size(event->window, &w, &h);
 
-    gdk_draw_rectangle(event->window, n->m_gc, FALSE, 0, 0, w-1, h-1);
+    gdk_draw_rectangle(event->window, n->gc, FALSE, 0, 0, w-1, h-1);
 
     return FALSE; /* propogate further */
 }
@@ -127,7 +127,7 @@ draw_border(GtkWidget *widget, GdkEventExpose *event, PopupNotification *n)
 void
 PopupNotification::window_button_release(GdkEventButton *event)
 {
-    if (actions.find(0) == actions.end()) m_notifier->unnotify(this);
+    if (actions.find(0) == actions.end()) notifier->unnotify(this);
     else action_invoke(0);
 }
 
@@ -170,25 +170,25 @@ _set_cursor(GtkWidget *widget, GdkEventExpose *event,
 
 PopupNotification::PopupNotification(PopupNotifier *n)
     : Notification(),
-      m_notifier(n),
-      m_window(NULL),
-      m_disp_screen(0),
-      m_height_offset(0),
-      m_gc(NULL)
+      notifier(n),
+      window(NULL),
+      disp_screen(0),
+      height_offset(0),
+      gc(NULL)
 {
 }
 
 PopupNotification::~PopupNotification()
 {
-    TRACE("destroying notification %d, window=%p\n", id, m_window);
+    TRACE("destroying notification %d, window=%p\n", id, window);
 
-    if (m_gc) g_object_unref(m_gc);
+    if (gc) g_object_unref(gc);
 
-    if (m_window)
+    if (window)
     {
-        gtk_widget_hide(m_window);
-        gtk_widget_destroy(m_window);
-        m_window = NULL;
+        gtk_widget_hide(window);
+        gtk_widget_destroy(window);
+        window = NULL;
     }
 }
 
@@ -197,14 +197,14 @@ PopupNotification::generate()
 {
     TRACE("Generating PopupNotification GUI for nid %d\n", id);
 
-    GtkWidget *win = m_window, *bodybox_widget, *vbox, *summary_label;
+    GtkWidget *win = window, *bodybox_widget, *vbox, *summary_label;
     GtkWidget *body_label = NULL, *image_widget;
 
     try
     {
-        if (!m_window)
+        if (!window)
         {
-            /* win will be assigned to m_window at the end */
+            /* win will be assigned to window at the end */
             win = gtk_window_new(GTK_WINDOW_POPUP);
 
             gtk_widget_add_events(win, GDK_BUTTON_RELEASE_MASK);
@@ -433,9 +433,9 @@ PopupNotification::generate()
     }
 
     /* now we have successfully built the UI, commit it to the instance  */
-    this->m_body_box = bodybox_widget;
-    this->m_window = win;
-    TRACE("window is %p\n", this->m_window);
+    this->body_box = bodybox_widget;
+    this->window = win;
+    TRACE("window is %p\n", this->window);
 
     update_position();
 }
@@ -443,8 +443,8 @@ PopupNotification::generate()
 void
 PopupNotification::show()
 {
-    if (!m_window) generate();    // can throw
-    gtk_widget_show(m_window);
+    if (!window) generate();    // can throw
+    gtk_widget_show(window);
 }
 
 /*
@@ -454,20 +454,20 @@ PopupNotification::show()
 int
 PopupNotification::get_height()
 {
-    if (!m_window) generate();    // can throw
+    if (!window) generate();    // can throw
 
     GtkRequisition req;
-    gtk_widget_size_request(m_window, &req);
+    gtk_widget_size_request(window, &req);
     return req.height;
 }
 
 void
 PopupNotification::update_position()
 {
-    if (!m_window) generate();    // can throw
+    if (!window) generate();    // can throw
 
     GtkRequisition req;
-    gtk_widget_size_request(m_window, &req);
+    gtk_widget_size_request(window, &req);
 
     GdkRectangle workarea;
 
@@ -477,10 +477,10 @@ PopupNotification::update_position()
         workarea.height = gdk_screen_height();
     }
 
-    gtk_window_move(GTK_WINDOW(m_window),
+    gtk_window_move(GTK_WINDOW(window),
                     workarea.x + workarea.width - req.width,
                     workarea.y + workarea.height - get_height() -
-                    m_height_offset);
+                    height_offset);
 }
 
 bool
@@ -492,7 +492,7 @@ PopupNotification::get_work_area(GdkRectangle &rect)
     if (workarea == None)
         return false;
 
-    Window win = XRootWindow(GDK_DISPLAY(), m_disp_screen);
+    Window win = XRootWindow(GDK_DISPLAY(), disp_screen);
 
     Atom type;
     int format;
@@ -512,10 +512,10 @@ PopupNotification::get_work_area(GdkRectangle &rect)
 
     guint32 *workareas = (guint32 *)ret_workarea;
 
-    rect.x      = workareas[m_disp_screen * 4];
-    rect.y      = workareas[m_disp_screen * 4 + 1];
-    rect.width  = workareas[m_disp_screen * 4 + 2];
-    rect.height = workareas[m_disp_screen * 4 + 3];
+    rect.x      = workareas[disp_screen * 4];
+    rect.y      = workareas[disp_screen * 4 + 1];
+    rect.width  = workareas[disp_screen * 4 + 2];
+    rect.height = workareas[disp_screen * 4 + 3];
 
     XFree(ret_workarea);
 
@@ -528,7 +528,7 @@ PopupNotification::get_work_area(GdkRectangle &rect)
 void
 PopupNotification::set_height_offset(int value)
 {
-    m_height_offset = value;
+    height_offset = value;
     update_position();     // can throw
 }
 
@@ -538,10 +538,10 @@ PopupNotification::update()
     /* contents have changed, so scrap current UI and regenerate */
     TRACE("updating for %d\n", id);
 
-    if (m_window)
+    if (window)
     {
-        gtk_container_remove(GTK_CONTAINER(m_window), m_body_box);
-        m_body_box = NULL;
+        gtk_container_remove(GTK_CONTAINER(window), body_box);
+        body_box = NULL;
     }
 
     generate();    // can throw

@@ -29,7 +29,31 @@
 
 class PopupNotification : public Notification
 {
+protected:
+	void update_position(void);
+
+	bool get_work_area(GdkRectangle &rect);
+
+	void format_summary(GtkLabel *label);
+	void process_body_markup(GtkLabel *label);
+	void linkify(GtkLabel *label);
+	void whiten(GtkWidget *eventbox);
+
+	static const int WIDTH         = 300;
+	static const int MIN_HEIGHT    = 50;
+	static const int IMAGE_SIZE    = 48;
+	static const int IMAGE_PADDING = 10;
+
+	PopupNotifier *notifier;
+
+	GtkWidget *window;
+	GtkWidget *body_box;
+	int disp_screen;
+	int height_offset;
+
 public:
+	GdkGC *gc;
+
 	PopupNotification(PopupNotifier *n);
 	~PopupNotification();
 
@@ -39,36 +63,7 @@ public:
 
 	void set_height_offset(int value);
 	int get_height(void);
-
-protected:
-	void update_position(void);
-
-	bool get_work_area(GdkRectangle &rect);
-
-private:
-	void format_summary(GtkLabel *label);
-	void process_body_markup(GtkLabel *label);
-	void linkify(GtkLabel *label);
-	void whiten(GtkWidget *eventbox);
-
-public:
 	void window_button_release(GdkEventButton *event);
-
-private:
-	static const int WIDTH         = 300;
-	static const int MIN_HEIGHT    = 50;
-	static const int IMAGE_SIZE    = 48;
-	static const int IMAGE_PADDING = 10;
-
-	PopupNotifier *m_notifier;
-
-	GtkWidget *m_window;
-	GtkWidget *m_body_box;
-	int m_disp_screen;
-	int m_height_offset;
-
-public:
-	GdkGC *m_gc;
 };
 
 #endif /* _POPUP_NOTIFICATION_HH_ */
