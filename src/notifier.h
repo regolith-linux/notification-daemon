@@ -1,4 +1,4 @@
-/** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; -*-
+/** -*- mode: c++; tab-width: 4; indent-tabs-mode: t; -*-
  * @file notifier.h Base class for notification backends
  *
  * Copyright (C) 2004 Mike Hearn
@@ -54,7 +54,7 @@ public:
     struct image **images;    /* an array of frames in the animated image */
     int primary_frame;        /* for notifiers that can't show animations, the still frame to use */
     char *sound;              /* the sound to play when the notification appears */
-    int timeout;              /* 0 means use heuristics */
+    uint timeout;              /* 0 means use heuristics */
     bool use_timeout;         /* should the notification ever time out? */
 
     int id;
@@ -63,41 +63,56 @@ public:
     virtual ~Notification();
 };
 
+typedef std::map<int, Notification*> NotificationsMap;
+
 class BaseNotifier {
 protected:
     uint next_id;
-    
+    GMainLoop *loop;
+
+	void register_timeout(int hz);
+
+	
 public:
     /* All notifications are given a unique, non-repeating id which the client can use
        The mapping between the ids and notification objects is stored here */
-    std::map<int, Notification*> notifications;
+
+    NotificationsMap notifications;
     
     virtual uint notify(Notification *n);
-    virtual bool unnotify(uint id);
+	
+    bool unnotify(uint id);
+	
+	virtual bool unnotify(Notification *n);
 
-    BaseNotifier();
-    virtual ~BaseNotifier() { };
+    BaseNotifier(GMainLoop *loop);
+    virtual ~BaseNotifier();
 
     /* This can be overriden by base classes to return subclasses of Notification */
     virtual Notification *create_notification();
+	
+	bool timing;
+	virtual bool timeout();	
 };
 
 extern BaseNotifier *notifier;    /* This holds the backend in use. It's set once, at startup. */
-
 
 
 class ConsoleNotifier : public BaseNotifier {
 public:    
     virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);
+
+	ConsoleNotifier(GMainLoop *loop) : BaseNotifier(loop) {};
 };
 
 class PopupNotifier : public BaseNotifier {
 private:
     void reflow();
+
 public:
     virtual uint notify(Notification *n);
-    virtual bool unnotify(uint id);
+    virtual bool unnotify(Notification *n);
 
     virtual Notification *create_notification();
 

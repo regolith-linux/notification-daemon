@@ -184,7 +184,7 @@ initialize_backend(int *argc, char ***argv)
 	char *envvar = getenv("NOTIFICATION_DAEMON_BACKEND");
 	string name = envvar ? envvar : "popup";
 
-	if (name == "console") backend = new ConsoleNotifier();
+	if (name == "console") backend = new ConsoleNotifier(loop);
 	else if (name == "popup") backend = new PopupNotifier(loop, argc, argv);
 	else {
 		fprintf(stderr, "%s: unknown backend specified: %s\n", envvar);
@@ -198,7 +198,6 @@ main(int argc, char **argv)
 {
 	DBusConnection *dbus_conn;
 	DBusError error;
-
 
 	dbus_error_init(&error);
 
@@ -227,12 +226,11 @@ main(int argc, char **argv)
 
 	dbus_connection_add_filter(dbus_conn, filter_func, NULL, NULL);
 
+	loop = g_main_loop_new(NULL, FALSE);
+
 	initialize_backend(&argc, &argv);
 
-
-	TRACE("started\n");
-
-	loop = g_main_loop_new(NULL, FALSE);
+	TRACE("started\n");	
 
 	g_main_loop_run(loop);
 

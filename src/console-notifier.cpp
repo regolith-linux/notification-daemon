@@ -22,15 +22,14 @@
 #include <notifier.h>
 #include <stdio.h>
 
-uint
-ConsoleNotifier::notify(Notification *n)
+
+uint ConsoleNotifier::notify(Notification *n)
 {
 	printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");
 	return BaseNotifier::notify(n);
 }
 
-bool
-ConsoleNotifier::unnotify(uint id)
+bool ConsoleNotifier::unnotify(uint id)
 {
 	return BaseNotifier::unnotify(id);
 }

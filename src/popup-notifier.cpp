@@ -24,7 +24,6 @@
 #include "notifier.h"
 #include "logging.h"
 
-
 class PopupNotification : public Notification {
 private:
 	static const int width = 300; // FIXME: make these relative to screen size
@@ -85,12 +84,11 @@ public:
     }
 
     ~PopupNotification() {
-        TRACE("destroying notification %d\n", id);
+        TRACE("destroying notification %d, windows=%p\n", id, window);
         gtk_widget_hide(GTK_WIDGET(window));
 		g_object_unref(gc);
-        g_object_unref(window);
+        //g_object_unref(G_OBJECT(window));  -- this crashes with an invalid cast in gtk_object_dispose, why?
     }
-
 
 	void generate() {
         TRACE("Generating new PopupNotification GUI for nid %d\n", id);
@@ -145,9 +143,11 @@ public:
         gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
 		update_position();
 
+		TRACE("window is %p\n", window);
 	}
 
 	void show() {
+		if (!window) generate();
 		gtk_widget_show(GTK_WIDGET(window));
 	}
 
@@ -161,6 +161,7 @@ public:
 	}
 
 	void update_position() {
+		if (!window) generate();
 		gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height() - height_offset);
 	}
 
@@ -170,7 +171,7 @@ public:
 	}
 };
 
-PopupNotifier::PopupNotifier(GMainLoop *loop, int *argc, char ***argv)
+PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv) : BaseNotifier(main_loop)
 {
     gtk_init(argc, argv);
 }
@@ -180,10 +181,11 @@ PopupNotifier::PopupNotifier(GMainLoop *loop, int *argc, char ***argv)
 
    This may be called many times per second so it should be reasonably fast.
  */
+
 void
 PopupNotifier::reflow()
 {
-	std::map<int, Notification*>::iterator i = notifications.begin();
+	NotificationsMap::iterator i = notifications.begin();
 
 	/* the height offset is the distance from the top/bottom of the screen to the
 	   nearest edge of the popup */
@@ -208,7 +210,7 @@ PopupNotifier::notify(Notification *base)
 
 	reflow();
 
-	TRACE("height is %d\n", n->height());
+	TRACE("height is %d, timeout in unix-time is %d\n", n->height(), n->timeout);
 
     n->show();
 
@@ -216,9 +218,11 @@ PopupNotifier::notify(Notification *base)
 }
 
 bool
-PopupNotifier::unnotify(uint id)
+PopupNotifier::unnotify(Notification *n)
 {
-    return BaseNotifier::unnotify(id);
+	bool ret = BaseNotifier::unnotify(n);
+	reflow();
+	return ret;
 }
 
 Notification*
