@@ -93,6 +93,8 @@ class PopupNotifier : public BaseNotifier {
 public:
     virtual uint notify(Notification *n);
     virtual bool unnotify(uint id);
+
+    virtual Notification *create_notification();
 };
 
 #endif

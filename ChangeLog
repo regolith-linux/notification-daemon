@@ -1,3 +1,7 @@
+Sun Jul  4 00:00:27 GMT 2004  Mike Hearn  <mike@navi.cx>
+	* src/main.cpp (initialize_backend): Check for invalid backends,
+	  uncomment popup backend
+
 Sat Jul  3 23:53:09 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/notifier.cpp: Rename to base-notifier.cpp
 	* src/base-notifier.cpp, src/notifier.h, src/console-notifier.cpp: change

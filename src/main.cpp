@@ -149,7 +149,11 @@ initialize_backend()
 	string name = envvar ? envvar : "console";
 
 	if (name == "console") backend = new ConsoleNotifier;
-	// else if (name == "popup") backend = new PopupNotifier;
+	else if (name == "popup") backend = new PopupNotifier;
+	else {
+		fprintf(stderr, "%s: unknown backend specified: %s\n", envvar);
+		exit(1);
+	}
 }
 
 
