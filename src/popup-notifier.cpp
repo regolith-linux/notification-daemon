@@ -91,11 +91,11 @@ public:
     }
 
 	void generate() {
-        TRACE("Generating new PopupNotification GUI for nid %d\n", id);
+        TRACE("Generating PopupNotification GUI for nid %d\n", id);
 
 		const int image_padding = 15;
 
-        window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
+		if (!window) window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
 
         hbox = gtk_hbox_new(FALSE, 4);
         vbox = gtk_vbox_new(FALSE, 2);
@@ -169,6 +169,20 @@ public:
 		height_offset = value;
 		update_position();
 	}
+
+	void update() {
+		/* contents have changed, so scrap current UI and regenerate */
+		TRACE("updating for %d\n", id);
+		
+		if (window) {
+			gtk_container_remove(GTK_CONTAINER(window), hbox);
+			hbox = NULL;
+		}
+		
+		generate();
+		
+		TRACE("updated for %d\n", id);
+	}
 };
 
 PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv) : BaseNotifier(main_loop)
@@ -210,7 +224,8 @@ PopupNotifier::notify(Notification *base)
 
 	reflow();
 
-	TRACE("height is %d, timeout in unix-time is %d\n", n->height(), n->timeout);
+	if (n->use_timeout) TRACE("timeout in unix-time is %d\n", n->timeout);
+	TRACE("height is %d\n", n->height());
 
     n->show();
 

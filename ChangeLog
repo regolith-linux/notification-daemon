@@ -1,7 +1,11 @@
-Wed Jul 14 00:04:46 2004  Mike Hearn  <mike@navi.cx>
+Wed Jul 14 02:13:10 GMT 2004  Mike Hearn  <mike@navi.cx>
+	* src/main.cpp, src/base-notifier.cpp, src/popup-notifier.cpp:
+	  Support replacements properly
+
+Wed Jul 14 00:04:46 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp: Eliminate stupid one-line function
 
-Mon Jul  5 00:20:13 2004  Mike Hearn  <mike@navi.cx>
+Mon Jul  5 00:20:13 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/base-notifier.cpp: Add timeouts infrastructure.
 
 Sun Jul 04 13:45:03 PDT 2004  Christian Hammond <chipx86@gnupdate.org>

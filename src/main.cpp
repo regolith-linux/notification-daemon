@@ -67,10 +67,13 @@ dispatch_notify(DBusMessage *message)
 	replaces = dbus_message_iter_get_uint32(&iter);
 	dbus_message_iter_next(&iter);
 
-	if (!replaces) n = backend->create_notification();
+	if (replaces == 0)
+		n = backend->create_notification();
 	else {
+		TRACE("replaces=%d\n", replaces);
+
 		n = backend->get(replaces);
-		validate( n != NULL, NULL, "invalid replacement ID given\n" );
+		validate( n != NULL, NULL, "invalid replacement ID (%d) given\n", replaces );
 	}
 
 	/* urgency */
@@ -128,8 +131,11 @@ dispatch_notify(DBusMessage *message)
 		n->timeout = dbus_message_iter_get_uint32(&iter);
 	}
 
+	if (replaces) backend->update(n);
 
 	int id = replaces ? replaces : backend->notify(n);
+
+	TRACE("id is %d\n", id);
 
 	DBusMessage *reply = dbus_message_new_method_return(message);
 	assert( reply != NULL );

@@ -42,6 +42,7 @@ Notification::~Notification()
 	// FIXME: free images/sound data
 }
 
+
 /*************************************************************/
 
 BaseNotifier::BaseNotifier(GMainLoop *main_loop)
@@ -49,7 +50,7 @@ BaseNotifier::BaseNotifier(GMainLoop *main_loop)
 	loop = main_loop;
 	g_main_loop_ref(loop);
 	
-	next_id = 0;
+	next_id = 1;
 	timing = false;
 }
 
@@ -89,8 +90,19 @@ void BaseNotifier::register_timeout(int hz)
 	g_timeout_add(hz, (GSourceFunc) timeout_dispatch, this);
 }
 
-uint BaseNotifier::notify(Notification *n)
+void BaseNotifier::setup_timeout(Notification *n)
 {
+	/* decide a sensible timeout. for now let's just use 5 seconds. in future, based on text length? */
+	if (n->use_timeout && !n->timeout) n->timeout = time(NULL) + 5;
+	
+	if (n->use_timeout && !timing) {
+		register_timeout(1000);
+		timing = true;
+	}	
+}
+
+uint BaseNotifier::notify(Notification *n)
+{	
 	/* add to the internal list using the next cookie, increment, then
 	   register a timeout, once per second if one isn't already
 	   registered to count down.
@@ -98,22 +110,22 @@ uint BaseNotifier::notify(Notification *n)
 	   we don't have a timeout triggering constantly as otherwise n-d
 	   could never be fully paged out by the kernel.
 	 */
-	
+
 	n->id = next_id;
 	
 	next_id++;
-	
+
 	notifications[n->id] = n;
 
-	/* decide a sensible timeout. for now let's just use 5 seconds. in future, based on text length? */
-	if (n->timeout == 0) n->timeout = time(NULL) + 5;
-	
-	if (n->use_timeout && !timing) {
-		register_timeout(1000);
-		timing = true;
-	}
+	update(n);
 	
 	return n->id;
+}
+
+void BaseNotifier::update(Notification *n)
+{
+	setup_timeout(n);	
+	n->update();
 }
 
 bool BaseNotifier::unnotify(uint id)

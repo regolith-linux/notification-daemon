@@ -62,6 +62,8 @@ public:
     
     Notification();
     virtual ~Notification();
+
+	virtual void update() {;} /* called when the contents have changed */
 };
 
 typedef std::map<int, Notification*> NotificationsMap;
@@ -73,6 +75,7 @@ protected:
 
 	void register_timeout(int hz);
 
+	void setup_timeout(Notification *n);
 	
 public:
     /* All notifications are given a unique, non-repeating id which the client can use
@@ -83,10 +86,9 @@ public:
 	Notification *get(uint id);
 	
     virtual uint notify(Notification *n);
-	
     bool unnotify(uint id);
-	
 	virtual bool unnotify(Notification *n);
+	virtual void update(Notification *n);
 
     BaseNotifier(GMainLoop *loop);
     virtual ~BaseNotifier();
