@@ -233,9 +233,9 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 	DBusMessage *ret = NULL;
 
 	if (equal(dbus_message_get_member(message), "Notify")) ret = handle_notify(message);
-	if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = handle_get_caps(message);
-	if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = handle_get_info(message);
-	if (equal(dbus_message_get_member(message), "CloseNotification")) ret = handle_close(message);
+	else if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = handle_get_caps(message);
+	else if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = handle_get_info(message);
+	else if (equal(dbus_message_get_member(message), "CloseNotification")) ret = handle_close(message);
 	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
 	/* we always reply to messages, even if it's just empty */
