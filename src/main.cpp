@@ -147,6 +147,20 @@ dispatch_notify(DBusMessage *message)
 	return reply;
 }
 
+static DBusMessage*
+dispatch_get_caps(DBusMessage *message)
+{
+	DBusMessage *reply = dbus_message_new_method_return(message);
+
+	DBusMessageIter iter;
+	dbus_message_iter_init(reply, &iter);
+
+	static const char* caps[] = { "body", "markup" };
+	dbus_message_iter_append_string_array(&iter, caps, sizeof(caps) / sizeof(caps[0]));
+
+	return reply;
+}
+
 static DBusHandlerResult
 filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 {
@@ -186,6 +200,7 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 	DBusMessage *ret = NULL;
 
 	if (equal(dbus_message_get_member(message), "Notify")) ret = dispatch_notify(message);
+	if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = dispatch_get_caps(message);
 	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
 	if (ret) dbus_connection_send(dbus_conn, ret, NULL);
