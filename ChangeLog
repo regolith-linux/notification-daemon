@@ -1,3 +1,9 @@
+Wed Sep 29 19:40:11 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cpp:
+	  - Compile using D-BUS CVS. I bet this will break things for other
+	    people...
+
 Thu Sep 16 19:51:09 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp (handle_notify): Make exception safe
 
