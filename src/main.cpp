@@ -294,13 +294,6 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     if (replaces) backend->update(n);
     uint id = replaces ? replaces : backend->notify(n);
 
-    n_holder.release();  /* commit the notification  */
-
-	if (replaces)
-		backend->update(n);
-
-	id = (replaces ? replaces : backend->notify(n));
-
 	n_holder.release();  /* Commit the notification  */
 
 	reply = dbus_message_new_method_return(message);
