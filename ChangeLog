@@ -1,3 +1,9 @@
+Wed Sep 29 22:12:43 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cpp:
+	  - Get message parsing to actually work.
+	  - Don't unref the message. D-BUS does that for us.
+
 Wed Sep 29 22:00:48 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/main.cpp:

@@ -75,6 +75,7 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 	Notification *n;
     uint replaces;
 	uint id;
+	int arraytype;
 	/* if we create a new notification, ensure it'll be freed if we throw  */
 	std::auto_ptr<Notification> n_holder;
 
@@ -158,36 +159,39 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 	validate( (type == DBUS_TYPE_ARRAY) || (type == DBUS_TYPE_NIL), NULL,
 			  "invalid notify message, images argument is not an array nor nil\n" );
 
-	int arraytype = dbus_message_iter_get_array_type(&iter);
-
-	if ((arraytype == DBUS_TYPE_STRING) || (arraytype == DBUS_TYPE_ARRAY))
+	if (type != DBUS_TYPE_NIL)
 	{
-		DBusMessageIter i;
-		int dummy; // FIXME: what is this supposed to do?
+		int arraytype = dbus_message_iter_get_array_type(&iter);
 
-		dbus_message_iter_init_array_iterator(&iter, &i, &dummy);
-
-		do
+		if ((arraytype == DBUS_TYPE_STRING) || (arraytype == DBUS_TYPE_ARRAY))
 		{
-			if (arraytype == DBUS_TYPE_STRING)
+			DBusMessageIter i;
+			int dummy; // FIXME: what is this supposed to do?
+
+			dbus_message_iter_init_array_iterator(&iter, &i, &dummy);
+
+			do
 			{
-				char *s = dbus_message_iter_get_string(&i);
+				if (arraytype == DBUS_TYPE_STRING)
+				{
+					char *s = dbus_message_iter_get_string(&i);
 
-				n->images.push_back(new Image(s));
+					n->images.push_back(new Image(s));
 
-				dbus_free(s);
-			}
-			else if (arraytype == DBUS_TYPE_ARRAY)
-			{
-				unsigned char *data;
-				int len;
+					dbus_free(s);
+				}
+				else if (arraytype == DBUS_TYPE_ARRAY)
+				{
+					unsigned char *data;
+					int len;
 
-				if (! dbus_message_iter_get_byte_array(&i, &data, &len) )
-					throw std::runtime_error( "could not retrieve marshalled image" );
+					if (! dbus_message_iter_get_byte_array(&i, &data, &len) )
+						throw std::runtime_error( "could not retrieve marshalled image" );
 
-				n->images.push_back(new Image(data, len));
-			}
-		} while (dbus_message_iter_next(&i));
+					n->images.push_back(new Image(data, len));
+				}
+			} while (dbus_message_iter_next(&i));
+		}
 	}
 
     dbus_message_iter_next(&iter);
@@ -198,35 +202,38 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 	if (type == DBUS_TYPE_DICT)
 	{
 		DBusMessageIter actioniter;
-		dbus_message_iter_init_dict_iterator(&iter, &actioniter);
 
-		do
+		if (dbus_message_iter_init_dict_iterator(&iter, &actioniter))
 		{
-			/* confusingly on the wire, the dict maps action text to ID,
-			   whereas internally we map the id to the action text.  */
+			do
+			{
+				/* confusingly on the wire, the dict maps action text to ID,
+				   whereas internally we map the id to the action text.  */
 
-			char *key = dbus_message_iter_get_dict_key(&actioniter);
-			uint actionid = dbus_message_iter_get_uint32(&actioniter);
+				char *key = dbus_message_iter_get_dict_key(&actioniter);
+				uint actionid = dbus_message_iter_get_uint32(&actioniter);
 
-			TRACE("action %d : %s\n", actionid, key);
+				TRACE("action %d : %s\n", actionid, key);
 
-			n->actions[actionid] = strdup(key);
+				n->actions[actionid] = strdup(key);
 
-			dbus_free(key);
-		} while (dbus_message_iter_next(&actioniter));
-
+				dbus_free(key);
+			} while (dbus_message_iter_next(&actioniter));
+		}
 	}
 	dbus_message_iter_next(&iter);
 
 	/* hints */
 	validate( (type == DBUS_TYPE_DICT) || (type == DBUS_TYPE_NIL), NULL,
 			  "invalid notify message, actions argument is not dict nor nil\n" );
+    dbus_message_iter_next(&iter);
 
 	/* expires */
-	validate(type == DBUS_TYPE_UINT32, NULL,
-			 "invalid notify message, expires argument is not uint32");
+	validate(type == DBUS_TYPE_BOOLEAN, NULL,
+			 "invalid notify message, expires argument is not uint32\n");
 
 	n->use_timeout = true;
+    dbus_message_iter_next(&iter);
 
     /* timeout */
     validate(type == DBUS_TYPE_UINT32, NULL,
@@ -234,6 +241,7 @@ static DBusMessage* handle_notify(DBusConnection *incoming, DBusMessage *message
 			 type );
 
 	n->timeout = dbus_message_iter_get_uint32(&iter);
+    dbus_message_iter_next(&iter);
 
 #undef type
 
@@ -363,7 +371,6 @@ static DBusHandlerResult filter_func(DBusConnection *conn, DBusMessage *message,
 	
     dbus_connection_send(conn, ret, NULL);
     dbus_message_unref(ret);
-	dbus_message_unref(message);
 
 	TRACE("sent reply\n");
 	
