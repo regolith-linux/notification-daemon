@@ -22,6 +22,8 @@
 #ifndef NOTIFIER_H
 #define NOTIFIER_H
 
+#include <glib.h>
+
 #include <string>
 #include <map>
 using std::string;
@@ -95,6 +97,8 @@ public:
     virtual bool unnotify(uint id);
 
     virtual Notification *create_notification();
+
+    PopupNotifier(GMainLoop *loop, int *argc, char ***argv);
 };
 
 #endif

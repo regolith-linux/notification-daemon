@@ -34,6 +34,7 @@ using std::string;
 #include "logging.h"
 
 BaseNotifier *backend;
+GMainLoop *loop;
 
 static bool
 handle_initial_messages(DBusMessage *message)
@@ -137,7 +138,7 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 
 
 void
-initialize_backend()
+initialize_backend(int *argc, char ***argv)
 {
 	/* Currently, the backend desired is chosen using an environment variable.
 	   In future, we could try and figure out the best backend to use in a smarter
@@ -146,10 +147,10 @@ initialize_backend()
 	 */
 
 	char *envvar = getenv("NOTIFICATION_DAEMON_BACKEND");
-	string name = envvar ? envvar : "console";
+	string name = envvar ? envvar : "popup";
 
-	if (name == "console") backend = new ConsoleNotifier;
-	else if (name == "popup") backend = new PopupNotifier;
+	if (name == "console") backend = new ConsoleNotifier();
+	else if (name == "popup") backend = new PopupNotifier(loop, argc, argv);
 	else {
 		fprintf(stderr, "%s: unknown backend specified: %s\n", envvar);
 		exit(1);
@@ -162,7 +163,7 @@ main(int argc, char **argv)
 {
 	DBusConnection *dbus_conn;
 	DBusError error;
-	GMainLoop *loop;
+
 
 	dbus_error_init(&error);
 
@@ -191,7 +192,7 @@ main(int argc, char **argv)
 
 	dbus_connection_add_filter(dbus_conn, filter_func, NULL, NULL);
 
-	initialize_backend();
+	initialize_backend(&argc, &argv);
 
 	loop = g_main_loop_new(NULL, FALSE);
 
