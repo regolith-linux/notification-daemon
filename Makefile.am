@@ -5,6 +5,7 @@ EXTRA_DIST = \
 	ChangeLog \
 	autogen.sh \
 	configure.ac \
+	notification-daemon.spec.in \
 	notification-daemon.service \
 	notification-daemon.service.in
 

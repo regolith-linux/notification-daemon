@@ -98,6 +98,7 @@ dnl # Output the Makefiles
 dnl ################################################################
 AC_CONFIG_FILES([
 Makefile
+notification-daemon.spec
 src/Makefile
 ])
 

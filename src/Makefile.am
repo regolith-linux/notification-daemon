@@ -5,8 +5,10 @@ notification_daemon_SOURCES = \
 	ConsoleNotification.cpp \
 	Image.cpp \
 	PopupNotification.cpp \
+	logging.cpp \
+	logging.h \
 	main.cpp \
-	logging.cpp
+	notifier.h
 
 notification_daemon_LDADD = $(PACKAGE_LIBS)
 
