@@ -1,3 +1,9 @@
+Thu Nov  4 00:03:12 2004  Mike Hearn  <mike@navi.cx>
+	* src/main.cpp, src/notifier.h, src/popup-notifier.cpp: Improve
+  	  error handling, get DBUS iterators right (finally), add support
+	  for animation demarshalling. Not actually presented using GTK+
+	  frontend yet though.
+
 Wed Nov 03 10:04:55 PST 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/PopupNotification.cpp:
@@ -69,6 +75,7 @@ Wed Sep 29 19:40:11 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
 	  - Compile using D-BUS CVS. I bet this will break things for other
 	    people...
 
+>>>>>>> .r1429
 Thu Sep 16 19:51:09 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp (handle_notify): Make exception safe
 

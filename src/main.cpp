@@ -42,7 +42,8 @@
  * strings and pointers and such. It works, but it'd be nice to have a
  * more OO natural API to work with. Downsides? Makes it harder to
  * build/install and increases memory usage. We already have problems
- * with swap time.
+ * with swap time. Probably not worth it. Also makes it harder to get
+ * accepted into various desktops ...
  */
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -75,14 +76,11 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 	DBusMessageIter iter;
 	DBusMessage *reply;
 	char *str;
-	Notification *n;
-	uint replaces;
-	uint id;
-	int arraytype;
-
-	/* If we create a new notification, ensure it'll be freed if we throw  */
-	std::auto_ptr<Notification> n_holder;
-
+    Notification *n;
+    uint replaces;
+    /* if we create a new notification, ensure it'll be freed if we throw  */
+    std::auto_ptr<Notification> n_holder;
+    
 	/*
 	 * We could probably use get_args here, at a cost of less fine grained
 	 * error reporting
@@ -116,14 +114,14 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 	dbus_message_iter_next(&iter);
 
 	if (replaces == 0)
-	{
+    {
 		n = backend->create_notification();
 		n->connection = incoming;
 
-		n_holder.reset(n);
+        n_holder.reset(n);
 	}
-	else
-	{
+    else
+    {
 		TRACE("replaces = %d\n", replaces);
 
 		n = backend->get(replaces);
@@ -173,8 +171,6 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 		dbus_free(str);
 	}
 
-	dbus_message_iter_next(&iter);
-
 	/*********************************************************************
 	 * Images
 	 *********************************************************************/
@@ -184,52 +180,49 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 
 	if (type != DBUS_TYPE_NIL)
 	{
-		DBusMessageIter array_iter;
-		int array_type;
+		DBusMessageIter arrayiter;
+		dbus_message_iter_init_array_iterator(&iter, &arrayiter, NULL);
+	
+		int arraytype = dbus_message_iter_get_array_type(&iter);
 
-		if (dbus_message_iter_init_array_iterator(&iter, &array_iter,
-												  &array_type))
+		if ((arraytype == DBUS_TYPE_STRING) || (arraytype == DBUS_TYPE_ARRAY))
 		{
-			validate(array_type == DBUS_TYPE_STRING ||
-					 array_type == DBUS_TYPE_ARRAY,
-					 NULL,
-					 "Images array must be of type string or array.\n");
-
-			if (array_type == DBUS_TYPE_STRING)
+			/* yes, the dbus api is this bad. they may look like java iterators, but they aren't */
+			if (dbus_message_iter_get_arg_type(&arrayiter) != DBUS_TYPE_INVALID)
 			{
 				do
 				{
-					char *str = dbus_message_iter_get_string(&array_iter);
-
-					n->images.push_back(new Image(str));
-
-					dbus_free(str);
-				}
-				while (dbus_message_iter_next(&array_iter));
-			}
-			else if (array_type == DBUS_TYPE_ARRAY)
-			{
-				do
-				{
-					unsigned char *data;
-					int len;
-
-					if (!dbus_message_iter_get_byte_array(&array_iter,
-														  &data, &len))
+					dbus_message_iter_next(&arrayiter);
+            
+					if (arraytype == DBUS_TYPE_STRING)
 					{
-						throw std::runtime_error("could not retrieve "
-												 "marshalled image");
-					}
+						char *s = dbus_message_iter_get_string(&arrayiter);
 
-					n->images.push_back(new Image(data, len));
-				}
-				while (dbus_message_iter_next(&array_iter));
+						n->images.push_back(new Image(s));
+                
+						dbus_free(s);
+					}
+					else if (arraytype == DBUS_TYPE_ARRAY)
+					{
+						unsigned char *data;
+						int len;
+
+						if (! dbus_message_iter_get_byte_array(&arrayiter, &data, &len) )
+							throw std::runtime_error( "could not retrieve marshalled image" );
+
+						n->images.push_back(new Image(data, len));
+					}
+				} while (dbus_message_iter_next(&arrayiter));
 			}
+
+			TRACE("There are %d images\n", n->images.size());
+		
 		}
 	}
+	
 
-	dbus_message_iter_next(&iter);
-
+    dbus_message_iter_next(&iter);
+    
 	/*********************************************************************
 	 * Actions
 	 *********************************************************************/
@@ -251,12 +244,10 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 				char *key     = dbus_message_iter_get_dict_key(&action_iter);
 				uint actionid = dbus_message_iter_get_uint32(&action_iter);
 
-				TRACE("action %d : %s\n", actionid, key);
+				TRACE("demarshal: action %d : %s\n", actionid, key);
 
 				n->actions[actionid] = strdup(key);
-
 				dbus_free(key);
-
 			} while (dbus_message_iter_next(&action_iter));
 		}
 	}
@@ -267,8 +258,14 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 	 * Hints
 	 *********************************************************************/
 	validate(type == DBUS_TYPE_DICT || type == DBUS_TYPE_NIL, NULL,
-			 "Invalid notify message. Actions argument is not dict or nil\n" );
+			 "Invalid notify message. Hints argument is not dict or nil\n" );
 
+    if (type != DBUS_TYPE_NIL)
+    {
+        n->use_timeout = true;
+        n->timeout = dbus_message_iter_get_uint32(&iter);
+    }
+    
 	dbus_message_iter_next(&iter);
 
 	/*********************************************************************
@@ -290,6 +287,13 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 	dbus_message_iter_next(&iter);
 
 #undef type
+    
+    /* end of demarshalling code  */
+    
+    if (replaces) backend->update(n);
+    uint id = replaces ? replaces : backend->notify(n);
+
+    n_holder.release();  /* commit the notification  */
 
 	if (replaces)
 		backend->update(n);
@@ -346,12 +350,12 @@ handle_close(DBusMessage *message)
 	if (!dbus_message_get_args(message, NULL,
 							   DBUS_TYPE_UINT32, &id,
 							   DBUS_TYPE_INVALID))
-	{
+    {
 		FIXME("error parsing message args but not propogating\n");
 		return NULL;
 	}
 
-	TRACE("closing notification %d\n", id);
+    TRACE("closing notification %d\n", id);
 
 	backend->unnotify(id);
 
@@ -366,17 +370,17 @@ filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
 	DBusMessage *ret = NULL;
 
 	if (message_type == DBUS_MESSAGE_TYPE_ERROR)
-	{
+    {
 		WARN("Error received: %s\n", dbus_message_get_error_name(message));
 		return DBUS_HANDLER_RESULT_HANDLED;
 	}
 
 	if (message_type == DBUS_MESSAGE_TYPE_SIGNAL)
-	{
-		const char *member = dbus_message_get_member(message);
-
-		if (equal(member, "ServiceAcquired"))
-			return DBUS_HANDLER_RESULT_HANDLED;
+    {
+        const char *member = dbus_message_get_member(message);
+        
+        if (equal(member, "ServiceAcquired"))
+            return DBUS_HANDLER_RESULT_HANDLED;
 
 		WARN("Received signal %s\n", member);
 
@@ -396,48 +400,33 @@ filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
 			 "unknown message received: %s.%s\n",
 			 s, dbus_message_get_member(message) );
 
+    try
+    {
+        if (equal(dbus_message_get_member(message), "Notify")) ret = handle_notify(conn, message);
+        else if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = handle_get_caps(message);
+        else if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = handle_get_info(message);
+        else if (equal(dbus_message_get_member(message), "CloseNotification")) ret = handle_close(message);
+        else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+    catch (const std::runtime_error &e)
+    {
+        std::cerr << "notification-daemon: ** exception thrown while processing "
+                  << dbus_message_get_member(message) << " request: " << e.what() << "\n";
+        ret = dbus_message_new_error(message, "org.freedesktop.Notifications.Error", e.what());
+    }
+    
+    /* we always reply to messages, even if it's just empty */
+    if (!ret) ret = dbus_message_new_method_return(message);
 
-	/*
-	 * Now we know it's on the only valid interface, dispatch the
-	 * method call
-	 * */
-	try
-	{
-		if (equal(dbus_message_get_member(message), "Notify"))
-			ret = handle_notify(conn, message);
-		else if (equal(dbus_message_get_member(message), "GetCapabilities"))
-			ret = handle_get_caps(message);
-		else if (equal(dbus_message_get_member(message), "GetServerInfo"))
-			ret = handle_get_info(message);
-		else if (equal(dbus_message_get_member(message), "CloseNotification"))
-			ret = handle_close(message);
-		else
-			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-	}
-	catch (const std::runtime_error &e)
-	{
-		std::cerr << "notification-daemon: ** "
-		          << "exception thrown while processing "
-		          << dbus_message_get_member(message) << " request: "
-		          << e.what() << std::endl;
+    TRACE("created return message\n");
+    
+    dbus_connection_send(conn, ret, NULL);
+    dbus_message_unref(ret);
+    dbus_message_unref(message);
 
-		ret = dbus_message_new_error(message,
-									 "org.freedesktop.Notifications.Error",
-									 e.what());
-	}
-
-	/* we always reply to messages, even if it's just empty */
-	if (!ret)
-		ret = dbus_message_new_method_return(message);
-
-	TRACE("created return message\n");
-
-	dbus_connection_send(conn, ret, NULL);
-	dbus_message_unref(ret);
-
-	TRACE("sent reply\n");
-
-	return DBUS_HANDLER_RESULT_HANDLED;
+    TRACE("sent reply\n");
+    
+    return DBUS_HANDLER_RESULT_HANDLED;
 }
 
 
@@ -459,7 +448,7 @@ initialize_backend(int *argc, char ***argv)
 	else if (name == "popup")
 		backend = new PopupNotifier(loop, argc, argv);
 	else
-	{
+    {
 		fprintf(stderr, "%s: unknown backend specified: %s\n", envvar);
 		exit(1);
 	}
@@ -469,8 +458,8 @@ initialize_backend(int *argc, char ***argv)
 int
 main(int argc, char **argv)
 {
-	std::set_terminate(__gnu_cxx::__verbose_terminate_handler);
-	DBusError error;
+    std::set_terminate(__gnu_cxx::__verbose_terminate_handler);
+    DBusError error;
 
 	dbus_error_init(&error);
 
