@@ -23,7 +23,6 @@
  * TODO:
  *  required:
  *    - caps query
- *    - timeouts
  *    - image support
  *  optional:
  *    - popup sliding/notification
