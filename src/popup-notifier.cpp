@@ -72,19 +72,30 @@ public:
 
         /* FIXME: calculate border offsets from NETWM window geometries */
         gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
-        gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height);
+        //gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height);
 
         hbox = gtk_hbox_new(FALSE, 4);
         vbox = gtk_vbox_new(FALSE, 2);
         image = gtk_image_new_from_stock(GTK_STOCK_OPEN, GTK_ICON_SIZE_LARGE_TOOLBAR); // FIXME
 
+		/* now set up the labels containing the notification text */
 		summary_label = gtk_label_new(summary);
 		boldify(GTK_LABEL(summary_label));
 		gtk_misc_set_alignment(GTK_MISC(summary_label), 0, 0.5);
 		
 		body_label = gtk_label_new(body);
 		gtk_label_set_use_markup(GTK_LABEL(body_label), TRUE);
+		gtk_label_set_line_wrap(GTK_LABEL(body_label), TRUE);		
 		gtk_misc_set_alignment(GTK_MISC(body_label), 0, 0.5);
+
+		/* we want to fix the width so the notifications expand upwards but not outwards.
+		   firstly, we need to grab the natural size request of the containing box, then we
+		   need to set the size request of the label to that width so it will always line wrap.
+		 */
+
+		GtkRequisition req;
+		gtk_widget_size_request(image, &req);
+		gtk_widget_set_size_request(body_label, width - (req.width + image_padding), -1);
 		
 		gtk_widget_show(summary_label);
 		gtk_widget_show(body_label);
