@@ -95,7 +95,6 @@ public:
 	void generate() {
         TRACE("Generating new PopupNotification GUI for nid %d\n", id);
 
-
 		const int image_padding = 15;
 
         window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
@@ -146,7 +145,6 @@ public:
         gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
 		update_position();
 
-		TRACE("done\n");
 	}
 
 	void show() {
@@ -210,7 +208,6 @@ PopupNotifier::notify(Notification *base)
 
 	reflow();
 
-	n->generate();
 	TRACE("height is %d\n", n->height());
 
     n->show();

@@ -40,6 +40,7 @@
 #include <dbus/dbus-glib.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <string>
 using std::string;
 
@@ -121,11 +122,16 @@ dispatch_notify(DBusMessage *message)
 	if (type == DBUS_TYPE_NIL) n->use_timeout = false;
 	else n->timeout = dbus_message_iter_get_uint32(&iter);
 
-	backend->notify(n);
+	int id = backend->notify(n);
 
+	DBusMessage *reply = dbus_message_new_method_return(message);
+	assert( reply != NULL );
+
+	dbus_message_append_args(reply, DBUS_TYPE_UINT32, id, DBUS_TYPE_INVALID);
+	
 #undef type
 
-	return NULL;
+	return reply;
 }
 
 static DBusHandlerResult
@@ -159,6 +165,8 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 	if (method == "Notify") ret = dispatch_notify(message);
 	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
+	if (ret) dbus_connection_send(dbus_conn, ret, NULL);
+	
 	// FIXME: return the reply message here
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
