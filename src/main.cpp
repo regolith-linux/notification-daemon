@@ -94,19 +94,18 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * App Name
      *********************************************************************/
-    validate(type == DBUS_TYPE_STRING || type == DBUS_TYPE_NIL, NULL,
-             "Invalid notify message. app name argument is "
-             "not a string or nil\n");
+    validate(type == DBUS_TYPE_STRING, NULL,
+             "Invalid notify message. app name argument is not a string \n");
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
      * App Icon
      *********************************************************************/
-    validate(type == DBUS_TYPE_ARRAY || type == DBUS_TYPE_NIL, NULL,
-             "Invalid notify message. app icon argument is "
-             "not a string or nil\n");
+    validate(type == DBUS_TYPE_ARRAY || type == DBUS_TYPE_STRING, NULL,
+             "Invalid notify message. app icon argument is not an "
+			 "array or string\n");
     dbus_message_iter_next(&iter);
-    
+
     /*********************************************************************
      * Replaces ID
      *********************************************************************/
@@ -137,8 +136,8 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Notification type
      *********************************************************************/
-    validate(type == DBUS_TYPE_STRING || type == DBUS_TYPE_NIL, NULL,
-             "Invalid notify message. Type argument is not a string or nil\n");
+    validate(type == DBUS_TYPE_STRING, NULL,
+             "Invalid notify message. Type argument is not a string\n");
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -163,8 +162,8 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Body
      *********************************************************************/
-    validate(type == DBUS_TYPE_STRING || type == DBUS_TYPE_NIL, NULL,
-             "Invalid notify message. Body argument is not string nor nil\n");
+    validate(type == DBUS_TYPE_STRING, NULL,
+             "Invalid notify message. Body argument is not a string\n");
 
     if (type != DBUS_TYPE_NIL)
     {
@@ -178,98 +177,85 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Images
      *********************************************************************/
-    validate(type == DBUS_TYPE_ARRAY || type == DBUS_TYPE_NIL, NULL,
-             "Invalid notify message. Images argument is not an "
-             "array or nil\n" );
+    validate(type == DBUS_TYPE_ARRAY || type == DBUS_TYPE_STRING, NULL,
+             "Invalid notify message. Images argument is not an array "
+			 "or string\n");
 
-    if (type != DBUS_TYPE_NIL)
-    {
-        DBusMessageIter arrayiter;
-        dbus_message_iter_init_array_iterator(&iter, &arrayiter, NULL);
-    
-        int arraytype = dbus_message_iter_get_array_type(&iter);
+	DBusMessageIter arrayiter;
+	dbus_message_iter_init_array_iterator(&iter, &arrayiter, NULL);
 
-        if ((arraytype == DBUS_TYPE_STRING) || (arraytype == DBUS_TYPE_ARRAY))
-        {
-            /* yes, the dbus api is this bad. they may look like java iterators, but they aren't */
-            if (dbus_message_iter_get_arg_type(&arrayiter) != DBUS_TYPE_INVALID)
-            {
-                do
-                {
-                    dbus_message_iter_next(&arrayiter);
-            
-                    if (arraytype == DBUS_TYPE_STRING)
-                    {
-                        char *s = dbus_message_iter_get_string(&arrayiter);
+	int arraytype = dbus_message_iter_get_array_type(&iter);
 
-                        n->images.push_back(new Image(s));
-                
-                        dbus_free(s);
-                    }
-                    else if (arraytype == DBUS_TYPE_ARRAY)
-                    {
-                        unsigned char *data;
-                        int len;
+	if ((arraytype == DBUS_TYPE_STRING) || (arraytype == DBUS_TYPE_ARRAY))
+	{
+		/* yes, the dbus api is this bad. they may look like java iterators, but they aren't */
+		if (dbus_message_iter_get_arg_type(&arrayiter) != DBUS_TYPE_INVALID)
+		{
+			do
+			{
+				dbus_message_iter_next(&arrayiter);
 
-                        if (! dbus_message_iter_get_byte_array(&arrayiter, &data, &len) )
-                            throw std::runtime_error( "could not retrieve marshalled image" );
+				if (arraytype == DBUS_TYPE_STRING)
+				{
+					char *s = dbus_message_iter_get_string(&arrayiter);
 
-                        n->images.push_back(new Image(data, len));
-                    }
-                } while (dbus_message_iter_next(&arrayiter));
-            }
+					n->images.push_back(new Image(s));
 
-            TRACE("There are %d images\n", n->images.size());
-        
-        }
-    }
-    
+					dbus_free(s);
+				}
+				else if (arraytype == DBUS_TYPE_ARRAY)
+				{
+					unsigned char *data;
+					int len;
+
+					if (! dbus_message_iter_get_byte_array(&arrayiter, &data, &len) )
+						throw std::runtime_error( "could not retrieve marshalled image" );
+
+					n->images.push_back(new Image(data, len));
+				}
+			} while (dbus_message_iter_next(&arrayiter));
+		}
+
+		TRACE("There are %d images\n", n->images.size());
+
+	}
+
 
     dbus_message_iter_next(&iter);
-    
+
     /*********************************************************************
      * Actions
      *********************************************************************/
-    validate(type == DBUS_TYPE_DICT || type == DBUS_TYPE_NIL, NULL,
-             "Invalid notify message. Actions argument is not dict or nil\n" );
+    validate(type == DBUS_TYPE_DICT, NULL,
+             "Invalid notify message. Actions argument is not a dict\n" );
 
-    if (type == DBUS_TYPE_DICT)
-    {
-        DBusMessageIter action_iter;
+	DBusMessageIter action_iter;
 
-        if (dbus_message_iter_init_dict_iterator(&iter, &action_iter))
-        {
-            do
-            {
-                /*
-                 * Confusingly on the wire, the dict maps action text to ID,
-                 * whereas internally we map the id to the action text.
-                 */
-                char *key     = dbus_message_iter_get_dict_key(&action_iter);
-                uint actionid = dbus_message_iter_get_uint32(&action_iter);
+	if (dbus_message_iter_init_dict_iterator(&iter, &action_iter))
+	{
+		do
+		{
+			/*
+			 * Confusingly on the wire, the dict maps action text to ID,
+			 * whereas internally we map the id to the action text.
+			 */
+			char *key     = dbus_message_iter_get_dict_key(&action_iter);
+			uint actionid = dbus_message_iter_get_uint32(&action_iter);
 
-                TRACE("demarshal: action %d : %s\n", actionid, key);
+			TRACE("demarshal: action %d : %s\n", actionid, key);
 
-                n->actions[actionid] = strdup(key);
-                dbus_free(key);
-            } while (dbus_message_iter_next(&action_iter));
-        }
-    }
+			n->actions[actionid] = strdup(key);
+			dbus_free(key);
+		} while (dbus_message_iter_next(&action_iter));
+	}
 
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
      * Hints
      *********************************************************************/
-    validate(type == DBUS_TYPE_DICT || type == DBUS_TYPE_NIL, NULL,
-             "Invalid notify message. Hints argument is not dict or nil\n" );
-
-    if (type != DBUS_TYPE_NIL)
-    {
-        n->use_timeout = true;
-        n->timeout = dbus_message_iter_get_uint32(&iter);
-    }
-    
+    validate(type == DBUS_TYPE_DICT, NULL,
+             "Invalid notify message. Hints argument is not a dict\n" );
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -291,9 +277,9 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     dbus_message_iter_next(&iter);
 
 #undef type
-    
+
     /* end of demarshalling code  */
-    
+
     if (replaces) backend->update(n);
     uint id = replaces ? replaces : backend->notify(n);
 
@@ -374,7 +360,7 @@ filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
     if (message_type == DBUS_MESSAGE_TYPE_SIGNAL)
     {
         const char *member = dbus_message_get_member(message);
-        
+
         if (equal(member, "ServiceAcquired"))
             return DBUS_HANDLER_RESULT_HANDLED;
 
@@ -412,18 +398,18 @@ filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
                   << dbus_message_get_member(message) << " request: " << e.what() << "\n";
         ret = dbus_message_new_error(message, "org.freedesktop.Notifications.Error", e.what());
     }
-    
+
     /* we always reply to messages, even if it's just empty */
     if (!ret) ret = dbus_message_new_method_return(message);
 
     TRACE("created return message\n");
-    
+
     dbus_connection_send(conn, ret, NULL);
     dbus_message_unref(ret);
     dbus_message_unref(message);
 
     TRACE("sent reply\n");
-    
+
     return DBUS_HANDLER_RESULT_HANDLED;
 }
 
