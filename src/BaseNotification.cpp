@@ -36,24 +36,24 @@ Notification::Notification()
 
 Notification::Notification(const Notification &obj)
 {
-	if (obj.summary) summary = strdup(obj.summary);
-	if (obj.body) body = strdup(obj.body);
-	primary_frame = obj.primary_frame;
-	timeout = obj.timeout;
-	use_timeout = obj.use_timeout;
-	id = obj.id;
+    if (obj.summary) summary = strdup(obj.summary);
+    if (obj.body) body = strdup(obj.body);
+    primary_frame = obj.primary_frame;
+    timeout = obj.timeout;
+    use_timeout = obj.use_timeout;
+    id = obj.id;
 }
 
 Notification::~Notification()
 {
-	TRACE("~Notification: %s, %s\n", summary, body);
-	
+    TRACE("~Notification: %s, %s\n", summary, body);
+    
     if (summary) free(summary);
     if (body) free(body);
 
-  	foreach( ActionsMap, actions ) free(i->second);
+    foreach( ActionsMap, actions ) free(i->second);
 
- 	foreach( ImageList, images ) delete *i;
+    foreach( ImageList, images ) delete *i;
 }
 
 void Notification::action_invoke(uint actionid)
@@ -65,9 +65,9 @@ void Notification::action_invoke(uint actionid)
     TRACE("sending Invoked signal on notification id %d, action id %d\n", id, actionid);
 
     dbus_message_append_args(signal,
-							 DBUS_TYPE_UINT32, id,
-							 DBUS_TYPE_UINT32, actionid,
-							 DBUS_TYPE_INVALID);
+                             DBUS_TYPE_UINT32, id,
+                             DBUS_TYPE_UINT32, actionid,
+                             DBUS_TYPE_INVALID);
 
     dbus_connection_send(connection, signal, NULL);
 
@@ -96,13 +96,13 @@ bool BaseNotifier::timeout()
 {
     /* check each notification to see if it timed out yet */
     time_t now = time(NULL);
-	bool needed = false;
+    bool needed = false;
 
-	TRACE("timeout\n");
+    TRACE("timeout\n");
 
-	foreach( NotificationsMap, notifications )
-	{
-		if (i->second->use_timeout) needed = true;
+    foreach( NotificationsMap, notifications )
+    {
+        if (i->second->use_timeout) needed = true;
 
         if (i->second->use_timeout && (i->second->timeout <= now)) unnotify(i->second);
     }
@@ -138,7 +138,7 @@ void BaseNotifier::setup_timeout(Notification *n)
        could never be fully paged out by the kernel. */
 
     if (n->use_timeout && !timing)
-	{
+    {
         register_timeout(1000);
         timing = true; /* set to false when ::timeout returns false */
     }
@@ -151,7 +151,7 @@ uint BaseNotifier::notify(Notification *n)
 
     update(n);  // can throw
 
-	/* don't commit to the map until after the notification has been able to update */
+    /* don't commit to the map until after the notification has been able to update */
     notifications[n->id] = n;
 
     return n->id;
@@ -175,7 +175,7 @@ bool BaseNotifier::unnotify(uint id)
 bool BaseNotifier::unnotify(Notification *n)
 {
     if (!notifications.erase(n->id))
-	{
+    {
         WARN("no such notification registered (%p), id=%d\n", n, n->id);
         return false;
     }

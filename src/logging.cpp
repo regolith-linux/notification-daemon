@@ -27,8 +27,8 @@
 void log(enum loglevel level, char *s, ...) {
     va_list args;
 
-	fprintf(stderr, "notification-daemon: ");
-	
+    fprintf(stderr, "notification-daemon: ");
+    
     switch (level) {
         case LOG_WARNING: fprintf(stderr, "warning: "); break;
         case LOG_TRACE: fprintf(stderr, "trace: "); break;

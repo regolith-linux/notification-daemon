@@ -39,25 +39,25 @@ using std::string;   // we should be using a Glibmm::ustring for most of this ..
 
 enum image_type
 {
-	IMAGE_TYPE_THEME = 0,
-	IMAGE_TYPE_ABSOLUTE = 1,
-	IMAGE_TYPE_RAW = 2
+    IMAGE_TYPE_THEME = 0,
+    IMAGE_TYPE_ABSOLUTE = 1,
+    IMAGE_TYPE_RAW = 2
 };
 
 class Image
 {
 public:
-	enum image_type type;
-	char *file;
-	unsigned char *data;
-	size_t datalen;
+    enum image_type type;
+    char *file;
+    unsigned char *data;
+    size_t datalen;
 
-	Image(char *newfile);
+    Image(char *newfile);
 
-	/* newdata will be owned by this object and freed on destruction */
-	Image(unsigned char *newdata, int newdatalen);
-	
-	virtual ~Image();
+    /* newdata will be owned by this object and freed on destruction */
+    Image(unsigned char *newdata, int newdatalen);
+    
+    virtual ~Image();
 };
 
 /* This class represents a notification. It's a class rather than a struct
@@ -80,7 +80,7 @@ public:
     int timeout;             /* 0 means use heuristics */
     bool use_timeout;         /* should the notification ever time out? */
 
-	ActionsMap actions;       /* the mapping of action ids to action strings */
+    ActionsMap actions;       /* the mapping of action ids to action strings */
 
     int id;
 
@@ -88,12 +88,12 @@ public:
     DBusConnection *connection;
 
     Notification();
-	Notification(const Notification &obj);
+    Notification(const Notification &obj);
     virtual ~Notification();
 
     virtual void update() {;} /* called when the contents have changed */
 
-	virtual void action_invoke(uint aid);
+    virtual void action_invoke(uint aid);
 };
 
 typedef std::map<int, Notification*> NotificationsMap;

@@ -25,11 +25,11 @@
 
 uint ConsoleNotifier::notify(Notification *n)
 {
-	printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");
-	return BaseNotifier::notify(n);
+    printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");
+    return BaseNotifier::notify(n);
 }
 
 bool ConsoleNotifier::unnotify(uint id)
 {
-	return BaseNotifier::unnotify(id);
+    return BaseNotifier::unnotify(id);
 }
