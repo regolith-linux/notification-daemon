@@ -49,13 +49,6 @@ using std::string;
 BaseNotifier *backend;
 GMainLoop *loop;
 
-static bool
-handle_initial_messages(DBusMessage *message)
-{
-	if (equal(dbus_message_get_member(message), "ServiceAcquired")) return true;
-	return false;
-}
-
 static DBusMessage*
 dispatch_notify(DBusMessage *message)
 {
@@ -137,7 +130,7 @@ static DBusHandlerResult
 filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 {
 	/* some quick checks that apply to all backends */
-	if (handle_initial_messages(message)) return DBUS_HANDLER_RESULT_HANDLED;
+	if (equal(dbus_message_get_member(message), "ServiceAcquired")) return DBUS_HANDLER_RESULT_HANDLED;
 
 	string s;
 
