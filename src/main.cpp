@@ -57,7 +57,7 @@ dispatch_notify(DBusMessage *message)
 	char *str;
 	Notification *n;
 	guint32 replaces;
-	
+
 	dbus_message_iter_init(message, &iter);
 
 #define type dbus_message_iter_get_arg_type(&iter)
@@ -72,7 +72,7 @@ dispatch_notify(DBusMessage *message)
 		n = backend->get(replaces);
 		validate( n != NULL, NULL, "invalid replacement ID given\n" );
 	}
-	
+
 	/* urgency */
 	validate( type == DBUS_TYPE_BYTE, NULL,
 			  "invalid notify message, second argument (urgency) is not a byte\n" );
@@ -128,13 +128,14 @@ dispatch_notify(DBusMessage *message)
 		n->timeout = dbus_message_iter_get_uint32(&iter);
 	}
 
+
 	int id = backend->notify(n);
 
 	DBusMessage *reply = dbus_message_new_method_return(message);
 	assert( reply != NULL );
 
 	dbus_message_append_args(reply, DBUS_TYPE_UINT32, id, DBUS_TYPE_INVALID);
-	
+
 #undef type
 
 	return reply;
@@ -149,24 +150,24 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 		WARN("Error received: %s\n", dbus_message_get_error_name(message));
 		return DBUS_HANDLER_RESULT_HANDLED;
 	}
-	
+
 	if (message_type == DBUS_MESSAGE_TYPE_SIGNAL) {
 		if (equal(dbus_message_get_member(message), "ServiceAcquired"))
 			return DBUS_HANDLER_RESULT_HANDLED;
 
 		WARN("Received signal (%d)\n", message_type);
-		
+
 		// FIXME: dbus-send sends messages as signals not as methods
 		// return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 	}
 
 	TRACE("method=%s\n", dbus_message_get_member(message));
-		  
+
 	const char *s = dbus_message_get_path(message);
 	validate( equal(s, "/org/freedesktop/Notifications"),
 			  DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
 			  "message received on unknown object '%s'\n", s );
-	
+
 	s = dbus_message_get_interface(message);
 	validate( equal(s, "org.freedesktop.Notifications"),
 			  DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
@@ -182,7 +183,7 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
 	if (ret) dbus_connection_send(dbus_conn, ret, NULL);
-	
+
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
 
@@ -245,7 +246,7 @@ main(int argc, char **argv)
 
 	initialize_backend(&argc, &argv);
 
-	TRACE("started\n");	
+	TRACE("started\n");
 
 	g_main_loop_run(loop);
 
