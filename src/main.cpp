@@ -161,6 +161,21 @@ dispatch_get_caps(DBusMessage *message)
 	return reply;
 }
 
+static DBusMessage*
+dispatch_get_info(DBusMessage *message)
+{
+	DBusMessage *reply = dbus_message_new_method_return(message);
+
+	DBusMessageIter iter;
+	dbus_message_iter_init(reply, &iter);
+
+	dbus_message_iter_append_string(&iter, "freedesktop.org Reference Implementation server");
+	dbus_message_iter_append_string(&iter, "freedesktop.org");
+	dbus_message_iter_append_string(&iter, "1.0");
+
+	return reply;
+}
+
 static DBusHandlerResult
 filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 {
@@ -201,9 +216,13 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 
 	if (equal(dbus_message_get_member(message), "Notify")) ret = dispatch_notify(message);
 	if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = dispatch_get_caps(message);
+	if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = dispatch_get_info(message);
 	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-	if (ret) dbus_connection_send(dbus_conn, ret, NULL);
+	if (ret) {
+		dbus_connection_send(dbus_conn, ret, NULL);
+		dbus_message_unref(ret);
+	}
 
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
