@@ -129,7 +129,7 @@ dispatch_notify(DBusMessage *message)
 	}
 
 
-	int id = backend->notify(n);
+	int id = replaces ? replaces : backend->notify(n);
 
 	DBusMessage *reply = dbus_message_new_method_return(message);
 	assert( reply != NULL );
