@@ -2,6 +2,7 @@
  * @file main.cpp Main Notification Daemon file.
  *
  * Copyright (C) 2004 Christian Hammond.
+ *               2004 Mike Hearn
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -39,11 +40,7 @@ GMainLoop *loop;
 static bool
 handle_initial_messages(DBusMessage *message)
 {
-	if (equal(dbus_message_get_member(message), "ServiceAcquired")) {
-		TRACE("Discarding ServiceAcquired message\n");
-		return true;
-	}
-
+	if (equal(dbus_message_get_member(message), "ServiceAcquired")) return true;
 	return false;
 }
 
