@@ -78,7 +78,7 @@ private:
 
     static gboolean dispatch_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
         PopupNotification *n = (PopupNotification *) user_data;
-        n->notifier->handle_button_release( dynamic_cast<Notification *> (n) );
+        n->notifier->handle_button_release( (Notification *) user_data );
         return TRUE;
     }
     
@@ -108,7 +108,6 @@ public:
             window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
             gtk_widget_add_events(GTK_WIDGET(window), GDK_BUTTON_RELEASE_MASK);
             g_signal_connect(G_OBJECT(window), "button-release-event", G_CALLBACK(dispatch_button_release), this);
-            
         }
 
         hbox = gtk_hbox_new(FALSE, 4);
@@ -127,8 +126,7 @@ public:
 
         /* we want to fix the width so the notifications expand upwards but not outwards.
            firstly, we need to grab the natural size request of the containing box, then we
-           need to set the size request of the label to that width so it will always line wrap.
-         */
+           need to set the size request of the label to that width so it will always line wrap. */
 
         GtkRequisition req;
         gtk_widget_size_request(image, &req);
@@ -207,8 +205,7 @@ PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv) : Ba
 /* This method is responsible for calculating the height offsets of all currently
    displayed notifications. In future, it may take into account animations and such.
 
-   This may be called many times per second so it should be reasonably fast.
- */
+   This may be called many times per second so it should be reasonably fast. */
 
 void PopupNotifier::reflow()
 {
@@ -259,5 +256,5 @@ Notification* PopupNotifier::create_notification()
 void PopupNotifier::handle_button_release(Notification *n)
 {
     TRACE("button release on notification %d\n", n->id);
-    invoke(n, 0);
+    invoke(n, 0); /* 0 is the default "invoked" action */
 }
