@@ -20,6 +20,7 @@
  */
 
 #include "notifier.h"
+#include "logging.h"
 
 Notification::Notification()
 {
@@ -28,6 +29,7 @@ Notification::Notification()
 	primary_frame = -1;
 	timeout = 0;
 	use_timeout = true;
+	id = 0;
 }
 
 Notification::~Notification()
@@ -35,6 +37,38 @@ Notification::~Notification()
 	if (this->summary) free(this->summary);
 	if (this->body) free(this->body);
 	// FIXME: free images/sound data
+}
+
+/*************************************************************/
+
+BaseNotifier::BaseNotifier()
+{
+	next_id = 0;
+}
+
+int
+BaseNotifier::notify(Notification *n)
+{
+	/* add to the internal list using the next cookie, increment, return */
+	n->id = next_id;
+	
+	next_id++;
+	
+	notifications[n->id] = n;
+	
+	return n->id;
+}
+
+bool
+BaseNotifier::unnotify(uint id)
+{
+	validate( notifications.find(id) != notifications.end(), false,
+			  "Given ID (%d) is not valid", id );
+	
+	delete notifications[id];
+	notifications.erase(id);
+	
+	return true;
 }
 
 Notification*

@@ -23,6 +23,7 @@
 #define NOTIFIER_H
 
 #include <string>
+#include <map>
 using std::string;
 
 /* some basic string utilities */
@@ -53,14 +54,25 @@ public:
     int timeout;              /* 0 means use heuristics */
     bool use_timeout;         /* should the notification ever time out? */
 
+    int id;
+    
     Notification();
     virtual ~Notification();
 };
 
 class BaseNotifier {
+protected:
+    uint next_id;
+    
 public:
-    virtual void notify(Notification *n) = 0;
-    virtual void unnotify(Notification *n) = 0;
+    /* All notifications are given a unique, non-repeating id which the client can use
+       The mapping between the ids and notification objects is stored here */
+    std::map<int, Notification*> notifications;
+    
+    virtual int notify(Notification *n);
+    virtual bool unnotify(uint id);
+
+    BaseNotifier();
     virtual ~BaseNotifier() { };
 
     /* This can be overriden by base classes to return subclasses of Notification */
@@ -69,10 +81,18 @@ public:
 
 extern BaseNotifier *notifier;    /* This holds the backend in use. It's set once, at startup. */
 
+
+
 class ConsoleNotifier : public BaseNotifier {
 public:    
-    virtual void notify(Notification *n);
-    virtual void unnotify(Notification *n);
+    virtual int notify(Notification *n);
+    virtual bool unnotify(uint id);
+};
+
+class PopupNotifier : public BaseNotifier {
+public:
+    virtual int notify(Notification *n);
+    virtual bool unnotify(uint id);
 };
 
 #endif
