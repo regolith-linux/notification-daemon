@@ -60,6 +60,7 @@ BaseNotifier::~BaseNotifier()
 	g_main_loop_unref(loop);
 }
 
+/* returns true if more heartbeats are needed */
 bool BaseNotifier::timeout()
 {
 	/* check each notification to see if it timed out yet */
@@ -76,6 +77,7 @@ bool BaseNotifier::timeout()
 	return !notifications.empty();
 }
 
+/* called by the glib main loop */
 static gboolean timeout_dispatch(gpointer data)
 {
 	BaseNotifier *n = (BaseNotifier *) data;
@@ -94,24 +96,20 @@ void BaseNotifier::register_timeout(int hz)
 void BaseNotifier::setup_timeout(Notification *n)
 {
 	/* decide a sensible timeout. for now let's just use 5 seconds. in future, based on text length? */
-	if (n->use_timeout && !n->timeout) n->timeout = time(NULL) + 5;
+	if (n->use_timeout && (n->timeout == 0)) n->timeout = time(NULL) + 5;
+
+	
+	/* we don't have a timeout triggering constantly as otherwise n-d
+	   could never be fully paged out by the kernel. */
 	
 	if (n->use_timeout && !timing) {
 		register_timeout(1000);
-		timing = true;
+		timing = true; /* set to false when ::timeout returns false */
 	}	
 }
 
 uint BaseNotifier::notify(Notification *n)
 {	
-	/* add to the internal list using the next cookie, increment, then
-	   register a timeout, once per second if one isn't already
-	   registered to count down.
-
-	   we don't have a timeout triggering constantly as otherwise n-d
-	   could never be fully paged out by the kernel.
-	 */
-
 	n->id = next_id;
 	
 	next_id++;
@@ -133,8 +131,7 @@ bool BaseNotifier::unnotify(uint id)
 {
 	Notification *n = get(id);
 	
-	validate( n != NULL, false,
-			  "Given ID (%d) is not valid", id );
+	validate( n != NULL, false, "Given ID (%d) is not valid", id );
 	
 	return unnotify(n);
 }
@@ -142,18 +139,19 @@ bool BaseNotifier::unnotify(uint id)
 bool BaseNotifier::unnotify(Notification *n)
 {
 	if (!notifications.erase(n->id)) {
-		WARN("no such notification (%p)\n", n);
+		WARN("no such notification registered (%p), id=%d\n", n, n->id);
 		return false;
 	}
 
 	TRACE("deleting due to unnotify (%p)\n", n);
 	delete n;
-	
+
 	return true;
 }
 
 Notification* BaseNotifier::create_notification()
 {
+	/* base classes override this to add extra info and abilities to the Notification class */
 	return new Notification();
 }
 
@@ -173,6 +171,7 @@ void BaseNotifier::invoke(Notification *n, uint actionid)
 	
 	dbus_message_append_args(signal, DBUS_TYPE_UINT32, n->id, DBUS_TYPE_UINT32, actionid, DBUS_TYPE_INVALID);
 
+	// fixme: this causes us to be disconnected from the bus, for some reason
 	dbus_connection_send(n->connection, signal, NULL);
 	dbus_message_unref(signal);
 }
