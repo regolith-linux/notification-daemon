@@ -50,7 +50,7 @@ BaseNotifier *backend;
 GMainLoop *loop;
 
 static DBusMessage*
-dispatch_notify(DBusMessage *message)
+handle_notify(DBusMessage *message)
 {
 	DBusError *error;
 	DBusMessageIter iter;
@@ -58,6 +58,8 @@ dispatch_notify(DBusMessage *message)
 	Notification *n;
 	guint32 replaces;
 
+	/* we could probably use get_args here, at a cost of less fine grained error reporting */
+	
 	dbus_message_iter_init(message, &iter);
 
 #define type dbus_message_iter_get_arg_type(&iter)
@@ -148,7 +150,7 @@ dispatch_notify(DBusMessage *message)
 }
 
 static DBusMessage*
-dispatch_get_caps(DBusMessage *message)
+handle_get_caps(DBusMessage *message)
 {
 	DBusMessage *reply = dbus_message_new_method_return(message);
 
@@ -162,7 +164,7 @@ dispatch_get_caps(DBusMessage *message)
 }
 
 static DBusMessage*
-dispatch_get_info(DBusMessage *message)
+handle_get_info(DBusMessage *message)
 {
 	DBusMessage *reply = dbus_message_new_method_return(message);
 
@@ -174,6 +176,22 @@ dispatch_get_info(DBusMessage *message)
 	dbus_message_iter_append_string(&iter, "1.0");
 
 	return reply;
+}
+
+static DBusMessage*
+handle_close(DBusMessage *message)
+{
+	guint32 id;
+	DBusError error;
+	
+	if (!dbus_message_get_args(message, &error, DBUS_TYPE_UINT32, &id, DBUS_TYPE_INVALID)) {
+		FIXME("error parsing message args but not propogating\n");
+		return NULL;
+	}
+
+	backend->unnotify(id);
+
+	return NULL;
 }
 
 static DBusHandlerResult
@@ -214,15 +232,17 @@ filter_func(DBusConnection *dbus_conn, DBusMessage *message, void *user_data)
 
 	DBusMessage *ret = NULL;
 
-	if (equal(dbus_message_get_member(message), "Notify")) ret = dispatch_notify(message);
-	if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = dispatch_get_caps(message);
-	if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = dispatch_get_info(message);
+	if (equal(dbus_message_get_member(message), "Notify")) ret = handle_notify(message);
+	if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = handle_get_caps(message);
+	if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = handle_get_info(message);
+	if (equal(dbus_message_get_member(message), "CloseNotification")) ret = handle_close(message);
 	else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-	if (ret) {
-		dbus_connection_send(dbus_conn, ret, NULL);
-		dbus_message_unref(ret);
-	}
+	/* we always reply to messages, even if it's just empty */
+	if (!ret) ret = dbus_message_new_method_return(message);
+	
+	dbus_connection_send(dbus_conn, ret, NULL);
+	dbus_message_unref(ret);
 
 	return DBUS_HANDLER_RESULT_HANDLED;
 }

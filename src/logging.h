@@ -22,7 +22,8 @@
 enum loglevel {
     LOG_TRACE,
     LOG_WARNING,
-    LOG_ERROR
+    LOG_ERROR,
+	LOG_FIXME
 };
 
 #define void_validate(condition, args...) if (!(condition)) { log(LOG_WARNING, args); return; }
@@ -31,5 +32,6 @@ void log(enum loglevel level, char *s, ...);
 
 #define TRACE(args...) log(LOG_TRACE, args);
 #define WARN(args...) log(LOG_WARNING, args);
+#define FIXME(args...) log(LOG_FIXME, args);
 #define ERROR(args...) log(LOG_ERROR, args);
 

@@ -31,9 +31,10 @@ void log(enum loglevel level, char *s, ...) {
     fprintf(stderr, "%s: ", getenv("_"));
     
     switch (level) {
-	case LOG_WARNING: fprintf(stderr, "warning: "); break;
-	case LOG_TRACE: fprintf(stderr, "trace: "); break;
-	case LOG_ERROR: fprintf(stderr, "error: "); break;
+		case LOG_WARNING: fprintf(stderr, "warning: "); break;
+		case LOG_TRACE: fprintf(stderr, "trace: "); break;
+		case LOG_ERROR: fprintf(stderr, "error: "); break;
+		case LOG_FIXME: fprintf(stderr, "fixme: "); break;
     }
                                                     
     va_start(args, s);

@@ -1,7 +1,7 @@
 Thu Jul 29 21:19:26 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp: Implement GetCapabilities
-	* src/main.cpp: Implement GetServerInfo
-
+	* src/main.cpp: Implement GetCapabilities, GetServerInfo, CloseNotification
+	* src/logging.cpp (log): Add a FIXME type
+	
 Wed Jul 14 02:13:10 GMT 2004  Mike Hearn  <mike@navi.cx>
 	* src/main.cpp, src/base-notifier.cpp, src/popup-notifier.cpp:
 	  Support replacements properly
