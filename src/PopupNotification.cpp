@@ -54,7 +54,7 @@ private:
     static const int width = 300;     // FIXME: make these relative to screen size
     static const int minheight = 50;
     static const int imagesize = 48;
-    static const int image_padding = 15;
+    static const int image_padding = 12;
 
 	int disp_screen;
 
@@ -225,7 +225,7 @@ public:
                 g_signal_connect(win, "button-release-event", G_CALLBACK(_window_button_release), this);
             }
 
-            bodybox_widget = gtk_hbox_new(FALSE, 4);
+            bodybox_widget = gtk_hbox_new(FALSE, 0);
             gtk_container_add(GTK_CONTAINER(win), bodybox_widget);
             gtk_widget_show(bodybox_widget);
 
@@ -346,16 +346,15 @@ public:
 
             gtk_widget_set_size_request(body ? body_label : summary_label,
                                         width - (imagesize + image_padding) - 10 /* FIXME */, -1);
-            if (image_widget)
-                gtk_widget_set_size_request(image_widget, imagesize, imagesize);
 
             summary_label = body_label = NULL;
 
             if (!actions.empty())
             {
-                /* now let's do the actions. we'll show them as hyperlinks to save space, and because
-                   it looks cooler that way :)  */
-
+                /*
+				 * now let's do the actions. we'll show them as hyperlinks to
+				 * save space, and because it looks cooler that way :)
+				 */
                 GtkWidget *actions_hbox = gtk_hbox_new(FALSE, 0);
                 gtk_box_pack_start(GTK_BOX(vbox), actions_hbox, FALSE, FALSE, 5);
                 gtk_widget_show(actions_hbox);
@@ -399,9 +398,12 @@ public:
                 }
             }
 
-            /* set up an eventbox so we can get a white background. for some reason GTK insists
-               that it be given a new X window if you want to change the background colour. it will
-               just silently ignore requests to change the colours of eg, a box.  */
+            /*
+			 * set up an eventbox so we can get a white background. for some
+			 * reason GTK insists that it be given a new X window if you want
+			 * to change the background colour. it will just silently ignore
+			 * requests to change the colours of eg, a box.
+			 */
 
             GtkWidget *eventbox = gtk_event_box_new();
             whiten(eventbox);
@@ -412,11 +414,14 @@ public:
             gtk_box_pack_end_defaults(GTK_BOX(bodybox_widget), eventbox);
 
             GtkWidget *imagebox = gtk_vbox_new(FALSE, 0);
-            gtk_container_set_border_width(GTK_CONTAINER(imagebox), image_padding);
+            gtk_container_set_border_width(GTK_CONTAINER(imagebox),
+										   image_padding);
+
             if (image_widget)
             {
-                gtk_box_pack_start_defaults(GTK_BOX(imagebox), image_widget);
                 gtk_widget_show(image_widget);
+                gtk_box_pack_start_defaults(GTK_BOX(imagebox), image_widget);
+				gtk_misc_set_alignment(GTK_MISC(image_widget), 0.5, 0.0);
                 image_widget = NULL;
             }
             gtk_widget_show(imagebox);
@@ -561,15 +566,17 @@ void PopupNotifier::reflow()
        screen to the nearest edge of the popup */
 
     int offset = 0;
+	int offsub = 0;
 
     foreach( NotificationsMap, notifications )
     {
         PopupNotification *n = dynamic_cast<PopupNotification*> (i->second);
         assert( n != NULL );
 
-        n->set_height_offset(offset);
+        n->set_height_offset(offset - offsub);
 
         offset += n->height();
+		offsub++;
     }
 }
 

@@ -1,3 +1,10 @@
+Wed Nov 03 10:02:51 PST 2004  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/PopupNotification.cpp:
+	  - Improve the display of notifications a bit. Fix up spacing and image
+	    alignment, and overlap them slightly so that you see one pixel border
+	    between two notifications rather than two.
+
 Wed Nov 03 09:41:23 PST 2004  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/PopupNotification.cpp:
