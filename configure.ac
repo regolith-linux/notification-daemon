@@ -78,7 +78,7 @@ fi
 if ! test -z "$with_dbus_services" ; then
 	DBUS_SERVICES_DIR="$with_dbus_services"
 else
-	DBUS_SERVICES_DIR="$LIBDIR/dbus-1.0/services"
+	DBUS_SERVICES_DIR="$LIBDIR/dbus-1/services"
 fi
 
 AC_SUBST(DBUS_SYS_DIR)
