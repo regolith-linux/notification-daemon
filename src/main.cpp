@@ -1,4 +1,4 @@
-/** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
+/** -*- mode: c++-mode; tab-width: 4; c-basic-offset: 4; -*-
  * @file main.cpp Main Notification Daemon file.
  *
  * Copyright (C) 2004 Christian Hammond.
@@ -65,6 +65,8 @@
 #include "notifier.h"
 #include "logging.h"
 
+#define equal(s1, s2) (strcmp(s1, s2) == 0)
+
 BaseNotifier *backend;
 static GMainLoop *loop;
 static DBusConnection *dbus_conn;
@@ -88,6 +90,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 
 #define type dbus_message_iter_get_arg_type(&iter)
 
+
 	/*********************************************************************
 	 * App Name
 	 *********************************************************************/
@@ -103,7 +106,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 			 "Invalid notify message. app icon argument is "
 			 "not a string or nil\n");
 	dbus_message_iter_next(&iter);
-
+    
 	/*********************************************************************
 	 * Replaces ID
 	 *********************************************************************/
@@ -383,12 +386,14 @@ filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
 	TRACE("method = %s\n", dbus_message_get_member(message));
 
 	s = dbus_message_get_path(message);
-	validate(equal(s, "/org/freedesktop/Notifications"),
+
+    validate(equal(s, "/org/freedesktop/Notifications"),
 			 DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
 			 "message received on unknown object '%s'\n", s );
 
 	s = dbus_message_get_interface(message);
-	validate(equal(s, "org.freedesktop.Notifications"),
+
+    validate(equal(s, "org.freedesktop.Notifications"),
 			 DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
 			 "unknown message received: %s.%s\n",
 			 s, dbus_message_get_member(message) );

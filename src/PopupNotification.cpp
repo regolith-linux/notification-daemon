@@ -41,8 +41,6 @@
 
 #include <assert.h>
 
-#define GTK_CALLBACK(name, params...) static gboolean name(GtkWidget *widget, params, gpointer user_data)
-
 struct expose_data
 {
     GtkWidget *widget;
@@ -497,11 +495,11 @@ PopupNotification::get_work_area(GdkRectangle &rect)
     Window win = XRootWindow(GDK_DISPLAY(), m_disp_screen);
 
     Atom type;
-    gint format;
-    gulong num, leftovers;
-    gulong max_len = 4 * 32;
-    guchar *ret_workarea;
-    gint result = XGetWindowProperty(GDK_DISPLAY(), win, workarea, 0,
+    int format;
+    unsigned long num, leftovers;
+    unsigned long max_len = 4 * 32;
+    unsigned char *ret_workarea;
+    int result = XGetWindowProperty(GDK_DISPLAY(), win, workarea, 0,
                                      max_len, False, AnyPropertyType,
                                      &type, &format, &num,
                                      &leftovers, &ret_workarea);
@@ -547,71 +545,5 @@ PopupNotification::update()
     }
 
     generate();    // can throw
-}
-
-
-PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv)
-    : BaseNotifier(main_loop)
-{
-    gtk_init(argc, argv);
-}
-
-/*
- * This method is responsible for calculating the height offsets of all
- * currently displayed notifications. In future, it may take into account
- * animations and such.
- *
- * This may be called many times per second so it should be reasonably fast.
- */
-void
-PopupNotifier::reflow()
-{
-    /* the height offset is the distance from the top/bottom of the
-       screen to the nearest edge of the popup */
-
-    int offset = 0;
-    int offsub = 0;
-
-    for (NotificationsMap::iterator i = notifications.begin();
-         i != notifications.end();
-         i++, offsub++)
-    {
-        PopupNotification *n = dynamic_cast<PopupNotification *>(i->second);
-        assert(n != NULL);
-
-        n->set_height_offset(offset - offsub);
-
-        offset += n->get_height();
-    }
-}
-
-uint
-PopupNotifier::notify(Notification *base)
-{
-    PopupNotification *n = dynamic_cast<PopupNotification*> (base);
-    assert( n != NULL );
-
-    uint id = BaseNotifier::notify(base);  // can throw
-
-    reflow();
-
-    n->show();
-
-    return id;
-}
-
-bool
-PopupNotifier::unnotify(Notification *n)
-{
-    bool ret = BaseNotifier::unnotify(n);
-
-    reflow();
-
-    return ret;
-}
-
-Notification* PopupNotifier::create_notification()
-{
-    return new PopupNotification(this);
 }
 

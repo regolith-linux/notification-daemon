@@ -5,6 +5,7 @@ notification_daemon_SOURCES = \
 	ConsoleNotification.cpp \
 	Image.cpp \
 	PopupNotification.cpp \
+	PopupNotifier.cpp \
 	logging.cpp \
 	logging.h \
 	main.cpp \

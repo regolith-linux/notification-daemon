@@ -22,6 +22,9 @@
 #ifndef _POPUP_NOTIFICATION_HH_
 #define _POPUP_NOTIFICATION_HH_
 
+#include <gtk/gtk.h>
+#include <gdk/gdk.h>
+
 #include "notifier.h"
 
 class PopupNotification : public Notification

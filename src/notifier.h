@@ -33,7 +33,6 @@
 using std::string;   // we should be using a Glibmm::ustring for most of this ....
 
 /* some basic utilities */
-#define equal(s1,s2) (s1 && s2 && !strcmp(s1,s2))
 #define S(str) std::string(str)
 #define ifnull(expr1, expr2) (expr1 ? expr1 : expr2)
 #define foreach(type, list) for (type::iterator i = list.begin(); i != list.end(); i++)
@@ -78,7 +77,7 @@ public:
     char *body;               /* UTF-8 encoded body, optionally containing markup */
     ImageList images;         /* an array of frames in the animated image. would this be better as a ptr array? */
     int primary_frame;        /* for notifiers that can't show animations, the still frame to use */
-    uint timeout;             /* 0 means use heuristics */
+    int timeout;             /* 0 means use heuristics */
     bool use_timeout;         /* should the notification ever time out? */
 
 	ActionsMap actions;       /* the mapping of action ids to action strings */
