@@ -79,6 +79,7 @@ public:
 	PopupNotification() {
         Notification::Notification();
 		gc = NULL;
+		window = NULL;
 		height_offset = 0;
     }
 
@@ -94,15 +95,9 @@ public:
         TRACE("Generating new PopupNotification GUI for nid %d\n", id);
 
 		const int width = 300; // FIXME: make these relative to screen size
-        const int height = 70;
 		const int image_padding = 15;
 
         window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_POPUP));
-        gtk_window_set_default_size(window, width, height);
-
-        /* FIXME: calculate border offsets from NETWM window geometries */
-        gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
-        gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height - height_offset);
 
         hbox = gtk_hbox_new(FALSE, 4);
         vbox = gtk_vbox_new(FALSE, 2);
@@ -146,11 +141,24 @@ public:
 		
 		gtk_container_add(GTK_CONTAINER(window), hbox);
 
+        /* FIXME: calculate border offsets from NETWM window geometries */
+        gtk_window_set_gravity(window, GDK_GRAVITY_SOUTH_EAST);
+        gtk_window_move(window, gdk_screen_width() - width, gdk_screen_height() - height() - height_offset);
+
 		TRACE("done\n");
 	}
 
 	void show() {
 		gtk_widget_show(GTK_WIDGET(window));
+	}
+
+	/* returns the natural height of the notification. generates the gui if not done so already */
+	int height() {
+		if (!window) generate();
+
+		GtkRequisition req;
+		gtk_widget_size_request(GTK_WIDGET(window), &req);
+		return req.height;
 	}
 };
 
@@ -173,6 +181,7 @@ PopupNotifier::notify(Notification *base)
 	reflow();
 	
 	n->generate();
+	TRACE("height is %d\n", n->height());
 	
     n->show();
     
