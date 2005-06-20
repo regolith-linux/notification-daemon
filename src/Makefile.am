@@ -6,6 +6,7 @@ notification_daemon_SOURCES = \
 	Image.cpp \
 	PopupNotification.cpp \
 	PopupNotifier.cpp \
+	dbus-compat.h \
 	logging.cpp \
 	logging.h \
 	main.cpp \

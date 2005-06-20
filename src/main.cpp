@@ -64,6 +64,7 @@
 
 #include "notifier.h"
 #include "logging.h"
+#include "dbus-compat.h"
 
 #define equal(s1, s2) (strcmp(s1, s2) == 0)
 
@@ -111,7 +112,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
      *********************************************************************/
     validate(type == DBUS_TYPE_UINT32, NULL,
              "Invalid notify message. replaces argument is not a uint32\n");
-    replaces = dbus_message_iter_get_uint32(&iter);
+    _notifyd_dbus_message_iter_get_uint32(&iter, replaces);
     dbus_message_iter_next(&iter);
 
     if (replaces == 0)
@@ -145,7 +146,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
      *********************************************************************/
     validate(type == DBUS_TYPE_BYTE, NULL,
              "Invalid notify message. Urgency argument is not a byte\n" );
-    n->urgency = dbus_message_iter_get_byte(&iter);
+    _notifyd_dbus_message_iter_get_byte(&iter, n->urgency);
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -154,9 +155,11 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_STRING, NULL,
              "Invalid notify message. Summary argument is not a string\n");
 
-    str = dbus_message_iter_get_string(&iter);
+    _notifyd_dbus_message_iter_get_string(&iter, str);
     n->summary = strdup(str);
+#if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
     dbus_free(str);
+#endif
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -165,12 +168,11 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_STRING, NULL,
              "Invalid notify message. Body argument is not a string\n");
 
-    if (type != DBUS_TYPE_NIL)
-    {
-        str = dbus_message_iter_get_string(&iter);
-        n->body = strdup(str);
-        dbus_free(str);
-    }
+	_notifyd_dbus_message_iter_get_string(&iter, str);
+	n->body = (*str == '\0' ? NULL : strdup(str));
+#if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+	dbus_free(str);
+#endif
 
     dbus_message_iter_next(&iter);
 
@@ -182,13 +184,20 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 			 "or string\n");
 
 	DBusMessageIter arrayiter;
+#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+	dbus_message_iter_recurse(&iter, &arrayiter);
+#else
 	dbus_message_iter_init_array_iterator(&iter, &arrayiter, NULL);
+#endif
 
-	int arraytype = dbus_message_iter_get_array_type(&iter);
+	int arraytype = dbus_message_iter_get_element_type(&iter);
 
-	if ((arraytype == DBUS_TYPE_STRING) || (arraytype == DBUS_TYPE_ARRAY))
+	if (arraytype == DBUS_TYPE_STRING || arraytype == DBUS_TYPE_ARRAY)
 	{
-		/* yes, the dbus api is this bad. they may look like java iterators, but they aren't */
+		/*
+		 * yes, the dbus api is this bad. they may look like java
+		 * iterators, but they aren't
+		 */
 		if (dbus_message_iter_get_arg_type(&arrayiter) != DBUS_TYPE_INVALID)
 		{
 			do
@@ -197,19 +206,22 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 
 				if (arraytype == DBUS_TYPE_STRING)
 				{
-					char *s = dbus_message_iter_get_string(&arrayiter);
+					char *s;
+					_notifyd_dbus_message_iter_get_string(&arrayiter, s);
 
 					n->images.push_back(new Image(s));
 
+#if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
 					dbus_free(s);
+#endif
 				}
 				else if (arraytype == DBUS_TYPE_ARRAY)
 				{
 					unsigned char *data;
 					int len;
 
-					if (! dbus_message_iter_get_byte_array(&arrayiter, &data, &len) )
-						throw std::runtime_error( "could not retrieve marshalled image" );
+					_notifyd_dbus_message_iter_get_byte_array(&arrayiter,
+															  &data, &len);
 
 					n->images.push_back(new Image(data, len));
 				}
@@ -226,27 +238,53 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Actions
      *********************************************************************/
-    validate(type == DBUS_TYPE_DICT, NULL,
-             "Invalid notify message. Actions argument is not a dict\n" );
+    validate(type == DBUS_TYPE_ARRAY, NULL,
+             "Invalid notify message. Actions argument is not a array\n" );
 
 	DBusMessageIter action_iter;
 
-	if (dbus_message_iter_init_dict_iterator(&iter, &action_iter))
+#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+	dbus_message_iter_recurse(&iter, &arrayiter);
+#else
+	dbus_message_iter_init_dict_iterator(&iter, &action_iter);
+#endif
+
+	while (dbus_message_iter_get_arg_type(&action_iter) ==
+#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+		   DBUS_TYPE_DICT_ENTRY
+#else
+		   DBUS_TYPE_DICT
+#endif
+			   )
 	{
-		do
-		{
-			/*
-			 * Confusingly on the wire, the dict maps action text to ID,
-			 * whereas internally we map the id to the action text.
-			 */
-			char *key     = dbus_message_iter_get_dict_key(&action_iter);
-			uint actionid = dbus_message_iter_get_uint32(&action_iter);
+		/*
+		 * Confusingly on the wire, the dict maps action text to ID,
+		 * whereas internally we map the id to the action text.
+		 */
+		char *key;
+		uint actionid;
 
-			TRACE("demarshal: action %d : %s\n", actionid, key);
+#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+		DBusMessageIter entry_iter;
+		dbus_message_iter_recurse(&action_iter, &entry_iter);
+		dbus_message_iter_get_basic(&entry_iter, &key);
+		dbus_message_iter_next(&entry_iter);
+		dbus_message_iter_get_basic(&entry_iter, &actionid);
+#else
+		key = dbus_message_iter_get_dict_key(&action_iter);
+		dbus_message_iter_next(&action_iter);
+		actionid = dbus_message_iter_get_uint32(&action_iter);
+#endif
 
-			n->actions[actionid] = strdup(key);
-			dbus_free(key);
-		} while (dbus_message_iter_next(&action_iter));
+		TRACE("demarshal: action %d : %s\n", actionid, key);
+
+		n->actions[actionid] = strdup(key);
+
+#if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+		dbus_free(key);
+#endif
+
+		dbus_message_iter_next(&action_iter);
 	}
 
     dbus_message_iter_next(&iter);
@@ -254,8 +292,8 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Hints
      *********************************************************************/
-    validate(type == DBUS_TYPE_DICT, NULL,
-             "Invalid notify message. Hints argument is not a dict\n" );
+    validate(type == DBUS_TYPE_ARRAY, NULL,
+             "Invalid notify message. Hints argument is not a array\n" );
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -273,7 +311,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_UINT32, NULL,
              "Invalid notify message. Timeout argument is not uint32\n");
 
-    n->timeout = dbus_message_iter_get_uint32(&iter);
+    _notifyd_dbus_message_iter_get_uint32(&iter, n->timeout);
     dbus_message_iter_next(&iter);
 
 #undef type
@@ -302,8 +340,9 @@ handle_get_caps(DBusMessage *message)
     DBusMessageIter iter;
     static const char *caps[] = { "body", "actions", "static-image" };
 
-    dbus_message_iter_init(reply, &iter);
-    dbus_message_iter_append_string_array(&iter, caps, G_N_ELEMENTS(caps));
+    dbus_message_iter_init_append(reply, &iter);
+    _notifyd_dbus_message_iter_append_string_array(&iter, caps,
+												   G_N_ELEMENTS(caps));
 
     return reply;
 }
@@ -313,13 +352,14 @@ handle_get_info(DBusMessage *message)
 {
     DBusMessage *reply = dbus_message_new_method_return(message);
     DBusMessageIter iter;
+	const char *name = "freedesktop.org Reference Implementation server";
+	const char *vendor = "freedesktop.org";
+	const char *version = VERSION;
 
-    dbus_message_iter_init(reply, &iter);
-
-    dbus_message_iter_append_string(&iter,
-        "freedesktop.org Reference Implementation server");
-    dbus_message_iter_append_string(&iter, "freedesktop.org");
-    dbus_message_iter_append_string(&iter, "0.1.0");
+    dbus_message_iter_init_append(reply, &iter);
+    _notifyd_dbus_message_iter_append_string(&iter, name);
+    _notifyd_dbus_message_iter_append_string(&iter, vendor);
+    _notifyd_dbus_message_iter_append_string(&iter, version);
 
     return reply;
 }
@@ -433,7 +473,8 @@ initialize_backend(int *argc, char ***argv)
         backend = new PopupNotifier(loop, argc, argv);
     else
     {
-        fprintf(stderr, "%s: unknown backend specified: %s\n", envvar);
+        fprintf(stderr, "%s: unknown backend specified: %s\n",
+				envvar, name.c_str());
         exit(1);
     }
 }
@@ -459,8 +500,8 @@ main(int argc, char **argv)
 
     dbus_connection_setup_with_g_main(dbus_conn, NULL);
 
-    dbus_bus_acquire_service(dbus_conn, "org.freedesktop.Notifications",
-                             0, &error);
+    dbus_bus_request_name(dbus_conn, "org.freedesktop.Notifications",
+						  0, &error);
 
     if (dbus_error_is_set(&error))
     {
