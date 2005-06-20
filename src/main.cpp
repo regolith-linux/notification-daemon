@@ -76,6 +76,7 @@ static DBusMessage *
 handle_notify(DBusConnection *incoming, DBusMessage *message)
 {
     DBusMessageIter iter;
+	DBusMessageIter arrayiter;
     DBusMessage *reply;
     char *str;
     Notification *n;
@@ -183,55 +184,56 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
              "Invalid notify message. Images argument is not an array "
 			 "or string\n");
 
-	DBusMessageIter arrayiter;
+	if (type == DBUS_TYPE_ARRAY)
+	{
 #if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-	dbus_message_iter_recurse(&iter, &arrayiter);
+		dbus_message_iter_recurse(&iter, &arrayiter);
 #else
-	dbus_message_iter_init_array_iterator(&iter, &arrayiter, NULL);
+		dbus_message_iter_init_array_iterator(&iter, &arrayiter, NULL);
 #endif
 
-	int arraytype = dbus_message_iter_get_element_type(&iter);
+		int arraytype = dbus_message_iter_get_element_type(&iter);
 
-	if (arraytype == DBUS_TYPE_STRING || arraytype == DBUS_TYPE_ARRAY)
-	{
-		/*
-		 * yes, the dbus api is this bad. they may look like java
-		 * iterators, but they aren't
-		 */
-		if (dbus_message_iter_get_arg_type(&arrayiter) != DBUS_TYPE_INVALID)
+		if (arraytype == DBUS_TYPE_STRING || arraytype == DBUS_TYPE_ARRAY)
 		{
-			do
+			/*
+			 * yes, the dbus api is this bad. they may look like java
+			 * iterators, but they aren't
+			 */
+			if (dbus_message_iter_get_arg_type(&arrayiter) != DBUS_TYPE_INVALID)
 			{
-				dbus_message_iter_next(&arrayiter);
-
-				if (arraytype == DBUS_TYPE_STRING)
+				do
 				{
-					char *s;
-					_notifyd_dbus_message_iter_get_string(&arrayiter, s);
+//					dbus_message_iter_next(&arrayiter);
 
-					n->images.push_back(new Image(s));
+					if (arraytype == DBUS_TYPE_STRING)
+					{
+						char *s;
+						_notifyd_dbus_message_iter_get_string(&arrayiter, s);
+
+						n->images.push_back(new Image(s));
 
 #if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-					dbus_free(s);
+						dbus_free(s);
 #endif
-				}
-				else if (arraytype == DBUS_TYPE_ARRAY)
-				{
-					unsigned char *data;
-					int len;
+					}
+					else if (arraytype == DBUS_TYPE_ARRAY)
+					{
+						unsigned char *data;
+						int len;
 
-					_notifyd_dbus_message_iter_get_byte_array(&arrayiter,
-															  &data, &len);
+						_notifyd_dbus_message_iter_get_byte_array(&arrayiter,
+																  &data, &len);
 
-					n->images.push_back(new Image(data, len));
-				}
-			} while (dbus_message_iter_next(&arrayiter));
+						n->images.push_back(new Image(data, len));
+					}
+				} while (dbus_message_iter_next(&arrayiter));
+			}
+
+			TRACE("There are %d images\n", n->images.size());
+
 		}
-
-		TRACE("There are %d images\n", n->images.size());
-
 	}
-
 
     dbus_message_iter_next(&iter);
 
@@ -244,7 +246,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_ARRAY, NULL,
              "Invalid notify message. Actions argument is not an array\n" );
 
-	dbus_message_iter_recurse(&iter, &arrayiter);
+	dbus_message_iter_recurse(&iter, &action_iter);
 #else
     validate(type == DBUS_TYPE_DICT, NULL,
              "Invalid notify message. Actions argument is not a dict\n" );
@@ -333,9 +335,8 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 
     reply = dbus_message_new_method_return(message);
 
-    dbus_message_append_args(reply,
-                             DBUS_TYPE_UINT32, id,
-                             DBUS_TYPE_INVALID);
+	dbus_message_iter_init_append(reply, &iter);
+	_notifyd_dbus_message_iter_append_uint32(&iter, id);
 
     return reply;
 }

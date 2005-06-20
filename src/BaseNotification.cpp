@@ -18,10 +18,14 @@
  * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA  02111-1307  USA
  */
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <glib.h> // for GMainLoop
 #include <time.h>
 
+#include "dbus-compat.h"
 #include "notifier.h"
 #include "logging.h"
 
@@ -64,10 +68,11 @@ void Notification::action_invoke(uint actionid)
 
     TRACE("sending Invoked signal on notification id %d, action id %d\n", id, actionid);
 
-    dbus_message_append_args(signal,
-                             DBUS_TYPE_UINT32, id,
-                             DBUS_TYPE_UINT32, actionid,
-                             DBUS_TYPE_INVALID);
+	DBusMessageIter iter;
+	dbus_message_iter_init_append(signal, &iter);
+
+	_notifyd_dbus_message_iter_append_uint32(&iter, id);
+	_notifyd_dbus_message_iter_append_uint32(&iter, actionid);
 
     dbus_connection_send(connection, signal, NULL);
 

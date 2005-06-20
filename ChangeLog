@@ -1,3 +1,9 @@
+Mon Jun 20 06:14:07 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/BaseNotification.cpp:
+	* src/main.cpp:
+	  - Handle the dicts and arrays and outgoing messages correctly.
+
 Mon Jun 20 00:36:02 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/main.cpp:
