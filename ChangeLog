@@ -1,3 +1,8 @@
+Mon Jun 20 04:03:11 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cpp:
+	  - Check the right types depending on D-BUS version.
+
 Mon Jun 20 03:57:40 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/Makefile.am:

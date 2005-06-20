@@ -238,14 +238,17 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Actions
      *********************************************************************/
-    validate(type == DBUS_TYPE_ARRAY, NULL,
-             "Invalid notify message. Actions argument is not a array\n" );
-
 	DBusMessageIter action_iter;
 
 #if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+    validate(type == DBUS_TYPE_ARRAY, NULL,
+             "Invalid notify message. Actions argument is not an array\n" );
+
 	dbus_message_iter_recurse(&iter, &arrayiter);
 #else
+    validate(type == DBUS_TYPE_DICT, NULL,
+             "Invalid notify message. Actions argument is not a dict\n" );
+
 	dbus_message_iter_init_dict_iterator(&iter, &action_iter);
 #endif
 
@@ -292,8 +295,13 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Hints
      *********************************************************************/
+#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
     validate(type == DBUS_TYPE_ARRAY, NULL,
-             "Invalid notify message. Hints argument is not a array\n" );
+             "Invalid notify message. Hints argument is not an array\n" );
+#else
+    validate(type == DBUS_TYPE_DICT, NULL,
+             "Invalid notify message. Hints argument is not a dict\n" );
+#endif
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
