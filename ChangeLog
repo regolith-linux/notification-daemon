@@ -1,3 +1,8 @@
+Mon Jun 20 00:36:02 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/main.cpp:
+	  - Make actions work for D-BUS 0.2x again.
+
 Mon Jun 20 04:03:11 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/main.cpp:

@@ -252,13 +252,11 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 	dbus_message_iter_init_dict_iterator(&iter, &action_iter);
 #endif
 
-	while (dbus_message_iter_get_arg_type(&action_iter) ==
 #if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-		   DBUS_TYPE_DICT_ENTRY
+	while (dbus_message_iter_get_arg_type(&action_iter) == DBUS_TYPE_DICT_ENTRY)
 #else
-		   DBUS_TYPE_DICT
+	do
 #endif
-			   )
 	{
 		/*
 		 * Confusingly on the wire, the dict maps action text to ID,
@@ -275,7 +273,6 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 		dbus_message_iter_get_basic(&entry_iter, &actionid);
 #else
 		key = dbus_message_iter_get_dict_key(&action_iter);
-		dbus_message_iter_next(&action_iter);
 		actionid = dbus_message_iter_get_uint32(&action_iter);
 #endif
 
@@ -285,10 +282,13 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 
 #if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
 		dbus_free(key);
-#endif
-
+#else
 		dbus_message_iter_next(&action_iter);
+#endif
 	}
+#if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+	while (dbus_message_iter_next(&action_iter));
+#endif
 
     dbus_message_iter_next(&iter);
 
