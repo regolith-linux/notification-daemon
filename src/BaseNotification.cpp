@@ -109,7 +109,10 @@ bool BaseNotifier::timeout()
     {
         if (i->second->use_timeout) needed = true;
 
-        if (i->second->use_timeout && (i->second->timeout <= now)) unnotify(i->second);
+        if (i->second->use_timeout && (i->second->timeout <= now)) {
+            unnotify(i->second);
+            break;
+        }
     }
 
     TRACE("heartbeat: %d, %d notifications left\n", now, notifications.size());

@@ -1,3 +1,9 @@
+Fri Jun 24 20:55:54 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotification.cpp:
+	  - Patch #2949 by Duarte Henriques to fix a crash on notification
+	    timeout.
+
 Fri Jun 24 20:49:06 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/main.cpp:
