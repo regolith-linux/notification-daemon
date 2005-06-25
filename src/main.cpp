@@ -116,8 +116,9 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     _notifyd_dbus_message_iter_get_uint32(&iter, replaces);
     dbus_message_iter_next(&iter);
 
-    if (replaces == 0)
+    if (replaces == 0 || (n = backend->get(replaces)) == NULL)
     {
+        replaces = 0;
         n = backend->create_notification();
         n->connection = incoming;
 
@@ -126,10 +127,6 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     else
     {
         TRACE("replaces = %d\n", replaces);
-
-        n = backend->get(replaces);
-        validate(n != NULL, NULL, "Invalid replacement ID (%d) given\n",
-                 replaces );
     }
 
     validate(n->connection != NULL, NULL,
