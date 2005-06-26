@@ -1,3 +1,12 @@
+Sat Jun 25 17:45:38 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/Makefile.am:
+	* src/PopupNotification.cpp:
+	A src/sexy-url-label.c:
+	A src/sexy-url-label.h:
+	  - Use SexyUrlLabel for the notification body. We now have bold,
+	    italic, underline, and hyperlinks. Huzzah!
+
 Fri Jun 24 20:55:54 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/BaseNotification.cpp:

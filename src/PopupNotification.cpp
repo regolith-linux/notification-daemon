@@ -38,6 +38,7 @@
 
 #include "PopupNotification.hh"
 #include "logging.h"
+#include "sexy-url-label.h"
 
 #include <assert.h>
 
@@ -318,7 +319,8 @@ PopupNotification::generate()
 
         if (body)
         {
-            body_label = gtk_label_new(body);
+            body_label = sexy_url_label_new();
+			sexy_url_label_set_markup(SEXY_URL_LABEL(body_label), body);
 
             //process_body_markup(body_label);
 
