@@ -67,6 +67,7 @@ public:
  */
 
 typedef std::map<int, char*> ActionsMap;
+typedef std::map<std::string, std::string> HintsMap;
 typedef std::vector<Image*> ImageList;
 
 class Notification
@@ -81,8 +82,12 @@ public:
     bool use_timeout;         /* should the notification ever time out? */
 
     ActionsMap actions;       /* the mapping of action ids to action strings */
+	HintsMap hints;          /* The mapping of hints. */
 
     int id;
+
+	int hint_x;
+	int hint_y;
 
     /* the connection which generated this notification. used for signal dispatch */
     DBusConnection *connection;
@@ -94,6 +99,9 @@ public:
     virtual void update() {;} /* called when the contents have changed */
 
     virtual void action_invoke(uint aid);
+
+protected:
+	static const int ARROW_LENGTH = 20;
 };
 
 typedef std::map<int, Notification*> NotificationsMap;

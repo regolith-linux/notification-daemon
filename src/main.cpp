@@ -72,6 +72,93 @@ BaseNotifier *backend;
 static GMainLoop *loop;
 static DBusConnection *dbus_conn;
 
+static GHashTable *
+read_dict(DBusMessageIter *iter, char valueType)
+{
+	DBusMessageIter dict_iter;
+	GDestroyNotify value_destroy_func = NULL;
+
+	if (valueType == DBUS_TYPE_UINT32)
+	{
+		value_destroy_func = NULL;
+	}
+	else if (valueType == DBUS_TYPE_STRING)
+	{
+		value_destroy_func = g_free;
+	}
+	else
+	{
+		ERROR("Unknown D-BUS type %c passed to read_table\n", valueType);
+		return NULL;
+	}
+
+	GHashTable *table = g_hash_table_new_full(g_str_hash, g_str_equal,
+											  g_free, value_destroy_func);
+
+#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+	dbus_message_iter_recurse(iter, &dictiter);
+
+	while (dbus_message_iter_get_arg_type(&hint_iter) == DBUS_TYPE_DICT_ENTRY)
+	{
+		DBusMessageIter entry_iter;
+		char *key;
+		void *value;
+
+		dbus_message_iter_recurse(&dict_iter, &etnry_iter);
+		dbus_message_iter_get_basic(&entry_iter, &key);
+		dbus_message_iter_next(&entry_iter);
+		dbus_message_iter_get_basic(&entry_iter, &value);
+
+		g_hash_table_replace(table, key, value);
+	}
+#else /* D-BUS < 0.30 */
+	if (dbus_message_iter_init_dict_iterator(iter, &dict_iter))
+	{
+		do
+		{
+			char *key = dbus_message_iter_get_dict_key(&dict_iter);
+
+			if (valueType == DBUS_TYPE_STRING)
+			{
+				char *value = dbus_message_iter_get_string(&dict_iter);
+
+				g_hash_table_replace(table, g_strdup(key), g_strdup(value));
+
+				dbus_free(value);
+			}
+			else if (valueType == DBUS_TYPE_UINT32)
+			{
+				dbus_uint32_t value = dbus_message_iter_get_uint32(&dict_iter);
+
+				g_hash_table_replace(table, g_strdup(key),
+									 GINT_TO_POINTER(value));
+			}
+
+			dbus_free(key);
+		}
+		while (dbus_message_iter_next(&dict_iter));
+	}
+#endif /* D-BUS < 0.30 */
+
+	return table;
+}
+
+static void
+action_foreach_func(const char *key, gpointer value, Notification *n)
+{
+	/*
+	 * Confusingly on the wire, the dict maps action text to ID,
+	 * whereas internally we map the id to the action text.
+	 */
+	n->actions[GPOINTER_TO_INT(value)] = g_strdup(key);
+}
+
+static void
+hint_foreach_func(const char *key, const char *value, Notification *n)
+{
+	n->hints[key] = value;
+}
+
 static DBusMessage *
 handle_notify(DBusConnection *incoming, DBusMessage *message)
 {
@@ -237,57 +324,21 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     /*********************************************************************
      * Actions
      *********************************************************************/
-	DBusMessageIter action_iter;
-
 #if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
     validate(type == DBUS_TYPE_ARRAY, NULL,
              "Invalid notify message. Actions argument is not an array\n" );
-
-	dbus_message_iter_recurse(&iter, &action_iter);
 #else
     validate(type == DBUS_TYPE_DICT, NULL,
              "Invalid notify message. Actions argument is not a dict\n" );
-
-	dbus_message_iter_init_dict_iterator(&iter, &action_iter);
 #endif
 
-#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-	while (dbus_message_iter_get_arg_type(&action_iter) == DBUS_TYPE_DICT_ENTRY)
-#else
-	do
-#endif
+	GHashTable *actions = read_dict(&iter, DBUS_TYPE_UINT32);
+
+	if (actions != NULL)
 	{
-		/*
-		 * Confusingly on the wire, the dict maps action text to ID,
-		 * whereas internally we map the id to the action text.
-		 */
-		char *key;
-		uint actionid;
-
-#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-		DBusMessageIter entry_iter;
-		dbus_message_iter_recurse(&action_iter, &entry_iter);
-		dbus_message_iter_get_basic(&entry_iter, &key);
-		dbus_message_iter_next(&entry_iter);
-		dbus_message_iter_get_basic(&entry_iter, &actionid);
-#else
-		key = dbus_message_iter_get_dict_key(&action_iter);
-		actionid = dbus_message_iter_get_uint32(&action_iter);
-#endif
-
-		TRACE("demarshal: action %d : %s\n", actionid, key);
-
-		n->actions[actionid] = strdup(key);
-
-#if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-		dbus_free(key);
-#else
-		dbus_message_iter_next(&action_iter);
-#endif
+		g_hash_table_foreach(actions, (GHFunc)action_foreach_func, n);
+		g_hash_table_destroy(actions);
 	}
-#if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-	while (dbus_message_iter_next(&action_iter));
-#endif
 
     dbus_message_iter_next(&iter);
 
@@ -301,6 +352,29 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_DICT, NULL,
              "Invalid notify message. Hints argument is not a dict\n" );
 #endif
+
+	GHashTable *hints = read_dict(&iter, DBUS_TYPE_STRING);
+
+	if (hints != NULL)
+	{
+		char *x = (char *)g_hash_table_lookup(hints, "x");
+		char *y = (char *)g_hash_table_lookup(hints, "y");
+
+		if (x != NULL && y != NULL)
+		{
+			n->hint_x = atoi(x);
+			n->hint_y = atoi(y);
+		}
+		else
+		{
+			n->hint_x = -1;
+			n->hint_y = -1;
+		}
+
+		g_hash_table_foreach(hints, (GHFunc)hint_foreach_func, n);
+		g_hash_table_destroy(hints);
+	}
+
     dbus_message_iter_next(&iter);
 
     /*********************************************************************

@@ -479,10 +479,69 @@ PopupNotification::update_position()
         workarea.height = gdk_screen_height();
     }
 
-    gtk_window_move(GTK_WINDOW(window),
-                    workarea.x + workarea.width - req.width,
-                    workarea.y + workarea.height - get_height() -
-                    height_offset);
+	int x, y;
+
+	TRACE("hint x = %d, hint y = %d\n", hint_x, hint_y);
+
+	/*
+	 * See if the caller has specified where the want the notification to
+	 * point to.
+	 */
+	if (hint_x != -1 && hint_y != -1)
+	{
+		GdkDisplay *display = gtk_widget_get_display(window);
+		GdkScreen *screen   = gdk_display_get_screen(display, disp_screen);
+		int screen_width    = gdk_screen_get_width(screen);
+		int screen_height   = gdk_screen_get_height(screen);
+		int new_height      = get_height() + ARROW_LENGTH;
+
+		/*
+		 * TODO: Maybe try to make the notification stay in the workarea,
+		 *       and just extend the arrow? Dunno.
+		 */
+
+		x = CLAMP(hint_x, 0, screen_width  - req.width);
+		y = CLAMP(hint_y, 0, screen_height - new_height);
+
+		gtk_widget_realize(window);
+		GdkRegion *win_region =
+			gdk_drawable_get_clip_region(GDK_DRAWABLE(window->window));
+
+		/* TODO: Be smarter about the location of the arrow. */
+		GdkPoint points[7];
+		points[0].x = 0;
+		points[0].y = ARROW_LENGTH;
+
+		points[1].x = 10;
+		points[1].y = ARROW_LENGTH;
+
+		points[2].x = 10;
+		points[2].y = 0;
+
+		points[3].x = 20;
+		points[3].y = ARROW_LENGTH;
+
+		points[4].x = req.width;
+		points[4].y = ARROW_LENGTH;
+
+		points[5].x = req.width;
+		points[5].y = new_height;
+
+		points[6].x = 0;
+		points[6].y = new_height;
+
+		GdkRegion *region = gdk_region_polygon(points, G_N_ELEMENTS(points),
+											   GDK_EVEN_ODD_RULE);
+
+//		gdk_window_shape_combine_region(window->window, region, 0, 0);
+	}
+	else
+	{
+		x = workarea.x + workarea.width - req.width;
+		y = workarea.y + workarea.height - get_height() - height_offset;
+	}
+
+    gtk_window_move(GTK_WINDOW(window), x, y);
 }
 
 bool

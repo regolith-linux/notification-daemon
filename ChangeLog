@@ -1,3 +1,13 @@
+Thu Jun 30 21:38:27 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/PopupNotification.cpp:
+	* src/main.cpp:
+	* src/notifier.h:
+	  - Separated the dict parsing code into a single function so that
+	    the action and hint code will be cleaned up.
+	  - Added very basic support for hints.
+	  - Add preliminary support for a little pointer arrow for x, y hints.
+
 Sat Jun 25 17:45:38 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/Makefile.am:
