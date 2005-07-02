@@ -22,6 +22,8 @@
 #ifndef NOTIFIER_H
 #define NOTIFIER_H
 
+#include <gdk/gdk.h>
+#include <gtk/gtk.h>
 #include <glib.h>
 
 #define DBUS_API_SUBJECT_TO_CHANGE
@@ -84,10 +86,14 @@ public:
     ActionsMap actions;       /* the mapping of action ids to action strings */
 	HintsMap hints;          /* The mapping of hints. */
 
+	GtkWidget *spacer;
+
     int id;
 
 	int hint_x;
 	int hint_y;
+
+	GdkPoint mArrowPoints[7];
 
     /* the connection which generated this notification. used for signal dispatch */
     DBusConnection *connection;
@@ -100,8 +106,9 @@ public:
 
     virtual void action_invoke(uint aid);
 
-protected:
-	static const int ARROW_LENGTH = 20;
+	static const int ARROW_OFFSET = 20;
+	static const int ARROW_WIDTH  = 20;
+	static const int ARROW_HEIGHT = 20;
 };
 
 typedef std::map<int, Notification*> NotificationsMap;

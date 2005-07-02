@@ -120,7 +120,24 @@ draw_border(GtkWidget *widget, GdkEventExpose *event, PopupNotification *n)
     int w, h;
     gdk_drawable_get_size(event->window, &w, &h);
 
-    gdk_draw_rectangle(event->window, n->gc, FALSE, 0, 0, w-1, h-1);
+	if (n->hint_x != -1 && n->hint_y != -1)
+	{
+		gdk_draw_polygon(event->window, n->gc, FALSE, n->mArrowPoints,
+						 G_N_ELEMENTS(n->mArrowPoints));
+
+		/* HACK! HACK! HACK! */
+		gdk_draw_line(event->window, n->gc,
+					  n->ARROW_OFFSET + 1, n->ARROW_HEIGHT,
+					  n->ARROW_OFFSET + n->ARROW_WIDTH / 2 + 1, 0);
+		gdk_draw_line(event->window, n->gc,
+					  n->ARROW_OFFSET + n->ARROW_WIDTH / 2 - 1, 0,
+					  n->ARROW_OFFSET + n->ARROW_WIDTH - 1, n->ARROW_HEIGHT);
+		gdk_draw_line(event->window, n->gc, 0, h - 1, w - 1, h - 1);
+	}
+	else
+	{
+		gdk_draw_rectangle(event->window, n->gc, FALSE, 0, 0, w-1, h-1);
+	}
 
     return FALSE; /* propogate further */
 }
@@ -213,8 +230,16 @@ PopupNotification::generate()
             g_signal_connect(win, "button-release-event", G_CALLBACK(_window_button_release), this);
         }
 
+		vbox = gtk_vbox_new(FALSE, 0);
+		gtk_widget_show(vbox);
+		gtk_container_add(GTK_CONTAINER(win), vbox);
+
+		spacer = gtk_image_new();
+		gtk_box_pack_start(GTK_BOX(vbox), spacer, FALSE, FALSE, 0);
+		gtk_widget_set_size_request(spacer, -1, ARROW_HEIGHT);
+
         bodybox_widget = gtk_hbox_new(FALSE, 0);
-        gtk_container_add(GTK_CONTAINER(win), bodybox_widget);
+		gtk_box_pack_start(GTK_BOX(vbox), bodybox_widget, FALSE, FALSE, 0);
         gtk_widget_show(bodybox_widget);
 
         if (images.empty())
@@ -493,7 +518,7 @@ PopupNotification::update_position()
 		GdkScreen *screen   = gdk_display_get_screen(display, disp_screen);
 		int screen_width    = gdk_screen_get_width(screen);
 		int screen_height   = gdk_screen_get_height(screen);
-		int new_height      = get_height() + ARROW_LENGTH;
+		int new_height      = get_height() + ARROW_HEIGHT;
 
 		/*
 		 * TODO: Maybe try to make the notification stay in the workarea,
@@ -503,37 +528,44 @@ PopupNotification::update_position()
 		x = CLAMP(hint_x, 0, screen_width  - req.width);
 		y = CLAMP(hint_y, 0, screen_height - new_height);
 
+		gtk_widget_show(spacer);
+
 		gtk_widget_realize(window);
-		GdkRegion *win_region =
-			gdk_drawable_get_clip_region(GDK_DRAWABLE(window->window));
 
 		/* TODO: Be smarter about the location of the arrow. */
-		GdkPoint points[7];
-		points[0].x = 0;
-		points[0].y = ARROW_LENGTH;
+		mArrowPoints[0].x = 0;
+		mArrowPoints[0].y = ARROW_HEIGHT;
 
-		points[1].x = 10;
-		points[1].y = ARROW_LENGTH;
+		mArrowPoints[1].x = ARROW_OFFSET;
+		mArrowPoints[1].y = ARROW_HEIGHT;
 
-		points[2].x = 10;
-		points[2].y = 0;
+		mArrowPoints[2].x = ARROW_OFFSET + ARROW_WIDTH / 2;
+		mArrowPoints[2].y = 0;
 
-		points[3].x = 20;
-		points[3].y = ARROW_LENGTH;
+		mArrowPoints[3].x = ARROW_OFFSET + ARROW_WIDTH;
+		mArrowPoints[3].y = ARROW_HEIGHT;
 
-		points[4].x = req.width;
-		points[4].y = ARROW_LENGTH;
+		mArrowPoints[4].x = req.width;
+		mArrowPoints[4].y = ARROW_HEIGHT;
 
-		points[5].x = req.width;
-		points[5].y = new_height;
+		mArrowPoints[5].x = req.width;
+		mArrowPoints[5].y = new_height;
 
-		points[6].x = 0;
-		points[6].y = new_height;
+		mArrowPoints[6].x = 0;
+		mArrowPoints[6].y = new_height;
 
-		GdkRegion *region = gdk_region_polygon(points, G_N_ELEMENTS(points),
+		GdkRegion *region = gdk_region_polygon(mArrowPoints,
+											   G_N_ELEMENTS(mArrowPoints),
 											   GDK_EVEN_ODD_RULE);
 
-//		gdk_window_shape_combine_region(window->window, region, 0, 0);
+		gdk_window_shape_combine_region(window->window, region, 0, 0);
+
+		gdk_region_destroy(region);
+
+		mArrowPoints[4].x = req.width - 1;
+		mArrowPoints[5].x = req.width - 1;
+		mArrowPoints[5].y = new_height - 1;
+		mArrowPoints[6].y = new_height - 1;
 	}
 	else
 	{

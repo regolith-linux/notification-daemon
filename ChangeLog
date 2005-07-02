@@ -1,3 +1,11 @@
+Sat Jul 02 12:25:11 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/PopupNotification.cpp:
+	* src/notifier.h:
+	  - "Properly" render an arrow on the top-left of the notification
+	    when an X, Y hint is set. The location of the arrow will be
+	    auto-computed a bit better later, and this code will suck less.
+
 Thu Jun 30 21:38:27 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/PopupNotification.cpp:
