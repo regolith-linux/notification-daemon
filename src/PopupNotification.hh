@@ -64,6 +64,12 @@ public:
 	void set_height_offset(int value);
 	int get_height(void);
 	void window_button_release(GdkEventButton *event);
+
+	GdkPoint mArrowPoints[7];
+
+	static const int ARROW_OFFSET = 20;
+	static const int ARROW_WIDTH  = 20;
+	static const int ARROW_HEIGHT = 20;
 };
 
 #endif /* _POPUP_NOTIFICATION_HH_ */

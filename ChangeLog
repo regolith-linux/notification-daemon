@@ -1,3 +1,9 @@
+Sat Jul 02 13:54:20 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/PopupNotification.hh:
+	* src/notifier.h:
+	  - Move the mArrowPoints and ARROW_* vars into the correct class.
+
 Sat Jul 02 12:25:11 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/PopupNotification.cpp:

@@ -93,8 +93,6 @@ public:
 	int hint_x;
 	int hint_y;
 
-	GdkPoint mArrowPoints[7];
-
     /* the connection which generated this notification. used for signal dispatch */
     DBusConnection *connection;
 
@@ -105,10 +103,6 @@ public:
     virtual void update() {;} /* called when the contents have changed */
 
     virtual void action_invoke(uint aid);
-
-	static const int ARROW_OFFSET = 20;
-	static const int ARROW_WIDTH  = 20;
-	static const int ARROW_HEIGHT = 20;
 };
 
 typedef std::map<int, Notification*> NotificationsMap;
