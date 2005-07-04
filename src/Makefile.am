@@ -8,7 +8,7 @@ SEXY_FILES = \
 notification_daemon_SOURCES = \
 	BaseNotification.cc \
 	BaseNotifier.hh \
-	ConsoleNotification.cc \
+	ConsoleNotifier.cc \
 	ConsoleNotifier.hh \
 	Image.cc \
 	Image.hh \
