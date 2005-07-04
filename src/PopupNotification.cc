@@ -461,8 +461,10 @@ PopupNotification::generate()
             gtk_box_pack_start(GTK_BOX(vbox), actions_hbox, FALSE, FALSE, 5);
             gtk_widget_show(actions_hbox);
 
-            foreach( ActionsMap, actions )
-            {
+			for (ActionsMap::const_iterator i = actions.begin();
+				 i != actions.end();
+				 i++)
+			{
                 TRACE("action %d is %s\n", i->first, i->second.c_str());
 
                 if (i->first == 0) continue;     /* skip the default action */

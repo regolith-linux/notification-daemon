@@ -1,3 +1,14 @@
+Mon Jul 04 14:52:12 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotification.cc:
+	* src/BaseNotifier.hh:
+	* src/Makefile.am:
+	A src/Notification.cc:
+	A src/Notification.hh:
+	* src/PopupNotification.cc:
+	* src/notifier.hh:
+	  - Split Notification into its own files.
+
 Mon Jul 04 14:36:52 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	A src/ConsoleNotifier.cc:

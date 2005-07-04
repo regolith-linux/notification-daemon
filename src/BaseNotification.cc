@@ -25,53 +25,11 @@
 #include <glib.h> // for GMainLoop
 #include <time.h>
 
+#include "BaseNotifier.hh"
+#include "Notification.hh"
+
 #include "dbus-compat.h"
-#include "notifier.hh"
 #include "logging.hh"
-
-Notification::Notification()
-{
-    primary_frame = -1;
-    timeout = 0;
-    use_timeout = false;
-    id = 0;
-}
-
-Notification::Notification(const Notification &obj)
-{
-    primary_frame = obj.primary_frame;
-    timeout = obj.timeout;
-    use_timeout = obj.use_timeout;
-    id = obj.id;
-}
-
-Notification::~Notification()
-{
-    TRACE("~Notification: %s, %s\n", summary.c_str(), body.c_str());
-
-    foreach(ImageList, images) delete *i;
-}
-
-void Notification::action_invoke(uint actionid)
-{
-    DBusMessage *signal = dbus_message_new_signal("/org/freedesktop/Notifications",
-                                                  "org.freedesktop.Notifications",
-                                                  "ActionInvoked");
-
-    TRACE("sending Invoked signal on notification id %d, action id %d\n", id, actionid);
-
-	DBusMessageIter iter;
-	dbus_message_iter_init_append(signal, &iter);
-
-	_notifyd_dbus_message_iter_append_uint32(&iter, id);
-	_notifyd_dbus_message_iter_append_uint32(&iter, actionid);
-
-    dbus_connection_send(connection, signal, NULL);
-
-    dbus_message_unref(signal);
-}
-
-/*************************************************************/
 
 BaseNotifier::BaseNotifier(GMainLoop *main_loop)
 {
@@ -97,9 +55,12 @@ bool BaseNotifier::timeout()
 
     TRACE("timeout\n");
 
-    foreach( NotificationsMap, notifications )
-    {
-        if (i->second->use_timeout) needed = true;
+	for (NotificationsMap::const_iterator i = notifications.begin();
+		 i != notifications.end();
+		 i++)
+	{
+        if (i->second->use_timeout)
+			needed = true;
 
         if (i->second->use_timeout && (i->second->timeout <= now)) {
             unnotify(i->second);

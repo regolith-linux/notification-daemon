@@ -23,7 +23,7 @@
 #ifndef _NOTIFYD_BASE_NOTIFIER_HH
 #define _NOTIFYD_BASE_NOTIFIER_HH
 
-#include "notifier.hh"
+#include "Notification.hh"
 
 class BaseNotifier
 {

@@ -12,6 +12,8 @@ notification_daemon_SOURCES = \
 	ConsoleNotifier.hh \
 	Image.cc \
 	Image.hh \
+	Notification.cc \
+	Notification.hh \
 	PopupNotification.cc \
 	PopupNotification.hh \
 	PopupNotifier.cc \

@@ -26,9 +26,6 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 
-#define DBUS_API_SUBJECT_TO_CHANGE
-#include <dbus/dbus.h>
-
 #include <string>
 #include <map>
 #include <vector>
@@ -37,51 +34,12 @@
 
 /* some basic utilities */
 #define S(str) std::string(str)
-#define foreach(type, list) for (type::iterator i = list.begin(); i != list.end(); i++)
 
 /* This class represents a notification. It's a class rather than a struct
    so notifiers can subclass it and append whatever information or functionality
    they want. For instance, a PopupNotifier might want to add layout information
    here.
  */
-
-typedef std::map<int, std::string> ActionsMap;
-typedef std::map<std::string, std::string> HintsMap;
-
-class Notification
-{
-public:
-    int urgency;              /* Urgency level */
-    std::string summary;            /* UTF-8 encoded text containing a brief description */
-    std::string body;               /* UTF-8 encoded body, optionally containing markup */
-    ImageList images;         /* an array of frames in the animated image. would this be better as a ptr array? */
-    int primary_frame;        /* for notifiers that can't show animations, the still frame to use */
-    int timeout;             /* 0 means use heuristics */
-    bool use_timeout;         /* should the notification ever time out? */
-
-    ActionsMap actions;       /* the mapping of action ids to action strings */
-	HintsMap hints;          /* The mapping of hints. */
-
-	GtkWidget *spacer;
-
-    int id;
-
-	int hint_x;
-	int hint_y;
-
-    /* the connection which generated this notification. used for signal dispatch */
-    DBusConnection *connection;
-
-    Notification();
-    Notification(const Notification &obj);
-    virtual ~Notification();
-
-    virtual void update() {;} /* called when the contents have changed */
-
-    virtual void action_invoke(uint aid);
-};
-
-typedef std::map<int, Notification*> NotificationsMap;
 
 #include "BaseNotifier.hh"
 
