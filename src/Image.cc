@@ -1,7 +1,8 @@
 /**
- * @file image.cpp Implementation of the image class
+ * @file Image.cpp Implementation of the image class
  *
  * Copyright (C) 2004 Mike Hearn <mike@navi.cx>
+ * Copyright (C) 2005 Christian Hammond <chipx86@chipx86.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as

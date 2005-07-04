@@ -1,8 +1,8 @@
 /* -*- mode: c++; tab-width: 4; indent-tabs-mode: t; -*- */
 /**
- * @file image.hh Image class
+ * @file Image.hh Image class
  *
- * Copyright (C) 2005 Christian Hammond
+ * Copyright (C) 2005 Christian Hammond <chipx86@chipx86.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
