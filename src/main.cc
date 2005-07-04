@@ -310,6 +310,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 																  &data, &len);
 
 						n->images.push_back(new Image(data, len));
+						dbus_free(data);
 					}
 				} while (dbus_message_iter_next(&arrayiter));
 			}

@@ -32,35 +32,15 @@
 #include <string>
 #include <map>
 #include <vector>
+
+#include "Image.hh"
+
 using std::string;   // we should be using a Glibmm::ustring for most of this ....
 
 /* some basic utilities */
 #define S(str) std::string(str)
 #define ifnull(expr1, expr2) (expr1 ? expr1 : expr2)
 #define foreach(type, list) for (type::iterator i = list.begin(); i != list.end(); i++)
-
-enum image_type
-{
-    IMAGE_TYPE_THEME = 0,
-    IMAGE_TYPE_ABSOLUTE = 1,
-    IMAGE_TYPE_RAW = 2
-};
-
-class Image
-{
-public:
-    enum image_type type;
-    char *file;
-    unsigned char *data;
-    size_t datalen;
-
-    Image(char *newfile);
-
-    /* newdata will be owned by this object and freed on destruction */
-    Image(unsigned char *newdata, int newdatalen);
-    
-    virtual ~Image();
-};
 
 /* This class represents a notification. It's a class rather than a struct
    so notifiers can subclass it and append whatever information or functionality
@@ -70,7 +50,6 @@ public:
 
 typedef std::map<int, char*> ActionsMap;
 typedef std::map<std::string, std::string> HintsMap;
-typedef std::vector<Image*> ImageList;
 
 class Notification
 {

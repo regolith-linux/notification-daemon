@@ -18,31 +18,52 @@
  * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA  02111-1307  USA
  */
+#include "Image.hh"
 
-#include "string.h"
-#include "notifier.hh"
-
-Image::Image(char *newfile)
+Image::Image(const std::string &file)
+	: mFile(file),
+	  mData(NULL),
+	  mDataLen(0)
 {
-    data = NULL;
-    datalen = 0;
-    file = strdup(newfile);
-        
-    if (file[0] == '/') type = IMAGE_TYPE_ABSOLUTE;
-    else type = IMAGE_TYPE_THEME;
+	if (file[0] == '/')
+		mType = ABSOLUTE;
+	else
+		mType = THEME;
 }
 
-/* newdata will be owned by this object and freed on destruction */
-Image::Image(unsigned char *newdata, int newdatalen)
+Image::Image(const unsigned char *data,
+			 int dataLen)
+	: mType(RAW)
 {
-    data = newdata;
-    datalen = newdatalen;
-    type = IMAGE_TYPE_RAW;
-    file = NULL;
+	mData = new unsigned char[dataLen];
+	memcpy(mData, data, dataLen);
 }
 
 Image::~Image()
 {
-    if (data) dbus_free(data); /* was allocated by DBUS */
-    if (file) free(file);
+	delete mData;
+}
+
+Image::Type
+Image::GetType(void)
+	const
+{
+	return mType;
+}
+
+const std::string &
+Image::GetFile(void)
+	const
+{
+	return mFile;
+}
+
+void
+Image::GetData(unsigned char **ret_data, size_t *ret_data_len)
+{
+	if (ret_data != NULL)
+		*ret_data = mData;
+
+	if (ret_data_len != NULL)
+		*ret_data_len = mDataLen;
 }

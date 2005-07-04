@@ -315,73 +315,96 @@ PopupNotification::generate()
         {
             Image *image = images[0];
 
-            if (image->type == IMAGE_TYPE_THEME)
-            {
-                TRACE("new from icon theme: %s\n", image->file);
+			switch (image->GetType())
+			{
+				case Image::THEME:
+				{
+					TRACE("new from icon theme: %s\n",
+						  image->GetFile().c_str());
 
-                GtkIconTheme *theme = gtk_icon_theme_new();
-                GError *error = NULL;
-                GdkPixbuf *icon = gtk_icon_theme_load_icon(theme, image->file,
-                                                           IMAGE_SIZE,
-                                                           GTK_ICON_LOOKUP_USE_BUILTIN, &error);
-                g_object_unref(G_OBJECT(theme));
+					GtkIconTheme *theme = gtk_icon_theme_new();
+					GError *error = NULL;
+					GdkPixbuf *icon =
+						gtk_icon_theme_load_icon(theme,
+												 image->GetFile().c_str(),
+												 IMAGE_SIZE,
+												 GTK_ICON_LOOKUP_USE_BUILTIN,
+												 &error);
+					g_object_unref(G_OBJECT(theme));
 
-                if (!error)
-                {
-                    image_widget = gtk_image_new_from_pixbuf(icon);
-                    gdk_pixbuf_unref(icon);
-                }
-                else
-                {
-                    throw std::runtime_error( S("could not load icon: ") + S(error->message) );
-                }
+					if (!error)
+					{
+						image_widget = gtk_image_new_from_pixbuf(icon);
+						gdk_pixbuf_unref(icon);
+					}
+					else
+					{
+						throw std::runtime_error(S("could not load icon: ") +
+												 S(error->message));
+					}
+
+					break;
+				}
+
+				case Image::ABSOLUTE:
+				{
+					TRACE("new from file: %s\n", image->GetFile().c_str());
+
+					GError *error = NULL;
+					GdkPixbuf *buf;
+
+					buf = gdk_pixbuf_new_from_file(image->GetFile().c_str(),
+												   &error);
+
+					if (error)
+					{
+						throw std::runtime_error(S("could not load file: ") +
+												 S(error->message));
+					}
+
+					image_widget = gtk_image_new_from_pixbuf(buf);
+
+					// do we leak buf here?
+					break;
+				}
+
+				case Image::RAW:
+				{
+					unsigned char *data;
+					size_t dataLen;
+
+					image->GetData(&data, &dataLen);
+
+					TRACE("new from raw: %c%c%c%c\n",
+						  data[0], data[1], data[2], data[3]);
+
+					GError *error = NULL;
+
+					GdkPixbufLoader *loader = gdk_pixbuf_loader_new();
+					if (error) throw std::runtime_error( S(error->message) );
+
+					gdk_pixbuf_loader_write(loader, data, dataLen, &error);
+					gdk_pixbuf_loader_close(loader, NULL);
+					if (error)
+					{
+						g_object_unref(loader);
+						throw std::runtime_error(S(error->message));
+					}
+
+					GdkPixbuf *buf = gdk_pixbuf_loader_get_pixbuf(loader);
+					image_widget = gtk_image_new_from_pixbuf(buf);
+					g_object_unref(loader);
+
+					// ditto, do we leak buf?
+					break;
+				}
+
+				default:
+					std::ostringstream s;
+					s << "unhandled image type " << image->GetType();
+					throw std::runtime_error( s.str() );
+					break;
             }
-            else if (image->type == IMAGE_TYPE_ABSOLUTE)
-            {
-                TRACE("new from file: %s\n", image->file);
-
-                GError *error = NULL;
-                GdkPixbuf *buf = gdk_pixbuf_new_from_file(image->file, &error);
-
-                if (error)
-                    throw std::runtime_error( S("could not load file: ") + S(error->message) );
-
-                image_widget = gtk_image_new_from_pixbuf(buf);
-
-                // do we leak buf here?
-            }
-            else if (image->type == IMAGE_TYPE_RAW)
-            {
-                TRACE("new from raw: %c%c%c%c\n", image->data[0], image->data[1], image->data[2], image->data[3]);
-
-                GError *error = NULL;
-
-                GdkPixbufLoader *loader = gdk_pixbuf_loader_new();
-                if (error) throw std::runtime_error( S(error->message) );
-
-                gdk_pixbuf_loader_write(loader, image->data, image->datalen, &error);
-                gdk_pixbuf_loader_close(loader, NULL);
-                if (error)
-                {
-                    g_object_unref(loader);
-                    throw std::runtime_error( S(error->message) );
-                }
-
-                GdkPixbuf *buf = gdk_pixbuf_loader_get_pixbuf(loader);
-
-                image_widget = gtk_image_new_from_pixbuf(buf);
-
-                g_object_unref(loader);
-
-                // ditto, do we leak buf?
-            }
-            else
-            {
-                std::ostringstream s;
-                s << "unhandled image type " << image->type;
-                throw std::runtime_error( s.str() );
-            }
-
         }
 
         vbox = gtk_vbox_new(FALSE, 2);

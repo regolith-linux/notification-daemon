@@ -1,3 +1,14 @@
+Mon Jul 04 13:59:58 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/Image.cc:
+	A src/Image.hh:
+	* src/Makefile.am:
+	* src/PopupNotification.cc:
+	* src/main.cc:
+	* src/notifier.hh:
+	  - Split the Image class definition from notifier.hh into Image.hh,
+	    and made it a more standard C++ API.
+
 Mon Jul 04 13:20:26 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	A src/BaseNotification.cc:
