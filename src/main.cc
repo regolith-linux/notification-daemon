@@ -67,8 +67,6 @@
 #include "logging.hh"
 #include "dbus-compat.h"
 
-#define equal(s1, s2) (strcmp(s1, s2) == 0)
-
 BaseNotifier *backend;
 static GMainLoop *loop;
 static DBusConnection *dbus_conn;
@@ -470,7 +468,6 @@ static DBusHandlerResult
 filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
 {
     int message_type = dbus_message_get_type(message);
-    const char *s;
     DBusMessage *ret = NULL;
 
     if (message_type == DBUS_MESSAGE_TYPE_ERROR)
@@ -481,38 +478,44 @@ filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
 
     if (message_type == DBUS_MESSAGE_TYPE_SIGNAL)
     {
-        const char *member = dbus_message_get_member(message);
+		std::string member = dbus_message_get_member(message);
 
-        if (equal(member, "ServiceAcquired"))
+        if (member == "ServiceAcquired")
             return DBUS_HANDLER_RESULT_HANDLED;
 
-        WARN("Received signal %s\n", member);
+        WARN("Received signal %s\n", member.c_str());
 
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
     TRACE("method = %s\n", dbus_message_get_member(message));
 
-    s = dbus_message_get_path(message);
+	std::string path = dbus_message_get_path(message);
 
-    validate(equal(s, "/org/freedesktop/Notifications"),
+    validate(path == "/org/freedesktop/Notifications",
              DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
-             "message received on unknown object '%s'\n", s );
+             "message received on unknown object '%s'\n", path.c_str());
 
-    s = dbus_message_get_interface(message);
+	std::string iface = dbus_message_get_interface(message);
+	std::string member = dbus_message_get_member(message);
 
-    validate(equal(s, "org.freedesktop.Notifications"),
+    validate(iface == "org.freedesktop.Notifications",
              DBUS_HANDLER_RESULT_NOT_YET_HANDLED,
              "unknown message received: %s.%s\n",
-             s, dbus_message_get_member(message) );
+             iface.c_str(), member.c_str());
 
     try
     {
-        if (equal(dbus_message_get_member(message), "Notify")) ret = handle_notify(conn, message);
-        else if (equal(dbus_message_get_member(message), "GetCapabilities")) ret = handle_get_caps(message);
-        else if (equal(dbus_message_get_member(message), "GetServerInfo")) ret = handle_get_info(message);
-        else if (equal(dbus_message_get_member(message), "CloseNotification")) ret = handle_close(message);
-        else return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+        if (member == "Notify")
+			ret = handle_notify(conn, message);
+        else if (member == "GetCapabilities")
+			ret = handle_get_caps(message);
+        else if (member == "GetServerInfo")
+			ret = handle_get_info(message);
+        else if (member == "CloseNotification")
+			ret = handle_close(message);
+        else
+			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
     catch (const std::runtime_error &e)
     {

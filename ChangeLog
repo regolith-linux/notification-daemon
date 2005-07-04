@@ -1,3 +1,8 @@
+Mon Jul 04 15:09:20 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/main.cc:
+	  - Remove the equal() macro, and use std::string in more places instead.
+
 Mon Jul 04 15:05:45 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/ConsoleNotifier.cc:
