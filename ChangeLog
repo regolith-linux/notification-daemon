@@ -1,3 +1,17 @@
+Mon Jul 04 14:33:47 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	A src/BaseNotifier.hh:
+	A src/ConsoleNotifier.hh:
+	* src/ConsoleNotification.cc:
+	* src/Makefile.am:
+	* src/PopupNotification.hh:
+	* src/PopupNotifier.cc:
+	A src/PopupNotifier.hh:
+	* src/main.cc:
+	* src/notifier.hh:
+	  - Split off BaseNotifier, ConsoleNotifier, and PopupNotifier class
+	    definitions into their own header files.
+
 Mon Jul 04 14:15:49 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/main.cc:

@@ -19,8 +19,8 @@
  * MA  02111-1307  USA
  */
 
-#ifndef NOTIFIER_H
-#define NOTIFIER_H
+#ifndef _NOTIFYD_NOTIFIER_HH_
+#define _NOTIFYD_NOTIFIER_HH_
 
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
@@ -37,7 +37,6 @@
 
 /* some basic utilities */
 #define S(str) std::string(str)
-#define ifnull(expr1, expr2) (expr1 ? expr1 : expr2)
 #define foreach(type, list) for (type::iterator i = list.begin(); i != list.end(); i++)
 
 /* This class represents a notification. It's a class rather than a struct
@@ -84,66 +83,8 @@ public:
 
 typedef std::map<int, Notification*> NotificationsMap;
 
-class BaseNotifier
-{
-protected:
-    uint next_id;
-    GMainLoop *loop;
-
-    void register_timeout(int hz);
-
-    void setup_timeout(Notification *n);
-
-public:
-    /* All notifications are given a unique, non-repeating id which the client can use
-       The mapping between the ids and notification objects is stored here */
-
-    NotificationsMap notifications;
-
-    Notification *get(uint id);
-
-    virtual uint notify(Notification *n);
-    bool unnotify(uint id);
-    virtual bool unnotify(Notification *n);
-    virtual void update(Notification *n);
-
-    BaseNotifier(GMainLoop *loop);
-    virtual ~BaseNotifier();
-
-    /* This can be overriden by base classes to return subclasses of Notification */
-    virtual Notification *create_notification();
-
-    bool timing;
-    virtual bool timeout();
-
-};
+#include "BaseNotifier.hh"
 
 extern BaseNotifier *notifier;    /* This holds the backend in use. It's set once, at startup. */
 
-
-class ConsoleNotifier : public BaseNotifier
-{
-public:
-    virtual uint notify(Notification *n);
-    virtual bool unnotify(uint id);
-
-    ConsoleNotifier(GMainLoop *loop) : BaseNotifier(loop) {};
-};
-
-class PopupNotifier : public BaseNotifier
-{
-private:
-    void reflow();
-
-public:
-    virtual uint notify(Notification *n);
-    virtual bool unnotify(Notification *n);
-
-    virtual Notification *create_notification();
-
-    void handle_button_release(Notification *n);
-
-    PopupNotifier(GMainLoop *loop, int *argc, char ***argv);
-};
-
-#endif
+#endif /* _NOTIFYD_NOTIFIER_HH_ */

@@ -7,12 +7,15 @@ SEXY_FILES = \
 
 notification_daemon_SOURCES = \
 	BaseNotification.cc \
+	BaseNotifier.hh \
 	ConsoleNotification.cc \
+	ConsoleNotifier.hh \
 	Image.cc \
 	Image.hh \
 	PopupNotification.cc \
 	PopupNotification.hh \
 	PopupNotifier.cc \
+	PopupNotifier.hh \
 	dbus-compat.h \
 	logging.cc \
 	logging.hh \

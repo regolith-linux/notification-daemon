@@ -1,7 +1,8 @@
-/** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
- * @file console-notifier.cpp Basic console notifications, mostly useful for testing
+/* -*- mode: c++; tab-width: 4; indent-tabs-mode: t; -*- */
+/**
+ * @file ConsoleNotifier.hh Console notifier
  *
- * Copyright (C) 2004 Mike Hearn
+ * Copyright (C) 2005 Christian Hammond
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,20 +19,18 @@
  * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA  02111-1307  USA
  */
+#ifndef _NOTIFYD_CONSOLE_NOTIFIER_HH
+#define _NOTIFYD_CONSOLE_NOTIFIER_HH
 
-#include <stdio.h>
+#include "notifier.hh"
 
-#include "ConsoleNotifier.hh"
-
-uint
-ConsoleNotifier::notify(Notification *n)
+class ConsoleNotifier : public BaseNotifier
 {
-    printf("NOTIFICATION: %s\n%s\n\n", n->summary.c_str(), n->body.c_str());
-    return BaseNotifier::notify(n);
-}
+public:
+    virtual uint notify(Notification *n);
+    virtual bool unnotify(uint id);
 
-bool
-ConsoleNotifier::unnotify(uint id)
-{
-    return BaseNotifier::unnotify(id);
-}
+    ConsoleNotifier(GMainLoop *loop) : BaseNotifier(loop) {};
+};
+
+#endif /* _NOTIFYD_CONSOLE_NOTIFIER_HH */

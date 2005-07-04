@@ -26,6 +26,7 @@
 #include <gdk/gdk.h>
 
 #include "notifier.hh"
+#include "PopupNotifier.hh"
 
 class PopupNotification : public Notification
 {

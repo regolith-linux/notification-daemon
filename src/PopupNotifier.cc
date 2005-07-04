@@ -1,5 +1,5 @@
 /**
- * @file PopupNotifier.cpp GTK+ based popup notifier
+ * @file PopupNotifier.cc GTK+ based popup notifier
  *
  * Copyright (C) 2004 Mike Hearn <mike@navi.cx>
  * Copyright (C) 2004 Christian Hammond <chipx86@chipx86.com>
@@ -19,8 +19,7 @@
  * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA  02111-1307  USA
  */
-
-#include "notifier.hh"
+#include "PopupNotifier.hh"
 
 #include <iostream>
 #include <sstream>
