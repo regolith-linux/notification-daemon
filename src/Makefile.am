@@ -6,7 +6,7 @@ SEXY_FILES = \
 	sexy-url-label.h
 
 notification_daemon_SOURCES = \
-	BaseNotification.cc \
+	BaseNotifier.cc \
 	BaseNotifier.hh \
 	ConsoleNotifier.cc \
 	ConsoleNotifier.hh \
