@@ -1,3 +1,17 @@
+Mon Jul 04 15:05:45 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/ConsoleNotifier.cc:
+	* src/ConsoleNotifier.hh:
+	* src/Makefile.am:
+	* src/Notification.hh:
+	* src/PopupNotification.cc:
+	* src/PopupNotification.hh:
+	* src/PopupNotifier.cc:
+	* src/PopupNotifier.hh:
+	* src/main.cc:
+	D src/notifier.hh:
+	  - Got rid of notifier.hh.
+
 Mon Jul 04 14:52:59 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	A src/BaseNotifier.cc:

@@ -22,7 +22,9 @@
 #ifndef _NOTIFYD_POPUP_NOTIFIER_HH
 #define _NOTIFYD_POPUP_NOTIFIER_HH
 
-#include "notifier.hh"
+#include "BaseNotifier.hh"
+
+class Notification;
 
 class PopupNotifier : public BaseNotifier
 {

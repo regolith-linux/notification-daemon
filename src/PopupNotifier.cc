@@ -19,17 +19,16 @@
  * Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA  02111-1307  USA
  */
-#include "PopupNotifier.hh"
-
 #include <iostream>
 #include <sstream>
 #include <exception>
 #include <stdexcept>
-
-#include "PopupNotification.hh"
-#include "logging.hh"
-
 #include <assert.h>
+
+#include "PopupNotifier.hh"
+#include "PopupNotification.hh"
+#include "Notification.hh"
+#include "logging.hh"
 
 PopupNotifier::PopupNotifier(GMainLoop *main_loop, int *argc, char ***argv)
     : BaseNotifier(main_loop)

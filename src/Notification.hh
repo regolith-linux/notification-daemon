@@ -32,6 +32,13 @@
 
 #include "Image.hh"
 
+
+/*
+ * This class represents a notification. It's a class rather than a struct
+ * so notifiers can subclass it and append whatever information or
+ * functionality they want. For instance, a PopupNotifier might want to
+ * add layout information here.
+ */
 class Notification
 {
 public:

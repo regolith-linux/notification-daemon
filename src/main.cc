@@ -64,7 +64,6 @@
 
 #include "ConsoleNotifier.hh"
 #include "PopupNotifier.hh"
-#include "notifier.hh"
 #include "logging.hh"
 #include "dbus-compat.h"
 

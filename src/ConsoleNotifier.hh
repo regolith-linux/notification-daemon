@@ -22,7 +22,9 @@
 #ifndef _NOTIFYD_CONSOLE_NOTIFIER_HH
 #define _NOTIFYD_CONSOLE_NOTIFIER_HH
 
-#include "notifier.hh"
+#include "BaseNotifier.hh"
+
+class Notification;
 
 class ConsoleNotifier : public BaseNotifier
 {

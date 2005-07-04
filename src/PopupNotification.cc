@@ -42,6 +42,8 @@
 
 #include <assert.h>
 
+#define S(str) std::string(str)
+
 struct expose_data
 {
     GtkWidget *widget;

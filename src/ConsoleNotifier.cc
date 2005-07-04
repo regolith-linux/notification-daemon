@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 #include "ConsoleNotifier.hh"
+#include "Notification.hh"
 
 uint
 ConsoleNotifier::notify(Notification *n)

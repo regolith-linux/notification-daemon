@@ -22,7 +22,6 @@ notification_daemon_SOURCES = \
 	logging.cc \
 	logging.hh \
 	main.cc \
-	notifier.hh \
 	$(SEXY_FILES)
 
 notification_daemon_LDADD = $(PACKAGE_LIBS)
