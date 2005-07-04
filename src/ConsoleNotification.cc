@@ -26,7 +26,7 @@
 
 uint ConsoleNotifier::notify(Notification *n)
 {
-    printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");
+    printf("NOTIFICATION: %s\n%s\n\n", n->summary.c_str(), n->body.c_str());
     return BaseNotifier::notify(n);
 }
 

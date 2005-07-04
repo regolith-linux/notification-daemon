@@ -1,3 +1,12 @@
+Mon Jul 04 14:14:08 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotification.cc:
+	* src/ConsoleNotification.cc:
+	* src/PopupNotification.cc:
+	* src/main.cc:
+	* src/notifier.hh:
+	  - Use std::string instead of char * in some places.
+
 Mon Jul 04 13:59:58 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/Image.cc:

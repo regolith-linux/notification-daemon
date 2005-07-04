@@ -48,15 +48,15 @@ using std::string;   // we should be using a Glibmm::ustring for most of this ..
    here.
  */
 
-typedef std::map<int, char*> ActionsMap;
+typedef std::map<int, std::string> ActionsMap;
 typedef std::map<std::string, std::string> HintsMap;
 
 class Notification
 {
 public:
     int urgency;              /* Urgency level */
-    char *summary;            /* UTF-8 encoded text containing a brief description */
-    char *body;               /* UTF-8 encoded body, optionally containing markup */
+    std::string summary;            /* UTF-8 encoded text containing a brief description */
+    std::string body;               /* UTF-8 encoded body, optionally containing markup */
     ImageList images;         /* an array of frames in the animated image. would this be better as a ptr array? */
     int primary_frame;        /* for notifiers that can't show animations, the still frame to use */
     int timeout;             /* 0 means use heuristics */

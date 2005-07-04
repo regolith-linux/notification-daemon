@@ -423,16 +423,16 @@ PopupNotification::generate()
         gtk_widget_show(padding);
 
         /* now set up the labels containing the notification text */
-        summary_label = gtk_label_new(summary);
+        summary_label = gtk_label_new(summary.c_str());
         format_summary(GTK_LABEL(summary_label));
         gtk_misc_set_alignment(GTK_MISC(summary_label), 0, 0.5);
         gtk_widget_show(summary_label);
         gtk_box_pack_start(GTK_BOX(vbox), summary_label, TRUE, TRUE, 5);
 
-        if (body)
+        if (body.c_str())
         {
             body_label = sexy_url_label_new();
-			sexy_url_label_set_markup(SEXY_URL_LABEL(body_label), body);
+			sexy_url_label_set_markup(SEXY_URL_LABEL(body_label), body.c_str());
 
             //process_body_markup(body_label);
 
@@ -446,7 +446,7 @@ PopupNotification::generate()
            firstly, we need to grab the natural size request of the containing box, then we
            need to set the size request of the label to that width so it will always line wrap. */
 
-        gtk_widget_set_size_request(body ? body_label : summary_label,
+        gtk_widget_set_size_request(body != "" ? body_label : summary_label,
                                     WIDTH - (IMAGE_SIZE + IMAGE_PADDING) - 10 /* FIXME */, -1);
 
         summary_label = body_label = NULL;
@@ -463,14 +463,14 @@ PopupNotification::generate()
 
             foreach( ActionsMap, actions )
             {
-                TRACE("action %d is %s\n", i->first, i->second);
+                TRACE("action %d is %s\n", i->first, i->second.c_str());
 
                 if (i->first == 0) continue;     /* skip the default action */
 
                 GtkWidget *eventbox = gtk_event_box_new();
                 gtk_box_pack_start(GTK_BOX(actions_hbox), eventbox, FALSE, FALSE, 0);
 
-                GtkWidget *label = gtk_label_new(i->second);
+                GtkWidget *label = gtk_label_new(i->second.c_str());
                 linkify(GTK_LABEL(label));
                 whiten(eventbox);
                 gtk_container_add(GTK_CONTAINER(eventbox), label);

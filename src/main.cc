@@ -150,7 +150,7 @@ action_foreach_func(const char *key, gpointer value, Notification *n)
 	 * Confusingly on the wire, the dict maps action text to ID,
 	 * whereas internally we map the id to the action text.
 	 */
-	n->actions[GPOINTER_TO_INT(value)] = g_strdup(key);
+	n->actions[GPOINTER_TO_INT(value)] = key;
 }
 
 static void
@@ -241,7 +241,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
              "Invalid notify message. Summary argument is not a string\n");
 
     _notifyd_dbus_message_iter_get_string(&iter, str);
-    n->summary = strdup(str);
+    n->summary = str;
 #if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
     dbus_free(str);
 #endif
@@ -254,7 +254,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
              "Invalid notify message. Body argument is not a string\n");
 
 	_notifyd_dbus_message_iter_get_string(&iter, str);
-	n->body = (*str == '\0' ? NULL : strdup(str));
+	n->body = str;
 #if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
 	dbus_free(str);
 #endif

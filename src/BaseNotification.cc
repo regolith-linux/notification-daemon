@@ -31,7 +31,6 @@
 
 Notification::Notification()
 {
-    summary = body = NULL;
     primary_frame = -1;
     timeout = 0;
     use_timeout = false;
@@ -40,8 +39,6 @@ Notification::Notification()
 
 Notification::Notification(const Notification &obj)
 {
-    if (obj.summary) summary = strdup(obj.summary);
-    if (obj.body) body = strdup(obj.body);
     primary_frame = obj.primary_frame;
     timeout = obj.timeout;
     use_timeout = obj.use_timeout;
@@ -50,14 +47,9 @@ Notification::Notification(const Notification &obj)
 
 Notification::~Notification()
 {
-    TRACE("~Notification: %s, %s\n", summary, body);
-    
-    if (summary) free(summary);
-    if (body) free(body);
+    TRACE("~Notification: %s, %s\n", summary.c_str(), body.c_str());
 
-    foreach( ActionsMap, actions ) free(i->second);
-
-    foreach( ImageList, images ) delete *i;
+    foreach(ImageList, images) delete *i;
 }
 
 void Notification::action_invoke(uint actionid)
