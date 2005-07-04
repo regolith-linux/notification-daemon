@@ -22,6 +22,8 @@
 #ifndef _NOTIFYD_CONSOLE_NOTIFIER_HH
 #define _NOTIFYD_CONSOLE_NOTIFIER_HH
 
+#include <glib.h>
+
 #include "BaseNotifier.hh"
 
 class Notification;

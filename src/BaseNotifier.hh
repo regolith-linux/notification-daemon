@@ -23,6 +23,8 @@
 #ifndef _NOTIFYD_BASE_NOTIFIER_HH
 #define _NOTIFYD_BASE_NOTIFIER_HH
 
+#include <glib.h>
+
 #include "Notification.hh"
 
 class BaseNotifier
@@ -52,7 +54,7 @@ public:
     virtual ~BaseNotifier();
 
     /* This can be overriden by base classes to return subclasses of Notification */
-    virtual Notification *create_notification();
+    virtual Notification *create_notification(DBusConnection *dbusConn);
 
     bool timing;
     virtual bool timeout();

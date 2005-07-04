@@ -91,7 +91,7 @@ PopupNotifier::unnotify(Notification *n)
 }
 
 Notification*
-PopupNotifier::create_notification()
+PopupNotifier::create_notification(DBusConnection *dbusConn)
 {
-    return new PopupNotification(this);
+    return new PopupNotification(this, dbusConn);
 }

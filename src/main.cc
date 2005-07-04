@@ -149,13 +149,13 @@ action_foreach_func(const char *key, gpointer value, Notification *n)
 	 * Confusingly on the wire, the dict maps action text to ID,
 	 * whereas internally we map the id to the action text.
 	 */
-	n->actions[GPOINTER_TO_INT(value)] = key;
+	n->AddAction(GPOINTER_TO_INT(value), key);
 }
 
 static void
 hint_foreach_func(const char *key, const char *value, Notification *n)
 {
-	n->hints[key] = value;
+	n->SetHint(key, value);
 }
 
 static DBusMessage *
@@ -205,8 +205,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     if (replaces == 0 || (n = backend->get(replaces)) == NULL)
     {
         replaces = 0;
-        n = backend->create_notification();
-        n->connection = incoming;
+        n = backend->create_notification(incoming);
 
         n_holder.reset(n);
     }
@@ -214,9 +213,6 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     {
         TRACE("replaces = %d\n", replaces);
     }
-
-    validate(n->connection != NULL, NULL,
-             "Backend is not set on notification\n" );
 
     /*********************************************************************
      * Notification type
@@ -230,7 +226,9 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
      *********************************************************************/
     validate(type == DBUS_TYPE_BYTE, NULL,
              "Invalid notify message. Urgency argument is not a byte\n" );
-    _notifyd_dbus_message_iter_get_byte(&iter, n->urgency);
+	int urgencyLevel;
+    _notifyd_dbus_message_iter_get_byte(&iter, urgencyLevel);
+	n->SetUrgencyLevel(urgencyLevel);
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -240,7 +238,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
              "Invalid notify message. Summary argument is not a string\n");
 
     _notifyd_dbus_message_iter_get_string(&iter, str);
-    n->summary = str;
+    n->SetSummary(str);
 #if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
     dbus_free(str);
 #endif
@@ -253,7 +251,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
              "Invalid notify message. Body argument is not a string\n");
 
 	_notifyd_dbus_message_iter_get_string(&iter, str);
-	n->body = str;
+	n->SetBody(str);
 #if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
 	dbus_free(str);
 #endif
@@ -294,7 +292,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 						char *s;
 						_notifyd_dbus_message_iter_get_string(&arrayiter, s);
 
-						n->images.push_back(new Image(s));
+						n->AddImage(new Image(s));
 
 #if !NOTIFYD_CHECK_DBUS_VERSION(0, 30)
 						dbus_free(s);
@@ -308,13 +306,13 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 						_notifyd_dbus_message_iter_get_byte_array(&arrayiter,
 																  &data, &len);
 
-						n->images.push_back(new Image(data, len));
+						n->AddImage(new Image(data, len));
 						dbus_free(data);
 					}
 				} while (dbus_message_iter_next(&arrayiter));
 			}
 
-			TRACE("There are %d images\n", n->images.size());
+			TRACE("There are %d images\n", n->GetImages().size());
 
 		}
 	}
@@ -357,20 +355,6 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
 
 	if (hints != NULL)
 	{
-		char *x = (char *)g_hash_table_lookup(hints, "x");
-		char *y = (char *)g_hash_table_lookup(hints, "y");
-
-		if (x != NULL && y != NULL)
-		{
-			n->hint_x = atoi(x);
-			n->hint_y = atoi(y);
-		}
-		else
-		{
-			n->hint_x = -1;
-			n->hint_y = -1;
-		}
-
 		g_hash_table_foreach(hints, (GHFunc)hint_foreach_func, n);
 		g_hash_table_destroy(hints);
 	}
@@ -383,7 +367,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_BOOLEAN, NULL,
              "Invalid notify message. Expires argument is not uint32\n");
 
-    n->use_timeout = true;
+	n->SetUseTimeout(true);
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -392,7 +376,9 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_UINT32, NULL,
              "Invalid notify message. Timeout argument is not uint32\n");
 
-    _notifyd_dbus_message_iter_get_uint32(&iter, n->timeout);
+	int timeout;
+    _notifyd_dbus_message_iter_get_uint32(&iter, timeout);
+	n->SetTimeout(timeout);
     dbus_message_iter_next(&iter);
 
 #undef type

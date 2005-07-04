@@ -34,7 +34,7 @@ public:
     virtual uint notify(Notification *n);
     virtual bool unnotify(Notification *n);
 
-    virtual Notification *create_notification();
+    virtual Notification *create_notification(DBusConnection *dbusConn);
 
     void handle_button_release(Notification *n);
 

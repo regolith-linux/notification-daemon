@@ -147,8 +147,12 @@ draw_border(GtkWidget *widget, GdkEventExpose *event, PopupNotification *n)
 void
 PopupNotification::window_button_release(GdkEventButton *event)
 {
-    if (actions.find(0) == actions.end()) notifier->unnotify(this);
-    else action_invoke(0);
+	const ActionsMap &actions = GetActions();
+
+    if (actions.find(0) == actions.end())
+		notifier->unnotify(this);
+    else
+		action_invoke(0);
 }
 
 static gboolean
@@ -188,8 +192,9 @@ _set_cursor(GtkWidget *widget, GdkEventExpose *event,
     return FALSE; /* propogate further  */
 }
 
-PopupNotification::PopupNotification(PopupNotifier *n)
-    : Notification(),
+PopupNotification::PopupNotification(PopupNotifier *n,
+									 DBusConnection *dbusConn)
+    : Notification(dbusConn),
       notifier(n),
       window(NULL),
       disp_screen(0),
@@ -202,7 +207,7 @@ bool
 PopupNotification::has_arrow(void)
 	const
 {
-	return hint_x != -1 && hint_y != -1;
+	return HasHint("x") && HasHint("y");
 }
 
 void
@@ -210,11 +215,11 @@ PopupNotification::generate_arrow(int &ret_arrow_x, int &ret_arrow_y)
 {
 	if (!has_arrow())
 	{
-		gtk_widget_hide(spacer);
+		gtk_widget_hide(mSpacer);
 		return;
 	}
 
-	gtk_widget_show(spacer);
+	gtk_widget_show(mSpacer);
 
 	gtk_widget_realize(window);
 
@@ -264,9 +269,10 @@ PopupNotification::generate_arrow(int &ret_arrow_x, int &ret_arrow_y)
 
 PopupNotification::~PopupNotification()
 {
-    TRACE("destroying notification %d, window=%p\n", id, window);
+    TRACE("destroying notification %d, window=%p\n", GetId(), window);
 
-    if (gc) g_object_unref(gc);
+    if (gc != NULL)
+		g_object_unref(gc);
 
     if (window)
     {
@@ -279,7 +285,7 @@ PopupNotification::~PopupNotification()
 void
 PopupNotification::generate()
 {
-    TRACE("Generating PopupNotification GUI for nid %d\n", id);
+    TRACE("Generating PopupNotification GUI for nid %d\n", GetId());
 
     GtkWidget *win = window, *bodybox_widget, *vbox, *summary_label;
     GtkWidget *body_label = NULL, *image_widget;
@@ -300,13 +306,15 @@ PopupNotification::generate()
 		gtk_widget_show(vbox);
 		gtk_container_add(GTK_CONTAINER(win), vbox);
 
-		spacer = gtk_image_new();
-		gtk_box_pack_start(GTK_BOX(vbox), spacer, FALSE, FALSE, 0);
-		gtk_widget_set_size_request(spacer, -1, ARROW_HEIGHT);
+		mSpacer = gtk_image_new();
+		gtk_box_pack_start(GTK_BOX(vbox), mSpacer, FALSE, FALSE, 0);
+		gtk_widget_set_size_request(mSpacer, -1, ARROW_HEIGHT);
 
         bodybox_widget = gtk_hbox_new(FALSE, 0);
 		gtk_box_pack_start(GTK_BOX(vbox), bodybox_widget, FALSE, FALSE, 0);
         gtk_widget_show(bodybox_widget);
+
+		const ImageList &images = GetImages();
 
         if (images.empty())
         {
@@ -425,16 +433,17 @@ PopupNotification::generate()
         gtk_widget_show(padding);
 
         /* now set up the labels containing the notification text */
-        summary_label = gtk_label_new(summary.c_str());
+        summary_label = gtk_label_new(GetSummary().c_str());
         format_summary(GTK_LABEL(summary_label));
         gtk_misc_set_alignment(GTK_MISC(summary_label), 0, 0.5);
         gtk_widget_show(summary_label);
         gtk_box_pack_start(GTK_BOX(vbox), summary_label, TRUE, TRUE, 5);
 
-        if (body.c_str())
+        if (GetBody().c_str())
         {
             body_label = sexy_url_label_new();
-			sexy_url_label_set_markup(SEXY_URL_LABEL(body_label), body.c_str());
+			sexy_url_label_set_markup(SEXY_URL_LABEL(body_label),
+									  GetBody().c_str());
 
             //process_body_markup(body_label);
 
@@ -448,10 +457,13 @@ PopupNotification::generate()
            firstly, we need to grab the natural size request of the containing box, then we
            need to set the size request of the label to that width so it will always line wrap. */
 
-        gtk_widget_set_size_request(body != "" ? body_label : summary_label,
-                                    WIDTH - (IMAGE_SIZE + IMAGE_PADDING) - 10 /* FIXME */, -1);
+        gtk_widget_set_size_request(
+			GetBody() != "" ? body_label : summary_label,
+			WIDTH - (IMAGE_SIZE + IMAGE_PADDING) - 10 /* FIXME */, -1);
 
         summary_label = body_label = NULL;
+
+		const ActionsMap &actions = GetActions();
 
         if (!actions.empty())
         {
@@ -493,7 +505,7 @@ PopupNotification::generate()
                                                     G_CALLBACK(_set_cursor), (void *) data);
 
                 /* if it's not the last item ...  */
-                if (i->second != actions[actions.size() - 1])
+                if (i->second != GetAction(actions.size() - 1))
                 {
                     label = gtk_label_new(" | ");    /* ... add a separator */
                     gtk_box_pack_start(GTK_BOX(actions_hbox), label, FALSE, FALSE, 0);
@@ -616,6 +628,9 @@ PopupNotification::update_position()
 		 * TODO: Maybe try to make the notification stay in the workarea,
 		 *       and just extend the arrow? Dunno.
 		 */
+		int hint_x = atoi(GetHint("x").c_str());
+		int hint_y = atoi(GetHint("y").c_str());
+
 		x = CLAMP(hint_x - arrow_x, 0, screen_width  - req.width);
 		y = CLAMP(hint_y - arrow_y, 0, screen_height - new_height);
 	}
@@ -681,7 +696,7 @@ void
 PopupNotification::update()
 {
     /* contents have changed, so scrap current UI and regenerate */
-    TRACE("updating for %d\n", id);
+    TRACE("updating for %d\n", GetId());
 
     if (window)
     {

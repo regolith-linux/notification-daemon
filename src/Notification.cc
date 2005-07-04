@@ -23,27 +23,32 @@
 #include "logging.hh"
 #include "dbus-compat.h"
 
-Notification::Notification()
+Notification::Notification(DBusConnection *dbusConn)
+	: mUrgency(0),
+	  mPrimaryFrame(-1),
+	  mTimeout(0),
+	  mUseTimeout(false),
+	  mId(0),
+	  mDBusConn(dbusConn)
 {
-    primary_frame = -1;
-    timeout = 0;
-    use_timeout = false;
-    id = 0;
 }
 
 Notification::Notification(const Notification &obj)
+	: mUrgency(obj.GetUrgencyLevel()),
+	  mSummary(obj.GetSummary()),
+	  mBody(obj.GetBody()),
+	  mPrimaryFrame(obj.GetPrimaryFrame()),
+	  mTimeout(obj.GetTimeout()),
+	  mUseTimeout(obj.GetUseTimeout()),
+	  mId(obj.GetId())
 {
-    primary_frame = obj.primary_frame;
-    timeout = obj.timeout;
-    use_timeout = obj.use_timeout;
-    id = obj.id;
 }
 
 Notification::~Notification()
 {
-    TRACE("~Notification: %s, %s\n", summary.c_str(), body.c_str());
+    TRACE("~Notification: %s, %s\n", GetSummary().c_str(), GetBody().c_str());
 
-	for (ImageList::iterator i = images.begin(); i != images.end(); i++)
+	for (ImageList::iterator i = mImages.begin(); i != mImages.end(); i++)
 		delete *i;
 }
 
@@ -53,15 +58,179 @@ void Notification::action_invoke(uint actionid)
                                                   "org.freedesktop.Notifications",
                                                   "ActionInvoked");
 
-    TRACE("sending Invoked signal on notification id %d, action id %d\n", id, actionid);
+    TRACE("sending Invoked signal on notification id %d, action id %d\n",
+		  GetId(), actionid);
 
 	DBusMessageIter iter;
 	dbus_message_iter_init_append(signal, &iter);
 
-	_notifyd_dbus_message_iter_append_uint32(&iter, id);
+	_notifyd_dbus_message_iter_append_uint32(&iter, GetId());
 	_notifyd_dbus_message_iter_append_uint32(&iter, actionid);
 
-    dbus_connection_send(connection, signal, NULL);
+    dbus_connection_send(mDBusConn, signal, NULL);
 
     dbus_message_unref(signal);
+}
+
+void
+Notification::SetUrgencyLevel(int urgencyLevel)
+{
+	mUrgency = urgencyLevel;
+}
+
+int
+Notification::GetUrgencyLevel(void)
+	const
+{
+	return mUrgency;
+}
+
+void
+Notification::SetSummary(const std::string &summary)
+{
+	mSummary = summary;
+}
+
+const std::string &
+Notification::GetSummary(void)
+	const
+{
+	return mSummary;
+}
+
+void
+Notification::SetBody(const std::string &body)
+{
+	mBody = body;
+}
+
+const std::string &
+Notification::GetBody(void)
+	const
+{
+	return mBody;
+}
+
+void
+Notification::AddImage(Image *image)
+{
+	mImages.push_back(image);
+}
+
+const ImageList &
+Notification::GetImages(void)
+	const
+{
+	return mImages;
+}
+
+ImageList &
+Notification::GetImages(void)
+{
+	return mImages;
+}
+
+int
+Notification::GetPrimaryFrame(void)
+	const
+{
+	return mPrimaryFrame;
+}
+
+void
+Notification::SetTimeout(int timeout)
+{
+	mTimeout = timeout;
+}
+
+int
+Notification::GetTimeout(void)
+	const
+{
+	return mTimeout;
+}
+
+void
+Notification::SetUseTimeout(bool useTimeout)
+{
+	mUseTimeout = useTimeout;
+}
+
+bool
+Notification::GetUseTimeout(void)
+	const
+{
+	return mUseTimeout;
+}
+
+void
+Notification::AddAction(int id, const std::string &value)
+{
+	mActions[id] = value;
+}
+
+const std::string &
+Notification::GetAction(int id)
+	const
+{
+	return (*mActions.find(id)).second;
+}
+
+const Notification::ActionsMap &
+Notification::GetActions(void)
+	const
+{
+	return mActions;
+}
+
+Notification::ActionsMap &
+Notification::GetActions(void)
+{
+	return mActions;
+}
+
+void
+Notification::SetHint(const std::string &key, const std::string &value)
+{
+	mHints[key] = value;
+}
+
+const std::string &
+Notification::GetHint(const std::string &key)
+	const
+{
+	return (*mHints.find(key)).second;
+}
+
+bool
+Notification::HasHint(const std::string &key)
+	const
+{
+	return mHints.find(key) != mHints.end();
+}
+
+const Notification::HintsMap &
+Notification::GetHints(void)
+	const
+{
+	return mHints;
+}
+
+Notification::HintsMap &
+Notification::GetHints(void)
+{
+	return mHints;
+}
+
+void
+Notification::SetId(int id)
+{
+	mId = id;
+}
+
+int
+Notification::GetId(void)
+	const
+{
+	return mId;
 }

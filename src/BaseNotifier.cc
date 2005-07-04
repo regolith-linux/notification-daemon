@@ -59,11 +59,13 @@ bool BaseNotifier::timeout()
 		 i != notifications.end();
 		 i++)
 	{
-        if (i->second->use_timeout)
+		Notification *n = i->second;
+
+        if (n->GetUseTimeout())
 			needed = true;
 
-        if (i->second->use_timeout && (i->second->timeout <= now)) {
-            unnotify(i->second);
+        if (n->GetUseTimeout() && n->GetTimeout() <= now) {
+            unnotify(n);
             break;
         }
     }
@@ -91,14 +93,17 @@ void BaseNotifier::register_timeout(int hz)
 
 void BaseNotifier::setup_timeout(Notification *n)
 {
-    /* decide a sensible timeout. for now let's just use 5 seconds. in future, based on text length? */
-    if (n->use_timeout && (n->timeout == 0)) n->timeout = time(NULL) + 5;
-
+    /*
+	 * Decide a sensible timeout. For now, let's just use 5 seconds.
+	 * In the future, maybe make this based on text length?
+	 */
+    if (n->GetUseTimeout() && n->GetTimeout() == 0)
+		n->SetTimeout(time(NULL) + 5);
 
     /* we don't have a timeout triggering constantly as otherwise n-d
        could never be fully paged out by the kernel. */
 
-    if (n->use_timeout && !timing)
+    if (n->GetUseTimeout() && !timing)
     {
         register_timeout(1000);
         timing = true; /* set to false when ::timeout returns false */
@@ -108,14 +113,14 @@ void BaseNotifier::setup_timeout(Notification *n)
 
 uint BaseNotifier::notify(Notification *n)
 {
-    n->id = next_id++;
+    n->SetId(next_id++);
 
     update(n);  // can throw
 
     /* don't commit to the map until after the notification has been able to update */
-    notifications[n->id] = n;
+    notifications[n->GetId()] = n;
 
-    return n->id;
+    return n->GetId();
 }
 
 void BaseNotifier::update(Notification *n)
@@ -135,9 +140,9 @@ bool BaseNotifier::unnotify(uint id)
 
 bool BaseNotifier::unnotify(Notification *n)
 {
-    if (!notifications.erase(n->id))
+    if (!notifications.erase(n->GetId()))
     {
-        WARN("no such notification registered (%p), id=%d\n", n, n->id);
+        WARN("no such notification registered (%p), id=%d\n", n, n->GetId());
         return false;
     }
 
@@ -147,10 +152,13 @@ bool BaseNotifier::unnotify(Notification *n)
     return true;
 }
 
-Notification* BaseNotifier::create_notification()
+Notification* BaseNotifier::create_notification(DBusConnection *dbusConn)
 {
-    /* base classes override this to add extra info and abilities to the Notification class */
-    return new Notification();
+    /*
+	 * Base classes override this to add extra info and abilities
+	 * to the Notification class
+	 */
+    return new Notification(dbusConn);
 }
 
 Notification *BaseNotifier::get(uint id)

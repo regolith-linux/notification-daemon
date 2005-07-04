@@ -1,3 +1,18 @@
+Mon Jul 04 16:11:39 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotifier.cc:
+	* src/BaseNotifier.hh:
+	* src/ConsoleNotifier.cc:
+	* src/ConsoleNotifier.hh:
+	* src/Notification.cc:
+	* src/Notification.hh:
+	* src/PopupNotification.cc:
+	* src/PopupNotification.hh:
+	* src/PopupNotifier.cc:
+	* src/PopupNotifier.hh:
+	* src/main.cc:
+	  - Fleshed out the Notification class a bit more.
+
 Mon Jul 04 15:09:20 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/main.cc:

@@ -49,13 +49,14 @@ protected:
 
 	GtkWidget *window;
 	GtkWidget *body_box;
+	GtkWidget *mSpacer;
 	int disp_screen;
 	int height_offset;
 
 public:
 	GdkGC *gc;
 
-	PopupNotification(PopupNotifier *n);
+	PopupNotification(PopupNotifier *n, DBusConnection *dbusConn);
 	~PopupNotification();
 
 	void generate(void);
