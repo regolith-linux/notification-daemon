@@ -65,6 +65,10 @@ public:
 	int get_height(void);
 	void window_button_release(GdkEventButton *event);
 
+	bool has_arrow(void) const;
+
+	void generate_arrow(int &ret_arrow_x, int &ret_arrow_y);
+
 	GdkPoint mArrowPoints[7];
 
 	static const int ARROW_OFFSET = 20;

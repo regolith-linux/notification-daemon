@@ -120,7 +120,7 @@ draw_border(GtkWidget *widget, GdkEventExpose *event, PopupNotification *n)
     int w, h;
     gdk_drawable_get_size(event->window, &w, &h);
 
-	if (n->hint_x != -1 && n->hint_y != -1)
+	if (n->has_arrow())
 	{
 		gdk_draw_polygon(event->window, n->gc, FALSE, n->mArrowPoints,
 						 G_N_ELEMENTS(n->mArrowPoints));
@@ -194,6 +194,70 @@ PopupNotification::PopupNotification(PopupNotifier *n)
       height_offset(0),
       gc(NULL)
 {
+}
+
+bool
+PopupNotification::has_arrow(void)
+	const
+{
+	return hint_x != -1 && hint_y != -1;
+}
+
+void
+PopupNotification::generate_arrow(int &ret_arrow_x, int &ret_arrow_y)
+{
+	if (!has_arrow())
+	{
+		gtk_widget_hide(spacer);
+		return;
+	}
+
+	gtk_widget_show(spacer);
+
+	gtk_widget_realize(window);
+
+    GtkRequisition req;
+    gtk_widget_size_request(window, &req);
+
+	int new_height = get_height() + ARROW_HEIGHT;
+
+	/* TODO: Be smarter about the location of the arrow. */
+	mArrowPoints[0].x = 0;
+	mArrowPoints[0].y = ARROW_HEIGHT;
+
+	mArrowPoints[1].x = ARROW_OFFSET;
+	mArrowPoints[1].y = ARROW_HEIGHT;
+
+	mArrowPoints[2].x = ARROW_OFFSET + ARROW_WIDTH / 2;
+	mArrowPoints[2].y = 0;
+
+	mArrowPoints[3].x = ARROW_OFFSET + ARROW_WIDTH;
+	mArrowPoints[3].y = ARROW_HEIGHT;
+
+	mArrowPoints[4].x = req.width;
+	mArrowPoints[4].y = ARROW_HEIGHT;
+
+	mArrowPoints[5].x = req.width;
+	mArrowPoints[5].y = new_height;
+
+	mArrowPoints[6].x = 0;
+	mArrowPoints[6].y = new_height;
+
+	GdkRegion *region = gdk_region_polygon(mArrowPoints,
+										   G_N_ELEMENTS(mArrowPoints),
+										   GDK_EVEN_ODD_RULE);
+
+	gdk_window_shape_combine_region(window->window, region, 0, 0);
+
+	gdk_region_destroy(region);
+
+	mArrowPoints[4].x = req.width - 1;
+	mArrowPoints[5].x = req.width - 1;
+	mArrowPoints[5].y = new_height - 1;
+	mArrowPoints[6].y = new_height - 1;
+
+	ret_arrow_x = ARROW_OFFSET + ARROW_WIDTH / 2;
+	ret_arrow_y = 0;
 }
 
 PopupNotification::~PopupNotification()
@@ -506,66 +570,27 @@ PopupNotification::update_position()
 
 	int x, y;
 
-	TRACE("hint x = %d, hint y = %d\n", hint_x, hint_y);
-
 	/*
 	 * See if the caller has specified where the want the notification to
 	 * point to.
 	 */
-	if (hint_x != -1 && hint_y != -1)
+	if (has_arrow())
 	{
 		GdkDisplay *display = gtk_widget_get_display(window);
 		GdkScreen *screen   = gdk_display_get_screen(display, disp_screen);
 		int screen_width    = gdk_screen_get_width(screen);
 		int screen_height   = gdk_screen_get_height(screen);
-		int new_height      = get_height() + ARROW_HEIGHT;
+		int new_height = get_height() + ARROW_HEIGHT;
+
+		int arrow_x, arrow_y;
+		generate_arrow(arrow_x, arrow_y);
 
 		/*
 		 * TODO: Maybe try to make the notification stay in the workarea,
 		 *       and just extend the arrow? Dunno.
 		 */
-
-		x = CLAMP(hint_x, 0, screen_width  - req.width);
-		y = CLAMP(hint_y, 0, screen_height - new_height);
-
-		gtk_widget_show(spacer);
-
-		gtk_widget_realize(window);
-
-		/* TODO: Be smarter about the location of the arrow. */
-		mArrowPoints[0].x = 0;
-		mArrowPoints[0].y = ARROW_HEIGHT;
-
-		mArrowPoints[1].x = ARROW_OFFSET;
-		mArrowPoints[1].y = ARROW_HEIGHT;
-
-		mArrowPoints[2].x = ARROW_OFFSET + ARROW_WIDTH / 2;
-		mArrowPoints[2].y = 0;
-
-		mArrowPoints[3].x = ARROW_OFFSET + ARROW_WIDTH;
-		mArrowPoints[3].y = ARROW_HEIGHT;
-
-		mArrowPoints[4].x = req.width;
-		mArrowPoints[4].y = ARROW_HEIGHT;
-
-		mArrowPoints[5].x = req.width;
-		mArrowPoints[5].y = new_height;
-
-		mArrowPoints[6].x = 0;
-		mArrowPoints[6].y = new_height;
-
-		GdkRegion *region = gdk_region_polygon(mArrowPoints,
-											   G_N_ELEMENTS(mArrowPoints),
-											   GDK_EVEN_ODD_RULE);
-
-		gdk_window_shape_combine_region(window->window, region, 0, 0);
-
-		gdk_region_destroy(region);
-
-		mArrowPoints[4].x = req.width - 1;
-		mArrowPoints[5].x = req.width - 1;
-		mArrowPoints[5].y = new_height - 1;
-		mArrowPoints[6].y = new_height - 1;
+		x = CLAMP(hint_x - arrow_x, 0, screen_width  - req.width);
+		y = CLAMP(hint_y - arrow_y, 0, screen_height - new_height);
 	}
 	else
 	{
