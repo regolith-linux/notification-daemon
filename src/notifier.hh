@@ -35,8 +35,6 @@
 
 #include "Image.hh"
 
-using std::string;   // we should be using a Glibmm::ustring for most of this ....
-
 /* some basic utilities */
 #define S(str) std::string(str)
 #define ifnull(expr1, expr2) (expr1 ? expr1 : expr2)

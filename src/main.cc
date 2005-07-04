@@ -546,7 +546,7 @@ initialize_backend(int *argc, char ***argv)
      * CompositedPopupNotifier.
      */
     char *envvar = getenv("NOTIFICATION_DAEMON_BACKEND");
-    string name = envvar ? envvar : "popup";
+	std::string name = envvar ? envvar : "popup";
 
     if (name == "console")
         backend = new ConsoleNotifier(loop);
