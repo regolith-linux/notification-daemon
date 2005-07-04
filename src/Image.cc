@@ -1,7 +1,7 @@
-/** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
- * @file console-notifier.cpp Basic console notifications, mostly useful for testing
+/**
+ * @file image.cpp Implementation of the image class
  *
- * Copyright (C) 2004 Mike Hearn
+ * Copyright (C) 2004 Mike Hearn <mike@navi.cx>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -19,17 +19,30 @@
  * MA  02111-1307  USA
  */
 
-#include <notifier.h>
-#include <stdio.h>
+#include "string.h"
+#include "notifier.hh"
 
-
-uint ConsoleNotifier::notify(Notification *n)
+Image::Image(char *newfile)
 {
-    printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");
-    return BaseNotifier::notify(n);
+    data = NULL;
+    datalen = 0;
+    file = strdup(newfile);
+        
+    if (file[0] == '/') type = IMAGE_TYPE_ABSOLUTE;
+    else type = IMAGE_TYPE_THEME;
 }
 
-bool ConsoleNotifier::unnotify(uint id)
+/* newdata will be owned by this object and freed on destruction */
+Image::Image(unsigned char *newdata, int newdatalen)
 {
-    return BaseNotifier::unnotify(id);
+    data = newdata;
+    datalen = newdatalen;
+    type = IMAGE_TYPE_RAW;
+    file = NULL;
+}
+
+Image::~Image()
+{
+    if (data) dbus_free(data); /* was allocated by DBUS */
+    if (file) free(file);
 }

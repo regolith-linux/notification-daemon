@@ -37,7 +37,7 @@
 #include <stdexcept>
 
 #include "PopupNotification.hh"
-#include "logging.h"
+#include "logging.hh"
 #include "sexy-url-label.h"
 
 #include <assert.h>

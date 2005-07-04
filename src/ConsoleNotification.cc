@@ -1,5 +1,5 @@
 /** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
- * @file logging.cpp Logging support
+ * @file console-notifier.cpp Basic console notifications, mostly useful for testing
  *
  * Copyright (C) 2004 Mike Hearn
  *
@@ -19,24 +19,18 @@
  * MA  02111-1307  USA
  */
 
-#include "logging.h"
-#include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 
-void log(enum loglevel level, char *s, ...) {
-    va_list args;
+#include "notifier.hh"
 
-    fprintf(stderr, "notification-daemon: ");
-    
-    switch (level) {
-        case LOG_WARNING: fprintf(stderr, "warning: "); break;
-        case LOG_TRACE: fprintf(stderr, "trace: "); break;
-        case LOG_ERROR: fprintf(stderr, "error: "); break;
-        case LOG_FIXME: fprintf(stderr, "fixme: "); break;
-    }
-                                                    
-    va_start(args, s);
-    vprintf(s, args);
-    va_end(args);
+
+uint ConsoleNotifier::notify(Notification *n)
+{
+    printf("NOTIFICATION: %s\n%s\n\n", n->summary, n->body ? n->body : "");
+    return BaseNotifier::notify(n);
+}
+
+bool ConsoleNotifier::unnotify(uint id)
+{
+    return BaseNotifier::unnotify(id);
 }

@@ -26,8 +26,8 @@
 #include <time.h>
 
 #include "dbus-compat.h"
-#include "notifier.h"
-#include "logging.h"
+#include "notifier.hh"
+#include "logging.hh"
 
 Notification::Notification()
 {

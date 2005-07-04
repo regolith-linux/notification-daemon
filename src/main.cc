@@ -62,8 +62,8 @@
 #include <stdexcept>
 #include <memory>
 
-#include "notifier.h"
-#include "logging.h"
+#include "notifier.hh"
+#include "logging.hh"
 #include "dbus-compat.h"
 
 #define equal(s1, s2) (strcmp(s1, s2) == 0)

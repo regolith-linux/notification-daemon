@@ -1,24 +1,25 @@
 libexec_PROGRAMS = notification-daemon
 
-notification_daemon_SOURCES = \
-	BaseNotification.cpp \
-	ConsoleNotification.cpp \
-	Image.cpp \
-	PopupNotification.cpp \
-	PopupNotifier.cpp \
-	dbus-compat.h \
-	logging.cpp \
-	logging.h \
-	main.cpp \
-	notifier.h \
-	sexy-url-label.c
-
-notification_daemon_LDADD = $(PACKAGE_LIBS)
-
 SEXY_BASE = http://osiris.chipx86.com/svn/osiris-misc/trunk/libsexy
 SEXY_FILES = \
 	sexy-url-label.c \
 	sexy-url-label.h
+
+notification_daemon_SOURCES = \
+	BaseNotification.cc \
+	ConsoleNotification.cc \
+	Image.cc \
+	PopupNotification.cc \
+	PopupNotification.hh \
+	PopupNotifier.cc \
+	dbus-compat.h \
+	logging.cc \
+	logging.hh \
+	main.cc \
+	notifier.hh \
+	$(SEXY_FILES)
+
+notification_daemon_LDADD = $(PACKAGE_LIBS)
 
 get-sexy:
 	for i in $(SEXY_FILES); do \

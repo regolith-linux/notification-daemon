@@ -1,3 +1,28 @@
+Mon Jul 04 13:20:26 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	A src/BaseNotification.cc:
+	D src/BaseNotification.cpp:
+	A src/ConsoleNotification.cc:
+	D src/ConsoleNotification.cpp:
+	A src/Image.cc:
+	D src/Image.cpp:
+	A src/logging.cc:
+	D src/logging.cpp:
+	A src/logging.hh:
+	D src/logging.h:
+	A src/main.cc:
+	D src/main.cpp:
+	A src/notifier.hh:
+	D src/notifier.h:
+	A src/PopupNotification.cc:
+	D src/PopupNotification.cpp:
+	A src/PopupNotifier.cc:
+	D src/PopupNotifier.cpp:
+	* src/Makefile.am:
+	* src/PopupNotification.hh:
+	  - Standardize on file naming. The .cpp and .hh files were a bit..
+	    inconsistent. This is part one of my code cleanup/reorg project.
+
 Mon Jul 04 01:38:47 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/PopupNotification.cpp:

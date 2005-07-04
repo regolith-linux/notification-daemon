@@ -1,7 +1,7 @@
-/**
- * @file image.cpp Implementation of the image class
+/** -*- mode: c++-mode; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; -*-
+ * @file logging.cpp Logging support
  *
- * Copyright (C) 2004 Mike Hearn <mike@navi.cx>
+ * Copyright (C) 2004 Mike Hearn
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -19,30 +19,24 @@
  * MA  02111-1307  USA
  */
 
-#include "string.h"
-#include "notifier.h"
+#include "logging.hh"
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-Image::Image(char *newfile)
-{
-    data = NULL;
-    datalen = 0;
-    file = strdup(newfile);
-        
-    if (file[0] == '/') type = IMAGE_TYPE_ABSOLUTE;
-    else type = IMAGE_TYPE_THEME;
-}
+void log(enum loglevel level, char *s, ...) {
+    va_list args;
 
-/* newdata will be owned by this object and freed on destruction */
-Image::Image(unsigned char *newdata, int newdatalen)
-{
-    data = newdata;
-    datalen = newdatalen;
-    type = IMAGE_TYPE_RAW;
-    file = NULL;
-}
-
-Image::~Image()
-{
-    if (data) dbus_free(data); /* was allocated by DBUS */
-    if (file) free(file);
+    fprintf(stderr, "notification-daemon: ");
+    
+    switch (level) {
+        case LOG_WARNING: fprintf(stderr, "warning: "); break;
+        case LOG_TRACE: fprintf(stderr, "trace: "); break;
+        case LOG_ERROR: fprintf(stderr, "error: "); break;
+        case LOG_FIXME: fprintf(stderr, "fixme: "); break;
+    }
+                                                    
+    va_start(args, s);
+    vprintf(s, args);
+    va_end(args);
 }

@@ -20,7 +20,7 @@
  * MA  02111-1307  USA
  */
 
-#include "notifier.h"
+#include "notifier.hh"
 
 #include <iostream>
 #include <sstream>
@@ -28,7 +28,7 @@
 #include <stdexcept>
 
 #include "PopupNotification.hh"
-#include "logging.h"
+#include "logging.hh"
 
 #include <assert.h>
 
