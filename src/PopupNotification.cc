@@ -193,7 +193,7 @@ _set_cursor(GtkWidget *widget, GdkEventExpose *event,
 }
 
 PopupNotification::PopupNotification(PopupNotifier *n,
-									 DBusConnection *dbusConn)
+                                     DBusConnection *dbusConn)
     : Notification(dbusConn),
       notifier(n),
       window(NULL),
@@ -223,8 +223,8 @@ PopupNotification::generate_arrow(int &ret_arrow_x, int &ret_arrow_y)
 
 	gtk_widget_realize(window);
 
-    GtkRequisition req;
-    gtk_widget_size_request(window, &req);
+	GtkRequisition req;
+	gtk_widget_size_request(window, &req);
 
 	int new_height = get_height() + ARROW_HEIGHT;
 
@@ -447,6 +447,7 @@ PopupNotification::generate()
 
             //process_body_markup(body_label);
 
+            g_signal_connect(body_label, "button-release-event", G_CALLBACK(_window_button_release), this);
             gtk_label_set_line_wrap(GTK_LABEL(body_label), TRUE);
             gtk_misc_set_alignment(GTK_MISC(body_label), 0, 0.5);
             gtk_widget_show(body_label);

@@ -1,8 +1,15 @@
+Sat Jul  9 18:53:45 2005  Mike Hearn  <mike@plan99.net>
+
+	* src/PopupNotification.cc: 
+	  - Patch from Duarte Henriques, bug #3725: Clicking on
+	    the body label should call the default action
+	
 Sat Jul  9 18:48:31 2005  Mike Hearn  <mike@plan99.net>
 
 	* src/main.cc:
-	  - Patch from bug #3044: typo fixes for DBus 0.3x,
-	    actually use the timeout field, do not unref message
+	  - Patch from Duarte Henriques, bug #3044: typo fixes
+	    for DBus 0.3x, actually use the timeout field, do
+	    not unref message
 
 Mon Jul 04 16:11:39 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
