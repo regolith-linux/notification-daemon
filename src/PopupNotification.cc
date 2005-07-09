@@ -342,16 +342,11 @@ PopupNotification::generate()
 												 &error);
 					g_object_unref(G_OBJECT(theme));
 
-					if (!error)
-					{
-						image_widget = gtk_image_new_from_pixbuf(icon);
-						gdk_pixbuf_unref(icon);
-					}
-					else
-					{
-						throw std::runtime_error(S("could not load icon: ") +
-												 S(error->message));
-					}
+					if (error) throw std::runtime_error(S("could not load icon: ") +
+                                                        S(error->message));
+
+                    image_widget = gtk_image_new_from_pixbuf(icon);
+                    gdk_pixbuf_unref(icon);
 
 					break;
 				}
@@ -373,8 +368,6 @@ PopupNotification::generate()
 					}
 
 					image_widget = gtk_image_new_from_pixbuf(buf);
-
-					// do we leak buf here?
 					break;
 				}
 
@@ -391,10 +384,9 @@ PopupNotification::generate()
 					GError *error = NULL;
 
 					GdkPixbufLoader *loader = gdk_pixbuf_loader_new();
-					if (error) throw std::runtime_error( S(error->message) );
+					if (error) throw std::runtime_error(S(error->message));
 
 					gdk_pixbuf_loader_write(loader, data, dataLen, &error);
-					gdk_pixbuf_loader_close(loader, NULL);
 					if (error)
 					{
 						g_object_unref(loader);
@@ -402,10 +394,16 @@ PopupNotification::generate()
 					}
 
 					GdkPixbuf *buf = gdk_pixbuf_loader_get_pixbuf(loader);
-					image_widget = gtk_image_new_from_pixbuf(buf);
+					if (!buf) throw std::runtime_error("Could not get pixbuf from loader");
+
+                    g_object_ref(G_OBJECT(buf));
+
+					gdk_pixbuf_loader_close(loader, NULL);
 					g_object_unref(loader);
 
-					// ditto, do we leak buf?
+					image_widget = gtk_image_new_from_pixbuf(buf);
+
+					g_object_unref(G_OBJECT(buf));
 					break;
 				}
 

@@ -37,6 +37,7 @@ Image::Image(const unsigned char *data,
 	: mType(RAW)
 {
 	mData = new unsigned char[dataLen];
+	mDataLen = dataLen;
 	memcpy(mData, data, dataLen);
 }
 
