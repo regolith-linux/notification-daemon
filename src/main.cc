@@ -95,7 +95,9 @@ read_dict(DBusMessageIter *iter, char valueType)
 											  g_free, value_destroy_func);
 
 #if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
-	dbus_message_iter_recurse(iter, &dictiter);
+	dbus_message_iter_recurse(iter, &dict_iter);
+
+	DBusMessageIter hint_iter;
 
 	while (dbus_message_iter_get_arg_type(&hint_iter) == DBUS_TYPE_DICT_ENTRY)
 	{
@@ -103,7 +105,7 @@ read_dict(DBusMessageIter *iter, char valueType)
 		char *key;
 		void *value;
 
-		dbus_message_iter_recurse(&dict_iter, &etnry_iter);
+		dbus_message_iter_recurse(&dict_iter, &entry_iter);
 		dbus_message_iter_get_basic(&entry_iter, &key);
 		dbus_message_iter_next(&entry_iter);
 		dbus_message_iter_get_basic(&entry_iter, &value);
@@ -367,7 +369,9 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_BOOLEAN, NULL,
              "Invalid notify message. Expires argument is not uint32\n");
 
-	n->SetUseTimeout(true);
+	bool use_timeout;
+	_notifyd_dbus_message_iter_get_boolean(&iter, use_timeout);
+	n->SetUseTimeout(use_timeout);
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
@@ -517,7 +521,6 @@ filter_func(DBusConnection *conn, DBusMessage *message, void *user_data)
 
     dbus_connection_send(conn, ret, NULL);
     dbus_message_unref(ret);
-    dbus_message_unref(message);
 
     TRACE("sent reply\n");
 
