@@ -287,7 +287,7 @@ PopupNotification::generate()
 {
     TRACE("Generating PopupNotification GUI for nid %d\n", GetId());
 
-    GtkWidget *win = window, *bodybox_widget, *vbox, *summary_label;
+    GtkWidget *win = window, *bodybox_widget, *hbox, *vbox, *summary_label;
     GtkWidget *body_label = NULL, *image_widget;
 
     try
@@ -302,17 +302,17 @@ PopupNotification::generate()
             g_signal_connect(win, "button-release-event", G_CALLBACK(_window_button_release), this);
         }
 
-		vbox = gtk_vbox_new(FALSE, 0);
-		gtk_widget_show(vbox);
-		gtk_container_add(GTK_CONTAINER(win), vbox);
+		bodybox_widget = gtk_vbox_new(FALSE, 0);
+		gtk_widget_show(bodybox_widget);
+		gtk_container_add(GTK_CONTAINER(win), bodybox_widget);
 
 		mSpacer = gtk_image_new();
-		gtk_box_pack_start(GTK_BOX(vbox), mSpacer, FALSE, FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(bodybox_widget), mSpacer, FALSE, FALSE, 0);
 		gtk_widget_set_size_request(mSpacer, -1, ARROW_HEIGHT);
 
-        bodybox_widget = gtk_hbox_new(FALSE, 0);
-		gtk_box_pack_start(GTK_BOX(vbox), bodybox_widget, FALSE, FALSE, 0);
-        gtk_widget_show(bodybox_widget);
+        hbox = gtk_hbox_new(FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(bodybox_widget), hbox, FALSE, FALSE, 0);
+        gtk_widget_show(hbox);
 
 		const ImageList &images = GetImages();
 
@@ -528,7 +528,7 @@ PopupNotification::generate()
         gtk_widget_show(eventbox);
 
         gtk_container_add(GTK_CONTAINER(eventbox), padding);
-        gtk_box_pack_end_defaults(GTK_BOX(bodybox_widget), eventbox);
+        gtk_box_pack_end_defaults(GTK_BOX(hbox), eventbox);
 
         GtkWidget *imagebox = gtk_vbox_new(FALSE, 0);
         gtk_container_set_border_width(GTK_CONTAINER(imagebox),
@@ -542,18 +542,18 @@ PopupNotification::generate()
             image_widget = NULL;
         }
         gtk_widget_show(imagebox);
-        gtk_box_pack_start(GTK_BOX(bodybox_widget), imagebox, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(hbox), imagebox, FALSE, FALSE, 0);
 
         /* now we setup an expose event handler to draw the border */
         g_signal_connect(win, "expose-event", G_CALLBACK(draw_border), this);
         gtk_widget_set_app_paintable(win, TRUE);
 
-        gtk_widget_show(bodybox_widget);
+        gtk_widget_show(hbox);
 
         /* now we want to ensure the height of the content is never less than MIN_HEIGHT */
         GtkRequisition req;
-        gtk_widget_size_request(bodybox_widget, &req);
-        gtk_widget_set_size_request(bodybox_widget, -1, MAX(MIN_HEIGHT, req.height));
+        gtk_widget_size_request(hbox, &req);
+        gtk_widget_set_size_request(hbox, -1, MAX(MIN_HEIGHT, req.height));
     }
     catch (...)
     {

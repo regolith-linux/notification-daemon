@@ -1,11 +1,18 @@
+Sun Jul 10 16:47:51 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/PopupNotification.cc:
+	  - Patch by Duarte Henriques (bug #3743) to fix notification
+	    replacing.
+
 Sat Jul  9 19:02:40 2005  Mike Hearn  <mike@plan99.net>
-	* src/PopupNotification.cc: 
+
+	* src/PopupNotification.cc:
 	  - Patch from Duarte Henriques, bug #3725: Clicking on
 	    the body label should call the default action
 	  - Patch from Duarte Henriques, bug #3057: initialize
 	    Image.dataLen, change pixbuf loader handling. [With
 	    some modifications by myself]
-	
+
 Sat Jul  9 18:48:31 2005  Mike Hearn  <mike@plan99.net>
 
 	* src/main.cc:
