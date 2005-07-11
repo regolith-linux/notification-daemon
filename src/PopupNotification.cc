@@ -445,7 +445,6 @@ PopupNotification::generate()
 
             //process_body_markup(body_label);
 
-            g_signal_connect(body_label, "button-release-event", G_CALLBACK(_window_button_release), this);
             gtk_label_set_line_wrap(GTK_LABEL(body_label), TRUE);
             gtk_misc_set_alignment(GTK_MISC(body_label), 0, 0.5);
             gtk_widget_show(body_label);

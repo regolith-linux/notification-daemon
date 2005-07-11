@@ -27,10 +27,8 @@
 
 typedef struct
 {
-	int x1;
-	int y1;
-	int x2;
-	int y2;
+	int start;
+	int end;
 	const gchar *url;
 
 } SexyUrlLabelLink;
@@ -40,10 +38,11 @@ typedef struct
 	GList *links;
 	GList *urls;
 	SexyUrlLabelLink *active_link;
-
 	GtkWidget *popup_menu;
-
 	GdkWindow *event_window;
+
+	int layout_x;
+	int layout_y;
 
 	GString *temp_markup_result;
 
@@ -66,8 +65,8 @@ static gboolean sexy_url_label_motion_notify_event(GtkWidget *widget,
 												   GdkEventMotion *event);
 static gboolean sexy_url_label_leave_notify_event(GtkWidget *widget,
 												  GdkEventCrossing *event);
-static gboolean sexy_url_label_button_release_event(GtkWidget *widget,
-													GdkEventButton *event);
+static gboolean sexy_url_label_button_press_event(GtkWidget *widget,
+												  GdkEventButton *event);
 
 static void open_link_activate_cb(GtkMenuItem *menu_item,
 								  SexyUrlLabel *url_label);
@@ -93,14 +92,14 @@ sexy_url_label_class_init(SexyUrlLabelClass *klass)
 
 	object_class->finalize = sexy_url_label_finalize;
 
-	widget_class->realize              = sexy_url_label_realize;
-	widget_class->unrealize            = sexy_url_label_unrealize;
-	widget_class->map                  = sexy_url_label_map;
-	widget_class->unmap                = sexy_url_label_unmap;
-	widget_class->size_allocate        = sexy_url_label_size_allocate;
-	widget_class->motion_notify_event  = sexy_url_label_motion_notify_event;
-	widget_class->leave_notify_event   = sexy_url_label_leave_notify_event;
-	widget_class->button_release_event = sexy_url_label_button_release_event;
+	widget_class->realize             = sexy_url_label_realize;
+	widget_class->unrealize           = sexy_url_label_unrealize;
+	widget_class->map                 = sexy_url_label_map;
+	widget_class->unmap               = sexy_url_label_unmap;
+	widget_class->size_allocate       = sexy_url_label_size_allocate;
+	widget_class->motion_notify_event = sexy_url_label_motion_notify_event;
+	widget_class->leave_notify_event  = sexy_url_label_leave_notify_event;
+	widget_class->button_press_event  = sexy_url_label_button_press_event;
 
 	g_type_class_add_private(klass, sizeof(SexyUrlLabelPrivate));
 
@@ -128,6 +127,7 @@ sexy_url_label_init(SexyUrlLabel *url_label)
 
 	priv->popup_menu = gtk_menu_new();
 
+	/* Open Link */
 	item = gtk_image_menu_item_new_with_mnemonic("_Open Link");
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(priv->popup_menu), item);
@@ -139,12 +139,17 @@ sexy_url_label_init(SexyUrlLabel *url_label)
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), image);
 	gtk_widget_show(image);
 
-	item = gtk_menu_item_new_with_mnemonic("Copy _Link Address");
+	/* Copy Link Address */
+	item = gtk_image_menu_item_new_with_mnemonic("Copy _Link Address");
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(priv->popup_menu), item);
 
 	g_signal_connect(G_OBJECT(item), "activate",
 					 G_CALLBACK(copy_link_activate_cb), url_label);
+
+	image = gtk_image_new_from_stock(GTK_STOCK_COPY, GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), image);
+	gtk_widget_show(image);
 }
 
 static void
@@ -164,11 +169,13 @@ sexy_url_label_motion_notify_event(GtkWidget *widget, GdkEventMotion *event)
 {
 	SexyUrlLabel *url_label = (SexyUrlLabel *)widget;
 	SexyUrlLabelPrivate *priv = SEXY_URL_LABEL_GET_PRIVATE(url_label);
+	PangoLayout *layout = gtk_label_get_layout(GTK_LABEL(url_label));
 	GdkModifierType state;
 	gboolean found = FALSE;
 	GList *l;
+	int index, trailing;
 	int x, y;
-	SexyUrlLabelLink *link;
+	SexyUrlLabelLink *link = NULL;
 
 	if (event->is_hint)
 		gdk_window_get_pointer(event->window, &x, &y, &state);
@@ -179,15 +186,20 @@ sexy_url_label_motion_notify_event(GtkWidget *widget, GdkEventMotion *event)
 		state = event->state;
 	}
 
-	for (l = priv->links; l != NULL; l = l->next)
+	if (pango_layout_xy_to_index(layout,
+								 (x - priv->layout_x) * PANGO_SCALE,
+								 (y - priv->layout_y) * PANGO_SCALE,
+								 &index, &trailing))
 	{
-		link = (SexyUrlLabelLink *)l->data;
-
-		if (x >= link->x1 && x <= link->x2 &&
-			y >= link->y1 && y <= link->y2)
+		for (l = priv->links; l != NULL; l = l->next)
 		{
-			found = TRUE;
-			break;
+			link = (SexyUrlLabelLink *)l->data;
+
+			if (index >= link->start && index <= link->end)
+			{
+				found = TRUE;
+				break;
+			}
 		}
 	}
 
@@ -223,22 +235,8 @@ sexy_url_label_leave_notify_event(GtkWidget *widget, GdkEventCrossing *event)
 	SexyUrlLabel *url_label = (SexyUrlLabel *)widget;
 	SexyUrlLabelPrivate *priv = SEXY_URL_LABEL_GET_PRIVATE(url_label);
 
-	if (gtk_get_event_widget((GdkEvent *)event) != widget ||
-		event->detail == GDK_NOTIFY_INFERIOR)
-	{
+	if (event->mode != GDK_CROSSING_NORMAL)
 		return FALSE;
-	}
-
-	if (priv->active_link != NULL)
-	{
-		if (event->x >= priv->active_link->x1 &&
-			event->x <= priv->active_link->x2 &&
-			event->y >= priv->active_link->y1 &&
-			event->y <= priv->active_link->y2)
-		{
-			return FALSE;
-		}
-	}
 
 	gdk_window_set_cursor(priv->event_window, NULL);
 	priv->active_link = NULL;
@@ -247,13 +245,13 @@ sexy_url_label_leave_notify_event(GtkWidget *widget, GdkEventCrossing *event)
 }
 
 static gboolean
-sexy_url_label_button_release_event(GtkWidget *widget, GdkEventButton *event)
+sexy_url_label_button_press_event(GtkWidget *widget, GdkEventButton *event)
 {
 	SexyUrlLabel *url_label = (SexyUrlLabel *)widget;
 	SexyUrlLabelPrivate *priv = SEXY_URL_LABEL_GET_PRIVATE(url_label);
 
 	if (priv->active_link == NULL)
-		return TRUE;
+		return FALSE;
 
 	if (event->button == 1)
 	{
@@ -425,17 +423,17 @@ sexy_url_label_rescan_label(SexyUrlLabel *url_label)
 	PangoLayout *layout = gtk_label_get_layout(GTK_LABEL(url_label));
 	PangoAttrList *list = pango_layout_get_attributes(layout);
 	PangoAttrIterator *iter;
-	gint layout_x, layout_y;
 	GList *url_list;
 
 	sexy_url_label_clear_links(url_label);
 
 	iter = pango_attr_list_get_iterator(list);
 
-	gtk_label_get_layout_offsets(GTK_LABEL(url_label), &layout_x, &layout_y);
+	gtk_label_get_layout_offsets(GTK_LABEL(url_label),
+								 &priv->layout_x, &priv->layout_y);
 
-	layout_x -= GTK_WIDGET(url_label)->allocation.x;
-	layout_y -= GTK_WIDGET(url_label)->allocation.y;
+	priv->layout_x -= GTK_WIDGET(url_label)->allocation.x;
+	priv->layout_y -= GTK_WIDGET(url_label)->allocation.y;
 
 	url_list = priv->urls;
 
@@ -455,19 +453,13 @@ sexy_url_label_rescan_label(SexyUrlLabel *url_label)
 			SexyUrlLabelLink *link;
 
 			pango_attr_iterator_range(iter, &start, &end);
-
 			pango_layout_index_to_pos(layout, start, &start_pos);
 			pango_layout_index_to_pos(layout, end,   &end_pos);
 
 			link = g_new0(SexyUrlLabelLink, 1);
-			link->x1 = layout_x + PANGO_PIXELS(start_pos.x);
-			link->y1 = layout_y + PANGO_PIXELS(start_pos.y);
-			link->x2 = layout_x +
-			           PANGO_PIXELS(end_pos.x) + PANGO_PIXELS(end_pos.width);
-			link->y2 = layout_y +
-			           PANGO_PIXELS(end_pos.y) + PANGO_PIXELS(end_pos.height);
-
-			link->url = (const gchar *)url_list->data;
+			link->start = start;
+			link->end   = end;
+			link->url   = (const gchar *)url_list->data;
 			priv->links = g_list_append(priv->links, link);
 
 			url_list = url_list->next;

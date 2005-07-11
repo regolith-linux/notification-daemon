@@ -1,3 +1,11 @@
+Sun Jul 10 19:23:23 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/PopupNotification.cc:
+	* src/sexy-url-label.c:
+	  - Updated SexyUrlLabel to fix several major bugs, including the one
+	    worked around by the patch in bug #3726. Reverted that fix now we
+	    don't need the workaround.
+
 Sun Jul 10 16:47:51 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/PopupNotification.cc:
