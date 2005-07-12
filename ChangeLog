@@ -1,3 +1,8 @@
+Tue Jul 12 12:23:30 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/Notification.cc:
+	  - Patch by Richard Hughes to fix compilation on D-BUS 0.3x.
+
 Tue Jul 12 12:21:45 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* notification-daemon.spec.in:

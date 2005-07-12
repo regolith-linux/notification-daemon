@@ -64,7 +64,8 @@ void Notification::action_invoke(uint actionid)
 	DBusMessageIter iter;
 	dbus_message_iter_init_append(signal, &iter);
 
-	_notifyd_dbus_message_iter_append_uint32(&iter, GetId());
+	int id = GetId();
+	_notifyd_dbus_message_iter_append_uint32(&iter, id);
 	_notifyd_dbus_message_iter_append_uint32(&iter, actionid);
 
     dbus_connection_send(mDBusConn, signal, NULL);
