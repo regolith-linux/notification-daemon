@@ -1,0 +1,44 @@
+Summary: Notification Daemon
+Name: notification-daemon
+Version: @VERSION@
+Release: 1%{?dist}
+License: GPL
+Group: Applications/System
+Source: http://www.galago.info/files/releases/source/notification-daemon-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+URL: http://svn.galago.info/trunk/notification-daemon
+BuildPrereq: dbus-devel >= 0.30
+Requires: dbus >= 0.30
+
+%description
+A daemon that displays passive pop-up notifications as per the
+Desktop Notifications spec (http://galago.info/specs/notification/index.php).
+
+%prep
+%setup -q
+
+%build
+%configure
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+%makeinstall
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post
+/sbin/service messagebus condrestart
+
+%files
+%defattr(-,root,root)
+%doc AUTHORS ChangeLog COPYING README
+%{_libexecdir}/*
+%{_datadir}/dbus-1/services/*
+%dir %{_sysconfdir}/dbus-1/system.d
+%config %{_sysconfdir}/dbus-1/system.d/notification-daemon.conf
+
+%changelog
+* Mon Jul 12 2005 Richard Hughes <richard@hughsie.com> 0.0.1-1
+- initial packaging of 0.0.1
