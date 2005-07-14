@@ -18,7 +18,10 @@ Desktop Notifications spec (http://galago.info/specs/notification/index.php).
 %setup -q
 
 %build
-%configure
+%configure \
+	--prefix=%{buildroot} \
+	--with-dbus-sys=%{buildroot}/etc/dbus-1/system.d	\
+	--with-dbus-services=%{buildroot}/usr/share/dbus-1/services
 make
 
 %install

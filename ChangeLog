@@ -1,3 +1,9 @@
+Thu Jul 14 00:09:30 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* notification-daemon.spec.in:
+	  - Patch by Richard Hughes to install the D-BUS service file in
+	    the right directory in the FC4 RPM spec file.
+
 Wed Jul 13 09:58:20 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/Notification.cc:
