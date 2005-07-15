@@ -1,3 +1,10 @@
+Thu Jul 14 19:10:19 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotifier.cc:
+	* AUTHORS:
+	  - Patch by Mark Szilveszter to add support for actually using
+	    custom timeouts, and to bump the default timeout to 7 seconds.
+
 Thu Jul 14 00:09:30 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* notification-daemon.spec.in:

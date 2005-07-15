@@ -94,12 +94,19 @@ void BaseNotifier::register_timeout(int hz)
 void BaseNotifier::setup_timeout(Notification *n)
 {
     /*
-	 * Decide a sensible timeout. For now, let's just use 5 seconds.
+	 * Decide a sensible timeout. For now, let's just use 7 seconds.
 	 * In the future, maybe make this based on text length?
 	 */
-    if (n->GetUseTimeout() && n->GetTimeout() == 0)
-		n->SetTimeout(time(NULL) + 5);
-
+    if (n->GetUseTimeout())
+	{
+		int timeout = n->GetTimeout();
+		
+		if (timeout == 0) /* Default timeout */
+			n->SetTimeout(time(NULL) + 7);
+		else if (timeout > 0) /* else user specified a timeout */
+			n->SetTimeout(time(NULL) + timeout);
+	}
+	
     /* we don't have a timeout triggering constantly as otherwise n-d
        could never be fully paged out by the kernel. */
 
