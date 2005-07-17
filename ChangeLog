@@ -1,3 +1,8 @@
+Sat Jul 16 03:12:06 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cc:
+	  - Fix hint support for D-BUS 0.3x.
+
 Sat Jul 16 03:09:38 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/dbus-compat.h:

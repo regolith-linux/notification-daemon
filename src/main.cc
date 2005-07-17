@@ -97,9 +97,7 @@ read_dict(DBusMessageIter *iter, char valueType)
 #if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
 	dbus_message_iter_recurse(iter, &dict_iter);
 
-	DBusMessageIter hint_iter;
-
-	while (dbus_message_iter_get_arg_type(&hint_iter) == DBUS_TYPE_DICT_ENTRY)
+	while (dbus_message_iter_get_arg_type(&dict_iter) == DBUS_TYPE_DICT_ENTRY)
 	{
 		DBusMessageIter entry_iter;
 		char *key;
@@ -110,7 +108,11 @@ read_dict(DBusMessageIter *iter, char valueType)
 		dbus_message_iter_next(&entry_iter);
 		dbus_message_iter_get_basic(&entry_iter, &value);
 
-		g_hash_table_replace(table, key, value);
+		g_hash_table_replace(table, g_strdup(key),
+							 (valueType == DBUS_TYPE_STRING
+							  ? g_strdup((char *)value) : value));
+
+		dbus_message_iter_next(&dict_iter);
 	}
 #else /* D-BUS < 0.30 */
 	if (dbus_message_iter_init_dict_iterator(iter, &dict_iter))
