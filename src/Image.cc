@@ -1,5 +1,5 @@
 /**
- * @file Image.cpp Implementation of the image class
+ * @file Image.cc Implementation of the image class
  *
  * Copyright (C) 2004 Mike Hearn <mike@navi.cx>
  * Copyright (C) 2005 Christian Hammond <chipx86@chipx86.com>

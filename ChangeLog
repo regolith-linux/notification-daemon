@@ -1,3 +1,10 @@
+Sat Jul 16 03:09:38 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/dbus-compat.h:
+	* src/Image.cc:
+	  - Update dbus-compat.h to fix some issues with arrays over D-BUS
+	    0.3x.
+
 Thu Jul 14 19:10:19 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/BaseNotifier.cc:
