@@ -1,3 +1,12 @@
+Sat Jul 23 16:53:12 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* Makefile.am:
+	D notification-daemon.service.in:
+	A org.freedesktop.Notifications.service.in:
+	  - Renamed notification-daemon.service.in to
+	    org.freedesktop.Notifications.service.in, and made the .service
+	    generation code more generic.
+
 Sat Jul 16 03:12:06 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/main.cc:

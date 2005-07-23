@@ -1,25 +1,24 @@
 SUBDIRS = src
 
+dbusdir        = $(DBUS_SYS_DIR)
+dist_dbus_DATA = notification-daemon.conf
+
+servicedir       = $(DBUS_SERVICES_DIR)
+service_in_files = org.freedesktop.Notifications.service.in
+service_DATA     = $(service_in_files:.service.in=.service)
+
+$(service_DATA): $(service_in_files) Makefile
+	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+
+dist-hook: notification-daemon.spec
+	cp notification-daemon.spec $(distdir)
+
 EXTRA_DIST = \
 	AUTHORS NEWS INSTALL COPYING README \
 	ChangeLog \
 	autogen.sh \
 	configure.ac \
 	notification-daemon.spec.in \
-	notification-daemon.service \
-	notification-daemon.service.in
+	$(service_in_files)
 
-CLEANFILES = notification-daemon.service
-
-dbusdir        = $(DBUS_SYS_DIR)
-dist_dbus_DATA = notification-daemon.conf
-
-servicedir       = $(DBUS_SERVICES_DIR)
-service_in_files = notification-daemon.service.in
-service_DATA     = notification-daemon.service
-
-%.service: %.service.in
-	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
-
-dist-hook: notification-daemon.spec
-	cp notification-daemon.spec $(distdir)
+CLEANFILES = $(service_DATA)
