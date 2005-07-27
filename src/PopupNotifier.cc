@@ -59,9 +59,12 @@ PopupNotifier::reflow()
         PopupNotification *n = dynamic_cast<PopupNotification *>(i->second);
         assert(n != NULL);
 
-        n->set_height_offset(offset - offsub);
+		if (!n->has_arrow())
+		{
+			n->set_height_offset(offset - offsub);
 
-        offset += n->get_height();
+			offset += n->get_height();
+		}
     }
 }
 

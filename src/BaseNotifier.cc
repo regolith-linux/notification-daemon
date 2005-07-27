@@ -101,7 +101,7 @@ void BaseNotifier::setup_timeout(Notification *n)
 
 		if (timeout <= 0) /* Default timeout */
 			n->SetTimeout(time(NULL) + 7);
-		else if (timeout > 0) /* else user specified a timeout */
+		else
 			n->SetTimeout(time(NULL) + timeout);
 
 		/* we don't have a timeout triggering constantly as otherwise n-d

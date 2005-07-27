@@ -1,3 +1,11 @@
+Wed Jul 27 02:14:01 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotifier.cc:
+	* src/PopupNotifier.cc:
+	  - Don't factor in the height of a notification that's set in a
+	    specific X, Y location. Previously one of these notifications
+	    caused a gap inbetween standard notifications. This is fixed.
+
 Wed Jul 27 00:41:41 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/BaseNotifier.cc:
