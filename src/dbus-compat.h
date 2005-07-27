@@ -132,6 +132,11 @@
 # define dbus_message_iter_init_append(msg, iter) \
 	dbus_message_iter_init(msg, iter)
 
+# define dbus_message_iter_get_element_type(iter) \
+	dbus_message_iter_get_array_type((iter))
+# define dbus_bus_request_name(conn, service, flags, error) \
+	dbus_bus_acquire_service((conn), (service), (flags), (error))
+
 # define _notifyd_dbus_message_iter_append_byte(iter, val) \
 	dbus_message_iter_append_byte((iter), (val))
 # define _notifyd_dbus_message_iter_append_boolean(iter, val) \

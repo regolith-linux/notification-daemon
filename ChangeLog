@@ -1,3 +1,8 @@
+Wed Jul 27 00:29:33 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/dbus-compat.h:
+	  - Make notification-daemon compile on D-BUS 0.2x again.
+
 Sat Jul 23 16:53:12 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* Makefile.am:
