@@ -1,3 +1,9 @@
+Wed Jul 27 00:41:41 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotifier.cc:
+	* src/BaseNotifier.hh:
+	  - Shift some code around, change some variable names.
+
 Wed Jul 27 00:29:33 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/dbus-compat.h:

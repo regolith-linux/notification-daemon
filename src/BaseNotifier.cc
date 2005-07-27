@@ -32,18 +32,16 @@
 #include "logging.hh"
 
 BaseNotifier::BaseNotifier(GMainLoop *main_loop)
+	: mTiming(false),
+	  mNextId(1),
+	  mLoop(main_loop)
 {
-    loop = main_loop;
-
-    g_main_loop_ref(loop);
-
-    next_id = 1;
-    timing = false;
+    g_main_loop_ref(mLoop);
 }
 
 BaseNotifier::~BaseNotifier()
 {
-    g_main_loop_unref(loop);
+    g_main_loop_unref(mLoop);
 }
 
 /* returns true if more heartbeats are needed */
@@ -81,7 +79,7 @@ static gboolean timeout_dispatch(gpointer data)
     BaseNotifier *n = (BaseNotifier *) data;
 
     bool ret = n->timeout();
-    if (!ret) n->timing = false;
+    if (!ret) n->mTiming = false;
 
     return ret ? TRUE : FALSE;
 }
@@ -100,27 +98,27 @@ void BaseNotifier::setup_timeout(Notification *n)
     if (n->GetUseTimeout())
 	{
 		int timeout = n->GetTimeout();
-		
-		if (timeout == 0) /* Default timeout */
+
+		if (timeout <= 0) /* Default timeout */
 			n->SetTimeout(time(NULL) + 7);
 		else if (timeout > 0) /* else user specified a timeout */
 			n->SetTimeout(time(NULL) + timeout);
-	}
-	
-    /* we don't have a timeout triggering constantly as otherwise n-d
-       could never be fully paged out by the kernel. */
 
-    if (n->GetUseTimeout() && !timing)
-    {
-        register_timeout(1000);
-        timing = true; /* set to false when ::timeout returns false */
-    }
+		/* we don't have a timeout triggering constantly as otherwise n-d
+		   could never be fully paged out by the kernel. */
+
+		if (!mTiming)
+		{
+			register_timeout(1000);
+			mTiming = true; /* set to false when ::timeout returns false */
+		}
+	}
 }
 
 
 uint BaseNotifier::notify(Notification *n)
 {
-    n->SetId(next_id++);
+    n->SetId(mNextId++);
 
     update(n);  // can throw
 

@@ -29,18 +29,12 @@
 
 class BaseNotifier
 {
-protected:
-    uint next_id;
-    GMainLoop *loop;
-
-    void register_timeout(int hz);
-
-    void setup_timeout(Notification *n);
-
 public:
-    /* All notifications are given a unique, non-repeating id which the client can use
-       The mapping between the ids and notification objects is stored here */
-
+    /*
+	 * All notifications are given a unique, non-repeating id which the
+	 * client can use. The mapping between the ids and notification objects
+	 * is stored here.
+	 */
     NotificationsMap notifications;
 
     Notification *get(uint id);
@@ -53,12 +47,22 @@ public:
     BaseNotifier(GMainLoop *loop);
     virtual ~BaseNotifier();
 
-    /* This can be overriden by base classes to return subclasses of Notification */
+    /*
+	 * This can be overriden by base classes to return subclasses
+	 * of Notification
+	 */
     virtual Notification *create_notification(DBusConnection *dbusConn);
 
-    bool timing;
+    bool mTiming;
     virtual bool timeout();
 
+protected:
+    uint mNextId;
+    GMainLoop *mLoop;
+
+    void register_timeout(int hz);
+
+    void setup_timeout(Notification *n);
 };
 
 #endif /* _NOTIFYD_BASE_NOTIFIER_HH */
