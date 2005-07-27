@@ -31,9 +31,6 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
-/sbin/service messagebus condrestart
-
 %files
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING README
