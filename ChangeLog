@@ -1,3 +1,9 @@
+Thu Jul 28 01:56:37 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* NEWS:
+	* configure.ac:
+	  - Bump to version 0.2.0.
+
 Thu Jul 28 01:53:13 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	A src/Hint.hh:
