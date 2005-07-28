@@ -1,3 +1,10 @@
+Mon Jul 25 22:47:41 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
+
+	* src/main.cc:
+	  - Open the variant type for hints so that we can get the value
+	    within.
+	  - Fix a GCC 4.0 compiler error.
+
 Thu Jul 28 01:56:37 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* NEWS:

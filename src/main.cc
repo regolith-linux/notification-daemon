@@ -128,7 +128,7 @@ read_hints(DBusMessageIter *iter)
 
 	while (dbus_message_iter_get_arg_type(&dict_iter) == DBUS_TYPE_DICT_ENTRY)
 	{
-		DBusMessageIter entry_iter;
+		DBusMessageIter entry_iter, value_iter;
 		char *key;
 		void *value;
 		Hint hint;
@@ -136,20 +136,23 @@ read_hints(DBusMessageIter *iter)
 		dbus_message_iter_recurse(&dict_iter, &entry_iter);
 		dbus_message_iter_get_basic(&entry_iter, &key);
 		dbus_message_iter_next(&entry_iter);
-		dbus_message_iter_get_basic(&entry_iter, &value);
 
-		switch (dbus_message_iter_get_arg_type(&entry_iter))
+		dbus_message_iter_recurse(&entry_iter, &value_iter);
+		dbus_message_iter_get_basic(&value_iter, &value);
+
+		switch (dbus_message_iter_get_arg_type(&value_iter))
 		{
 			case DBUS_TYPE_STRING:
-				hints[key] = Hint(key, *((char *)value));
+				hints[key] = Hint(key, std::string((char *)value));
 				break;
 
 			case DBUS_TYPE_INT32:
-				hints[key] = Hint(key, *((int *)value));
+				hints[key] = Hint(key, (dbus_uint32_t)value);
 				break;
 
 			case DBUS_TYPE_BOOLEAN:
-				hints[key] = Hint(key, *((bool *)value));
+				hints[key] = Hint(key, (bool)value);
+				break;
 
 			default:
 				break;
