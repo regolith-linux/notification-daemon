@@ -410,7 +410,9 @@ handle_get_caps(DBusMessage *message)
 {
     DBusMessage *reply = dbus_message_new_method_return(message);
     DBusMessageIter iter;
-    static const char *caps[] = { "body", "actions", "static-image" };
+    static const char *caps[] = {
+		"actions", "body", "body-hyperlinks", "body-markup", "icon-static"
+	};
 
     dbus_message_iter_init_append(reply, &iter);
     _notifyd_dbus_message_iter_append_string_array(&iter, caps,
