@@ -1,3 +1,9 @@
+Mon Jul 25 22:50:49 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
+
+	* NEWS:
+	* configure.ac:
+	  - Bump to version 0.2.1.
+
 Mon Jul 25 22:47:41 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
 
 	* src/main.cc:
