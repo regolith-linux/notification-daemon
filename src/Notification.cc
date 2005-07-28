@@ -195,12 +195,18 @@ Notification::GetActions(void)
 }
 
 void
-Notification::SetHint(const std::string &key, const std::string &value)
+Notification::SetHints(HintMap hints)
 {
-	mHints[key] = value;
+	mHints = hints;
 }
 
-const std::string &
+void
+Notification::AddHint(Hint &hint)
+{
+	mHints[hint.GetKey()] = hint;
+}
+
+const Hint &
 Notification::GetHint(const std::string &key)
 	const
 {
@@ -208,20 +214,25 @@ Notification::GetHint(const std::string &key)
 }
 
 bool
-Notification::HasHint(const std::string &key)
+Notification::HasHint(const std::string &key, Hint::Type type)
 	const
 {
-	return mHints.find(key) != mHints.end();
+	bool found = mHints.find(key) != mHints.end();
+
+	if (!found || type == Hint::UNSET)
+		return found;
+
+	return (GetHint(key).GetType() == type);
 }
 
-const Notification::HintsMap &
+const HintMap &
 Notification::GetHints(void)
 	const
 {
 	return mHints;
 }
 
-Notification::HintsMap &
+HintMap &
 Notification::GetHints(void)
 {
 	return mHints;

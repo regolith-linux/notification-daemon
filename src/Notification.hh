@@ -28,6 +28,7 @@
 #include <map>
 #include <string>
 
+#include "Hint.hh"
 #include "Image.hh"
 
 
@@ -41,7 +42,6 @@ class Notification
 {
 public:
 	typedef std::map<int, std::string> ActionsMap;
-	typedef std::map<std::string, std::string> HintsMap;
 
     Notification(DBusConnection *dbusConn);
     Notification(const Notification &obj);
@@ -79,12 +79,13 @@ public:
 	const ActionsMap &GetActions(void) const;
 	ActionsMap &GetActions(void);
 
-	void SetHint(const std::string &key, const std::string &value);
-	const std::string &GetHint(const std::string &key) const;
-	bool HasHint(const std::string &key) const;
+	void SetHints(HintMap hints);
+	void AddHint(Hint &hint);
+	const Hint &GetHint(const std::string &key) const;
+	bool HasHint(const std::string &key, Hint::Type type = Hint::UNSET) const;
 
-	const HintsMap &GetHints(void) const;
-	HintsMap &GetHints(void);
+	const HintMap &GetHints(void) const;
+	HintMap &GetHints(void);
 
 	void SetId(int id);
 	int GetId(void) const;
@@ -102,7 +103,7 @@ private:
     bool mUseTimeout;     /* Should the notification ever time out? */
 
     ActionsMap mActions;  /* The mapping of action ids to action strings */
-	HintsMap mHints;      /* The mapping of hints. */
+	HintMap mHints;       /* The mapping of hints. */
 
     int mId;
 

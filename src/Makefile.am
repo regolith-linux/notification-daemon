@@ -10,6 +10,7 @@ notification_daemon_SOURCES = \
 	BaseNotifier.hh \
 	ConsoleNotifier.cc \
 	ConsoleNotifier.hh \
+	Hint.hh \
 	Image.cc \
 	Image.hh \
 	Notification.cc \

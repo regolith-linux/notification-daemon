@@ -1,8 +1,8 @@
 /** -*- mode: c++-mode; tab-width: 4; c-basic-offset: 4; -*-
  * @file main.cpp Main Notification Daemon file.
  *
- * Copyright (C) 2004 Christian Hammond.
- *             2004 Mike Hearn
+ * Copyright (C) 2004-2005 Christian Hammond.
+ *               2004-2005 Mike Hearn
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -63,6 +63,7 @@
 #include <memory>
 
 #include "ConsoleNotifier.hh"
+#include "Hint.hh"
 #include "PopupNotifier.hh"
 #include "logging.hh"
 #include "dbus-compat.h"
@@ -72,27 +73,12 @@ static GMainLoop *loop;
 static DBusConnection *dbus_conn;
 
 static GHashTable *
-read_dict(DBusMessageIter *iter, char valueType)
+read_int_dict(DBusMessageIter *iter)
 {
 	DBusMessageIter dict_iter;
-	GDestroyNotify value_destroy_func = NULL;
-
-	if (valueType == DBUS_TYPE_UINT32)
-	{
-		value_destroy_func = NULL;
-	}
-	else if (valueType == DBUS_TYPE_STRING)
-	{
-		value_destroy_func = g_free;
-	}
-	else
-	{
-		ERROR("Unknown D-BUS type %c passed to read_table\n", valueType);
-		return NULL;
-	}
 
 	GHashTable *table = g_hash_table_new_full(g_str_hash, g_str_equal,
-											  g_free, value_destroy_func);
+											  g_free, NULL);
 
 #if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
 	dbus_message_iter_recurse(iter, &dict_iter);
@@ -107,11 +93,7 @@ read_dict(DBusMessageIter *iter, char valueType)
 		dbus_message_iter_get_basic(&entry_iter, &key);
 		dbus_message_iter_next(&entry_iter);
 		dbus_message_iter_get_basic(&entry_iter, &value);
-
-		g_hash_table_replace(table, g_strdup(key),
-							 (valueType == DBUS_TYPE_STRING
-							  ? g_strdup((char *)value) : value));
-
+		g_hash_table_replace(table, g_strdup(key), value);
 		dbus_message_iter_next(&dict_iter);
 	}
 #else /* D-BUS < 0.30 */
@@ -120,22 +102,10 @@ read_dict(DBusMessageIter *iter, char valueType)
 		do
 		{
 			char *key = dbus_message_iter_get_dict_key(&dict_iter);
+			dbus_uint32_t value = dbus_message_iter_get_uint32(&dict_iter);
 
-			if (valueType == DBUS_TYPE_STRING)
-			{
-				char *value = dbus_message_iter_get_string(&dict_iter);
-
-				g_hash_table_replace(table, g_strdup(key), g_strdup(value));
-
-				dbus_free(value);
-			}
-			else if (valueType == DBUS_TYPE_UINT32)
-			{
-				dbus_uint32_t value = dbus_message_iter_get_uint32(&dict_iter);
-
-				g_hash_table_replace(table, g_strdup(key),
-									 GINT_TO_POINTER(value));
-			}
+			g_hash_table_replace(table, g_strdup(key),
+								 GINT_TO_POINTER(value));
 
 			dbus_free(key);
 		}
@@ -144,6 +114,87 @@ read_dict(DBusMessageIter *iter, char valueType)
 #endif /* D-BUS < 0.30 */
 
 	return table;
+}
+
+static HintMap
+read_hints(DBusMessageIter *iter)
+{
+	DBusMessageIter dict_iter;
+
+	HintMap hints;
+
+#if NOTIFYD_CHECK_DBUS_VERSION(0, 30)
+	dbus_message_iter_recurse(iter, &dict_iter);
+
+	while (dbus_message_iter_get_arg_type(&dict_iter) == DBUS_TYPE_DICT_ENTRY)
+	{
+		DBusMessageIter entry_iter;
+		char *key;
+		void *value;
+		Hint hint;
+
+		dbus_message_iter_recurse(&dict_iter, &entry_iter);
+		dbus_message_iter_get_basic(&entry_iter, &key);
+		dbus_message_iter_next(&entry_iter);
+		dbus_message_iter_get_basic(&entry_iter, &value);
+
+		switch (dbus_message_iter_get_arg_type(&entry_iter))
+		{
+			case DBUS_TYPE_STRING:
+				hints[key] = Hint(key, *((char *)value));
+				break;
+
+			case DBUS_TYPE_INT32:
+				hints[key] = Hint(key, *((int *)value));
+				break;
+
+			case DBUS_TYPE_BOOLEAN:
+				hints[key] = Hint(key, *((bool *)value));
+
+			default:
+				break;
+		}
+
+		dbus_message_iter_next(&dict_iter);
+	}
+#else /* D-BUS < 0.30 */
+	if (dbus_message_iter_init_dict_iterator(iter, &dict_iter))
+	{
+		do
+		{
+			char *temp = dbus_message_iter_get_dict_key(&dict_iter);
+			std::string key = temp;
+			dbus_free(temp);
+
+			switch (dbus_message_iter_get_arg_type(&dict_iter))
+			{
+				case DBUS_TYPE_STRING:
+				{
+					char *value = dbus_message_iter_get_string(&dict_iter);
+					hints[key] = Hint(key, value);
+					dbus_free(value);
+					break;
+				}
+
+				case DBUS_TYPE_INT32:
+					hints[key] =
+						Hint(key, dbus_message_iter_get_uint32(&dict_iter));
+					break;
+
+				case DBUS_TYPE_BOOLEAN:
+					hints[key] =
+						Hint(key, dbus_message_iter_get_boolean(&dict_iter));
+					break;
+
+				default:
+					break;
+			}
+		}
+		while (dbus_message_iter_next(&dict_iter));
+	}
+#endif /* D-BUS < 0.30 */
+
+	return hints;
 }
 
 static void
@@ -156,11 +207,13 @@ action_foreach_func(const char *key, gpointer value, Notification *n)
 	n->AddAction(GPOINTER_TO_INT(value), key);
 }
 
+#if 0
 static void
 hint_foreach_func(const char *key, const char *value, Notification *n)
 {
 	n->SetHint(key, value);
 }
+#endif
 
 static DBusMessage *
 handle_notify(DBusConnection *incoming, DBusMessage *message)
@@ -334,7 +387,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
              "Invalid notify message. Actions argument is not a dict\n" );
 #endif
 
-	GHashTable *actions = read_dict(&iter, DBUS_TYPE_UINT32);
+	GHashTable *actions = read_int_dict(&iter);
 
 	if (actions != NULL)
 	{
@@ -355,13 +408,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
              "Invalid notify message. Hints argument is not a dict\n" );
 #endif
 
-	GHashTable *hints = read_dict(&iter, DBUS_TYPE_STRING);
-
-	if (hints != NULL)
-	{
-		g_hash_table_foreach(hints, (GHFunc)hint_foreach_func, n);
-		g_hash_table_destroy(hints);
-	}
+	n->SetHints(read_hints(&iter));
 
     dbus_message_iter_next(&iter);
 

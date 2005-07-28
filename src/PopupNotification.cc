@@ -626,8 +626,8 @@ PopupNotification::update_position()
 		 * TODO: Maybe try to make the notification stay in the workarea,
 		 *       and just extend the arrow? Dunno.
 		 */
-		int hint_x = atoi(GetHint("x").c_str());
-		int hint_y = atoi(GetHint("y").c_str());
+		int hint_x = GetHint("x").GetInteger();
+		int hint_y = GetHint("y").GetInteger();
 
 		x = CLAMP(hint_x - arrow_x, 0, screen_width  - req.width);
 		y = CLAMP(hint_y - arrow_y, 0, screen_height - new_height);
