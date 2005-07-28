@@ -1,3 +1,8 @@
+Wed Jul 27 22:02:34 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* Makefile.am:
+	  - Pass make distcheck.
+
 Wed Jul 27 10:06:06 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* notification-daemon.spec.in:

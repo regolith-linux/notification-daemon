@@ -1,7 +1,7 @@
 SUBDIRS = src
 
-dbusdir        = $(DBUS_SYS_DIR)
-dist_dbus_DATA = notification-daemon.conf
+dbusdir   = $(DBUS_SYS_DIR)
+dbus_DATA = notification-daemon.conf
 
 servicedir       = $(DBUS_SERVICES_DIR)
 service_in_files = org.freedesktop.Notifications.service.in
@@ -19,6 +19,7 @@ EXTRA_DIST = \
 	autogen.sh \
 	configure.ac \
 	notification-daemon.spec.in \
+	$(dbus_DATA) \
 	$(service_in_files)
 
 CLEANFILES = $(service_DATA)
