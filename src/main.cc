@@ -416,12 +416,12 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     dbus_message_iter_next(&iter);
 
     /*********************************************************************
-     * Expires
+     * Use Timeout
      *********************************************************************/
     validate(type == DBUS_TYPE_BOOLEAN, NULL,
-             "Invalid notify message. Expires argument is not uint32\n");
+             "Invalid notify message. Use Timeout argument is not bool\n");
 
-	bool use_timeout;
+	dbus_bool_t use_timeout;
 	_notifyd_dbus_message_iter_get_boolean(&iter, use_timeout);
 	n->SetUseTimeout(use_timeout);
     dbus_message_iter_next(&iter);

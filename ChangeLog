@@ -1,3 +1,9 @@
+Tue Aug 09 10:12:05 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/main.cc:
+	  - Use the D-BUS bool type instead of the C++ bool type, so that we
+	    don't break PPC and AMD64.
+
 Mon Jul 25 22:50:49 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
 
 	* NEWS:
