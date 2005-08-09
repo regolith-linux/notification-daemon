@@ -286,7 +286,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
      *********************************************************************/
     validate(type == DBUS_TYPE_BYTE, NULL,
              "Invalid notify message. Urgency argument is not a byte\n" );
-	int urgencyLevel;
+	unsigned char urgencyLevel;
     _notifyd_dbus_message_iter_get_byte(&iter, urgencyLevel);
 	n->SetUrgencyLevel(urgencyLevel);
     dbus_message_iter_next(&iter);
@@ -432,7 +432,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     validate(type == DBUS_TYPE_UINT32, NULL,
              "Invalid notify message. Timeout argument is not uint32\n");
 
-	int timeout;
+	dbus_uint32_t timeout;
     _notifyd_dbus_message_iter_get_uint32(&iter, timeout);
 	n->SetTimeout(timeout);
     dbus_message_iter_next(&iter);
