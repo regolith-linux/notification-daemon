@@ -1,3 +1,9 @@
+Wed Aug 10 01:44:22 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/main.cc:
+	  - Another patch by Martin Pitt to use the correct data type for
+	    the replaces ID when parsing the D-BUS message.
+
 Wed Aug 10 01:41:52 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/PopupNotification.cc:

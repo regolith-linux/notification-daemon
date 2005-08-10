@@ -237,7 +237,7 @@ handle_notify(DBusConnection *incoming, DBusMessage *message)
     DBusMessage *reply;
     char *str;
     Notification *n;
-    uint replaces;
+    dbus_uint32_t replaces;
     /* if we create a new notification, ensure it'll be freed if we throw  */
     std::auto_ptr<Notification> n_holder;
 
