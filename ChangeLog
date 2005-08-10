@@ -1,3 +1,9 @@
+Wed Aug 10 01:48:41 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/BaseNotifier.cc:
+	  - Handle all expiring notifications in BaseNotifier::timeout(),
+	    instead of only one at a time. This has been bugging me.
+
 Wed Aug 10 01:44:22 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/main.cc:

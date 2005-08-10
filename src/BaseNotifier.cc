@@ -45,7 +45,8 @@ BaseNotifier::~BaseNotifier()
 }
 
 /* returns true if more heartbeats are needed */
-bool BaseNotifier::timeout()
+bool
+BaseNotifier::timeout()
 {
     /* check each notification to see if it timed out yet */
     time_t now = time(NULL);
@@ -62,9 +63,9 @@ bool BaseNotifier::timeout()
         if (n->GetUseTimeout())
 			needed = true;
 
-        if (n->GetUseTimeout() && n->GetTimeout() <= now) {
+        if (n->GetUseTimeout() && n->GetTimeout() <= now)
+		{
             unnotify(n);
-            break;
         }
     }
 
