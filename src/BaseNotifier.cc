@@ -36,23 +36,23 @@ BaseNotifier::BaseNotifier(GMainLoop *main_loop)
 	  mNextId(1),
 	  mLoop(main_loop)
 {
-    g_main_loop_ref(mLoop);
+	g_main_loop_ref(mLoop);
 }
 
 BaseNotifier::~BaseNotifier()
 {
-    g_main_loop_unref(mLoop);
+	g_main_loop_unref(mLoop);
 }
 
 /* returns true if more heartbeats are needed */
 bool
 BaseNotifier::timeout()
 {
-    /* check each notification to see if it timed out yet */
-    time_t now = time(NULL);
-    bool needed = false;
+	/* check each notification to see if it timed out yet */
+	time_t now = time(NULL);
+	bool needed = false;
 
-    TRACE("timeout\n");
+	TRACE("timeout\n");
 
 	for (NotificationsMap::const_iterator i = notifications.begin();
 		 i != notifications.end();
@@ -60,43 +60,45 @@ BaseNotifier::timeout()
 	{
 		Notification *n = i->second;
 
-        if (n->GetUseTimeout())
+		if (n->GetUseTimeout())
 			needed = true;
 
-        if (n->GetUseTimeout() && n->GetTimeout() <= now)
-		{
-            unnotify(n);
-        }
-    }
+		if (n->GetUseTimeout() && n->GetTimeout() <= now)
+			unnotify(n);
+	}
 
-    TRACE("heartbeat: %d, %d notifications left\n", now, notifications.size());
+	TRACE("heartbeat: %d, %d notifications left\n", now, notifications.size());
 
-    return needed;
+	return needed;
 }
 
 /* called by the glib main loop */
-static gboolean timeout_dispatch(gpointer data)
+static gboolean
+timeout_dispatch(gpointer data)
 {
-    BaseNotifier *n = (BaseNotifier *) data;
+	BaseNotifier *n = (BaseNotifier *)data;
 
-    bool ret = n->timeout();
-    if (!ret) n->mTiming = false;
+	bool ret = n->timeout();
+	if (!ret)
+		n->mTiming = false;
 
-    return ret ? TRUE : FALSE;
+	return ret ? TRUE : FALSE;
 }
 
-void BaseNotifier::register_timeout(int hz)
+void
+BaseNotifier::register_timeout(int hz)
 {
-    g_timeout_add(hz, (GSourceFunc) timeout_dispatch, this);
+	g_timeout_add(hz, (GSourceFunc)timeout_dispatch, this);
 }
 
-void BaseNotifier::setup_timeout(Notification *n)
+void
+BaseNotifier::setup_timeout(Notification *n)
 {
-    /*
+	/*
 	 * Decide a sensible timeout. For now, let's just use 7 seconds.
 	 * In the future, maybe make this based on text length?
 	 */
-    if (n->GetUseTimeout())
+	if (n->GetUseTimeout())
 	{
 		int timeout = n->GetTimeout();
 
@@ -117,59 +119,70 @@ void BaseNotifier::setup_timeout(Notification *n)
 }
 
 
-uint BaseNotifier::notify(Notification *n)
+uint
+BaseNotifier::notify(Notification *n)
 {
-    n->SetId(mNextId++);
+	n->SetId(mNextId++);
 
-    update(n);  // can throw
+	update(n);  // can throw
 
-    /* don't commit to the map until after the notification has been able to update */
-    notifications[n->GetId()] = n;
+	/*
+	 * Don't commit to the map until after the notification has
+	 * been able to update
+	 */
+	notifications[n->GetId()] = n;
 
-    return n->GetId();
+	return n->GetId();
 }
 
-void BaseNotifier::update(Notification *n)
+void
+BaseNotifier::update(Notification *n)
 {
-    setup_timeout(n);
-    n->update();  // can throw
+	setup_timeout(n);
+	n->update();  // can throw
 }
 
-bool BaseNotifier::unnotify(uint id)
+bool
+BaseNotifier::unnotify(uint id)
 {
-    Notification *n = get(id);
+	Notification *n = get(id);
 
-    validate( n != NULL, false, "Given ID (%d) is not valid", id );
+	validate(n != NULL, false, "Given ID (%d) is not valid", id);
 
-    return unnotify(n);
+	return unnotify(n);
 }
 
-bool BaseNotifier::unnotify(Notification *n)
+bool
+BaseNotifier::unnotify(Notification *n)
 {
-    if (!notifications.erase(n->GetId()))
-    {
-        WARN("no such notification registered (%p), id=%d\n", n, n->GetId());
-        return false;
-    }
+	if (!notifications.erase(n->GetId()))
+	{
+		WARN("no such notification registered (%p), id=%d\n", n, n->GetId());
+		return false;
+	}
 
-    TRACE("deleting due to unnotify (%p)\n", n);
-    delete n;
+	TRACE("deleting due to unnotify (%p)\n", n);
+	delete n;
 
-    return true;
+	return true;
 }
 
-Notification* BaseNotifier::create_notification(DBusConnection *dbusConn)
+Notification *
+BaseNotifier::create_notification(DBusConnection *dbusConn)
 {
-    /*
+	/*
 	 * Base classes override this to add extra info and abilities
 	 * to the Notification class
 	 */
-    return new Notification(dbusConn);
+	return new Notification(dbusConn);
 }
 
-Notification *BaseNotifier::get(uint id)
+Notification *
+BaseNotifier::get(uint id)
 {
-    if (notifications.find(id) == notifications.end()) return NULL;
-    return notifications[id];
+	if (notifications.find(id) == notifications.end())
+		return NULL;
+
+	return notifications[id];
 }
 
