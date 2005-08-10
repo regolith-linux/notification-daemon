@@ -1,3 +1,9 @@
+Wed Aug 10 01:35:50 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/main.cc:
+	  - Hopefully properly grab hint values from the D-BUS message iter
+	    in a way that will work on AMD64 and PPC.
+
 Wed Aug 10 01:32:24 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* NEWS:
