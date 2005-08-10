@@ -1,3 +1,6 @@
+version 0.2.2:
+	* Fixed several run-time issues on PPC and AMD64.
+
 version 0.2.1 (28-July-2005):
 	* Fixed hint support for D-BUS 0.3x.
 	* Fixed a compile issue with GCC 4.0.

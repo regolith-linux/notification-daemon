@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notification-daemon, 0.2.1, chipx86@chipx86.com)
+AC_INIT(notification-daemon, 0.2.1.90, chipx86@chipx86.com)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2004-2005 Christian Hammond])
@@ -14,7 +14,7 @@ dnl ################################################################
 NOTIFICATION_DAEMON_MAJOR_VERSION=0
 NOTIFICATION_DAEMON_MINOR_VERSION=2
 NOTIFICATION_DAEMON_MICRO_VERSION=1
-NOTIFICATION_DAEMON_DEVEL_VERSION=0
+NOTIFICATION_DAEMON_DEVEL_VERSION=90
 
 NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_MICRO_VERSION
 
