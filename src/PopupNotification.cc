@@ -601,6 +601,8 @@ PopupNotification::update_position()
 
     if (!get_work_area(workarea))
     {
+        workarea.x = 0;
+        workarea.y = 0;
         workarea.width  = gdk_screen_width();
         workarea.height = gdk_screen_height();
     }
@@ -668,7 +670,7 @@ PopupNotification::get_work_area(GdkRectangle &rect)
         return false;
     }
 
-    guint32 *workareas = (guint32 *)ret_workarea;
+    long *workareas = (long *)ret_workarea;
 
     rect.x      = workareas[disp_screen * 4];
     rect.y      = workareas[disp_screen * 4 + 1];

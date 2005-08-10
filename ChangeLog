@@ -1,3 +1,11 @@
+Wed Aug 10 01:41:52 PDT 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/PopupNotification.cc:
+	  - Patch by Martin Pitt to properly initialize the window origin
+	    if the call to get_work_area() fails, and to cast the workarea
+	    array to a long * instead of guint32 * so that it will work
+	    properly on 64-bit CPUs.
+
 Wed Aug 10 01:35:50 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/main.cc:
