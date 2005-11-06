@@ -1,3 +1,11 @@
+==================== 0.2.3 ====================
+
+Sun Nov 06 14:09:08 PST 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* configure.ac:
+	* NEWS:
+	  - Bump to version 0.2.3.
+
 Sat Nov 05 21:36:33 PST 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* src/main.cc:

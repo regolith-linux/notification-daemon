@@ -1,3 +1,6 @@
+version 0.2.3 (6-November-2005):
+	* Depends on libsexy for the URL label.
+
 version 0.2.2 (10-August-2005):
 	* Fixed several run-time issues on PPC and AMD64 (Martin Pitt)
 	* Notifications that are created at the same time will disappear at
