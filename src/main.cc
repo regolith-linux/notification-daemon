@@ -130,7 +130,6 @@ read_hints(DBusMessageIter *iter)
 	{
 		DBusMessageIter entry_iter, value_iter;
 		char *key;
-		void *value;
 		Hint hint;
 
 		dbus_message_iter_recurse(&dict_iter, &entry_iter);

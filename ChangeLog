@@ -1,3 +1,14 @@
+Sat Nov 05 21:36:33 PST 2005  Christian Hammond <chipx86@chipx86.com>
+
+	* src/main.cc:
+	* src/Makefile.am:
+	* src/PopupNotification.cc:
+	D src/sexy-url-label.c:
+	D src/sexy-url-label.h:
+	* configure.ac:
+	  - Remove sexy-url-label and instead depend on libsexy. Sadly, this
+	    requires that I remove my "get-sexy" make target :(
+
 Wed Aug 10 01:56:24 PDT 2005  Christian Hammond <chipx86@chipx86.com>
 
 	* NEWS:

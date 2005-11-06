@@ -55,7 +55,7 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 AC_EXEEXT
 
-pkg_modules="gtk+-2.0 >= 2.2.0, glib-2.0 >= 2.2.2, dbus-1 >= 0.20, dbus-glib-1 >= 0.20"
+pkg_modules="gtk+-2.0 >= 2.2.0, glib-2.0 >= 2.2.2, dbus-1 >= 0.20, dbus-glib-1 >= 0.20 libsexy >= 0.1.3"
 PKG_CHECK_MODULES(PACKAGE, [$pkg_modules])
 AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)

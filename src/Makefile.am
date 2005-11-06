@@ -1,10 +1,5 @@
 libexec_PROGRAMS = notification-daemon
 
-SEXY_BASE = http://osiris.chipx86.com/svn/osiris-misc/trunk/libsexy
-SEXY_FILES = \
-	sexy-url-label.c \
-	sexy-url-label.h
-
 notification_daemon_SOURCES = \
 	BaseNotifier.cc \
 	BaseNotifier.hh \
@@ -22,15 +17,9 @@ notification_daemon_SOURCES = \
 	dbus-compat.h \
 	logging.cc \
 	logging.hh \
-	main.cc \
-	$(SEXY_FILES)
+	main.cc
 
 notification_daemon_LDADD = $(PACKAGE_LIBS)
-
-get-sexy:
-	for i in $(SEXY_FILES); do \
-		wget $(SEXY_BASE)/libsexy/$$i -O $$i; \
-	done
 
 INCLUDES = \
 	$(PACKAGE_CFLAGS)

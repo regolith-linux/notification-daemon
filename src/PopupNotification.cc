@@ -31,6 +31,8 @@
 # include <gdk/gdkx.h>
 #endif
 
+#include <libsexy/sexy-url-label.h>
+
 #include <iostream>
 #include <sstream>
 #include <exception>
@@ -38,7 +40,6 @@
 
 #include "PopupNotification.hh"
 #include "logging.hh"
-#include "sexy-url-label.h"
 
 #include <assert.h>
 
