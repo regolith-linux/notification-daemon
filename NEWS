@@ -1,3 +1,6 @@
+version 0.2.4 (6-November-2005):
+	* Support clicking on hyperlinks.
+
 version 0.2.3 (6-November-2005):
 	* Depends on libsexy for the URL label.
 

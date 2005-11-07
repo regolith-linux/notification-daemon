@@ -283,6 +283,50 @@ PopupNotification::~PopupNotification()
     }
 }
 
+static void
+url_activated_cb(GtkWidget *url_label, const gchar *url)
+{
+	char *escaped_url;
+	char *cmd = NULL;
+
+	escaped_url = g_shell_quote(url);
+
+	if (g_getenv("GNOME_DESKTOP_SESSION_ID") != NULL &&
+		g_find_program_in_path("gnome-open") != NULL)
+	{
+		cmd = g_strdup_printf("gnome-open %s", escaped_url);
+	}
+	else if (g_getenv("KDE_FULL_SESSION") != NULL &&
+			 g_find_program_in_path("konqueror") != NULL)
+	{
+		cmd = g_strdup_printf("konqueror %s", escaped_url);
+	}
+	else if (g_find_program_in_path("mozilla-firefox") != NULL)
+	{
+		cmd = g_strdup_printf("mozilla-firefox %s", escaped_url);
+	}
+	else if (g_find_program_in_path("firefox") != NULL)
+	{
+		cmd = g_strdup_printf("firefox %s", escaped_url);
+	}
+	else if (g_find_program_in_path("mozilla") != NULL)
+	{
+		cmd = g_strdup_printf("mozilla %s", escaped_url);
+	}
+	else
+	{
+		g_warning("Unable to find a browser.");
+	}
+
+	g_free(escaped_url);
+
+	if (cmd != NULL)
+	{
+		g_spawn_command_line_async(cmd, NULL);
+		g_free(cmd);
+	}
+}
+
 void
 PopupNotification::generate()
 {
@@ -443,6 +487,8 @@ PopupNotification::generate()
             body_label = sexy_url_label_new();
 			sexy_url_label_set_markup(SEXY_URL_LABEL(body_label),
 									  GetBody().c_str());
+			g_signal_connect(G_OBJECT(body_label), "url_activated",
+							 G_CALLBACK(url_activated_cb), NULL);
 
             //process_body_markup(body_label);
 
