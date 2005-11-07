@@ -291,16 +291,18 @@ url_activated_cb(GtkWidget *url_label, const gchar *url)
 
 	escaped_url = g_shell_quote(url);
 
-	if (g_getenv("GNOME_DESKTOP_SESSION_ID") != NULL &&
+	if (/*g_getenv("GNOME_DESKTOP_SESSION_ID") != NULL &&*/
 		g_find_program_in_path("gnome-open") != NULL)
 	{
 		cmd = g_strdup_printf("gnome-open %s", escaped_url);
 	}
+#if 0
 	else if (g_getenv("KDE_FULL_SESSION") != NULL &&
 			 g_find_program_in_path("konqueror") != NULL)
 	{
 		cmd = g_strdup_printf("konqueror %s", escaped_url);
 	}
+#endif
 	else if (g_find_program_in_path("mozilla-firefox") != NULL)
 	{
 		cmd = g_strdup_printf("mozilla-firefox %s", escaped_url);
