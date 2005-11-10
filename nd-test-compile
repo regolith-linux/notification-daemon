@@ -1,0 +1,3 @@
+dbus-binding-tool --mode=glib-server notifydaemon.xml > notifydaemon-dbus-glue.h
+
+gcc notifydaemon.c eggnotificationbubblewidget.c -o notifydaemon-test -Wall -DFORTIFY_SOURCE=3 -O1 -ggdb3 -DNOTIFY_DAEMON_ENABLE_TEST -DDBUS_API_SUBJECT_TO_CHANGE `pkg-config --cflags --libs gtk+-2.0 dbus-1 dbus-glib-1` -I ../../
