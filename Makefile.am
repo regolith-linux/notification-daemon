@@ -3,7 +3,6 @@ SUBDIRS = src
 EXTRA_DIST = \
 	AUTHORS NEWS INSTALL COPYING README \
 	ChangeLog \
-	Doxyfile.in \
 	autogen.sh \
 	configure.ac \
 	notification-daemon.service \

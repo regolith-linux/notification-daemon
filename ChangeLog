@@ -1,3 +1,7 @@
 2005-11-10  John (J5) Palmieri  <johnp@redhat.com>
 
+	* Makefile.am: remove Doxyfile.in ref 
+
+2005-11-10  John (J5) Palmieri  <johnp@redhat.com>
+
 	* Initial checkin of the next generation notification daemon
