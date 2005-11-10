@@ -1,22 +1,18 @@
-SUBDIRS = src
+INCLUDES=-I$(top_srcdir) $(NOTIFICATION_DAEMON_CFLAGS)
 
-EXTRA_DIST = \
-	AUTHORS NEWS INSTALL COPYING README \
-	ChangeLog \
-	Doxyfile.in \
-	autogen.sh \
-	configure.ac \
-	notification-daemon.service \
-	notification-daemon.service.in
+EXTRA_DIST=notifydaemon.xml
 
-servicedir       = $(DBUS_SERVICES_DIR)
-service_in_files = notification-daemon.service.in
-service_DATA     = notification-daemon.service
+libexec_PROGRAMS = notification-daemon
 
-%.service: %.service.in
-	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
+notification_daemon_SOURCES=		\
+	eggnotificationbubblewidget.c	\
+	eggnotificationbubblewidget.h	\
+	notifydaemon.c			\
+	notifydaemon.h
 
-$(OBJECTS): libtool
-libtool: $(LIBTOOL_DEPS)
-	$(SHELL) ./config.status --recheck
+notification_daemon_LDADD= $(NOTIFICATION_DAEMON_LIBS)
 
+BUILT_SOURCES = notifydaemon-dbus-glue.h
+
+notifydaemon-dbus-glue.h: notifydaemon.xml
+	dbus-binding-tool --mode=glib-server notifydaemon.xml > notifydaemon-dbus-glue.h
