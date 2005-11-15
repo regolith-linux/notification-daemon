@@ -1,4 +1,4 @@
-INCLUDES=-I$(top_srcdir) $(NOTIFICATION_DAEMON_CFLAGS)
+INCLUDES=-I$(top_srcdir) $(NOTIFY_DAEMON_CFLAGS)
 
 EXTRA_DIST=notifydaemon.xml
 
@@ -10,7 +10,7 @@ notify_daemon_SOURCES=		\
 	notifydaemon.c			\
 	notifydaemon.h
 
-notify_daemon_LDADD= $(NOTIFICATION_DAEMON_LIBS)
+notify_daemon_LDADD= $(NOTIFY_DAEMON_LIBS)
 
 BUILT_SOURCES = notifydaemon-dbus-glue.h
 

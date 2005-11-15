@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notify-daemon, 0.0.2, johnp@redhat.com)
+AC_INIT(notify-daemon, 0.3.0, johnp@redhat.com)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2005 John (J5) Palmieri])
@@ -13,8 +13,8 @@ dnl ################################################################
 dnl # Version information
 dnl ################################################################
 NOTIFY_DAEMON_MAJOR_VERSION=0
-NOTIFY_DAEMON_MINOR_VERSION=0
-NOTIFY_DAEMON_MICRO_VERSION=2
+NOTIFY_DAEMON_MINOR_VERSION=3
+NOTIFY_DAEMON_MICRO_VERSION=0
 NOTIFY_DAEMON_DEVEL_VERSION=0
 
 NOTIFY_DAEMON_VERSION=$NOTIFY_DAEMON_MAJOR_VERSION.$NOTIFY_DAEMON_MINOR_VERSION.$NOTIFY_DAEMON_MICRO_VERSION
@@ -29,19 +29,19 @@ if test "x$NOTIFY_DAEMON_DEVEL_VERSION" != "x0"; then
 fi
 
 AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_MAJOR_VERSION, $NOTIFY_DAEMON_MAJOR_VERSION,
-	[notification-daemon major version.])
+	[notify-daemon major version.])
 AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_MINOR_VERSION, $NOTIFY_DAEMON_MINOR_VERSION,
-	[notification-daemon minor version.])
+	[notify-daemon minor version.])
 AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_MICRO_VERSION, $NOTIFY_DAEMON_MICRO_VERSION,
-	[notification-daemon micro version.])
+	[notify-daemon micro version.])
 AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_VERSION, "$NOTIFY_DAEMON_VERSION",
-	[notification-daemon version.])
+	[notify-daemon version.])
 
 dnl ################################################################
 dnl # Initialize automake
 dnl ################################################################
 VERSION=$NOTIFY_DAEMON_VERSION
-PACKAGE=notification-daemon
+PACKAGE=notify-daemon
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
