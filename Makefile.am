@@ -5,12 +5,12 @@ EXTRA_DIST = \
 	ChangeLog \
 	autogen.sh \
 	configure.ac \
-	notification-daemon.service \
-	notification-daemon.service.in
+	notify-daemon.service \
+	notify-daemon.service.in
 
 servicedir       = $(DBUS_SERVICES_DIR)
-service_in_files = notification-daemon.service.in
-service_DATA     = notification-daemon.service
+service_in_files = notify-daemon.service.in
+service_DATA     = notify-daemon.service
 
 %.service: %.service.in
 	@sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@

@@ -1,3 +1,7 @@
+2005-11-15  John (J5) Palmieri  <johnp@redhat.com>
+	
+	* Change refrences from notification to notify
+
 2005-11-10  John (J5) Palmieri  <johnp@redhat.com>
 
 	* Makefile.am: remove Doxyfile.in ref 

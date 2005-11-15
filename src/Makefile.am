@@ -2,15 +2,15 @@ INCLUDES=-I$(top_srcdir) $(NOTIFICATION_DAEMON_CFLAGS)
 
 EXTRA_DIST=notifydaemon.xml
 
-libexec_PROGRAMS = notification-daemon
+libexec_PROGRAMS = notify-daemon
 
-notification_daemon_SOURCES=		\
+notify_daemon_SOURCES=		\
 	eggnotificationbubblewidget.c	\
 	eggnotificationbubblewidget.h	\
 	notifydaemon.c			\
 	notifydaemon.h
 
-notification_daemon_LDADD= $(NOTIFICATION_DAEMON_LIBS)
+notify_daemon_LDADD= $(NOTIFICATION_DAEMON_LIBS)
 
 BUILT_SOURCES = notifydaemon-dbus-glue.h
 
