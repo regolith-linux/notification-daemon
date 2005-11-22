@@ -44,11 +44,19 @@ struct _EggNotificationBubbleWidget
   GtkWidget *icon;
 
   gboolean active;
-  GtkWidget *main_hbox;
+  GtkWidget *table;
   GtkWidget *bubble_widget_header_label;
   GtkWidget *bubble_widget_body_label;
+  PangoLayout *body_layout;
 
   gint x, y;
+  gboolean can_composite;
+
+  GdkColor header_text_color;
+  GdkColor body_text_color;
+  GdkColor bg_start_gradient;
+  GdkColor bg_end_gradient;
+  GdkColor border_color;
 };
 
 struct _EggNotificationBubbleWidgetClass

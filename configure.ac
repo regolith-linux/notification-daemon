@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notify-daemon, 0.3.0, johnp@redhat.com)
+AC_INIT(notify-daemon, 0.3.1, johnp@redhat.com)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2005 John (J5) Palmieri])
@@ -14,7 +14,7 @@ dnl # Version information
 dnl ################################################################
 NOTIFY_DAEMON_MAJOR_VERSION=0
 NOTIFY_DAEMON_MINOR_VERSION=3
-NOTIFY_DAEMON_MICRO_VERSION=0
+NOTIFY_DAEMON_MICRO_VERSION=1
 NOTIFY_DAEMON_DEVEL_VERSION=0
 
 NOTIFY_DAEMON_VERSION=$NOTIFY_DAEMON_MAJOR_VERSION.$NOTIFY_DAEMON_MINOR_VERSION.$NOTIFY_DAEMON_MICRO_VERSION
