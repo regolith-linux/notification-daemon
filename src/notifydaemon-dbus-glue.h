@@ -53,40 +53,37 @@ G_BEGIN_DECLS
 #endif /* !G_ENABLE_DEBUG */
 
 
-/* BOOLEAN:STRING,STRING,UINT,STRING,STRING,BOXED,BOXED,INT,POINTER,POINTER (/tmp/dbus-binding-tool-c-marshallers.Dt9soe:1) */
-extern void dbus_glib_marshal__BOOLEAN__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER_POINTER (GClosure     *closure,
-                                                                                                          GValue       *return_value,
-                                                                                                          guint         n_param_values,
-                                                                                                          const GValue *param_values,
-                                                                                                          gpointer      invocation_hint,
-                                                                                                          gpointer      marshal_data);
+/* NONE:STRING,STRING,UINT,STRING,STRING,BOXED,BOXED,INT,POINTER (/tmp/dbus-binding-tool-c-marshallers.DKIhPQ:1) */
+extern void dbus_glib_marshal__VOID__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER (GClosure     *closure,
+                                                                                               GValue       *return_value,
+                                                                                               guint         n_param_values,
+                                                                                               const GValue *param_values,
+                                                                                               gpointer      invocation_hint,
+                                                                                               gpointer      marshal_data);
 void
-dbus_glib_marshal__BOOLEAN__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER_POINTER (GClosure     *closure,
-                                                                                              GValue       *return_value,
-                                                                                              guint         n_param_values,
-                                                                                              const GValue *param_values,
-                                                                                              gpointer      invocation_hint,
-                                                                                              gpointer      marshal_data)
+dbus_glib_marshal__VOID__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER (GClosure     *closure,
+                                                                                   GValue       *return_value,
+                                                                                   guint         n_param_values,
+                                                                                   const GValue *param_values,
+                                                                                   gpointer      invocation_hint,
+                                                                                   gpointer      marshal_data)
 {
-  typedef gboolean (*GMarshalFunc_BOOLEAN__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER_POINTER) (gpointer     data1,
-                                                                                                              gpointer     arg_1,
-                                                                                                              gpointer     arg_2,
-                                                                                                              guint        arg_3,
-                                                                                                              gpointer     arg_4,
-                                                                                                              gpointer     arg_5,
-                                                                                                              gpointer     arg_6,
-                                                                                                              gpointer     arg_7,
-                                                                                                              gint         arg_8,
-                                                                                                              gpointer     arg_9,
-                                                                                                              gpointer     arg_10,
-                                                                                                              gpointer     data2);
-  register GMarshalFunc_BOOLEAN__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER_POINTER callback;
+  typedef void (*GMarshalFunc_VOID__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER) (gpointer     data1,
+                                                                                               gpointer     arg_1,
+                                                                                               gpointer     arg_2,
+                                                                                               guint        arg_3,
+                                                                                               gpointer     arg_4,
+                                                                                               gpointer     arg_5,
+                                                                                               gpointer     arg_6,
+                                                                                               gpointer     arg_7,
+                                                                                               gint         arg_8,
+                                                                                               gpointer     arg_9,
+                                                                                               gpointer     data2);
+  register GMarshalFunc_VOID__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER callback;
   register GCClosure *cc = (GCClosure*) closure;
   register gpointer data1, data2;
-  gboolean v_return;
 
-  g_return_if_fail (return_value != NULL);
-  g_return_if_fail (n_param_values == 11);
+  g_return_if_fail (n_param_values == 10);
 
   if (G_CCLOSURE_SWAP_DATA (closure))
     {
@@ -98,25 +95,23 @@ dbus_glib_marshal__BOOLEAN__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POI
       data1 = g_value_peek_pointer (param_values + 0);
       data2 = closure->data;
     }
-  callback = (GMarshalFunc_BOOLEAN__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER_POINTER) (marshal_data ? marshal_data : cc->callback);
+  callback = (GMarshalFunc_VOID__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER) (marshal_data ? marshal_data : cc->callback);
 
-  v_return = callback (data1,
-                       g_marshal_value_peek_string (param_values + 1),
-                       g_marshal_value_peek_string (param_values + 2),
-                       g_marshal_value_peek_uint (param_values + 3),
-                       g_marshal_value_peek_string (param_values + 4),
-                       g_marshal_value_peek_string (param_values + 5),
-                       g_marshal_value_peek_boxed (param_values + 6),
-                       g_marshal_value_peek_boxed (param_values + 7),
-                       g_marshal_value_peek_int (param_values + 8),
-                       g_marshal_value_peek_pointer (param_values + 9),
-                       g_marshal_value_peek_pointer (param_values + 10),
-                       data2);
-
-  g_value_set_boolean (return_value, v_return);
+  callback (data1,
+            g_marshal_value_peek_string (param_values + 1),
+            g_marshal_value_peek_string (param_values + 2),
+            g_marshal_value_peek_uint (param_values + 3),
+            g_marshal_value_peek_string (param_values + 4),
+            g_marshal_value_peek_string (param_values + 5),
+            g_marshal_value_peek_boxed (param_values + 6),
+            g_marshal_value_peek_boxed (param_values + 7),
+            g_marshal_value_peek_int (param_values + 8),
+            g_marshal_value_peek_pointer (param_values + 9),
+            data2);
 }
+#define dbus_glib_marshal__NONE__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER	dbus_glib_marshal__VOID__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER
 
-/* BOOLEAN:UINT,POINTER (/tmp/dbus-binding-tool-c-marshallers.Dt9soe:2) */
+/* BOOLEAN:UINT,POINTER (/tmp/dbus-binding-tool-c-marshallers.DKIhPQ:2) */
 extern void dbus_glib_marshal__BOOLEAN__UINT_POINTER (GClosure     *closure,
                                                       GValue       *return_value,
                                                       guint         n_param_values,
@@ -169,7 +164,7 @@ G_END_DECLS
 
 #include <dbus/dbus-glib.h>
 static const DBusGMethodInfo dbus_glib__methods[] = {
-  { (GCallback) notify_daemon_notify_handler, dbus_glib_marshal__BOOLEAN__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER_POINTER, 0 },
+  { (GCallback) notify_daemon_notify_handler, dbus_glib_marshal__NONE__STRING_STRING_UINT_STRING_STRING_BOXED_BOXED_INT_POINTER, 0 },
   { (GCallback) notify_daemon_close_notification_handler, dbus_glib_marshal__BOOLEAN__UINT_POINTER, 148 },
 };
 
@@ -177,7 +172,7 @@ const DBusGObjectInfo dbus_glib__object_info = {
   0,
   dbus_glib__methods,
   2,
-"org.freedesktop.Notifications\0Notify\0S\0app_name\0I\0s\0icon\0I\0s\0id\0I\0u\0trouble\0I\0s\0d_ret\0I\0s\0str_ret\0I\0as\0hints\0I\0a{sv}\0timeout\0I\0i\0return_id\0O\0F\0N\0u\0\0org.freedesktop.Notifications\0CloseNotification\0S\0id\0I\0u\0\0\0",
+"org.freedesktop.Notifications\0Notify\0A\0app_name\0I\0s\0icon\0I\0s\0id\0I\0u\0trouble\0I\0s\0d_ret\0I\0s\0str_ret\0I\0as\0hints\0I\0a{sv}\0timeout\0I\0i\0return_id\0O\0F\0N\0u\0\0org.freedesktop.Notifications\0CloseNotification\0S\0id\0I\0u\0\0\0",
 "\0",
 "\0"
 };

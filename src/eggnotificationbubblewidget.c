@@ -240,7 +240,7 @@ _populate_window (EggNotificationBubbleWidget *bubble_widget)
   gtk_widget_show (bubble_widget->bubble_widget_header_label);
   gtk_widget_show (bubble_widget->bubble_widget_body_label);
 
-  bubble_widget->table = gtk_table_new (2, 2, FALSE);
+  bubble_widget->table = gtk_table_new (3, 2, FALSE);
   gtk_table_set_col_spacings (bubble_widget->table, 5);
   gtk_table_set_row_spacings (bubble_widget->table, 5);
  
@@ -299,6 +299,12 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
   gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
                         bubble_widget->bubble_widget_body_label);
 
+  if (bubble_widget->button_hbox != NULL &&
+        gtk_widget_get_parent (bubble_widget->button_hbox) != NULL)
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+                        bubble_widget->button_hbox);
+
+
   if (alignment == TRIANGLE_LEFT)
     {
       gtk_table_attach (GTK_TABLE (bubble_widget->table),
@@ -340,6 +346,17 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
                         0, 0);
 
     }
+
+    if (bubble_widget->button_hbox != NULL)
+      {
+        gtk_table_attach (GTK_TABLE (bubble_widget->table),
+                          bubble_widget->button_hbox,
+                          1, 2, 2, 3,
+                          GTK_FILL, GTK_FILL,
+                          0, 0);
+     
+        gtk_widget_show_all (bubble_widget->button_hbox);
+      }
 }
 
 static void
@@ -446,6 +463,7 @@ egg_notification_bubble_widget_set (EggNotificationBubbleWidget *bubble_widget,
   
 }
 
+
 void
 egg_notification_bubble_widget_set_pos (EggNotificationBubbleWidget   *bubble_widget,
                                  gint x, gint y)
@@ -463,6 +481,8 @@ egg_notification_bubble_widget_set_pos (EggNotificationBubbleWidget   *bubble_wi
 
   gtk_window_move (GTK_WINDOW (bubble_widget), x, y);
 
+  /* TODO: This is wrong - if elements are added before
+           set_pos is called the layout become wrong */
   if (x < (monitor.x + monitor.width) / 2)
       _layout_window (bubble_widget, TRIANGLE_LEFT);
   else
@@ -638,7 +658,7 @@ _stencil_bubble_top_right (cairo_t *cr,
                       rect->y,
                       p1x, 
                       rect->y);
-      cairo_line_to (cr, triangle[0].x, rect->y);
+      cairo_close_path (cr);
     }
   else
     {
@@ -736,7 +756,7 @@ _stencil_bubble_top_left  (cairo_t *cr,
                       rect->y,
                       p1x, 
                       rect->y);
-      cairo_line_to (cr, triangle[0].x, rect->y);
+      cairo_close_path (cr);
     }
   else
     {
@@ -1064,5 +1084,48 @@ egg_notification_bubble_widget_event_handler (GtkWidget *widget,
     default:
       break;
     }
+}
+
+GtkWidget *      
+egg_notification_bubble_widget_create_button (EggNotificationBubbleWidget *bubble_widget,
+                                              const gchar *label)
+{
+  GtkWidget *b;
+  GtkWidget *l;
+  gchar *label_markup;
+
+  b = gtk_button_new ();
+  gtk_button_set_relief (b, GTK_RELIEF_NONE);
+  gtk_container_set_border_width (GTK_CONTAINER (b), 0);
+
+  label_markup = g_markup_printf_escaped ("<span weight=\"bold\" underline=\"single\" foreground=\"blue\">%s</span>", label);
+
+  l = gtk_label_new (label_markup);
+  gtk_label_set_use_markup (l, TRUE);
+
+  g_free (label_markup);
+
+  gtk_container_add (GTK_CONTAINER (b), l);
+
+  gtk_widget_show_all (b); 
+  
+  if (bubble_widget->button_hbox == NULL)
+    bubble_widget->button_hbox = gtk_hbox_new (FALSE, 0); 
+
+  gtk_box_pack_end (GTK_BOX (bubble_widget->button_hbox),
+                    b,
+                    FALSE, FALSE,
+                    0);
+
+  return (b);
+}
+
+void
+egg_notification_bubble_widget_clear_buttons (EggNotificationBubbleWidget *bubble_widget)
+{
+  if (bubble_widget->button_hbox != NULL)
+    gtk_widget_destroy (bubble_widget->button_hbox);
+
+  bubble_widget->button_hbox = NULL;
 }
 

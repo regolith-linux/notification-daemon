@@ -25,6 +25,9 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include <dbus/dbus-glib.h>
+#include <dbus/dbus-glib-lowlevel.h>
+
 G_BEGIN_DECLS
 #define NOTIFY_TYPE_DAEMON (notify_daemon_get_type ())
 #define NOTIFY_DAEMON(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), NOTIFY_TYPE_DAEMON, NotifyDaemon))
@@ -68,11 +71,10 @@ gboolean notify_daemon_notify_handler (NotifyDaemon *daemon,
                                        guint id,
                                        const gchar *summary,
                                        const gchar *body,
-                                       GSList *actions,
+                                       gchar **actions,
                                        GHashTable *hints,
                                        int timeout,
-                                       guint *return_id,
-                                       GError **error);
+                                       DBusGMethodInvocation *context);
 
 gboolean notify_daemon_close_notification_handler (NotifyDaemon *daemon,
                                                    guint id,

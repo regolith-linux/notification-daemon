@@ -47,6 +47,7 @@ struct _EggNotificationBubbleWidget
   GtkWidget *table;
   GtkWidget *bubble_widget_header_label;
   GtkWidget *bubble_widget_body_label;
+  GtkWidget *button_hbox;
   PangoLayout *body_layout;
 
   gint x, y;
@@ -94,6 +95,12 @@ void             egg_notification_bubble_widget_set_icon_from_data (EggNotificat
                                                                     int                            width,
                                                                     int                            height,
                                                                     int                            rowstride);
+
+
+GtkWidget *      egg_notification_bubble_widget_create_button (EggNotificationBubbleWidget *bubble_widget,
+                                                               const gchar *label);
+
+void             egg_notification_bubble_widget_clear_buttons (EggNotificationBubbleWidget *bubble_widget);
 G_END_DECLS
 
 #endif /* __EGG_NOTIFICATION_BUBBLE_WIDGET_H__ */

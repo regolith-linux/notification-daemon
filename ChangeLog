@@ -1,3 +1,27 @@
+2005-12-09  John (J5) Palmieri  <johnp@redhat.com>
+
+	* src/eggnotificationbubblewidget.c (_layout_window): Add buttons for
+	actions
+	(draw_bubble_widget): close the cairo path so courner caps work
+	(egg_notification_bubble_widget_create_button): new method to create
+	a button and add it to the bubble
+	(egg_notification_bubble_widget_clear_buttons): new method for clearing
+	up all the buttons in the bubble
+	
+	* src/notifydaemon.xml: make the Notify method async so we can get the
+	sender
+
+	* src/notifydaemon.c (_emit_action_invoked_signal):  Emits the dbus 
+	signal when one of the action buttons is clicked
+	(_emit_closed_signal): emits a Closed signal over the bus when the
+	bubble is closed
+	(_close_notification): call _emit_closed_signal
+	(_notification_daemon_handle_bubble_widget_action): new method - iternal
+	callback we hook up to the buttons' "clicked" signal
+	(notify_daemon_notify_handler): change to an async method
+	store the unique name of the sender that called us
+	setup buttons if actions have been added 
+	
 2005-11-22  John (J5) Palmieri  <johnp@redhat.com>
 
 	* src/eggnotificationbubblewidget.c: Add a more stylized bubble
