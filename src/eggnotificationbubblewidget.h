@@ -52,6 +52,7 @@ struct _EggNotificationBubbleWidget
 
   gint x, y;
   gboolean can_composite;
+  gboolean draw_arrow;
 
   GdkColor header_text_color;
   GdkColor body_text_color;
@@ -101,6 +102,9 @@ GtkWidget *      egg_notification_bubble_widget_create_button (EggNotificationBu
                                                                const gchar *label);
 
 void             egg_notification_bubble_widget_clear_buttons (EggNotificationBubbleWidget *bubble_widget);
+
+void             egg_notification_bubble_widget_set_draw_arrow (EggNotificationBubbleWidget *bubble_widget, gboolean value);
+
 G_END_DECLS
 
 #endif /* __EGG_NOTIFICATION_BUBBLE_WIDGET_H__ */

@@ -64,7 +64,9 @@ static GtkWindowClass *parent_class;
 enum 
 {
     ORIENT_TOP = 0,
-    ORIENT_BOTTOM = 1
+    ORIENT_BOTTOM = 1,
+    ORIENT_LEFT = 2,
+    ORIENT_RIGHT = 3
 }; 
 
 enum {
@@ -135,49 +137,6 @@ egg_notification_bubble_widget_class_init (EggNotificationBubbleWidgetClass *cla
 }
 
 static void
-_size_request_handler (GtkWidget *widget, GtkRequisition *requisition, EggNotificationBubbleWidget *bw)
-{
-  #if 0
-  GtkRequisition req;
-  int new_height;
-
-  if (!GTK_WIDGET_VISIBLE (widget) ||
-      GTK_WIDGET (bw)->allocation.width <= 1)
-  return;
-  
-  gtk_widget_set_size_request (GTK_WIDGET (bw), 0, -1);
-  gtk_widget_size_request (GTK_WIDGET (bw), &req);
-  g_print ("req width: %d, req height: %d\n", req.width, req.height);
-
-  new_height = GTK_WIDGET (bw)->allocation.height - widget->allocation.height
-               + req.height;
-
-  if (GTK_WIDGET (bw)->allocation.width > 0 && new_height > 0 && new_height !=
-      widget->allocation.height)
-      {
-
-        g_print ("window req width: %d, req height: %d\n", 
-                       GTK_WIDGET (bw)->allocation.width,
-                       new_height);
-    gtk_window_resize (GTK_WINDOW (bw), 
-                       GTK_WIDGET (bw)->allocation.width,
-                       new_height);
-     }
-     #endif
-
-#if 0
-  if (req.width > MAX_BUBBLE_WIDTH)
-    {
-      g_print ("-");
-    fflush (stdout);
-      gtk_widget_set_size_request (GTK_WIDGET (bubble_widget), MAX_BUBBLE_WIDTH, -1);
-      gtk_widget_size_request (GTK_WIDGET (bubble_widget), &req);
-      gtk_window_resize (GTK_WINDOW (bubble_widget), req.width, req.height);
-    }
-#endif
-}
-
-static void
 egg_notification_bubble_widget_init (EggNotificationBubbleWidget *bubble_widget)
 {
   GtkWindow *win;
@@ -189,6 +148,7 @@ egg_notification_bubble_widget_init (EggNotificationBubbleWidget *bubble_widget)
   egg_notification_bubble_widget_screen_changed (GTK_WIDGET (bubble_widget),
                                                  NULL);
 
+  bubble_widget->draw_arrow = FALSE;
  
   _populate_window (bubble_widget);
 
@@ -206,104 +166,30 @@ egg_notification_bubble_widget_finalize (GObject *object)
 }
 
 static void
-_populate_window (EggNotificationBubbleWidget *bubble_widget)
-{
-  g_return_if_fail (EGG_IS_NOTIFICATION_BUBBLE_WIDGET (bubble_widget));
-
-  GtkWidget *vbox;
-  GtkWidget *hbox;
-  GtkWidget *widget;
-  GdkGeometry geom;
- 
-  widget = GTK_WIDGET (bubble_widget);
-
-  gtk_widget_add_events (widget, GDK_BUTTON_PRESS_MASK);
-  gtk_widget_set_app_paintable (widget, TRUE);
-  gtk_window_set_resizable (GTK_WINDOW (bubble_widget), TRUE);
-  gtk_container_set_border_width (GTK_CONTAINER (bubble_widget), BORDER_SIZE + 5);
-
-  bubble_widget->bubble_widget_header_label = gtk_label_new (NULL);
-
-  //use placeholder so we can use pango/cairo to draw body
-  bubble_widget->bubble_widget_body_label = gtk_frame_new("");
-  gtk_frame_set_shadow_type (bubble_widget->bubble_widget_body_label, GTK_SHADOW_NONE);
-  bubble_widget->icon = gtk_image_new_from_stock (GTK_STOCK_INFO, GTK_ICON_SIZE_BUTTON);
-  gtk_widget_ref (bubble_widget->bubble_widget_header_label);
-  gtk_widget_ref (bubble_widget->bubble_widget_body_label);
-  gtk_widget_ref (bubble_widget->icon);
-
-  gtk_label_set_line_wrap (GTK_LABEL (bubble_widget->bubble_widget_header_label), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (bubble_widget->bubble_widget_header_label), 0.0, 0.0);
-
-  gtk_misc_set_alignment (GTK_MISC (bubble_widget->icon), 0.0, 0.0);
-  gtk_widget_show (bubble_widget->icon);
-  gtk_widget_show (bubble_widget->bubble_widget_header_label);
-  gtk_widget_show (bubble_widget->bubble_widget_body_label);
-
-  bubble_widget->table = gtk_table_new (3, 2, FALSE);
-  gtk_table_set_col_spacings (bubble_widget->table, 5);
-  gtk_table_set_row_spacings (bubble_widget->table, 5);
- 
-  gtk_table_attach (GTK_TABLE (bubble_widget->table),
-                    bubble_widget->icon,
-                    0, 1, 1, 2,
-                    GTK_FILL, GTK_FILL,
-                    0, 0);
-
-  gtk_table_attach (GTK_TABLE (bubble_widget->table),
-                    bubble_widget->bubble_widget_header_label,
-                    1, 2, 0, 1,
-                    GTK_FILL, GTK_FILL,
-                    0, 0);
-
-  gtk_table_attach (GTK_TABLE (bubble_widget->table),
-                    bubble_widget->bubble_widget_body_label,
-                    1, 2, 1, 2,
-                    GTK_FILL, GTK_FILL,
-                    0, 0);
-  
-  gtk_container_add (GTK_CONTAINER (bubble_widget), bubble_widget->table);
-
-  bubble_widget->body_layout = pango_layout_new (
-                                 gtk_widget_get_pango_context (
-                                   GTK_WIDGET (bubble_widget)));
-
-  g_signal_connect (bubble_widget, "style-set",
-                    G_CALLBACK (egg_notification_bubble_widget_context_changed_handler),
-                    NULL);
-
-  g_signal_connect (bubble_widget, "direction-changed",
-                    G_CALLBACK (egg_notification_bubble_widget_context_changed_handler),
-                    NULL);
-
-  g_signal_connect_after (bubble_widget, "event-after",
-                          G_CALLBACK (egg_notification_bubble_widget_event_handler),
-                          bubble_widget);
-   
-  g_signal_connect (bubble_widget->bubble_widget_body_label, "expose-event",
-                    G_CALLBACK (egg_notification_bubble_widget_body_label_expose_handler),
-                    bubble_widget);
-}
-
-static void
 _layout_window (EggNotificationBubbleWidget *bubble_widget,
                 int alignment)
 {
+  if (bubble_widget->draw_arrow)
+    gtk_container_set_border_width (GTK_CONTAINER (bubble_widget), BORDER_SIZE + 5);
+  else
+    gtk_container_set_border_width (GTK_CONTAINER (bubble_widget), 10);
 
-  gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
-                        bubble_widget->icon);
+  if (gtk_widget_get_parent (bubble_widget->icon))
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+                          bubble_widget->icon);
 
-  gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
-                        bubble_widget->bubble_widget_header_label);
+  if (gtk_widget_get_parent (bubble_widget->bubble_widget_header_label))
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+                          bubble_widget->bubble_widget_header_label);
 
-  gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
-                        bubble_widget->bubble_widget_body_label);
+  if (gtk_widget_get_parent (bubble_widget->bubble_widget_body_label))
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+                          bubble_widget->bubble_widget_body_label);
 
   if (bubble_widget->button_hbox != NULL &&
         gtk_widget_get_parent (bubble_widget->button_hbox) != NULL)
     gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
                         bubble_widget->button_hbox);
-
 
   if (alignment == TRIANGLE_LEFT)
     {
@@ -351,12 +237,75 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
       {
         gtk_table_attach (GTK_TABLE (bubble_widget->table),
                           bubble_widget->button_hbox,
-                          1, 2, 2, 3,
+                          0, 2, 2, 3,
                           GTK_FILL, GTK_FILL,
                           0, 0);
      
-        gtk_widget_show_all (bubble_widget->button_hbox);
       }
+
+    gtk_widget_show_all (bubble_widget->table);
+}
+
+static void
+_populate_window (EggNotificationBubbleWidget *bubble_widget)
+{
+  g_return_if_fail (EGG_IS_NOTIFICATION_BUBBLE_WIDGET (bubble_widget));
+
+  GtkWidget *widget;
+ 
+  widget = GTK_WIDGET (bubble_widget);
+
+  gtk_widget_add_events (widget, GDK_BUTTON_PRESS_MASK);
+  gtk_widget_set_app_paintable (widget, TRUE);
+  gtk_window_set_resizable (GTK_WINDOW (bubble_widget), FALSE);
+
+  bubble_widget->bubble_widget_header_label = gtk_label_new (NULL);
+
+  //use placeholder so we can use pango/cairo to draw body
+  bubble_widget->bubble_widget_body_label = gtk_frame_new("");
+  gtk_frame_set_shadow_type (GTK_FRAME (bubble_widget->bubble_widget_body_label), GTK_SHADOW_NONE);
+  bubble_widget->icon = gtk_image_new_from_stock (GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_BUTTON);
+  gtk_widget_ref (bubble_widget->bubble_widget_header_label);
+  gtk_widget_ref (bubble_widget->bubble_widget_body_label);
+  gtk_widget_ref (bubble_widget->icon);
+
+  gtk_label_set_line_wrap (GTK_LABEL (bubble_widget->bubble_widget_header_label), TRUE);
+  gtk_misc_set_alignment (GTK_MISC (bubble_widget->bubble_widget_header_label), 0.0, 0.0);
+
+  gtk_misc_set_alignment (GTK_MISC (bubble_widget->icon), 0.0, 0.0);
+  gtk_widget_show (bubble_widget->icon);
+  gtk_widget_show (bubble_widget->bubble_widget_header_label);
+  gtk_widget_show (bubble_widget->bubble_widget_body_label);
+
+  bubble_widget->table = gtk_table_new (3, 2, FALSE);
+  gtk_table_set_col_spacings (GTK_TABLE (bubble_widget->table), 5);
+  gtk_table_set_row_spacings (GTK_TABLE (bubble_widget->table), 5);
+ 
+  gtk_container_add (GTK_CONTAINER (bubble_widget), bubble_widget->table);
+
+  bubble_widget->body_layout = pango_layout_new (
+                                 gtk_widget_get_pango_context (
+                                   GTK_WIDGET (bubble_widget)));
+
+  /* do a fake layout for now so we can calculate
+     height and width */
+  _layout_window (bubble_widget, TRIANGLE_RIGHT); 
+
+  g_signal_connect (bubble_widget, "style-set",
+                    G_CALLBACK (egg_notification_bubble_widget_context_changed_handler),
+                    NULL);
+
+  g_signal_connect (bubble_widget, "direction-changed",
+                    G_CALLBACK (egg_notification_bubble_widget_context_changed_handler),
+                    NULL);
+
+  g_signal_connect_after (bubble_widget, "event-after",
+                          G_CALLBACK (egg_notification_bubble_widget_event_handler),
+                          bubble_widget);
+   
+  g_signal_connect (bubble_widget->bubble_widget_body_label, "expose-event",
+                    G_CALLBACK (egg_notification_bubble_widget_body_label_expose_handler),
+                    bubble_widget);
 }
 
 static void
@@ -408,10 +357,17 @@ _calculate_pango_layout_from_aspect (PangoLayout *layout,
 
   if (w > TEXT_WIDTH_THRESHOLD)
     {
+      double f;
+
       pango_layout_get_size (layout, &w, &h);
 
       x = sqrt (factor * w / h);
-      w = round (w / x);
+      if (x == 0)
+        x = 1;
+
+      f = (double) w / x;
+
+      w = (gint) (f + 0.5);
 
       pango_layout_set_width(layout, w);
     }
@@ -460,7 +416,6 @@ egg_notification_bubble_widget_set (EggNotificationBubbleWidget *bubble_widget,
   pango_layout_get_pixel_size (bubble_widget->body_layout, &w, &h);
   gtk_widget_set_size_request (bubble_widget->bubble_widget_body_label, w, h);
   
-  
 }
 
 
@@ -479,14 +434,14 @@ egg_notification_bubble_widget_set_pos (EggNotificationBubbleWidget   *bubble_wi
   monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
   gdk_screen_get_monitor_geometry (screen, monitor_num, &monitor);
 
-  gtk_window_move (GTK_WINDOW (bubble_widget), x, y);
-
   /* TODO: This is wrong - if elements are added before
            set_pos is called the layout become wrong */
   if (x < (monitor.x + monitor.width) / 2)
       _layout_window (bubble_widget, TRIANGLE_LEFT);
   else
       _layout_window (bubble_widget, TRIANGLE_RIGHT);
+
+  gtk_window_move (GTK_WINDOW (bubble_widget), x, y);
 }
 
 static void
@@ -554,6 +509,8 @@ egg_notification_bubble_widget_body_label_expose_handler (GtkWidget *widget,
 
   cairo_fill (cr);
   cairo_destroy (cr);
+
+  return TRUE;
 }
 
 static gboolean 
@@ -563,14 +520,14 @@ egg_notification_bubble_widget_expose (GtkWidget *widget, GdkEventExpose *event)
   EggNotificationBubbleWidget *bw;
 
   bw = EGG_NOTIFICATION_BUBBLE_WIDGET (widget);
-
+  
   draw_bubble_widget (bw);
 
   widget_parent_class = (GtkWidgetClass *)parent_class;
   if (widget_parent_class->expose_event)
     widget_parent_class->expose_event (widget, event);
- 
-  return TRUE;
+
+  return TRUE; 
 }
 
 static GdkPoint 
@@ -777,6 +734,100 @@ _stencil_bubble_bottom_right (cairo_t *cr,
                               GdkRectangle *rect,
 			      int pos_x, int pos_y)
 {
+  GdkPoint triangle[3];
+  double d, p1x, p2x, p3x, pdx, pvx, p1y, p2y, p3y, pdy, pvy;
+
+  triangle[2].x = rect->x + rect->width - TRIANGLE_START;
+  triangle[2].y = rect->y + rect->height;
+
+  triangle[0].x = triangle[2].x - TRIANGLE_WIDTH;
+  triangle[0].y = rect->y + rect->height;
+  triangle[1].x = (triangle[2].x - triangle[0].x) / 2 + triangle[0].x;
+  triangle[1].y = rect->y + rect->height +  BORDER_SIZE - 5;
+
+#if 0
+  if (triangle[1].x + (BORDER_SIZE - 5) < pos_x)
+    triangle[1].x = pos_x - (BORDER_SIZE + 5);
+#endif 
+
+  cairo_move_to (cr, triangle[0].x, triangle[0].y);
+  cairo_line_to (cr, triangle[1].x, triangle[1].y);
+  cairo_line_to (cr, triangle[2].x, triangle[2].y);
+
+  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y + rect->height);
+  cairo_curve_to (cr, 
+                  rect->x + rect->width,
+                  rect->y + rect->height,
+                  rect->x + rect->width,
+                  rect->y + rect->height,
+                  rect->x + rect->width, 
+                  rect->y + rect->height - CURVE_LENGTH);
+
+  cairo_line_to (cr, rect->x + rect->width, rect->y + CURVE_LENGTH);
+
+  p1x = rect->x + rect->width;
+  p2x = rect->x;
+  p1y = rect->y - (BORDER_SIZE - 5);
+  p2y = rect->y;
+  
+  pdx = p1x - p2x;
+  pdy = p1y - p2y;
+  
+  d = sqrt (pdx * pdx + 
+            pdy * pdy);
+
+  pvx = (pdx / d);
+  pvy = (pdy / d);
+ 
+  p3x = p1x - CURVE_LENGTH * pvx;
+  p3y = p1y - CURVE_LENGTH * pvy;
+
+  cairo_curve_to (cr, 
+                  p1x,
+                  p1y,
+                  p1x,
+                  p1y,
+                  p3x, 
+                  p3y);
+
+  p3x = p2x + CURVE_LENGTH * pvx;
+  p3y = p2y + CURVE_LENGTH * pvy;
+  
+  cairo_line_to (cr, p3x, p3y);
+
+  cairo_curve_to (cr, 
+                  p2x,
+                  p2y,
+                  p2x,
+                  p2y,
+                  p2x, 
+                  p2y + CURVE_LENGTH);
+
+  cairo_line_to (cr, rect->x, rect->y + rect->height - CURVE_LENGTH);
+  p1x = rect->x + CURVE_LENGTH;
+  if (p1x < triangle[0].x)
+    {
+      cairo_curve_to (cr, 
+                      rect->x,
+                      rect->y + rect->height,
+                      rect->x,
+                      rect->y + rect->height,
+                      p1x, 
+                      rect->y + rect->height);
+      cairo_close_path (cr);
+    }
+  else
+    {
+      cairo_curve_to (cr, 
+                      rect->x,
+                      rect->y + rect->height,
+                      rect->x,
+                      rect->y + rect->height,
+                      triangle[0].x, 
+                      rect->y + rect->height);
+    }
+
+  return triangle[1];
 
 }
 
@@ -785,6 +836,147 @@ _stencil_bubble_bottom_left  (cairo_t *cr,
                               GdkRectangle *rect,
 			      int pos_x, int pos_y)
 {
+  GdkPoint triangle[3];
+  double d, p1x, p2x, p3x, pdx, pvx, p1y, p2y, p3y, pdy, pvy;
+
+  triangle[0].x = rect->x + TRIANGLE_START;
+  triangle[0].y = rect->y + rect->height;
+  triangle[2].x = triangle[0].x + TRIANGLE_WIDTH;
+  triangle[2].y = rect->y + rect->height;
+  triangle[1].x = (triangle[2].x - triangle[0].x) / 2 + triangle[0].x;
+  triangle[1].y = rect->y + rect->height + BORDER_SIZE - 5;
+
+  //if (triangle[1].x - (BORDER_SIZE - 5 ) > pos_x)
+  //  triangle[1].x = pos_x + (BORDER_SIZE + 5);
+
+  cairo_move_to (cr, triangle[0].x, triangle[0].y);
+  cairo_line_to (cr, triangle[1].x, triangle[1].y);
+  cairo_line_to (cr, triangle[2].x, triangle[2].y);
+
+  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y + rect->height);
+  cairo_curve_to (cr, 
+                  rect->x + rect->width,
+                  rect->y + rect->height,
+                  rect->x + rect->width,
+                  rect->y + rect->height,
+                  rect->x + rect->width, 
+                  rect->y + rect->height - CURVE_LENGTH);
+
+  cairo_line_to (cr, rect->x + rect->width, rect->y + CURVE_LENGTH);
+
+  p1x = rect->x + rect->width;
+  p2x = rect->x;
+  p1y = rect->y;
+  p2y = rect->y - (BORDER_SIZE - 5);
+  
+  pdx = p1x - p2x;
+  pdy = p1y - p2y;
+  
+  d = sqrt (pdx * pdx + 
+            pdy * pdy);
+
+  pvx = (pdx / d);
+  pvy = (pdy / d);
+ 
+  p3x = p1x - CURVE_LENGTH * pvx;
+  p3y = p1y - CURVE_LENGTH * pvy;
+
+  cairo_curve_to (cr, 
+                  p1x,
+                  p1y,
+                  p1x,
+                  p1y,
+                  p3x, 
+                  p3y);
+
+  p3x = p2x + CURVE_LENGTH * pvx;
+  p3y = p2y + CURVE_LENGTH * pvy;
+  
+  cairo_line_to (cr, p3x, p3y);
+
+  cairo_curve_to (cr, 
+                  p2x,
+                  p2y,
+                  p2x,
+                  p2y,
+                  p2x, 
+                  p2y + CURVE_LENGTH);
+
+  cairo_line_to (cr, rect->x, rect->y + rect->height - CURVE_LENGTH);
+  p1x = rect->x + CURVE_LENGTH;
+  if (p1x < triangle[0].x)
+    {
+      cairo_curve_to (cr, 
+                      rect->x,
+                      rect->y + rect->height,
+                      rect->x,
+                      rect->y + rect->height,
+                      p1x, 
+                      rect->y + rect->height);
+      cairo_close_path (cr);
+    }
+  else
+    {
+      cairo_curve_to (cr, 
+                      rect->x,
+                      rect->y + rect->height,
+                      rect->x,
+                      rect->y + rect->height,
+                      triangle[0].x, 
+                      rect->y + rect->height);
+    }
+
+  return triangle[1];
+
+}
+
+static void
+_stencil_bubble_no_arrow (cairo_t *cr,
+                          GdkRectangle *rect)
+{
+
+  cairo_move_to (cr, rect->x + CURVE_LENGTH, rect->y + rect->height);
+
+  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y + rect->height);
+  cairo_curve_to (cr, 
+                  rect->x + rect->width,
+                  rect->y + rect->height,
+                  rect->x + rect->width,
+                  rect->y + rect->height,
+                  rect->x + rect->width, 
+                  rect->y + rect->height - CURVE_LENGTH);
+
+  cairo_line_to (cr, rect->x + rect->width, rect->y + CURVE_LENGTH);
+
+  cairo_curve_to (cr, 
+                  rect->x + rect->width,
+                  rect->y,
+                  rect->x + rect->width,
+                  rect->y,
+                  rect->x + rect->width - CURVE_LENGTH, 
+                  rect->y);
+
+  cairo_line_to (cr, rect->x + CURVE_LENGTH, rect->y);
+
+  cairo_curve_to (cr, 
+                  rect->x,
+                  rect->y,
+                  rect->x,
+                  rect->y,
+                  rect->x, 
+                  rect->y + CURVE_LENGTH);
+
+  cairo_line_to (cr, rect->x, rect->y + rect->height - CURVE_LENGTH);
+  
+  cairo_curve_to (cr, 
+                  rect->x,
+                  rect->y + rect->height,
+                  rect->x,
+                  rect->y + rect->height,
+                  rect->x + CURVE_LENGTH, 
+                  rect->y + rect->height);
+
+  cairo_close_path (cr);
 
 }
 
@@ -850,8 +1042,6 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   cairo_pattern_t *pat;
   GdkPixmap *mask;
   GdkPoint arrow_pos;
-  PangoAttribute *body_text_color;
-  PangoAttrList *attrlist;
   
   int orient;
   int orient_triangle;  
@@ -860,6 +1050,12 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   cairo_t *cairo_context;
   cairo_t *mask_cr;
   gboolean can_composite;
+
+  mask_cr = NULL;
+  mask = NULL;
+  
+  arrow_pos.x = 0;
+  arrow_pos.y = 0; 
 
   widget = GTK_WIDGET(bubble_widget);
   cairo_context = gdk_cairo_create (widget->window);
@@ -870,6 +1066,8 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
  
   x = bubble_widget->x;
   y = bubble_widget->y;
+
+  gtk_window_move (GTK_WINDOW (widget), x, y);
 
   screen = gtk_window_get_screen (GTK_WINDOW(widget));
   monitor_num = gdk_screen_get_monitor_at_window (screen, widget->window);
@@ -888,6 +1086,8 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   w = requisition.width;
   h = requisition.height;
 
+  g_message ("w %i, h %i", w, h);
+
   if (!can_composite)
     {
       mask = gdk_pixmap_new (NULL, w, h, 1);
@@ -904,48 +1104,59 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   else
     y = y + 5;
 
-  rectangle_border = BORDER_SIZE-2; 
+  if (bubble_widget->draw_arrow)
+    rectangle_border = BORDER_SIZE-2; 
+  else
+    rectangle_border = 2;
 
   rectangle.x = rectangle_border;
   rectangle.y = rectangle_border;
   rectangle.width = w - (rectangle_border * 2);
   rectangle.height = h - (rectangle_border * 2);
 
-  if (orient == ORIENT_TOP)
+  if (bubble_widget->draw_arrow)
     {
-      if (orient_triangle == TRIANGLE_LEFT)
+      if (orient == ORIENT_TOP)
         {
-          arrow_pos = 
-            _stencil_bubble_top_left (cairo_context, &rectangle, x, y);
-          if (!can_composite)
-            _stencil_bubble_top_left (mask_cr, &rectangle, x, y);
+          if (orient_triangle == TRIANGLE_LEFT)
+            {
+              arrow_pos = 
+                _stencil_bubble_top_left (cairo_context, &rectangle, x, y);
+              if (!can_composite)
+                _stencil_bubble_top_left (mask_cr, &rectangle, x, y);
+            }
+          else
+            {
+              arrow_pos = 
+                _stencil_bubble_top_right (cairo_context, &rectangle, x, y);
+              if (!can_composite)
+                _stencil_bubble_top_right (mask_cr, &rectangle, x, y);
+            }
         }
       else
         {
-          arrow_pos = 
-            _stencil_bubble_top_right (cairo_context, &rectangle, x, y);
-          if (!can_composite)
-            _stencil_bubble_top_right (mask_cr, &rectangle, x, y);
+          if (orient_triangle == TRIANGLE_LEFT)
+            {
+              arrow_pos = 
+                _stencil_bubble_bottom_left (cairo_context, &rectangle, x, y);
+              if (!can_composite)
+                _stencil_bubble_bottom_left (mask_cr, &rectangle, x, y);
+            }
+          else
+            {
+              arrow_pos = 
+                _stencil_bubble_bottom_right (cairo_context, &rectangle, x, y);
+              if (!can_composite)
+                _stencil_bubble_bottom_right (mask_cr, &rectangle, x, y);
+            }
         }
     }
-  else
+  else  /* draw without arrow */
     {
-      if (orient_triangle == TRIANGLE_LEFT)
-        {
-          arrow_pos = 
-            _stencil_bubble_bottom_left (cairo_context, &rectangle, x, y);
-          if (!can_composite)
-            _stencil_bubble_bottom_left (mask_cr, &rectangle, x, y);
-        }
-      else
-        {
-          arrow_pos = 
-            _stencil_bubble_bottom_right (cairo_context, &rectangle, x, y);
-          if (!can_composite)
-            _stencil_bubble_bottom_right (mask_cr, &rectangle, x, y);
-        }
+      _stencil_bubble_no_arrow (cairo_context, &rectangle);
+      if (!can_composite)
+        _stencil_bubble_no_arrow (mask_cr, &rectangle);
     }
-
   //cairo_set_source_rgba (cairo_context, 0.43, 0.49, 0.55, 1);
 
   if (can_composite)
@@ -960,33 +1171,6 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   cairo_paint (cairo_context);
  
   cairo_set_operator (cairo_context, CAIRO_OPERATOR_OVER);
-
-#if 0
-  //create shadow
-  if (can_composite)
-    {
-      cairo_path_t *path;
-      cairo_pattern_t *blur;
-
-      path = cairo_copy_path_flat (cairo_context);
-      cairo_new_path (cairo_context);
-      
-      cairo_translate (cairo_context, 5, 5);
-      cairo_append_path (cairo_context, path);
-      blur = cairo_pattern_create_rgba (0, 0, 0, .75);
-      cairo_pattern_set_filter (blur, CAIRO_FILTER_GAUSSIAN);
-
-      cairo_set_source (cairo_context, blur);
-      cairo_fill (cairo_context);
-     
-      cairo_identity_matrix (cairo_context);
-      cairo_append_path (cairo_context, path);
-     
-      cairo_pattern_destroy (blur);
-      cairo_path_destroy (path);
-    }
-
-#endif
 
   pat = cairo_pattern_create_linear (0.0, 0.0,  0.0, h);
   //cairo_pattern_add_color_stop_rgba (pat, 1, 0.59, 0.76, 0.93, 1);
@@ -1035,7 +1219,6 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
 
   cairo_destroy (cairo_context);
  
-  gtk_window_move (GTK_WINDOW (widget), x - arrow_pos.x, y + 5);
   bubble_widget->active = TRUE;
 }
 
@@ -1095,13 +1278,13 @@ egg_notification_bubble_widget_create_button (EggNotificationBubbleWidget *bubbl
   gchar *label_markup;
 
   b = gtk_button_new ();
-  gtk_button_set_relief (b, GTK_RELIEF_NONE);
+  gtk_button_set_relief (GTK_BUTTON (b), GTK_RELIEF_NONE);
   gtk_container_set_border_width (GTK_CONTAINER (b), 0);
 
   label_markup = g_markup_printf_escaped ("<span weight=\"bold\" underline=\"single\" foreground=\"blue\">%s</span>", label);
 
   l = gtk_label_new (label_markup);
-  gtk_label_set_use_markup (l, TRUE);
+  gtk_label_set_use_markup (GTK_LABEL (l), TRUE);
 
   g_free (label_markup);
 
@@ -1128,4 +1311,12 @@ egg_notification_bubble_widget_clear_buttons (EggNotificationBubbleWidget *bubbl
 
   bubble_widget->button_hbox = NULL;
 }
+
+void
+egg_notification_bubble_widget_set_draw_arrow (EggNotificationBubbleWidget *bubble_widget, 
+                                               gboolean value)
+{
+  bubble_widget->draw_arrow = value;
+}
+
 

@@ -51,6 +51,7 @@ struct _NotifyDaemonPrivate
   guint next_id;
   guint timeout_source;
   GHashTable *notification_hash;
+  GSList *poptart_stack;
 };
 
 static void notify_daemon_finalize (GObject * object);
@@ -101,6 +102,7 @@ notify_daemon_finalize (GObject * object)
   daemon = NOTIFY_DAEMON (object);
 
   g_hash_table_destroy (daemon->priv->notification_hash);
+  g_slist_free (daemon->priv->poptart_stack);
 
   parent_class = G_OBJECT_CLASS (notify_daemon_parent_class);
 
@@ -526,6 +528,106 @@ _notification_daemon_handle_bubble_widget_default (EggNotificationBubbleWidget *
   _close_notification (daemon, GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (bw), "_notify_id")));
 }
 
+static void
+_remove_bubble_from_poptart_stack (EggNotificationBubbleWidget *bw,
+                                   NotifyDaemon *daemon)
+{
+  NotifyDaemonPrivate *priv;
+  GdkRectangle workarea;
+  GSList *remove_link;
+  GSList *link;
+
+  gint x, y;
+  
+  priv = daemon->priv;
+
+  link = priv->poptart_stack;
+  remove_link = NULL;
+
+  workarea.x = 0;
+  workarea.y = 0;
+  workarea.width  = gdk_screen_width();
+  workarea.height = gdk_screen_height();
+
+  y = workarea.y + workarea.height;
+  x = 0;
+  while (link)
+    {
+      EggNotificationBubbleWidget *b;
+      GtkRequisition req;
+
+      b = EGG_NOTIFICATION_BUBBLE_WIDGET (link->data);
+      if (b != bw)
+        {
+          printf ("dude\n");
+ 
+          gtk_widget_size_request (GTK_WIDGET (b), &req);
+
+          x = workarea.x + workarea.width - req.width;
+          y = y - req.height;
+
+          egg_notification_bubble_widget_set_pos (b, x, y);
+        }
+      else 
+        {
+          remove_link = link;
+        }
+
+      link = link->next;
+    }
+
+    if (remove_link)
+      priv->poptart_stack = g_slist_remove_link (priv->poptart_stack, remove_link);
+}
+
+static void
+_notify_daemon_add_bubble_to_poptart_stack (NotifyDaemon *daemon, 
+                                            EggNotificationBubbleWidget *bw)
+{
+  NotifyDaemonPrivate *priv;
+  GtkRequisition req;
+  GdkRectangle workarea;
+  GSList *link;
+  gint x, y;  
+
+  priv = daemon->priv;
+ 
+  gtk_widget_size_request (GTK_WIDGET (bw), &req);
+
+  workarea.x = 0;
+  workarea.y = 0;
+  workarea.width  = gdk_screen_width();
+  workarea.height = gdk_screen_height();
+
+  x = workarea.x + workarea.width - req.width;
+  y = workarea.y + workarea.height - req.height;
+
+  g_message ("x %i y %i width %i height %i", x, y, req.width, req.height);
+
+  egg_notification_bubble_widget_set_pos (bw, x, y);
+
+  link = priv->poptart_stack;
+  while (link)
+    {
+      EggNotificationBubbleWidget *b;
+
+      b = EGG_NOTIFICATION_BUBBLE_WIDGET (link->data);
+      gtk_widget_size_request (GTK_WIDGET (b), &req);
+
+      x = workarea.x + workarea.width - req.width;
+      y = y - req.height;
+      g_message ("x %i y %i width %i height %i", x, y, req.width, req.height);
+      egg_notification_bubble_widget_set_pos (b, x, y);
+
+      link = link->next;
+    }
+
+  g_signal_connect (bw, "destroy", _remove_bubble_from_poptart_stack, daemon);
+  priv->poptart_stack = g_slist_prepend (priv->poptart_stack, bw); 
+}
+
+
+
 gboolean 
 notify_daemon_notify_handler (NotifyDaemon *daemon,
                               const gchar *app_name,
@@ -547,6 +649,9 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
   guint return_id;
   gchar *sender;
   gint i;
+
+  x = 0;
+  y = 0;
 
   nt = NULL;
 
@@ -615,9 +720,15 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
     }
 
   if (use_pos_data)
-    egg_notification_bubble_widget_set_pos (bw, x, y);
+    {
+      egg_notification_bubble_widget_set_draw_arrow (bw, TRUE);
+      egg_notification_bubble_widget_set_pos (bw, x, y);
+    }
   else
-    egg_notification_bubble_widget_set_pos (bw, 100, 20);
+    {
+      egg_notification_bubble_widget_set_draw_arrow (bw, FALSE);
+      _notify_daemon_add_bubble_to_poptart_stack (daemon, bw);
+    }
 
   /* check for icon_data if icon == "" */
   if (strcmp ("", icon) == 0)
