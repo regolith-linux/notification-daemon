@@ -15,4 +15,4 @@ notify_daemon_LDADD= $(NOTIFY_DAEMON_LIBS)
 BUILT_SOURCES = notifydaemon-dbus-glue.h
 
 notifydaemon-dbus-glue.h: notifydaemon.xml
-	dbus-binding-tool --mode=glib-server notifydaemon.xml > notifydaemon-dbus-glue.h
+	dbus-binding-tool --mode=glib-server $(srcdir)/notifydaemon.xml > notifydaemon-dbus-glue.h

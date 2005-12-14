@@ -68,7 +68,7 @@ AM_PROG_LIBTOOL
 
 AC_CHECK_LIB([popt], [poptGetArg], , AC_MSG_ERROR([Popt is required]))
 
-pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= 0.35, dbus-glib-1 >= 0.35"
+pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= 0.60, dbus-glib-1 >= 0.60"
 PKG_CHECK_MODULES(NOTIFY_DAEMON, [$pkg_modules])
 AC_SUBST(NOTIFY_DAEMON_CFLAGS)
 AC_SUBST(NOTIFY_DAEMON_LIBS)
@@ -120,14 +120,7 @@ fi
 if ! test -z "$with_dbus_services" ; then
 	DBUS_SERVICES_DIR="$with_dbus_services"
 else
-	# D-BUS 0.23 and higher use $prefix/share/dbus-1/services
-	# D-BUS 0.22 and lower use $prefix/lib/dbus-1/services
-	if test "$DBUS_MAJOR_VER" -ge 1 -o \
-	        "$DBUS_MINOR_VER" -ge 23; then
-		DBUS_SERVICES_DIR="$DATADIR/dbus-1/services"
-	else
-		DBUS_SERVICES_DIR="$LIBDIR/dbus-1/services"
-	fi
+	DBUS_SERVICES_DIR="$DATADIR/dbus-1/services"
 fi
 
 AC_SUBST(DBUS_SYS_DIR)

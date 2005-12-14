@@ -1,3 +1,11 @@
+2005-12-14  John (J5) Palmieri  <johnp@redhat.com>
+
+	* Release 0.3.0
+
+	* src/Makefile.am: fix for building in a seperate build directory
+
+	* configure.ac: Require D-Bus >= 0.60
+
 2005-12-12  John (J5) Palmieri  <johnp@redhat.com>
 
 	* src/eggnotificationbubblewidget.c (size_request_handler): removed
