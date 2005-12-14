@@ -1,6 +1,6 @@
 2005-12-14  John (J5) Palmieri  <johnp@redhat.com>
 
-	* Release 0.3.0
+	* Release 0.3.1
 
 	* src/Makefile.am: fix for building in a seperate build directory
 

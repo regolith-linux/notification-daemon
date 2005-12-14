@@ -1,6 +1,6 @@
-notify-daemon 0.3.0
+notify-daemon 0.3.1
 ===
 
-* First release of the notify daemon which supports the new 0.3.0 protocol
+* First release of the notify daemon which supports the new 0.3.x protocol
 * Users of the older notification-daemon must make sure they uninstall it
   as it will try to catch messages ment for the notify-daemon
