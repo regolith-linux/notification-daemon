@@ -26,10 +26,12 @@
 #include "eggnotificationbubblewidget.h"
 
 #define BORDER_SIZE 30 
-#define CURVE_LENGTH 25
+#define BORDER_LINE_WIDTH 2
+#define CURVE_LENGTH 25 
 #define TRIANGLE_START 45 
 #define TRIANGLE_WIDTH 60 
 #define TEXT_WIDTH_THRESHOLD 100 
+
 
 static void egg_notification_bubble_widget_class_init        (EggNotificationBubbleWidgetClass *klass);
 static void egg_notification_bubble_widget_init              (EggNotificationBubbleWidget      *bubble_widget);
@@ -53,6 +55,8 @@ static void egg_notification_bubble_widget_screen_changed    (GtkWidget *widget,
 
 static void _populate_window (EggNotificationBubbleWidget *bubble_widget);
 static void draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget);
+static void _stencil_bubble (EggNotificationBubbleWidget *bw);
+
 
 static GtkWindowClass *parent_class;
 
@@ -60,13 +64,28 @@ static GtkWindowClass *parent_class;
 #define BEVEL_ALPHA_MEDIUM 0.5
 #define BEVEL_ALPHA_DARK   0.8 
 
+enum
+{
+  DRAW_MOVE  = 0,
+  DRAW_LINE  = 1,
+  DRAW_CAP   = 2,
+  DRAW_CLOSE = 3
+};
+
+typedef struct _DrawingInstruction
+{
+  gint type;
+  
+  gint end_x, end_y;
+  gint corner_x, corner_y;
+} DrawingInstruction;
 
 enum 
 {
-    ORIENT_TOP = 0,
+    ORIENT_TOP    = 0,
     ORIENT_BOTTOM = 1,
-    ORIENT_LEFT = 2,
-    ORIENT_RIGHT = 3
+    ORIENT_LEFT   = 2,
+    ORIENT_RIGHT  = 3
 }; 
 
 enum {
@@ -148,6 +167,8 @@ egg_notification_bubble_widget_init (EggNotificationBubbleWidget *bubble_widget)
   egg_notification_bubble_widget_screen_changed (GTK_WIDGET (bubble_widget),
                                                  NULL);
 
+  bubble_widget->dp.is_clear = TRUE;
+  bubble_widget->dp.pipeline = NULL;
   bubble_widget->draw_arrow = FALSE;
  
   _populate_window (bubble_widget);
@@ -244,6 +265,195 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
       }
 
     gtk_widget_show_all (bubble_widget->table);
+}
+
+static void
+_drawing_instruction_internal_add (GList **pipeline,
+                                   guint type,
+                                   gint end_x, gint end_y, 
+                                   gint corner_x, gint corner_y)
+{
+  DrawingInstruction *di;
+
+  di = g_new0 (DrawingInstruction, 1);
+  di->type = type;
+  di->end_x = end_x;
+  di->end_y = end_y;
+  di->corner_x = corner_x;
+  di->corner_y = corner_y;
+
+  *pipeline = g_list_append (*pipeline, di);
+}
+
+static void
+_drawing_instruction_move (GList **pipeline, 
+                           gint x, gint y)
+{
+  _drawing_instruction_internal_add (pipeline, DRAW_MOVE, x, y, 0, 0);
+}
+
+static void
+_drawing_instruction_line (GList **pipeline, 
+                           gint x, gint y)
+{
+  _drawing_instruction_internal_add (pipeline, DRAW_LINE, x, y, 0, 0);
+}
+
+static void
+_drawing_instruction_cap  (GList **pipeline, 
+                           gint x, gint y, 
+                           gint corner_x, gint corner_y)
+{
+  _drawing_instruction_internal_add (pipeline, DRAW_CAP, x, y, corner_x, corner_y);
+}
+
+static void
+_drawing_instruction_close  (GList **pipeline)
+{
+  _drawing_instruction_internal_add (pipeline, DRAW_CLOSE, 0, 0, 0, 0);
+}
+
+/* given a distance from start point x1, y1
+   calculate the point dist units away */
+static GdkPoint
+_calc_point_on_line (x1, y1, x2, y2, dist)
+{
+  GdkPoint result;
+  gint dx, dy;
+  gdouble d, vx, vy;
+  
+  dx = x2 - x1;
+  dy = y2 - y1;
+
+  d = sqrt (dx * dx + dy * dy);
+  vx = dx / d;
+  vy = dy / d;
+  
+  result.x = x1 + dist * vx;
+  result.y = y1 + dist * vy;
+
+  return result;
+}
+
+static void
+_edge_line_to (EggNotificationBubbleWidget *bw,
+               gint x, gint y,
+               gint corner_radius)
+{
+  if (bw->dp.is_clear == TRUE)
+    {
+      bw->dp.start_x = x;
+      bw->dp.start_y = y;
+      bw->dp.start_corner_radius = corner_radius;
+      bw->dp.is_clear = FALSE;
+    }
+  else
+    {
+      GdkPoint start_p;
+      GdkPoint end_p;
+
+      start_p = _calc_point_on_line (bw->dp.last_x, 
+                                     bw->dp.last_y,
+                                     x,
+                                     y,
+                                     bw->dp.last_corner_radius);
+      end_p = _calc_point_on_line (x,
+                                   y,
+                                   bw->dp.last_x, 
+                                   bw->dp.last_y,
+                                   corner_radius);
+
+      if (bw->dp.last_x == bw->dp.start_x &&
+          bw->dp.last_y == bw->dp.start_y)
+        _drawing_instruction_move (&bw->dp.pipeline, start_p.x, start_p.y);
+      else
+        _drawing_instruction_cap (&bw->dp.pipeline,
+                                  start_p.x, 
+                                  start_p.y,
+                                  bw->dp.last_x,
+                                  bw->dp.last_y);
+
+      _drawing_instruction_line (&bw->dp.pipeline, end_p.x, end_p.y);
+
+    }
+
+  bw->dp.last_x = x;
+  bw->dp.last_y = y;
+  bw->dp.last_corner_radius = corner_radius;
+}
+
+static void
+_close_path (EggNotificationBubbleWidget *bw)
+{
+  GdkPoint start_p;
+  GdkPoint end_p;
+  DrawingInstruction *di;
+
+  start_p = _calc_point_on_line (bw->dp.last_x, 
+                                 bw->dp.last_y,
+                                 bw->dp.start_x,
+                                 bw->dp.start_y,
+                                 bw->dp.last_corner_radius);
+                                 
+  end_p = _calc_point_on_line (bw->dp.start_x,
+                               bw->dp.start_y,
+                               bw->dp.last_x, 
+                               bw->dp.last_y,
+                               bw->dp.start_corner_radius);
+
+  
+  _drawing_instruction_cap (&bw->dp.pipeline,
+                             start_p.x, 
+                             start_p.y,
+                             bw->dp.last_x,
+                             bw->dp.last_y);
+ 
+  _drawing_instruction_line (&bw->dp.pipeline,
+                             end_p.x, 
+                             end_p.y);
+
+  di = (DrawingInstruction *) bw->dp.pipeline->data;
+  _drawing_instruction_cap (&bw->dp.pipeline,
+                             di->end_x,
+                             di->end_y,
+                             bw->dp.start_x,
+                             bw->dp.start_y);
+
+  _drawing_instruction_close (&bw->dp.pipeline);
+
+}
+
+static void
+_drawing_instruction_draw (DrawingInstruction *di, cairo_t *cr)
+{
+  switch (di->type)
+    {
+      case DRAW_MOVE:
+        cairo_move_to (cr, di->end_x, di->end_y);
+        break;
+      case DRAW_LINE:
+        cairo_line_to (cr, di->end_x, di->end_y);
+      break;
+      case DRAW_CAP:
+        cairo_curve_to (cr, 
+                        di->corner_x, di->corner_y,
+                        di->corner_x, di->corner_y,
+                        di->end_x, di->end_y);
+      break;
+      case DRAW_CLOSE:
+        cairo_close_path (cr);
+      break;
+    }
+}
+
+static void
+_drawing_pipeline_clear (EggNotificationBubbleWidget *bw)
+{
+  bw->dp.is_clear = TRUE;
+
+  g_list_foreach (bw->dp.pipeline, (GFunc) g_free, NULL);
+  g_list_free (bw->dp.pipeline);
+  bw->dp.pipeline = NULL;
 }
 
 static void
@@ -441,7 +651,11 @@ egg_notification_bubble_widget_set_pos (EggNotificationBubbleWidget   *bubble_wi
   else
       _layout_window (bubble_widget, TRIANGLE_RIGHT);
 
-  gtk_window_move (GTK_WINDOW (bubble_widget), x, y);
+  _stencil_bubble (bubble_widget);
+  
+  gtk_window_move (GTK_WINDOW (bubble_widget), 
+                   x - bubble_widget->offset_x, 
+                   y - bubble_widget->offset_y);
 }
 
 static void
@@ -530,114 +744,42 @@ egg_notification_bubble_widget_expose (GtkWidget *widget, GdkEventExpose *event)
   return TRUE; 
 }
 
-static GdkPoint 
-_stencil_bubble_top_right (cairo_t *cr,
-                           GdkRectangle *rect,
-			   int pos_x, int pos_y)
+static void 
+_stencil_bubble_top_right (EggNotificationBubbleWidget *bw,
+                           GdkRectangle *rect)
 {
   GdkPoint triangle[3];
-  double d, p1x, p2x, p3x, pdx, pvx, p1y, p2y, p3y, pdy, pvy;
 
-  triangle[2].x = rect->x + rect->width - TRIANGLE_START;
-  triangle[2].y = rect->y;
-
-  triangle[0].x = triangle[2].x - TRIANGLE_WIDTH;
   triangle[0].y = rect->y;
+  triangle[0].x = rect->x + rect->width - (TRIANGLE_START + TRIANGLE_WIDTH);
+  triangle[2].x = triangle[0].x + TRIANGLE_WIDTH;
+  triangle[2].y = rect->y;
   triangle[1].x = (triangle[2].x - triangle[0].x) / 2 + triangle[0].x;
   triangle[1].y = rect->y - BORDER_SIZE + 5;
 
-#if 0
-  if (triangle[1].x + (BORDER_SIZE - 5) < pos_x)
-    triangle[1].x = pos_x - (BORDER_SIZE + 5);
-#endif 
 
-  cairo_move_to (cr, triangle[0].x, triangle[0].y);
-  cairo_line_to (cr, triangle[1].x, triangle[1].y);
-  cairo_line_to (cr, triangle[2].x, triangle[2].y);
+  bw->offset_x = triangle[1].x;
+  bw->offset_y = triangle[1].y;
 
-  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y);
-  cairo_curve_to (cr, 
-                  rect->x + rect->width,
-                  rect->y,
-                  rect->x + rect->width,
-                  rect->y,
-                  rect->x + rect->width, 
-                  rect->y + CURVE_LENGTH);
+  _edge_line_to (bw, triangle[0].x, triangle[0].y, 0);
+  _edge_line_to (bw, triangle[1].x, triangle[1].y, 0);
+  _edge_line_to (bw, triangle[2].x, triangle[2].y, 0);
 
-  cairo_line_to (cr, rect->x + rect->width, rect->y + rect->height - CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y + rect->height, CURVE_LENGTH);
 
-  p1x = rect->x + rect->width;
-  p2x = rect->x;
-  p1y = rect->y + rect->height + (BORDER_SIZE - 5);
-  p2y = rect->y + rect->height;
-  
-  pdx = p1x - p2x;
-  pdy = p1y - p2y;
-  
-  d = sqrt (pdx * pdx + 
-            pdy * pdy);
+  _edge_line_to (bw, rect->x, rect->y + rect->height + BORDER_SIZE - 5, CURVE_LENGTH);
 
-  pvx = (pdx / d);
-  pvy = (pdy / d);
- 
-  p3x = p1x - CURVE_LENGTH * pvx;
-  p3y = p1y - CURVE_LENGTH * pvy;
+  _edge_line_to (bw, rect->x, rect->y, CURVE_LENGTH);
 
-  cairo_curve_to (cr, 
-                  p1x,
-                  p1y,
-                  p1x,
-                  p1y,
-                  p3x, 
-                  p3y);
-
-  p3x = p2x + CURVE_LENGTH * pvx;
-  p3y = p2y + CURVE_LENGTH * pvy;
-  
-  cairo_line_to (cr, p3x, p3y);
-
-  cairo_curve_to (cr, 
-                  p2x,
-                  p2y,
-                  p2x,
-                  p2y,
-                  p2x, 
-                  p2y - CURVE_LENGTH);
-
-  cairo_line_to (cr, rect->x, rect->y + CURVE_LENGTH);
-  p1x = rect->x + CURVE_LENGTH;
-  if (p1x < triangle[0].x)
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y,
-                      rect->x,
-                      rect->y,
-                      p1x, 
-                      rect->y);
-      cairo_close_path (cr);
-    }
-  else
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y,
-                      rect->x,
-                      rect->y,
-                      triangle[0].x, 
-                      rect->y);
-    }
-
-  return triangle[1];
+  _close_path (bw);
 }
 
-static GdkPoint
-_stencil_bubble_top_left  (cairo_t *cr,
-                           GdkRectangle *rect, 
-                           int pos_x, int pos_y)
+static void 
+_stencil_bubble_top_left  (EggNotificationBubbleWidget *bw,
+                           GdkRectangle *rect)
 {
   GdkPoint triangle[3];
-  double d, p1x, p2x, p3x, pdx, pvx, p1y, p2y, p3y, pdy, pvy;
 
   triangle[0].x = rect->x + TRIANGLE_START;
   triangle[0].y = rect->y;
@@ -646,96 +788,29 @@ _stencil_bubble_top_left  (cairo_t *cr,
   triangle[1].x = (triangle[2].x - triangle[0].x) / 2 + triangle[0].x;
   triangle[1].y = rect->y - BORDER_SIZE + 5;
 
-  //if (triangle[1].x - (BORDER_SIZE - 5 ) > pos_x)
-  //  triangle[1].x = pos_x + (BORDER_SIZE + 5);
+  bw->offset_x = triangle[1].x;
+  bw->offset_y = triangle[1].y;
 
-  cairo_move_to (cr, triangle[0].x, triangle[0].y);
-  cairo_line_to (cr, triangle[1].x, triangle[1].y);
-  cairo_line_to (cr, triangle[2].x, triangle[2].y);
+  _edge_line_to (bw, triangle[0].x, triangle[0].y, 0);
+  _edge_line_to (bw, triangle[1].x, triangle[1].y, 0);
+  _edge_line_to (bw, triangle[2].x, triangle[2].y, 0);
 
-  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y);
-  cairo_curve_to (cr, 
-                  rect->x + rect->width,
-                  rect->y,
-                  rect->x + rect->width,
-                  rect->y,
-                  rect->x + rect->width, 
-                  rect->y + CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y + rect->height + BORDER_SIZE - 5, CURVE_LENGTH);
 
-  cairo_line_to (cr, rect->x + rect->width, rect->y + rect->height - CURVE_LENGTH);
+  _edge_line_to (bw, rect->x, rect->y + rect->height, CURVE_LENGTH);
 
-  p1x = rect->x + rect->width;
-  p2x = rect->x;
-  p1y = rect->y + rect->height;
-  p2y = rect->y + rect->height + (BORDER_SIZE - 5);
-  
-  pdx = p1x - p2x;
-  pdy = p1y - p2y;
-  
-  d = sqrt (pdx * pdx + 
-            pdy * pdy);
+  _edge_line_to (bw, rect->x, rect->y, CURVE_LENGTH);
 
-  pvx = (pdx / d);
-  pvy = (pdy / d);
- 
-  p3x = p1x - CURVE_LENGTH * pvx;
-  p3y = p1y - CURVE_LENGTH * pvy;
+  _close_path (bw);
 
-  cairo_curve_to (cr, 
-                  p1x,
-                  p1y,
-                  p1x,
-                  p1y,
-                  p3x, 
-                  p3y);
-
-  p3x = p2x + CURVE_LENGTH * pvx;
-  p3y = p2y + CURVE_LENGTH * pvy;
-  
-  cairo_line_to (cr, p3x, p3y);
-
-  cairo_curve_to (cr, 
-                  p2x,
-                  p2y,
-                  p2x,
-                  p2y,
-                  p2x, 
-                  p2y - CURVE_LENGTH);
-
-  cairo_line_to (cr, rect->x, rect->y + CURVE_LENGTH);
-  p1x = rect->x + CURVE_LENGTH;
-  if (p1x < triangle[0].x)
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y,
-                      rect->x,
-                      rect->y,
-                      p1x, 
-                      rect->y);
-      cairo_close_path (cr);
-    }
-  else
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y,
-                      rect->x,
-                      rect->y,
-                      triangle[0].x, 
-                      rect->y);
-    }
-
-  return triangle[1];
 }
 
-static GdkPoint
-_stencil_bubble_bottom_right (cairo_t *cr,
-                              GdkRectangle *rect,
-			      int pos_x, int pos_y)
+static void
+_stencil_bubble_bottom_right (EggNotificationBubbleWidget *bw,
+                              GdkRectangle *rect)
 {
   GdkPoint triangle[3];
-  double d, p1x, p2x, p3x, pdx, pvx, p1y, p2y, p3y, pdy, pvy;
 
   triangle[2].x = rect->x + rect->width - TRIANGLE_START;
   triangle[2].y = rect->y + rect->height;
@@ -745,99 +820,27 @@ _stencil_bubble_bottom_right (cairo_t *cr,
   triangle[1].x = (triangle[2].x - triangle[0].x) / 2 + triangle[0].x;
   triangle[1].y = rect->y + rect->height +  BORDER_SIZE - 5;
 
-#if 0
-  if (triangle[1].x + (BORDER_SIZE - 5) < pos_x)
-    triangle[1].x = pos_x - (BORDER_SIZE + 5);
-#endif 
+  bw->offset_x = triangle[1].x;
+  bw->offset_y = triangle[1].y;
 
-  cairo_move_to (cr, triangle[0].x, triangle[0].y);
-  cairo_line_to (cr, triangle[1].x, triangle[1].y);
-  cairo_line_to (cr, triangle[2].x, triangle[2].y);
+  _edge_line_to (bw, triangle[2].x, triangle[2].y, 0);
+  _edge_line_to (bw, triangle[1].x, triangle[1].y, 0);
+  _edge_line_to (bw, triangle[0].x, triangle[0].y, 0);
 
-  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y + rect->height);
-  cairo_curve_to (cr, 
-                  rect->x + rect->width,
-                  rect->y + rect->height,
-                  rect->x + rect->width,
-                  rect->y + rect->height,
-                  rect->x + rect->width, 
-                  rect->y + rect->height - CURVE_LENGTH);
+   
+  _edge_line_to (bw, rect->x, rect->y + rect->height, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x, rect->y - BORDER_SIZE + 5, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y + rect->height, CURVE_LENGTH);
 
-  cairo_line_to (cr, rect->x + rect->width, rect->y + CURVE_LENGTH);
-
-  p1x = rect->x + rect->width;
-  p2x = rect->x;
-  p1y = rect->y - (BORDER_SIZE - 5);
-  p2y = rect->y;
-  
-  pdx = p1x - p2x;
-  pdy = p1y - p2y;
-  
-  d = sqrt (pdx * pdx + 
-            pdy * pdy);
-
-  pvx = (pdx / d);
-  pvy = (pdy / d);
- 
-  p3x = p1x - CURVE_LENGTH * pvx;
-  p3y = p1y - CURVE_LENGTH * pvy;
-
-  cairo_curve_to (cr, 
-                  p1x,
-                  p1y,
-                  p1x,
-                  p1y,
-                  p3x, 
-                  p3y);
-
-  p3x = p2x + CURVE_LENGTH * pvx;
-  p3y = p2y + CURVE_LENGTH * pvy;
-  
-  cairo_line_to (cr, p3x, p3y);
-
-  cairo_curve_to (cr, 
-                  p2x,
-                  p2y,
-                  p2x,
-                  p2y,
-                  p2x, 
-                  p2y + CURVE_LENGTH);
-
-  cairo_line_to (cr, rect->x, rect->y + rect->height - CURVE_LENGTH);
-  p1x = rect->x + CURVE_LENGTH;
-  if (p1x < triangle[0].x)
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y + rect->height,
-                      rect->x,
-                      rect->y + rect->height,
-                      p1x, 
-                      rect->y + rect->height);
-      cairo_close_path (cr);
-    }
-  else
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y + rect->height,
-                      rect->x,
-                      rect->y + rect->height,
-                      triangle[0].x, 
-                      rect->y + rect->height);
-    }
-
-  return triangle[1];
-
+  _close_path (bw);
 }
 
-static GdkPoint 
-_stencil_bubble_bottom_left  (cairo_t *cr,
-                              GdkRectangle *rect,
-			      int pos_x, int pos_y)
+static void 
+_stencil_bubble_bottom_left  (EggNotificationBubbleWidget *bw,
+                              GdkRectangle *rect)
 {
   GdkPoint triangle[3];
-  double d, p1x, p2x, p3x, pdx, pvx, p1y, p2y, p3y, pdy, pvy;
 
   triangle[0].x = rect->x + TRIANGLE_START;
   triangle[0].y = rect->y + rect->height;
@@ -846,138 +849,103 @@ _stencil_bubble_bottom_left  (cairo_t *cr,
   triangle[1].x = (triangle[2].x - triangle[0].x) / 2 + triangle[0].x;
   triangle[1].y = rect->y + rect->height + BORDER_SIZE - 5;
 
-  //if (triangle[1].x - (BORDER_SIZE - 5 ) > pos_x)
-  //  triangle[1].x = pos_x + (BORDER_SIZE + 5);
+  bw->offset_x = triangle[1].x;
+  bw->offset_y = triangle[1].y;
 
-  cairo_move_to (cr, triangle[0].x, triangle[0].y);
-  cairo_line_to (cr, triangle[1].x, triangle[1].y);
-  cairo_line_to (cr, triangle[2].x, triangle[2].y);
+  _edge_line_to (bw, triangle[2].x, triangle[2].y, 0);
+  _edge_line_to (bw, triangle[1].x, triangle[1].y, 0);
+  _edge_line_to (bw, triangle[0].x, triangle[0].y, 0);
 
-  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y + rect->height);
-  cairo_curve_to (cr, 
-                  rect->x + rect->width,
-                  rect->y + rect->height,
-                  rect->x + rect->width,
-                  rect->y + rect->height,
-                  rect->x + rect->width, 
-                  rect->y + rect->height - CURVE_LENGTH);
+  _edge_line_to (bw, rect->x, rect->y + rect->height, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x, rect->y, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y - BORDER_SIZE + 5, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y + rect->height, CURVE_LENGTH);
 
-  cairo_line_to (cr, rect->x + rect->width, rect->y + CURVE_LENGTH);
+  _close_path (bw);
+}
 
-  p1x = rect->x + rect->width;
-  p2x = rect->x;
-  p1y = rect->y;
-  p2y = rect->y - (BORDER_SIZE - 5);
-  
-  pdx = p1x - p2x;
-  pdy = p1y - p2y;
-  
-  d = sqrt (pdx * pdx + 
-            pdy * pdy);
+static void
+_stencil_bubble_no_arrow (EggNotificationBubbleWidget *bw,
+                          GdkRectangle *rect)
+{
+  bw->offset_x = 0;
+  bw->offset_y = 0;
 
-  pvx = (pdx / d);
-  pvy = (pdy / d);
- 
-  p3x = p1x - CURVE_LENGTH * pvx;
-  p3y = p1y - CURVE_LENGTH * pvy;
+  _edge_line_to (bw, rect->x + rect->width, rect->y, CURVE_LENGTH);
+  _edge_line_to (bw, rect->x + rect->width, rect->y + rect->height, CURVE_LENGTH);
 
-  cairo_curve_to (cr, 
-                  p1x,
-                  p1y,
-                  p1x,
-                  p1y,
-                  p3x, 
-                  p3y);
+  _edge_line_to (bw, rect->x, rect->y + rect->height, CURVE_LENGTH);
 
-  p3x = p2x + CURVE_LENGTH * pvx;
-  p3y = p2y + CURVE_LENGTH * pvy;
-  
-  cairo_line_to (cr, p3x, p3y);
+  _edge_line_to (bw, rect->x, rect->y, CURVE_LENGTH);
 
-  cairo_curve_to (cr, 
-                  p2x,
-                  p2y,
-                  p2x,
-                  p2y,
-                  p2x, 
-                  p2y + CURVE_LENGTH);
-
-  cairo_line_to (cr, rect->x, rect->y + rect->height - CURVE_LENGTH);
-  p1x = rect->x + CURVE_LENGTH;
-  if (p1x < triangle[0].x)
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y + rect->height,
-                      rect->x,
-                      rect->y + rect->height,
-                      p1x, 
-                      rect->y + rect->height);
-      cairo_close_path (cr);
-    }
-  else
-    {
-      cairo_curve_to (cr, 
-                      rect->x,
-                      rect->y + rect->height,
-                      rect->x,
-                      rect->y + rect->height,
-                      triangle[0].x, 
-                      rect->y + rect->height);
-    }
-
-  return triangle[1];
+  _close_path (bw);
 
 }
 
 static void
-_stencil_bubble_no_arrow (cairo_t *cr,
-                          GdkRectangle *rect)
+_stencil_bubble (EggNotificationBubbleWidget *bw)
 {
+  GdkRectangle rect;
+  GtkRequisition req;
+  gint rect_border;
 
-  cairo_move_to (cr, rect->x + CURVE_LENGTH, rect->y + rect->height);
-
-  cairo_line_to (cr, rect->x + rect->width - CURVE_LENGTH, rect->y + rect->height);
-  cairo_curve_to (cr, 
-                  rect->x + rect->width,
-                  rect->y + rect->height,
-                  rect->x + rect->width,
-                  rect->y + rect->height,
-                  rect->x + rect->width, 
-                  rect->y + rect->height - CURVE_LENGTH);
-
-  cairo_line_to (cr, rect->x + rect->width, rect->y + CURVE_LENGTH);
-
-  cairo_curve_to (cr, 
-                  rect->x + rect->width,
-                  rect->y,
-                  rect->x + rect->width,
-                  rect->y,
-                  rect->x + rect->width - CURVE_LENGTH, 
-                  rect->y);
-
-  cairo_line_to (cr, rect->x + CURVE_LENGTH, rect->y);
-
-  cairo_curve_to (cr, 
-                  rect->x,
-                  rect->y,
-                  rect->x,
-                  rect->y,
-                  rect->x, 
-                  rect->y + CURVE_LENGTH);
-
-  cairo_line_to (cr, rect->x, rect->y + rect->height - CURVE_LENGTH);
+  gtk_widget_size_request (GTK_WIDGET (bw), &req);
   
-  cairo_curve_to (cr, 
-                  rect->x,
-                  rect->y + rect->height,
-                  rect->x,
-                  rect->y + rect->height,
-                  rect->x + CURVE_LENGTH, 
-                  rect->y + rect->height);
+  if (bw->draw_arrow)
+    rect_border = BORDER_SIZE - BORDER_LINE_WIDTH;
+  else
+    rect_border = BORDER_LINE_WIDTH;
 
-  cairo_close_path (cr);
+  rect.x = rect_border;
+  rect.y = rect_border;
+  rect.width = req.width - (rect_border * 2);
+  rect.height = req.height - (rect_border * 2);
 
+  _drawing_pipeline_clear (bw);
+
+  if (bw->draw_arrow)
+    {
+      GdkScreen *screen;
+      GdkRectangle monitor;
+      gint monitor_num;
+      gint orient;
+      gint orient_triangle;
+      gint x, y;
+
+      x = bw->x;
+      y = bw->y;
+      screen = gtk_window_get_screen (GTK_WINDOW(bw));
+      monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
+      gdk_screen_get_monitor_geometry (screen, monitor_num, &monitor);
+
+      /* TODO: draw corner cases */
+      if (x < (monitor.x + monitor.width) / 2)
+        orient_triangle = TRIANGLE_LEFT;
+      else
+        orient_triangle = TRIANGLE_RIGHT;
+ 
+      orient = ORIENT_TOP;
+
+      if ((y + req.height) > monitor.y + monitor.height)
+        orient = ORIENT_BOTTOM;
+
+      if (orient == ORIENT_TOP)
+        {
+          if (orient_triangle == TRIANGLE_RIGHT)
+            _stencil_bubble_top_right (bw, &rect);
+          else if (orient_triangle == TRIANGLE_LEFT)
+            _stencil_bubble_top_left (bw, &rect);
+        }
+      else if (orient == ORIENT_BOTTOM)
+        {
+          if (orient_triangle == TRIANGLE_RIGHT)
+            _stencil_bubble_bottom_right (bw, &rect);
+          else if (orient_triangle == TRIANGLE_LEFT)
+            _stencil_bubble_bottom_left (bw, &rect);
+        }
+    }
+  else
+    _stencil_bubble_no_arrow (bw, &rect);
 }
 
 static GdkColor
@@ -1034,18 +1002,11 @@ static void
 draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
 {
   GtkRequisition requisition;
-  gint x, y, w, h;
-  GdkScreen *screen;
-  gint monitor_num;
-  GdkRectangle monitor;
-  GdkRectangle rectangle;
+  gint w, h;
   cairo_pattern_t *pat;
   GdkPixmap *mask;
   GdkPoint arrow_pos;
   
-  int orient;
-  int orient_triangle;  
-  guint rectangle_border;
   GtkWidget *widget;
   cairo_t *cairo_context;
   cairo_t *mask_cr;
@@ -1063,30 +1024,10 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   can_composite = bubble_widget->can_composite;
 
   _calculate_colors_from_style (bubble_widget);
- 
-  x = bubble_widget->x;
-  y = bubble_widget->y;
-
-  gtk_window_move (GTK_WINDOW (widget), x, y);
-
-  screen = gtk_window_get_screen (GTK_WINDOW(widget));
-  monitor_num = gdk_screen_get_monitor_at_window (screen, widget->window);
-  gdk_screen_get_monitor_geometry (screen, monitor_num, &monitor);
-
-  if (x < (monitor.x + monitor.width) / 2)
-    {
-      orient_triangle = TRIANGLE_LEFT;
-    }
-  else
-    { 
-      orient_triangle = TRIANGLE_RIGHT;
-    }
 
   gtk_widget_size_request (widget, &requisition);
   w = requisition.width;
   h = requisition.height;
-
-  g_message ("w %i, h %i", w, h);
 
   if (!can_composite)
     {
@@ -1094,70 +1035,9 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
       mask_cr = gdk_cairo_create ((GdkDrawable *) mask);
     }
 
-  orient = ORIENT_TOP;
-
-  if ((y + h) > monitor.y + monitor.height)
-    {
-      y -= (h + 5);
-      orient = ORIENT_BOTTOM;
-    }
-  else
-    y = y + 5;
-
-  if (bubble_widget->draw_arrow)
-    rectangle_border = BORDER_SIZE-2; 
-  else
-    rectangle_border = 2;
-
-  rectangle.x = rectangle_border;
-  rectangle.y = rectangle_border;
-  rectangle.width = w - (rectangle_border * 2);
-  rectangle.height = h - (rectangle_border * 2);
-
-  if (bubble_widget->draw_arrow)
-    {
-      if (orient == ORIENT_TOP)
-        {
-          if (orient_triangle == TRIANGLE_LEFT)
-            {
-              arrow_pos = 
-                _stencil_bubble_top_left (cairo_context, &rectangle, x, y);
-              if (!can_composite)
-                _stencil_bubble_top_left (mask_cr, &rectangle, x, y);
-            }
-          else
-            {
-              arrow_pos = 
-                _stencil_bubble_top_right (cairo_context, &rectangle, x, y);
-              if (!can_composite)
-                _stencil_bubble_top_right (mask_cr, &rectangle, x, y);
-            }
-        }
-      else
-        {
-          if (orient_triangle == TRIANGLE_LEFT)
-            {
-              arrow_pos = 
-                _stencil_bubble_bottom_left (cairo_context, &rectangle, x, y);
-              if (!can_composite)
-                _stencil_bubble_bottom_left (mask_cr, &rectangle, x, y);
-            }
-          else
-            {
-              arrow_pos = 
-                _stencil_bubble_bottom_right (cairo_context, &rectangle, x, y);
-              if (!can_composite)
-                _stencil_bubble_bottom_right (mask_cr, &rectangle, x, y);
-            }
-        }
-    }
-  else  /* draw without arrow */
-    {
-      _stencil_bubble_no_arrow (cairo_context, &rectangle);
-      if (!can_composite)
-        _stencil_bubble_no_arrow (mask_cr, &rectangle);
-    }
-  //cairo_set_source_rgba (cairo_context, 0.43, 0.49, 0.55, 1);
+  g_list_foreach (bubble_widget->dp.pipeline, (GFunc) _drawing_instruction_draw, cairo_context);
+  if (!can_composite)
+    g_list_foreach (bubble_widget->dp.pipeline, (GFunc) _drawing_instruction_draw, mask_cr);
 
   if (can_composite)
     cairo_set_source_rgba (cairo_context, 1, 1, 1, 0);

@@ -1,3 +1,23 @@
+2006-01-03  John (J5) Palmieri  <johnp@redhat.com>
+
+	* src/eggnotificationbubblewidget.h (struct _DrawingPipeline):
+	Added intermediate pipeline for graphics rendering
+
+	* src/eggnotificationbubblewidget.c 
+	(_stencil_bubble*): These methods now take care of prerendering
+	the graphics to the pipeline and calculating the x, y offset of
+	the arrow
+	(struct DrawingInstruction): intermediate drawing primitive
+	(_drawing_instruction_*): New internal methods for manipulating
+	drawing instructions
+	(_edge_line_to, _close_path): internal convinience methods for
+	drawing skewed lines attached by rounded corners (i.e. you can
+	draw a box and specify the radius of each corner)
+	(egg_notification_bubble_widget_set_pos): prerender the bubble here
+	to get arrow offsets
+	(draw_bubble_widget): Take out all calculations from this expose
+	handler and simply render the precalculated pipeline
+	 
 2005-12-14  John (J5) Palmieri  <johnp@redhat.com>
 
 	* Release 0.3.1

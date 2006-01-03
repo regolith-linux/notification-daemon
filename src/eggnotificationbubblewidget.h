@@ -35,6 +35,21 @@ typedef struct _EggNotificationBubbleWidget	 EggNotificationBubbleWidget;
 typedef struct _EggNotificationBubbleWidgetClass EggNotificationBubbleWidgetClass;
 typedef struct _EggNotificationBubbleWidgetData	 EggNotificationBubbleWidgetData;
 
+struct _DrawingPipeline
+{
+  gint start_x;
+  gint start_y;
+  gint start_corner_radius;
+
+  gint last_x;
+  gint last_y;
+  gint last_corner_radius;
+
+  gboolean is_clear;
+
+  GList *pipeline;
+}; 
+
 struct _EggNotificationBubbleWidget
 {
   GtkWindow parent_instance;
@@ -51,6 +66,7 @@ struct _EggNotificationBubbleWidget
   PangoLayout *body_layout;
 
   gint x, y;
+  gint offset_x, offset_y;
   gboolean can_composite;
   gboolean draw_arrow;
 
@@ -59,6 +75,9 @@ struct _EggNotificationBubbleWidget
   GdkColor bg_start_gradient;
   GdkColor bg_end_gradient;
   GdkColor border_color;
+
+  /* drawing instructions */
+  struct _DrawingPipeline dp;
 };
 
 struct _EggNotificationBubbleWidgetClass
