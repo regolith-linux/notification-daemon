@@ -600,7 +600,7 @@ egg_notification_bubble_widget_set (EggNotificationBubbleWidget *bubble_widget,
   bubble_widget->bubble_widget_header_text = g_strdup (bubble_widget_header_text);
   bubble_widget->bubble_widget_body_text = g_strdup (bubble_widget_body_text);
 
-  if (icon != NULL || strcmp (icon, "") != 0)
+  if (icon != NULL && strcmp (icon, "") != 0)
     {
       if (g_str_has_prefix (icon, "file://"))
         {

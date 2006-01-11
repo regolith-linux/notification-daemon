@@ -143,6 +143,8 @@ AC_CONFIG_FILES([
 Makefile
 notification-daemon.service
 src/Makefile
+themes/Makefile
+themes/bubble/Makefile
 ])
 
 AC_OUTPUT
