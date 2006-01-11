@@ -25,12 +25,12 @@
 #include <gtk/gtk.h>
 #include "eggnotificationbubblewidget.h"
 
-#define BORDER_SIZE 30 
+#define BORDER_SIZE 30
 #define BORDER_LINE_WIDTH 2
-#define CURVE_LENGTH 25 
-#define TRIANGLE_START 45 
-#define TRIANGLE_WIDTH 60 
-#define TEXT_WIDTH_THRESHOLD 100 
+#define CURVE_LENGTH 25
+#define TRIANGLE_START 45
+#define TRIANGLE_WIDTH 60
+#define TEXT_WIDTH_THRESHOLD 100
 
 
 static void egg_notification_bubble_widget_class_init        (EggNotificationBubbleWidgetClass *klass);
@@ -39,11 +39,11 @@ static void egg_notification_bubble_widget_finalize          (GObject        *ob
 static void egg_notification_bubble_widget_event_handler     (GtkWidget   *widget,
                                                               GdkEvent    *event,
                                                               gpointer     user_data);
-static gboolean egg_notification_bubble_widget_expose        (GtkWidget *widget, 
+static gboolean egg_notification_bubble_widget_expose        (GtkWidget *widget,
                                                               GdkEventExpose *event);
 
-static gboolean egg_notification_bubble_widget_body_label_expose_handler (GtkWidget *widget, 
-                                                                          GdkEventExpose *event, 
+static gboolean egg_notification_bubble_widget_body_label_expose_handler (GtkWidget *widget,
+                                                                          GdkEventExpose *event,
                                                                           EggNotificationBubbleWidget *bw);
 
 static void egg_notification_bubble_widget_context_changed_handler (EggNotificationBubbleWidget      *bubble_widget);
@@ -62,7 +62,7 @@ static GtkWindowClass *parent_class;
 
 #define BEVEL_ALPHA_LIGHT  0.2
 #define BEVEL_ALPHA_MEDIUM 0.5
-#define BEVEL_ALPHA_DARK   0.8 
+#define BEVEL_ALPHA_DARK   0.8
 
 enum
 {
@@ -75,23 +75,23 @@ enum
 typedef struct _DrawingInstruction
 {
   gint type;
-  
+
   gint end_x, end_y;
   gint corner_x, corner_y;
 } DrawingInstruction;
 
-enum 
+enum
 {
     ORIENT_TOP    = 0,
     ORIENT_BOTTOM = 1,
     ORIENT_LEFT   = 2,
     ORIENT_RIGHT  = 3
-}; 
+};
 
 enum {
     TRIANGLE_LEFT = 0,
     TRIANGLE_RIGHT = 1
-}; 
+};
 
 enum
 {
@@ -159,7 +159,7 @@ static void
 egg_notification_bubble_widget_init (EggNotificationBubbleWidget *bubble_widget)
 {
   GtkWindow *win;
-  
+
   win = GTK_WINDOW (bubble_widget);
 
   bubble_widget->can_composite = FALSE;
@@ -170,7 +170,7 @@ egg_notification_bubble_widget_init (EggNotificationBubbleWidget *bubble_widget)
   bubble_widget->dp.is_clear = TRUE;
   bubble_widget->dp.pipeline = NULL;
   bubble_widget->draw_arrow = FALSE;
- 
+
   _populate_window (bubble_widget);
 
 }
@@ -196,20 +196,20 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
     gtk_container_set_border_width (GTK_CONTAINER (bubble_widget), 10);
 
   if (gtk_widget_get_parent (bubble_widget->icon))
-    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table),
                           bubble_widget->icon);
 
   if (gtk_widget_get_parent (bubble_widget->bubble_widget_header_label))
-    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table),
                           bubble_widget->bubble_widget_header_label);
 
   if (gtk_widget_get_parent (bubble_widget->bubble_widget_body_label))
-    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table),
                           bubble_widget->bubble_widget_body_label);
 
   if (bubble_widget->button_hbox != NULL &&
         gtk_widget_get_parent (bubble_widget->button_hbox) != NULL)
-    gtk_container_remove (GTK_CONTAINER (bubble_widget->table), 
+    gtk_container_remove (GTK_CONTAINER (bubble_widget->table),
                         bubble_widget->button_hbox);
 
   if (alignment == TRIANGLE_LEFT)
@@ -261,7 +261,7 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
                           0, 2, 2, 3,
                           GTK_FILL, GTK_FILL,
                           0, 0);
-     
+
       }
 
     gtk_widget_show_all (bubble_widget->table);
@@ -270,7 +270,7 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
 static void
 _drawing_instruction_internal_add (GList **pipeline,
                                    guint type,
-                                   gint end_x, gint end_y, 
+                                   gint end_x, gint end_y,
                                    gint corner_x, gint corner_y)
 {
   DrawingInstruction *di;
@@ -286,22 +286,22 @@ _drawing_instruction_internal_add (GList **pipeline,
 }
 
 static void
-_drawing_instruction_move (GList **pipeline, 
+_drawing_instruction_move (GList **pipeline,
                            gint x, gint y)
 {
   _drawing_instruction_internal_add (pipeline, DRAW_MOVE, x, y, 0, 0);
 }
 
 static void
-_drawing_instruction_line (GList **pipeline, 
+_drawing_instruction_line (GList **pipeline,
                            gint x, gint y)
 {
   _drawing_instruction_internal_add (pipeline, DRAW_LINE, x, y, 0, 0);
 }
 
 static void
-_drawing_instruction_cap  (GList **pipeline, 
-                           gint x, gint y, 
+_drawing_instruction_cap  (GList **pipeline,
+                           gint x, gint y,
                            gint corner_x, gint corner_y)
 {
   _drawing_instruction_internal_add (pipeline, DRAW_CAP, x, y, corner_x, corner_y);
@@ -321,14 +321,14 @@ _calc_point_on_line (x1, y1, x2, y2, dist)
   GdkPoint result;
   gint dx, dy;
   gdouble d, vx, vy;
-  
+
   dx = x2 - x1;
   dy = y2 - y1;
 
   d = sqrt (dx * dx + dy * dy);
   vx = dx / d;
   vy = dy / d;
-  
+
   result.x = x1 + dist * vx;
   result.y = y1 + dist * vy;
 
@@ -352,14 +352,14 @@ _edge_line_to (EggNotificationBubbleWidget *bw,
       GdkPoint start_p;
       GdkPoint end_p;
 
-      start_p = _calc_point_on_line (bw->dp.last_x, 
+      start_p = _calc_point_on_line (bw->dp.last_x,
                                      bw->dp.last_y,
                                      x,
                                      y,
                                      bw->dp.last_corner_radius);
       end_p = _calc_point_on_line (x,
                                    y,
-                                   bw->dp.last_x, 
+                                   bw->dp.last_x,
                                    bw->dp.last_y,
                                    corner_radius);
 
@@ -368,7 +368,7 @@ _edge_line_to (EggNotificationBubbleWidget *bw,
         _drawing_instruction_move (&bw->dp.pipeline, start_p.x, start_p.y);
       else
         _drawing_instruction_cap (&bw->dp.pipeline,
-                                  start_p.x, 
+                                  start_p.x,
                                   start_p.y,
                                   bw->dp.last_x,
                                   bw->dp.last_y);
@@ -389,27 +389,27 @@ _close_path (EggNotificationBubbleWidget *bw)
   GdkPoint end_p;
   DrawingInstruction *di;
 
-  start_p = _calc_point_on_line (bw->dp.last_x, 
+  start_p = _calc_point_on_line (bw->dp.last_x,
                                  bw->dp.last_y,
                                  bw->dp.start_x,
                                  bw->dp.start_y,
                                  bw->dp.last_corner_radius);
-                                 
+
   end_p = _calc_point_on_line (bw->dp.start_x,
                                bw->dp.start_y,
-                               bw->dp.last_x, 
+                               bw->dp.last_x,
                                bw->dp.last_y,
                                bw->dp.start_corner_radius);
 
-  
+
   _drawing_instruction_cap (&bw->dp.pipeline,
-                             start_p.x, 
+                             start_p.x,
                              start_p.y,
                              bw->dp.last_x,
                              bw->dp.last_y);
- 
+
   _drawing_instruction_line (&bw->dp.pipeline,
-                             end_p.x, 
+                             end_p.x,
                              end_p.y);
 
   di = (DrawingInstruction *) bw->dp.pipeline->data;
@@ -435,7 +435,7 @@ _drawing_instruction_draw (DrawingInstruction *di, cairo_t *cr)
         cairo_line_to (cr, di->end_x, di->end_y);
       break;
       case DRAW_CAP:
-        cairo_curve_to (cr, 
+        cairo_curve_to (cr,
                         di->corner_x, di->corner_y,
                         di->corner_x, di->corner_y,
                         di->end_x, di->end_y);
@@ -462,7 +462,7 @@ _populate_window (EggNotificationBubbleWidget *bubble_widget)
   GtkWidget *widget;
 
   g_return_if_fail (EGG_IS_NOTIFICATION_BUBBLE_WIDGET (bubble_widget));
- 
+
   widget = GTK_WIDGET (bubble_widget);
 
   gtk_widget_add_events (widget, GDK_BUTTON_PRESS_MASK);
@@ -490,7 +490,7 @@ _populate_window (EggNotificationBubbleWidget *bubble_widget)
   bubble_widget->table = gtk_table_new (3, 2, FALSE);
   gtk_table_set_col_spacings (GTK_TABLE (bubble_widget->table), 5);
   gtk_table_set_row_spacings (GTK_TABLE (bubble_widget->table), 5);
- 
+
   gtk_container_add (GTK_CONTAINER (bubble_widget), bubble_widget->table);
 
   bubble_widget->body_layout = pango_layout_new (
@@ -499,7 +499,7 @@ _populate_window (EggNotificationBubbleWidget *bubble_widget)
 
   /* do a fake layout for now so we can calculate
      height and width */
-  _layout_window (bubble_widget, TRIANGLE_RIGHT); 
+  _layout_window (bubble_widget, TRIANGLE_RIGHT);
 
   g_signal_connect (bubble_widget, "style-set",
                     G_CALLBACK (egg_notification_bubble_widget_context_changed_handler),
@@ -512,7 +512,7 @@ _populate_window (EggNotificationBubbleWidget *bubble_widget)
   g_signal_connect_after (bubble_widget, "event-after",
                           G_CALLBACK (egg_notification_bubble_widget_event_handler),
                           bubble_widget);
-   
+
   g_signal_connect (bubble_widget->bubble_widget_body_label, "expose-event",
                     G_CALLBACK (egg_notification_bubble_widget_body_label_expose_handler),
                     bubble_widget);
@@ -525,7 +525,7 @@ _destroy_pixmap_data_func (guchar *pixels,
   g_free (pixels);
 }
 
-void 
+void
 egg_notification_bubble_widget_set_icon_from_data (EggNotificationBubbleWidget *bubble_widget,
                                                    const guchar *data,
                                                    gboolean has_alpha,
@@ -552,17 +552,17 @@ egg_notification_bubble_widget_set_icon_from_data (EggNotificationBubbleWidget *
 
 static void
 _calculate_pango_layout_from_aspect (PangoLayout *layout,
-                                     const char *text, 
+                                     const char *text,
                                      double factor)
 {
   gint len;
   gint w, h;
   double x;
-  
+
   len = strlen (text);
   pango_layout_set_width(layout, -1);
-  pango_layout_set_text (layout, text, len);
-  
+  pango_layout_set_markup(layout, text, len);
+
   pango_layout_get_pixel_size (layout, &w, &h);
 
   if (w > TEXT_WIDTH_THRESHOLD)
@@ -606,13 +606,13 @@ egg_notification_bubble_widget_set (EggNotificationBubbleWidget *bubble_widget,
         {
           gchar *icon_path = (gchar *) icon + (7 * sizeof (gchar));
           gtk_image_set_from_file (GTK_IMAGE (bubble_widget->icon), icon_path);
-        } 
-      else 
+        }
+      else
         {
           gtk_image_set_from_icon_name (GTK_IMAGE (bubble_widget->icon), icon, GTK_ICON_SIZE_DIALOG);
         }
     }
-    
+
   markupquoted = g_markup_escape_text (bubble_widget->bubble_widget_header_text, -1);
   markuptext = g_strdup_printf ("<span size=\"larger\" weight=\"ultrabold\">%s</span>", markupquoted);
   gtk_label_set_markup (GTK_LABEL (bubble_widget->bubble_widget_header_label), markuptext);
@@ -620,12 +620,12 @@ egg_notification_bubble_widget_set (EggNotificationBubbleWidget *bubble_widget,
   g_free (markupquoted);
 
   _calculate_pango_layout_from_aspect (bubble_widget->body_layout,
-                                       bubble_widget->bubble_widget_body_text, 
+                                       bubble_widget->bubble_widget_body_text,
                                        0.25);
 
   pango_layout_get_pixel_size (bubble_widget->body_layout, &w, &h);
   gtk_widget_set_size_request (bubble_widget->bubble_widget_body_label, w, h);
-  
+
 }
 
 
@@ -652,9 +652,9 @@ egg_notification_bubble_widget_set_pos (EggNotificationBubbleWidget   *bubble_wi
       _layout_window (bubble_widget, TRIANGLE_RIGHT);
 
   _stencil_bubble (bubble_widget);
-  
-  gtk_window_move (GTK_WINDOW (bubble_widget), 
-                   x - bubble_widget->offset_x, 
+
+  gtk_window_move (GTK_WINDOW (bubble_widget),
+                   x - bubble_widget->offset_x,
                    y - bubble_widget->offset_y);
 }
 
@@ -679,7 +679,7 @@ egg_notification_bubble_widget_screen_changed (GtkWidget *widget,
   GdkScreen *screen;
   GdkColormap *colormap;
   gboolean can_composite;
- 
+
   bw = EGG_NOTIFICATION_BUBBLE_WIDGET (widget);
 
   widget_parent_class = (GtkWidgetClass *)parent_class;
@@ -687,25 +687,25 @@ egg_notification_bubble_widget_screen_changed (GtkWidget *widget,
     widget_parent_class->screen_changed (widget, old_screen);
 
   can_composite = TRUE;
-  
+
   screen = gtk_widget_get_screen (widget);
   colormap = gdk_screen_get_rgba_colormap (screen);
-  
+
   if (!colormap)
     {
       colormap = gdk_screen_get_rgb_colormap (screen);
       can_composite = FALSE;
     }
-    
+
   gtk_widget_set_colormap (widget, colormap);
-  
+
   bw->can_composite = can_composite;
 }
 
 
 static gboolean
-egg_notification_bubble_widget_body_label_expose_handler (GtkWidget *widget, 
-                                                          GdkEventExpose *event, 
+egg_notification_bubble_widget_body_label_expose_handler (GtkWidget *widget,
+                                                          GdkEventExpose *event,
                                                           EggNotificationBubbleWidget *bw)
 {
   cairo_t *cr;
@@ -713,9 +713,9 @@ egg_notification_bubble_widget_body_label_expose_handler (GtkWidget *widget,
 
   cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
-  cairo_set_source_rgba (cr, bw->body_text_color.red, 
-                             bw->body_text_color.green, 
-                             bw->body_text_color.blue, 
+  cairo_set_source_rgba (cr, bw->body_text_color.red,
+                             bw->body_text_color.green,
+                             bw->body_text_color.blue,
                              0.60);
   cairo_move_to (cr, event->area.x, event->area.y);
 
@@ -727,24 +727,24 @@ egg_notification_bubble_widget_body_label_expose_handler (GtkWidget *widget,
   return TRUE;
 }
 
-static gboolean 
+static gboolean
 egg_notification_bubble_widget_expose (GtkWidget *widget, GdkEventExpose *event)
 {
   GtkWidgetClass *widget_parent_class;
   EggNotificationBubbleWidget *bw;
 
   bw = EGG_NOTIFICATION_BUBBLE_WIDGET (widget);
-  
+
   draw_bubble_widget (bw);
 
   widget_parent_class = (GtkWidgetClass *)parent_class;
   if (widget_parent_class->expose_event)
     widget_parent_class->expose_event (widget, event);
 
-  return TRUE; 
+  return TRUE;
 }
 
-static void 
+static void
 _stencil_bubble_top_right (EggNotificationBubbleWidget *bw,
                            GdkRectangle *rect)
 {
@@ -775,7 +775,7 @@ _stencil_bubble_top_right (EggNotificationBubbleWidget *bw,
   _close_path (bw);
 }
 
-static void 
+static void
 _stencil_bubble_top_left  (EggNotificationBubbleWidget *bw,
                            GdkRectangle *rect)
 {
@@ -827,7 +827,7 @@ _stencil_bubble_bottom_right (EggNotificationBubbleWidget *bw,
   _edge_line_to (bw, triangle[1].x, triangle[1].y, 0);
   _edge_line_to (bw, triangle[0].x, triangle[0].y, 0);
 
-   
+
   _edge_line_to (bw, rect->x, rect->y + rect->height, CURVE_LENGTH);
   _edge_line_to (bw, rect->x, rect->y - BORDER_SIZE + 5, CURVE_LENGTH);
   _edge_line_to (bw, rect->x + rect->width, rect->y, CURVE_LENGTH);
@@ -836,7 +836,7 @@ _stencil_bubble_bottom_right (EggNotificationBubbleWidget *bw,
   _close_path (bw);
 }
 
-static void 
+static void
 _stencil_bubble_bottom_left  (EggNotificationBubbleWidget *bw,
                               GdkRectangle *rect)
 {
@@ -890,7 +890,7 @@ _stencil_bubble (EggNotificationBubbleWidget *bw)
   gint rect_border;
 
   gtk_widget_size_request (GTK_WIDGET (bw), &req);
-  
+
   if (bw->draw_arrow)
     rect_border = BORDER_SIZE - BORDER_LINE_WIDTH;
   else
@@ -923,7 +923,7 @@ _stencil_bubble (EggNotificationBubbleWidget *bw)
         orient_triangle = TRIANGLE_LEFT;
       else
         orient_triangle = TRIANGLE_RIGHT;
- 
+
       orient = ORIENT_TOP;
 
       if ((y + req.height) > monitor.y + monitor.height)
@@ -953,10 +953,10 @@ _blend_colors (GdkColor color1, GdkColor color2, gdouble factor)
 {
   GdkColor result;
   gint channel_intensity;
-  
+
   channel_intensity = color1.red * factor + color2.red * (1 - factor);
   result.red = CLAMP (channel_intensity, 0, 65535);
-  
+
   channel_intensity = color1.green * factor + color2.green * (1 - factor);
   result.green = CLAMP (channel_intensity, 0, 65535);
 
@@ -980,7 +980,7 @@ _calculate_colors_from_style (EggNotificationBubbleWidget *bw)
   GdkColor bg_start_gradient;
 
   widget = GTK_WIDGET (bw);
-  
+
   gtk_widget_ensure_style (widget);
   style = widget->style;
 
@@ -989,9 +989,9 @@ _calculate_colors_from_style (EggNotificationBubbleWidget *bw)
   bg_start_gradient = style->base[GTK_STATE_NORMAL];
   bg_end_gradient = style->bg[GTK_STATE_SELECTED];
   border_color = style->mid[GTK_STATE_NORMAL];
-  
+
   bg_end_gradient = _blend_colors (bg_start_gradient, bg_end_gradient, 0.25);
- 
+
   bw->header_text_color = header_text_color;
   bw->body_text_color = body_text_color;
   bw->bg_start_gradient = bg_start_gradient;
@@ -1008,7 +1008,7 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   cairo_pattern_t *pat;
   GdkPixmap *mask;
   GdkPoint arrow_pos;
-  
+
   GtkWidget *widget;
   cairo_t *cairo_context;
   cairo_t *mask_cr;
@@ -1016,13 +1016,13 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
 
   mask_cr = NULL;
   mask = NULL;
-  
+
   arrow_pos.x = 0;
-  arrow_pos.y = 0; 
+  arrow_pos.y = 0;
 
   widget = GTK_WIDGET(bubble_widget);
   cairo_context = gdk_cairo_create (widget->window);
-  
+
   can_composite = bubble_widget->can_composite;
 
   _calculate_colors_from_style (bubble_widget);
@@ -1044,29 +1044,29 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   if (can_composite)
     cairo_set_source_rgba (cairo_context, 1, 1, 1, 0);
   else
-    cairo_set_source_rgba (cairo_context, 
-                           bubble_widget->border_color.red / 65535.0, 
+    cairo_set_source_rgba (cairo_context,
+                           bubble_widget->border_color.red / 65535.0,
                            bubble_widget->border_color.green / 65535.0,
                            bubble_widget->border_color.blue / 65535.0, 1);
-                         
+
   cairo_set_operator (cairo_context, CAIRO_OPERATOR_SOURCE);
   cairo_paint (cairo_context);
- 
+
   cairo_set_operator (cairo_context, CAIRO_OPERATOR_OVER);
 
   pat = cairo_pattern_create_linear (0.0, 0.0,  0.0, h);
   //cairo_pattern_add_color_stop_rgba (pat, 1, 0.59, 0.76, 0.93, 1);
-  cairo_pattern_add_color_stop_rgba (pat, 0, 
+  cairo_pattern_add_color_stop_rgba (pat, 0,
                                      bubble_widget->bg_start_gradient.red /
-                                     65535.0, 
+                                     65535.0,
                                      bubble_widget->bg_start_gradient.green /
                                      65535.0,
                                      bubble_widget->bg_start_gradient.blue /
                                      65535.0, 1);
 
-  cairo_pattern_add_color_stop_rgba (pat, 1, 
+  cairo_pattern_add_color_stop_rgba (pat, 1,
                                      bubble_widget->bg_end_gradient.red /
-                                     65535.0, 
+                                     65535.0,
                                      bubble_widget->bg_end_gradient.green /
                                      65535.0,
                                      bubble_widget->bg_end_gradient.blue /
@@ -1075,7 +1075,7 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
   cairo_set_source (cairo_context, pat);
   cairo_fill_preserve (cairo_context);
   cairo_pattern_destroy (pat);
-  
+
   cairo_set_line_width (cairo_context, 3.5);
   cairo_set_source_rgba (cairo_context, 0.43, 0.49, 0.55, 1);
   cairo_stroke (cairo_context);
@@ -1100,7 +1100,7 @@ draw_bubble_widget (EggNotificationBubbleWidget *bubble_widget)
     }
 
   cairo_destroy (cairo_context);
- 
+
   bubble_widget->active = TRUE;
 }
 
@@ -1120,12 +1120,12 @@ egg_notification_bubble_widget_hide (EggNotificationBubbleWidget *bubble_widget)
 EggNotificationBubbleWidget*
 egg_notification_bubble_widget_new (void)
 {
-  return g_object_new (EGG_TYPE_NOTIFICATION_BUBBLE_WIDGET, 
-                       "type", GTK_WINDOW_POPUP, 
+  return g_object_new (EGG_TYPE_NOTIFICATION_BUBBLE_WIDGET,
+                       "type", GTK_WINDOW_POPUP,
                        NULL);
 }
 
-static void 
+static void
 egg_notification_bubble_widget_context_changed_handler (EggNotificationBubbleWidget *bubble_widget)
 {
   pango_layout_context_changed (bubble_widget->body_layout);
@@ -1151,7 +1151,7 @@ egg_notification_bubble_widget_event_handler (GtkWidget *widget,
     }
 }
 
-GtkWidget *      
+GtkWidget *
 egg_notification_bubble_widget_create_button (EggNotificationBubbleWidget *bubble_widget,
                                               const gchar *label)
 {
@@ -1172,10 +1172,10 @@ egg_notification_bubble_widget_create_button (EggNotificationBubbleWidget *bubbl
 
   gtk_container_add (GTK_CONTAINER (b), l);
 
-  gtk_widget_show_all (b); 
-  
+  gtk_widget_show_all (b);
+
   if (bubble_widget->button_hbox == NULL)
-    bubble_widget->button_hbox = gtk_hbox_new (FALSE, 0); 
+    bubble_widget->button_hbox = gtk_hbox_new (FALSE, 0);
 
   gtk_box_pack_end (GTK_BOX (bubble_widget->button_hbox),
                     b,
@@ -1195,7 +1195,7 @@ egg_notification_bubble_widget_clear_buttons (EggNotificationBubbleWidget *bubbl
 }
 
 void
-egg_notification_bubble_widget_set_draw_arrow (EggNotificationBubbleWidget *bubble_widget, 
+egg_notification_bubble_widget_set_draw_arrow (EggNotificationBubbleWidget *bubble_widget,
                                                gboolean value)
 {
   bubble_widget->draw_arrow = value;

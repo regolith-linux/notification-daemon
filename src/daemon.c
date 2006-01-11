@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.  
+ * 02111-1307, USA.
  */
 
 #include "config.h"
@@ -102,7 +102,7 @@ notify_daemon_init (NotifyDaemon * daemon)
 
   daemon->priv->next_id = 1;
   daemon->priv->timeout_source = 0;
-  daemon->priv->notification_hash = g_hash_table_new_full ((GHashFunc) g_int_hash, 
+  daemon->priv->notification_hash = g_hash_table_new_full ((GHashFunc) g_int_hash,
                                                            (GEqualFunc) g_int_equal,
                                                            (GDestroyNotify) g_free,
                                                            (GDestroyNotify) _notify_timeout_destroy);
@@ -153,11 +153,11 @@ _emit_action_invoked_signal (GObject *notify_widget, gchar *action)
   else
     {
       DBusMessage *message;
-          
+
       gchar *dest;
       guint id;
-        
-      message = dbus_message_new_signal ("/org/freedesktop/Notifications", 
+
+      message = dbus_message_new_signal ("/org/freedesktop/Notifications",
                                          "org.freedesktop.Notifications",
                                          "ActionInvoked");
 
@@ -167,14 +167,14 @@ _emit_action_invoked_signal (GObject *notify_widget, gchar *action)
 
       g_assert (dest != NULL);
 
-      dbus_message_set_destination (message, dest); 
-      dbus_message_append_args (message, 
-                                DBUS_TYPE_UINT32, &id, 
+      dbus_message_set_destination (message, dest);
+      dbus_message_append_args (message,
+                                DBUS_TYPE_UINT32, &id,
                                 DBUS_TYPE_STRING, &action,
                                 DBUS_TYPE_INVALID);
-                                 
+
       dbus_connection_send (con, message, NULL);
-     
+
       dbus_message_unref (message);
       dbus_connection_unref (con);
     }
@@ -198,11 +198,11 @@ _emit_closed_signal (GObject *notify_widget)
   else
     {
       DBusMessage *message;
-          
+
       gchar *dest;
       guint id;
-        
-      message = dbus_message_new_signal ("/org/freedesktop/Notifications", 
+
+      message = dbus_message_new_signal ("/org/freedesktop/Notifications",
                                          "org.freedesktop.Notifications",
                                          "NotificationClosed");
 
@@ -213,20 +213,20 @@ _emit_closed_signal (GObject *notify_widget)
 
       g_assert (dest != NULL);
 
-      dbus_message_set_destination (message, dest); 
-      dbus_message_append_args (message, 
+      dbus_message_set_destination (message, dest);
+      dbus_message_append_args (message,
                                 DBUS_TYPE_UINT32, &id,
                                 DBUS_TYPE_INVALID);
-                                 
+
       dbus_connection_send (con, message, NULL);
-     
+
       dbus_message_unref (message);
       dbus_connection_unref (con);
     }
 }
 
 static void
-_close_notification (NotifyDaemon *daemon, 
+_close_notification (NotifyDaemon *daemon,
                      guint id)
 {
   NotifyDaemonPrivate *priv;
@@ -281,7 +281,7 @@ _is_expired (gpointer key,
     }
 
   *phas_more_timeouts = TRUE;
-  
+
   return FALSE;
 }
 
@@ -295,8 +295,8 @@ _check_expiration (gpointer data)
 
   daemon = (NotifyDaemon *) data;
 
-  g_hash_table_foreach_remove (daemon->priv->notification_hash, 
-                                (GHRFunc) _is_expired, 
+  g_hash_table_foreach_remove (daemon->priv->notification_hash,
+                                (GHRFunc) _is_expired,
                                 (gpointer) &has_more_timeouts);
 
   if (!has_more_timeouts)
@@ -314,7 +314,7 @@ _calculate_timeout (NotifyDaemon *daemon, NotifyTimeout *nt, int timeout)
   else
     {
       gulong usec;
-    
+
       nt->has_timeout = TRUE;
       if (timeout == -1)
         timeout = NOTIFY_DAEMON_DEFAULT_TIMEOUT;
@@ -322,18 +322,18 @@ _calculate_timeout (NotifyDaemon *daemon, NotifyTimeout *nt, int timeout)
       usec = timeout * 1000; /* convert from msec to usec */
       g_get_current_time (&nt->expiration);
       g_time_val_add (&nt->expiration, usec);
-      
+
       if (daemon->priv->timeout_source == 0)
-        daemon->priv->timeout_source = 
-          g_timeout_add (500, 
-                         (GSourceFunc) _check_expiration, 
+        daemon->priv->timeout_source =
+          g_timeout_add (500,
+                         (GSourceFunc) _check_expiration,
                          (gpointer) daemon);
     }
 
 }
 
 static guint
-_store_notification (NotifyDaemon *daemon, 
+_store_notification (NotifyDaemon *daemon,
                      EggNotificationBubbleWidget *bw,
                      int timeout)
 {
@@ -343,7 +343,7 @@ _store_notification (NotifyDaemon *daemon,
   priv = daemon->priv;
   id = 0;
 
-  do 
+  do
     {
       id = priv->next_id;
 
@@ -356,23 +356,23 @@ _store_notification (NotifyDaemon *daemon,
         id = 0;
     }
   while (id == 0);
-  
+
   nt = (NotifyTimeout *) g_new0(NotifyTimeout, 1);
 
   nt->id = id;
   nt->widget = bw;
-  
+
   _calculate_timeout (daemon, nt, timeout);
-  
-  g_hash_table_insert (priv->notification_hash, 
-                       g_memdup(&id, sizeof (guint)), 
+
+  g_hash_table_insert (priv->notification_hash,
+                       g_memdup(&id, sizeof (guint)),
                        (gpointer) nt);
 
   return id;
 }
 
-static gboolean 
-_notify_daemon_process_icon_data (NotifyDaemon *daemon, 
+static gboolean
+_notify_daemon_process_icon_data (NotifyDaemon *daemon,
                                   EggNotificationBubbleWidget *bw,
                                   GValue *icon_data)
 {
@@ -384,21 +384,21 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
   int rowstride;
   int n_channels;
   gsize expected_len;
-  
+
   GValueArray *image_struct;
   GValue *value;
   GArray *tmp_array;
- 
+
   data = NULL;
- 
+
   if (!G_VALUE_HOLDS (icon_data, G_TYPE_VALUE_ARRAY))
     {
       g_warning ("_notify_daemon_process_icon_data expected a GValue of type GValueArray");
       return FALSE;
     }
- 
+
   image_struct = (GValueArray *) (g_value_get_boxed (icon_data));
-  
+
   value = g_value_array_get_nth (image_struct, 0);
   if (!value)
     {
@@ -413,7 +413,7 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
     }
 
   width = g_value_get_int (value);
-  
+
   value = g_value_array_get_nth (image_struct, 1);
   if (!value)
     {
@@ -503,7 +503,7 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
       return FALSE;
     }
 
-  tmp_array = (GArray *) g_value_get_boxed (value);  
+  tmp_array = (GArray *) g_value_get_boxed (value);
   expected_len = (height -1) * rowstride + width * ((n_channels * bits_per_sample + 7) / 8);
 
   if (expected_len != tmp_array->len)
@@ -525,14 +525,14 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
 }
 
 static void
-_notification_daemon_handle_bubble_widget_action (GtkWidget *b, 
+_notification_daemon_handle_bubble_widget_action (GtkWidget *b,
                                                   EggNotificationBubbleWidget *bw)
 {
   gchar *action;
 
   action = (gchar *) g_object_get_data (G_OBJECT (b), "_notify_action");
 
-  _emit_action_invoked_signal (G_OBJECT (bw), action);  
+  _emit_action_invoked_signal (G_OBJECT (bw), action);
 }
 
 static void
@@ -552,7 +552,7 @@ _remove_bubble_from_poptart_stack (EggNotificationBubbleWidget *bw,
   GSList *link;
 
   gint x, y;
-  
+
   priv = daemon->priv;
 
   link = priv->poptart_stack;
@@ -574,7 +574,7 @@ _remove_bubble_from_poptart_stack (EggNotificationBubbleWidget *bw,
       if (b != bw)
         {
           printf ("dude\n");
- 
+
           gtk_widget_size_request (GTK_WIDGET (b), &req);
 
           x = workarea.x + workarea.width - req.width;
@@ -582,7 +582,7 @@ _remove_bubble_from_poptart_stack (EggNotificationBubbleWidget *bw,
 
           egg_notification_bubble_widget_set_pos (b, x, y);
         }
-      else 
+      else
         {
           remove_link = link;
         }
@@ -595,17 +595,17 @@ _remove_bubble_from_poptart_stack (EggNotificationBubbleWidget *bw,
 }
 
 static void
-_notify_daemon_add_bubble_to_poptart_stack (NotifyDaemon *daemon, 
+_notify_daemon_add_bubble_to_poptart_stack (NotifyDaemon *daemon,
                                             EggNotificationBubbleWidget *bw)
 {
   NotifyDaemonPrivate *priv;
   GtkRequisition req;
   GdkRectangle workarea;
   GSList *link;
-  gint x, y;  
+  gint x, y;
 
   priv = daemon->priv;
- 
+
   gtk_widget_size_request (GTK_WIDGET (bw), &req);
 
   workarea.x = 0;
@@ -638,12 +638,12 @@ _notify_daemon_add_bubble_to_poptart_stack (NotifyDaemon *daemon,
 
   g_signal_connect(G_OBJECT(bw), "destroy",
 				   G_CALLBACK(_remove_bubble_from_poptart_stack), daemon);
-  priv->poptart_stack = g_slist_prepend (priv->poptart_stack, bw); 
+  priv->poptart_stack = g_slist_prepend (priv->poptart_stack, bw);
 }
 
 
 
-gboolean 
+gboolean
 notify_daemon_notify_handler (NotifyDaemon *daemon,
                               const gchar *app_name,
                               const gchar *icon,
@@ -673,7 +673,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
   priv = daemon->priv;
   bw = NULL;
   if (id > 0)
-    nt = (NotifyTimeout *) 
+    nt = (NotifyTimeout *)
            g_hash_table_lookup (priv->notification_hash, &id);
 
   if (!nt)
@@ -687,7 +687,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
   use_pos_data = FALSE;
 
   egg_notification_bubble_widget_set (bw, summary, icon, body);
- 
+
   /* deal with x, and y hints */
   data = (GValue *) (g_hash_table_lookup (hints, "x"));
   if (data)
@@ -698,7 +698,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
       if (data)
         {
           y = g_value_get_int (data);
-          use_pos_data = TRUE;       
+          use_pos_data = TRUE;
         }
     }
 
@@ -720,15 +720,15 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         }
 
       b = egg_notification_bubble_widget_create_button (bw, l);
-       
-      g_object_set_data_full (G_OBJECT (b), 
-                              "_notify_action", 
-                              g_strdup (actions[i]), 
+
+      g_object_set_data_full (G_OBJECT (b),
+                              "_notify_action",
+                              g_strdup (actions[i]),
                               (GDestroyNotify) g_free);
 
-      g_signal_connect (b, 
+      g_signal_connect (b,
                         "clicked",
-                        (GCallback)_notification_daemon_handle_bubble_widget_action, 
+                        (GCallback)_notification_daemon_handle_bubble_widget_action,
                         bw);
 
       i = i + 2;
@@ -753,7 +753,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         _notify_daemon_process_icon_data (daemon, bw, data);
     }
 
-  g_signal_connect (bw, "clicked", (GCallback)_notification_daemon_handle_bubble_widget_default, daemon);  
+  g_signal_connect (bw, "clicked", (GCallback)_notification_daemon_handle_bubble_widget_default, daemon);
 
   egg_notification_bubble_widget_show (bw);
 
@@ -770,9 +770,9 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
 #endif
 
   g_object_set_data (G_OBJECT (bw), "_notify_id", GUINT_TO_POINTER (return_id));
-  g_object_set_data_full (G_OBJECT (bw), 
-                          "_notify_sender", 
-                          sender, 
+  g_object_set_data_full (G_OBJECT (bw),
+                          "_notify_sender",
+                          sender,
                           (GDestroyNotify) g_free);
 
   if (nt)
@@ -783,7 +783,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
   return TRUE;
 }
 
-gboolean 
+gboolean
 notify_daemon_close_notification_handler (NotifyDaemon *daemon,
                                           guint id,
                                           GError **error)

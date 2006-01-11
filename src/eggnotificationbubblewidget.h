@@ -48,7 +48,7 @@ struct _DrawingPipeline
   gboolean is_clear;
 
   GList *pipeline;
-}; 
+};
 
 struct _EggNotificationBubbleWidget
 {
