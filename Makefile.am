@@ -1,14 +1,14 @@
 SUBDIRS = src
 
 servicedir       = $(DBUS_SERVICES_DIR)
-service_DATA     = notify-daemon.service
+service_DATA     = notification-daemon.service
 
 EXTRA_DIST = \
 	AUTHORS NEWS INSTALL COPYING README \
 	ChangeLog \
 	autogen.sh \
 	configure.ac \
-	notify-daemon.service
+	notification-daemon.service
 
 $(OBJECTS): libtool
 libtool: $(LIBTOOL_DEPS)

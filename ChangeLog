@@ -1,3 +1,24 @@
+Tue Jan 10 23:56:01 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/Makefile.am:
+	A src/daemon.c:
+	A src/daemon.h:
+	A src/notificationdaemon.xml:
+	D src/notifydaemon.c:
+	D src/notifydaemon.h:
+	D src/notifydaemon.xml:
+	* Makefile.am:
+	* autogen.sh:
+	* configure.ac:
+	A notification-daemon.service.in:
+	D notify-daemon.service.in:
+	  - Rename from notify-daemon to notification-daemon. I've received a
+	    number of questions and some complaints about the name change,
+	    some of which are packaging concerns, some upgrade concerns, and
+	    just general confusion and "Why?" As this is the "Desktop
+	    Notifications" project, and due to reasons expressed to me from
+	    others, I feel it's best to revert the name.
+
 Tue Jan 10 23:32:55 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/eggnotificationbubblewidget.c:

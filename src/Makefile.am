@@ -1,18 +1,18 @@
-INCLUDES=-I$(top_srcdir) $(NOTIFY_DAEMON_CFLAGS)
+INCLUDES = -I$(top_srcdir) $(NOTIFICATION_DAEMON_CFLAGS)
 
-EXTRA_DIST=notifydaemon.xml
+EXTRA_DIST = notificationdaemon.xml
 
-libexec_PROGRAMS = notify-daemon
+libexec_PROGRAMS = notification-daemon
 
-notify_daemon_SOURCES=		\
+notification_daemon_SOURCES =		\
 	eggnotificationbubblewidget.c	\
 	eggnotificationbubblewidget.h	\
-	notifydaemon.c			\
-	notifydaemon.h
+	daemon.c			\
+	daemon.h
 
-notify_daemon_LDADD= $(NOTIFY_DAEMON_LIBS)
+notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 
-BUILT_SOURCES = notifydaemon-dbus-glue.h
+BUILT_SOURCES = notificationdaemon-dbus-glue.h
 
-notifydaemon-dbus-glue.h: notifydaemon.xml
-	dbus-binding-tool --mode=glib-server $(srcdir)/notifydaemon.xml > notifydaemon-dbus-glue.h
+notificationdaemon-dbus-glue.h: notificationdaemon.xml
+	dbus-binding-tool --mode=glib-server $(srcdir)/notificationdaemon.xml > notificationdaemon-dbus-glue.h

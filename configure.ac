@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notify-daemon, 0.3.1, johnp@redhat.com)
+AC_INIT(notification-daemon, 0.3.1, galago-devel@lists.freedesktop.org)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2005 John (J5) Palmieri])
@@ -12,36 +12,36 @@ AC_COPYRIGHT([Copyright 2005 John (J5) Palmieri])
 dnl ################################################################
 dnl # Version information
 dnl ################################################################
-NOTIFY_DAEMON_MAJOR_VERSION=0
-NOTIFY_DAEMON_MINOR_VERSION=3
-NOTIFY_DAEMON_MICRO_VERSION=1
-NOTIFY_DAEMON_DEVEL_VERSION=0
+NOTIFICATION_DAEMON_MAJOR_VERSION=0
+NOTIFICATION_DAEMON_MINOR_VERSION=3
+NOTIFICATION_DAEMON_MICRO_VERSION=1
+NOTIFICATION_DAEMON_DEVEL_VERSION=0
 
-NOTIFY_DAEMON_VERSION=$NOTIFY_DAEMON_MAJOR_VERSION.$NOTIFY_DAEMON_MINOR_VERSION.$NOTIFY_DAEMON_MICRO_VERSION
+NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_MICRO_VERSION
 
-if test "x$NOTIFY_DAEMON_DEVEL_VERSION" != "x0"; then
-	if test "x$NOTIFY_DAEMON_MICRO_VERSION" = "x0"; then
-		NOTIFY_DAEMON_MICRO_VERSION=$NOTIFY_DAEMON_DEVEL_VERSION
-		NOTIFY_DAEMON_VERSION=$NOTIFY_DAEMON_MAJOR_VERSION.$NOTIFY_DAEMON_MINOR_VERSION.$NOTIFY_DAEMON_DEVEL_VERSION
+if test "x$NOTIFICATION_DAEMON_DEVEL_VERSION" != "x0"; then
+	if test "x$NOTIFICATION_DAEMON_MICRO_VERSION" = "x0"; then
+		NOTIFICATION_DAEMON_MICRO_VERSION=$NOTIFICATION_DAEMON_DEVEL_VERSION
+		NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_DEVEL_VERSION
 	else
-		NOTIFY_DAEMON_VERSION=$NOTIFY_DAEMON_VERSION.$NOTIFY_DAEMON_DEVEL_VERSION
+		NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_VERSION.$NOTIFICATION_DAEMON_DEVEL_VERSION
 	fi
 fi
 
-AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_MAJOR_VERSION, $NOTIFY_DAEMON_MAJOR_VERSION,
-	[notify-daemon major version.])
-AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_MINOR_VERSION, $NOTIFY_DAEMON_MINOR_VERSION,
-	[notify-daemon minor version.])
-AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_MICRO_VERSION, $NOTIFY_DAEMON_MICRO_VERSION,
-	[notify-daemon micro version.])
-AC_DEFINE_UNQUOTED(NOTIFY_DAEMON_VERSION, "$NOTIFY_DAEMON_VERSION",
-	[notify-daemon version.])
+AC_DEFINE_UNQUOTED(NOTIFICATION_DAEMON_MAJOR_VERSION, $NOTIFICATION_DAEMON_MAJOR_VERSION,
+	[notification-daemon major version.])
+AC_DEFINE_UNQUOTED(NOTIFICATION_DAEMON_MINOR_VERSION, $NOTIFICATION_DAEMON_MINOR_VERSION,
+	[notification-daemon minor version.])
+AC_DEFINE_UNQUOTED(NOTIFICATION_DAEMON_MICRO_VERSION, $NOTIFICATION_DAEMON_MICRO_VERSION,
+	[notification-daemon micro version.])
+AC_DEFINE_UNQUOTED(NOTIFICATION_DAEMON_VERSION, "$NOTIFICATION_DAEMON_VERSION",
+	[notification-daemon version.])
 
 dnl ################################################################
 dnl # Initialize automake
 dnl ################################################################
-VERSION=$NOTIFY_DAEMON_VERSION
-PACKAGE=notify-daemon
+VERSION=$NOTIFICATION_DAEMON_VERSION
+PACKAGE=notification-daemon
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
@@ -70,9 +70,9 @@ AC_CHECK_LIB([popt], [poptGetArg], , AC_MSG_ERROR([Popt is required]))
 
 REQ_DBUS_VERSION=0.36
 pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= $REQ_DBUS_VERSION, dbus-glib-1 >= $REQ_DBUS_VERSION"
-PKG_CHECK_MODULES(NOTIFY_DAEMON, [$pkg_modules])
-AC_SUBST(NOTIFY_DAEMON_CFLAGS)
-AC_SUBST(NOTIFY_DAEMON_LIBS)
+PKG_CHECK_MODULES(NOTIFICATION_DAEMON, [$pkg_modules])
+AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
+AC_SUBST(NOTIFICATION_DAEMON_LIBS)
 
 gdk_modules="gdk-2.0 gdk-pixbuf-2.0"
 PKG_CHECK_MODULES(GDK, [$gdk_modules], have_gdk=yes,
@@ -141,7 +141,7 @@ dnl # Output the Makefiles
 dnl ################################################################
 AC_CONFIG_FILES([
 Makefile
-notify-daemon.service
+notification-daemon.service
 src/Makefile
 ])
 

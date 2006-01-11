@@ -19,9 +19,9 @@
  */
 
 #include "config.h"
-#include "notifydaemon.h"
+#include "daemon.h"
 #include "eggnotificationbubblewidget.h"
-#include "notifydaemon-dbus-glue.h"
+#include "notificationdaemon-dbus-glue.h"
 
 #include <stdlib.h>
 #include <errno.h>
