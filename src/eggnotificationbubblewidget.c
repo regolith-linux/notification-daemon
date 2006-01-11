@@ -963,6 +963,8 @@ _blend_colors (GdkColor color1, GdkColor color2, gdouble factor)
   channel_intensity = color1.blue * factor + color2.blue * (1 - factor);
   result.blue = CLAMP (channel_intensity, 0, 65535);
 
+  result.pixel = 0xFF; /* This is never really used. */
+
   return result;
 }
 

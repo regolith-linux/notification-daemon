@@ -54,6 +54,21 @@ struct _NotifyDaemonPrivate
   GSList *poptart_stack;
 };
 
+#define CHECK_DBUS_VERSION(major, minor) \
+	(DBUS_MAJOR_VER > (major) || \
+	 (DBUS_MAJOR_VER == (major) && DBUS_MINOR_VER >= (minor)))
+
+#if !CHECK_DBUS_VERSION(0, 60)
+/* This is a hack that will go away in time. For now, it's fairly safe. */
+struct _DBusGMethodInvocation
+{
+	DBusGConnection *connection;
+	DBusGMessage *message;
+	const DBusGObjectInfo *object;
+	const DBusGMethodInfo *method;
+};
+#endif /* D-BUS < 0.60 */
+
 static void notify_daemon_finalize (GObject * object);
 static void _emit_closed_signal (GObject *notify_widget);
 
@@ -148,8 +163,7 @@ _emit_action_invoked_signal (GObject *notify_widget, gchar *action)
 
       dest = g_object_get_data (notify_widget,
                                 "_notify_sender");
-      id = GPOINTER_TO_UINT (g_object_get_data (notify_widget,
-                                                "_notify_id"));
+      id = GPOINTER_TO_UINT (g_object_get_data (notify_widget, "_notify_id"));
 
       g_assert (dest != NULL);
 
@@ -622,7 +636,8 @@ _notify_daemon_add_bubble_to_poptart_stack (NotifyDaemon *daemon,
       link = link->next;
     }
 
-  g_signal_connect (bw, "destroy", _remove_bubble_from_poptart_stack, daemon);
+  g_signal_connect(G_OBJECT(bw), "destroy",
+				   G_CALLBACK(_remove_bubble_from_poptart_stack), daemon);
   priv->poptart_stack = g_slist_prepend (priv->poptart_stack, bw); 
 }
 
@@ -747,7 +762,12 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
   else
     return_id = id;
 
+#if CHECK_DBUS_VERSION(0, 60)
   sender = dbus_g_method_get_sender (context);
+#else
+  sender = g_strdup(dbus_message_get_sender(
+	dbus_g_message_get_message(context->message)));
+#endif
 
   g_object_set_data (G_OBJECT (bw), "_notify_id", GUINT_TO_POINTER (return_id));
   g_object_set_data_full (G_OBJECT (bw), 
