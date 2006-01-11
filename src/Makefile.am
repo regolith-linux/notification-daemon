@@ -1,25 +1,18 @@
-libexec_PROGRAMS = notification-daemon
+INCLUDES=-I$(top_srcdir) $(NOTIFY_DAEMON_CFLAGS)
 
-notification_daemon_SOURCES = \
-	BaseNotifier.cc \
-	BaseNotifier.hh \
-	ConsoleNotifier.cc \
-	ConsoleNotifier.hh \
-	Hint.hh \
-	Image.cc \
-	Image.hh \
-	Notification.cc \
-	Notification.hh \
-	PopupNotification.cc \
-	PopupNotification.hh \
-	PopupNotifier.cc \
-	PopupNotifier.hh \
-	dbus-compat.h \
-	logging.cc \
-	logging.hh \
-	main.cc
+EXTRA_DIST=notifydaemon.xml
 
-notification_daemon_LDADD = $(PACKAGE_LIBS)
+libexec_PROGRAMS = notify-daemon
 
-INCLUDES = \
-	$(PACKAGE_CFLAGS)
+notify_daemon_SOURCES=		\
+	eggnotificationbubblewidget.c	\
+	eggnotificationbubblewidget.h	\
+	notifydaemon.c			\
+	notifydaemon.h
+
+notify_daemon_LDADD= $(NOTIFY_DAEMON_LIBS)
+
+BUILT_SOURCES = notifydaemon-dbus-glue.h
+
+notifydaemon-dbus-glue.h: notifydaemon.xml
+	dbus-binding-tool --mode=glib-server $(srcdir)/notifydaemon.xml > notifydaemon-dbus-glue.h

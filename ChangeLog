@@ -1,686 +1,100 @@
-Sun Nov 06 17:17:01 PST 2005  Christian Hammond <chipx86@chipx86.com>
+Tue Jan 10 23:32:55 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
-	* src/PopupNotification.cc:
-	  - Since D-BUS is run before the gnome session, let's just hard-code
-	    support for gnome-open. Sorry to everyone who this inconveniences :)
-
-==================== 0.2.4 ====================
-
-Sun Nov 06 16:38:02 PST 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.cc:
-	* ChangeLog:
-	* NEWS:
+	* src/eggnotificationbubblewidget.c:
+	* src/notifydaemon.c:
 	* configure.ac:
-	  - Support actually clicking on hyperlinks. How did this not get
-	    implemented? Time for another release.
-	  - Release 0.2.4.
-
-==================== 0.2.3 ====================
-
-Sun Nov 06 14:09:08 PST 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* configure.ac:
-	* NEWS:
-	  - Bump to version 0.2.3.
-
-Sat Nov 05 21:36:33 PST 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	* src/Makefile.am:
-	* src/PopupNotification.cc:
-	D src/sexy-url-label.c:
-	D src/sexy-url-label.h:
-	* configure.ac:
-	  - Remove sexy-url-label and instead depend on libsexy. Sadly, this
-	    requires that I remove my "get-sexy" make target :(
-
-Wed Aug 10 01:56:24 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* NEWS:
-	* configure.ac:
-	  - Bump to version 0.2.2 and prepare for release.
-
-Wed Aug 10 01:52:01 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotifier.cc:
-	  - Some code cleanups and consistency changes.
-
-Wed Aug 10 01:48:41 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotifier.cc:
-	  - Handle all expiring notifications in BaseNotifier::timeout(),
-	    instead of only one at a time. This has been bugging me.
-
-Wed Aug 10 01:44:22 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	  - Another patch by Martin Pitt to use the correct data type for
-	    the replaces ID when parsing the D-BUS message.
-
-Wed Aug 10 01:41:52 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.cc:
-	  - Patch by Martin Pitt to properly initialize the window origin
-	    if the call to get_work_area() fails, and to cast the workarea
-	    array to a long * instead of guint32 * so that it will work
-	    properly on 64-bit CPUs.
-
-Wed Aug 10 01:35:50 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	  - Hopefully properly grab hint values from the D-BUS message iter
-	    in a way that will work on AMD64 and PPC.
-
-Wed Aug 10 01:32:24 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* NEWS:
-	* configure.ac:
-	  - Bump to version 0.2.1.90.
-
-Tue Aug 09 10:14:13 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	  - Fix up a few other data types as well.
-
-Tue Aug 09 10:12:05 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	  - Use the D-BUS bool type instead of the C++ bool type, so that we
-	    don't break PPC and AMD64.
-
-Mon Jul 25 22:50:49 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* NEWS:
-	* configure.ac:
-	  - Bump to version 0.2.1.
-
-Mon Jul 25 22:47:41 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cc:
-	  - Open the variant type for hints so that we can get the value
-	    within.
-	  - Fix a GCC 4.0 compiler error.
-
-Thu Jul 28 01:56:37 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* NEWS:
-	* configure.ac:
-	  - Bump to version 0.2.0.
-
-Thu Jul 28 01:53:13 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	A src/Hint.hh:
-	* src/Makefile.am:
-	* src/Notification.cc:
-	* src/Notification.hh:
-	* src/PopupNotification.cc:
-	* src/main.cc:
-	  - Grab the hints and put them into a Hint class, so we can get them
-	    by data type.
-
-Thu Jul 28 00:05:45 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	  - Updated the server capabilities that are returned.
-
-Wed Jul 27 22:02:34 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* Makefile.am:
-	  - Pass make distcheck.
-
-Wed Jul 27 10:06:06 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* notification-daemon.spec.in:
-	  - Don't restart the D-BUS system daemon. Especially since we don't
-	    need it.
-
-Wed Jul 27 02:14:01 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotifier.cc:
-	* src/PopupNotifier.cc:
-	  - Don't factor in the height of a notification that's set in a
-	    specific X, Y location. Previously one of these notifications
-	    caused a gap inbetween standard notifications. This is fixed.
-
-Wed Jul 27 00:41:41 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotifier.cc:
-	* src/BaseNotifier.hh:
-	  - Shift some code around, change some variable names.
-
-Wed Jul 27 00:29:33 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/dbus-compat.h:
-	  - Make notification-daemon compile on D-BUS 0.2x again.
-
-Sat Jul 23 16:53:12 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* Makefile.am:
-	D notification-daemon.service.in:
-	A org.freedesktop.Notifications.service.in:
-	  - Renamed notification-daemon.service.in to
-	    org.freedesktop.Notifications.service.in, and made the .service
-	    generation code more generic.
-
-Sat Jul 16 03:12:06 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cc:
-	  - Fix hint support for D-BUS 0.3x.
-
-Sat Jul 16 03:09:38 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/dbus-compat.h:
-	* src/Image.cc:
-	  - Update dbus-compat.h to fix some issues with arrays over D-BUS
-	    0.3x.
-
-Thu Jul 14 19:10:19 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotifier.cc:
-	* AUTHORS:
-	  - Patch by Mark Szilveszter to add support for actually using
-	    custom timeouts, and to bump the default timeout to 7 seconds.
-
-Thu Jul 14 00:09:30 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* notification-daemon.spec.in:
-	  - Patch by Richard Hughes to install the D-BUS service file in
-	    the right directory in the FC4 RPM spec file.
-
-Wed Jul 13 09:58:20 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/Notification.cc:
-	  - Patch by Richard Hughes to fix another build issue with D-BUS 0.3x.
-
-Tue Jul 12 12:24:58 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* AUTHORS:
-	  - Fill out the AUTHORS file a bit.
-
-Tue Jul 12 12:23:30 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/Notification.cc:
-	  - Patch by Richard Hughes to fix compilation on D-BUS 0.3x.
-
-Tue Jul 12 12:21:45 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* notification-daemon.spec.in:
-	  - Patch by Richard Hughes to provide a Fedora Core 4 RPM spec file,
-	    with some small changes by me.
-
-Sun Jul 10 19:23:23 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.cc:
-	* src/sexy-url-label.c:
-	  - Updated SexyUrlLabel to fix several major bugs, including the one
-	    worked around by the patch in bug #3726. Reverted that fix now we
-	    don't need the workaround.
-
-Sun Jul 10 16:47:51 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.cc:
-	  - Patch by Duarte Henriques (bug #3743) to fix notification
-	    replacing.
-
-Sat Jul  9 19:02:40 2005  Mike Hearn  <mike@plan99.net>
-
-	* src/PopupNotification.cc:
-	  - Patch from Duarte Henriques, bug #3725: Clicking on
-	    the body label should call the default action
-	  - Patch from Duarte Henriques, bug #3057: initialize
-	    Image.dataLen, change pixbuf loader handling. [With
-	    some modifications by myself]
-
-Sat Jul  9 18:48:31 2005  Mike Hearn  <mike@plan99.net>
-
-	* src/main.cc:
-	  - Patch from Duarte Henriques, bug #3044: typo fixes
-	    for DBus 0.3x, actually use the timeout field, do
-	    not unref message
-
-Mon Jul 04 16:11:39 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotifier.cc:
-	* src/BaseNotifier.hh:
-	* src/ConsoleNotifier.cc:
-	* src/ConsoleNotifier.hh:
-	* src/Notification.cc:
-	* src/Notification.hh:
-	* src/PopupNotification.cc:
-	* src/PopupNotification.hh:
-	* src/PopupNotifier.cc:
-	* src/PopupNotifier.hh:
-	* src/main.cc:
-	  - Fleshed out the Notification class a bit more.
-
-Mon Jul 04 15:09:20 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	  - Remove the equal() macro, and use std::string in more places instead.
-
-Mon Jul 04 15:05:45 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/ConsoleNotifier.cc:
-	* src/ConsoleNotifier.hh:
-	* src/Makefile.am:
-	* src/Notification.hh:
-	* src/PopupNotification.cc:
-	* src/PopupNotification.hh:
-	* src/PopupNotifier.cc:
-	* src/PopupNotifier.hh:
-	* src/main.cc:
-	D src/notifier.hh:
-	  - Got rid of notifier.hh.
-
-Mon Jul 04 14:52:59 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	A src/BaseNotifier.cc:
-	D src/BaseNotification.cc:
-	* src/Makefile.am:
-	  - Renamed BaseNotification.cc to BaseNotifier.cc.
-
-Mon Jul 04 14:52:12 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotification.cc:
-	* src/BaseNotifier.hh:
-	* src/Makefile.am:
-	A src/Notification.cc:
-	A src/Notification.hh:
-	* src/PopupNotification.cc:
-	* src/notifier.hh:
-	  - Split Notification into its own files.
-
-Mon Jul 04 14:36:52 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	A src/ConsoleNotifier.cc:
-	D src/ConsoleNotification.cc:
-	* src/Makefile.am:
-	  - Renamed ConsoleNotification.cc to ConsoleNotifier.cc.
-
-Mon Jul 04 14:33:47 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	A src/BaseNotifier.hh:
-	A src/ConsoleNotifier.hh:
-	* src/ConsoleNotification.cc:
-	* src/Makefile.am:
-	* src/PopupNotification.hh:
-	* src/PopupNotifier.cc:
-	A src/PopupNotifier.hh:
-	* src/main.cc:
-	* src/notifier.hh:
-	  - Split off BaseNotifier, ConsoleNotifier, and PopupNotifier class
-	    definitions into their own header files.
-
-Mon Jul 04 14:15:49 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cc:
-	* src/notifier.hh:
-	  - Use std::string instead of string.
-
-Mon Jul 04 14:14:08 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotification.cc:
-	* src/ConsoleNotification.cc:
-	* src/PopupNotification.cc:
-	* src/main.cc:
-	* src/notifier.hh:
-	  - Use std::string instead of char * in some places.
-
-Mon Jul 04 13:59:58 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/Image.cc:
-	A src/Image.hh:
-	* src/Makefile.am:
-	* src/PopupNotification.cc:
-	* src/main.cc:
-	* src/notifier.hh:
-	  - Split the Image class definition from notifier.hh into Image.hh,
-	    and made it a more standard C++ API.
-
-Mon Jul 04 13:20:26 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	A src/BaseNotification.cc:
-	D src/BaseNotification.cpp:
-	A src/ConsoleNotification.cc:
-	D src/ConsoleNotification.cpp:
-	A src/Image.cc:
-	D src/Image.cpp:
-	A src/logging.cc:
-	D src/logging.cpp:
-	A src/logging.hh:
-	D src/logging.h:
-	A src/main.cc:
-	D src/main.cpp:
-	A src/notifier.hh:
-	D src/notifier.h:
-	A src/PopupNotification.cc:
-	D src/PopupNotification.cpp:
-	A src/PopupNotifier.cc:
-	D src/PopupNotifier.cpp:
-	* src/Makefile.am:
-	* src/PopupNotification.hh:
-	  - Standardize on file naming. The .cpp and .hh files were a bit..
-	    inconsistent. This is part one of my code cleanup/reorg project.
-
-Mon Jul 04 01:38:47 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.cpp:
-	* src/PopupNotification.hh:
-	  - Add generate_arrow() and has_arrow() functions.
-	  - Position the notification so that the arrow points to the X, Y
-	    hint location.
-
-Sat Jul 02 13:54:20 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.hh:
-	* src/notifier.h:
-	  - Move the mArrowPoints and ARROW_* vars into the correct class.
-
-Sat Jul 02 12:25:11 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.cpp:
-	* src/notifier.h:
-	  - "Properly" render an arrow on the top-left of the notification
-	    when an X, Y hint is set. The location of the arrow will be
-	    auto-computed a bit better later, and this code will suck less.
-
-Thu Jun 30 21:38:27 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/PopupNotification.cpp:
-	* src/main.cpp:
-	* src/notifier.h:
-	  - Separated the dict parsing code into a single function so that
-	    the action and hint code will be cleaned up.
-	  - Added very basic support for hints.
-	  - Add preliminary support for a little pointer arrow for x, y hints.
-
-Sat Jun 25 17:45:38 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/Makefile.am:
-	* src/PopupNotification.cpp:
-	A src/sexy-url-label.c:
-	A src/sexy-url-label.h:
-	  - Use SexyUrlLabel for the notification body. We now have bold,
-	    italic, underline, and hyperlinks. Huzzah!
-
-Fri Jun 24 20:55:54 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/BaseNotification.cpp:
-	  - Patch #2949 by Duarte Henriques to fix a crash on notification
-	    timeout.
-
-Fri Jun 24 20:49:06 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cpp:
-	  - Patch #3614 by Duarte Henriques to support using old handles that
-	    have already timed out.
-
-Mon Jun 20 06:14:07 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/BaseNotification.cpp:
-	* src/main.cpp:
-	  - Handle the dicts and arrays and outgoing messages correctly.
-
-Mon Jun 20 00:36:02 PDT 2005  Christian Hammond <chipx86@chipx86.com>
-
-	* src/main.cpp:
-	  - Make actions work for D-BUS 0.2x again.
-
-Mon Jun 20 04:03:11 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Check the right types depending on D-BUS version.
-
-Mon Jun 20 03:57:40 PDT 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/Makefile.am:
-	A src/dbus-compat.h:
-	* src/main.cpp:
-	  - Compiles under D-BUS 0.3x now. Hasn't been tested at all.
-
-Fri Apr 01 09:29:40 PST 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Updated for the 0.6 notification spec.
-
-Sat Feb 12 23:55:15 PST 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* configure.ac:
-	  - For D-BUS 0.23 and higher, use $datadir/dbus-1/services instead of
-	    $libdir/dbus-1/servics for the service info file.
-
-Sun Jan 16 16:12:18 PST 2005  Christian Hammond <chipx86@gnupdate.org>
-
-	* configure.ac:
-	  - Install the service file to the correct directory.
-
-Fri Nov 05 02:01:35 PST 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/PopupNotification.cpp:
-	  - Fix warnings.
-
-Fri Nov 05 01:52:29 PST 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/PopupNotification.cpp:
-	* src/PopupNotification.h:
-	* src/main.cpp:
-	* acinclude.m4:
-	* configure.ac:
-	  - First step in cleaning up the code. Also fixes whatever changes
-	    caused the notification-daemon to break.
-
-Thu Nov  4 00:03:12 2004  Mike Hearn  <mike@navi.cx>
-
-	* src/main.cpp, src/notifier.h, src/popup-notifier.cpp: Improve
-	  error handling, get DBUS iterators right (finally), add support
-	  for animation demarshalling. Not actually presented using GTK+
-	  frontend yet though.
-
-Wed Nov 03 10:04:55 PST 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/PopupNotification.cpp:
-	  - Better image padding.
-
-Wed Nov 03 10:02:51 PST 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/PopupNotification.cpp:
-	  - Improve the display of notifications a bit. Fix up spacing and image
-	    alignment, and overlap them slightly so that you see one pixel border
-	    between two notifications rather than two.
-
-Wed Nov 03 09:41:23 PST 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/PopupNotification.cpp:
-	  - Factor in the panels when figuring out where to put our popup
-	    notification.
-
-Wed Nov 03 01:17:48 PST 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/Makefile.am:
-	* Makefile.am:
-	* configure.ac:
-	A notification-daemon.spec.in:
-	  - Fixed make distcheck.
-
-Wed Nov 03 01:14:01 PST 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* Makefile.am:
-	A acinclude.m4:
-	* configure.ac:
-	  - Fixed up the variables in the .service file and for the D-BUS
-	    services and system dir paths.
-
-Thu Sep 30 00:11:19 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	A src/BaseNotification.cpp:
-	A src/ConsoleNotification.cpp:
-	A src/Image.cpp:
-	A src/PopupNotification.cpp:
-	D src/base-notifier.cpp:
-	D src/console-notifier.cpp:
-	D src/image.cpp:
-	D src/popup-notifier.cpp:
-	* ChangeLog:
-	* src/Makefile.am:
-	  - Renamed some filenames to match their class better.
-
-Wed Sep 29 22:29:54 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Code cleanups. Things just felt inconsistent, and I'm a code nazi,
-	    so now the style is more like that of the rest of the galago project.
-
-Wed Sep 29 22:12:43 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Get message parsing to actually work.
-	  - Don't unref the message. D-BUS does that for us.
-
-Wed Sep 29 22:00:48 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Updated to match the spec.
-
-Wed Sep 29 19:40:11 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Compile using D-BUS CVS. I bet this will break things for other
-	    people...
-
->>>>>>> .r1429
-Thu Sep 16 19:51:09 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp (handle_notify): Make exception safe
-
-Wed Sep 15 19:52:37 2004  Mike Hearn  <mike@navi.cx>
-	* src/popup-notifier.cpp (class PopupNotification): Use a hand
-	  cursor for the action hyperlinks
-
-Tue Sep 14 23:03:29 2004  Mike Hearn  <mike@navi.cx>
-	* src/popup-notifier.cpp (class PopupNotification): make gui
-	  construction exception safe	
-
-Mon Sep 13 22:02:42 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp (handle_notify): trap exceptions and convert to
-	  DBUS errors
-	* src/popup-notifier.cpp (class PopupNotification): Make exception
-	  safe, fix some memory leaks, support actions, refactor action_invoke
-	  into base class, throw exceptions on bad images, support images
-
-Wed Sep  8 23:13:40 2004  Mike Hearn  <mike@navi.cx>
-	* src/base-notifier.cpp (Notification): Use new foreach macro
-	* src/notifier.h: Add a foreach macro for iterators
-	* src/main.cpp: Demarshal actions
-	* src/popup-notifier.cpp (class PopupNotification): Fix
-	  positioning bug, make summary bolder, give content area a white
-	  background, basic multi-actions rendering as links, center
-	  summary when no body is supplied.
+	  - Although it's a small hack, add support back for D-BUS 0.36+.
+
+Tue Jan 10 22:57:51 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/eggnotificationbubblewidget.c:
+	  - Fix another case of C99 usage.
+
+2006-01-03  John (J5) Palmieri  <johnp@redhat.com>
+
+	* src/eggnotificationbubblewidget.h (struct _DrawingPipeline):
+	Added intermediate pipeline for graphics rendering
+
+	* src/eggnotificationbubblewidget.c 
+	(_stencil_bubble*): These methods now take care of prerendering
+	the graphics to the pipeline and calculating the x, y offset of
+	the arrow
+	(struct DrawingInstruction): intermediate drawing primitive
+	(_drawing_instruction_*): New internal methods for manipulating
+	drawing instructions
+	(_edge_line_to, _close_path): internal convinience methods for
+	drawing skewed lines attached by rounded corners (i.e. you can
+	draw a box and specify the radius of each corner)
+	(egg_notification_bubble_widget_set_pos): prerender the bubble here
+	to get arrow offsets
+	(draw_bubble_widget): Take out all calculations from this expose
+	handler and simply render the precalculated pipeline
+
+==================== 0.3.1 ====================
+
+2005-12-14  John (J5) Palmieri  <johnp@redhat.com>
+
+	* Release 0.3.1
+
+	* src/Makefile.am: fix for building in a seperate build directory
+
+	* configure.ac: Require D-Bus >= 0.60
+
+2005-12-12  John (J5) Palmieri  <johnp@redhat.com>
+
+	* src/eggnotificationbubblewidget.c (size_request_handler): removed
+	(egg_notification_bubble_widget_init): initialize draw_arrow to FALSE
+	(_populate_window): Move adding widgets to the table to the 
+	_layout_window method
+	(draw_bubble_widget): now can draw bubble without the arrow
+	(egg_notification_bubble_widget_set_draw_arrow): New method for setting
+	whether or not we should draw the arrow
+
+	* src/notifydaemon.c (_notify_daemon_add_bubble_to_poptart_stack): new
+	method which is used for adding bubbles without x, y coordinates to the
+	"poptart" stack
+	(_remove_bubble_from_poptart_stack): removes a bubble from the stack
+	and repositions the rest of the stack
+	(notify_daemon_notify_handler): add bubble to poptart stack if no
+	no x, y location given
+
+2005-12-09  John (J5) Palmieri  <johnp@redhat.com>
+
+	* src/eggnotificationbubblewidget.c (_layout_window): Add buttons for
+	actions
+	(draw_bubble_widget): close the cairo path so courner caps work
+	(egg_notification_bubble_widget_create_button): new method to create
+	a button and add it to the bubble
+	(egg_notification_bubble_widget_clear_buttons): new method for clearing
+	up all the buttons in the bubble
 	
+	* src/notifydaemon.xml: make the Notify method async so we can get the
+	sender
 
-Thu Jul 29 18:09:30 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/base-notifier.cpp:
-	  - Make sure we have a '/' before the object path in messages.
-	    This prevents the Disconnect signal we're getting when we try
-	    to send ActionInvoked.
-
-Thu Jul 29 18:08:31 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	A notification-daemon.conf:
-	* Makefile.am:
-	  - Added notification-daemon.conf for D-BUS policies.
-
-Thu Jul 29 21:19:26 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp: Implement GetCapabilities, GetServerInfo, CloseNotification
-	* src/logging.cpp (log): Add a FIXME type
+	* src/notifydaemon.c (_emit_action_invoked_signal):  Emits the dbus 
+	signal when one of the action buttons is clicked
+	(_emit_closed_signal): emits a Closed signal over the bus when the
+	bubble is closed
+	(_close_notification): call _emit_closed_signal
+	(_notification_daemon_handle_bubble_widget_action): new method - iternal
+	callback we hook up to the buttons' "clicked" signal
+	(notify_daemon_notify_handler): change to an async method
+	store the unique name of the sender that called us
+	setup buttons if actions have been added 
 	
-Wed Jul 14 02:13:10 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp, src/base-notifier.cpp, src/popup-notifier.cpp:
-	  Support replacements properly
+2005-11-22  John (J5) Palmieri  <johnp@redhat.com>
 
-Wed Jul 14 00:04:46 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp: Eliminate stupid one-line function
+	* src/eggnotificationbubblewidget.c: Add a more stylized bubble
+	and render in both composite and shaped window mode
 
-Mon Jul  5 00:20:13 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/base-notifier.cpp: Add timeouts infrastructure.
-
-Sun Jul 04 13:45:03 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Don't process the summary twice. It screws up everything.
-
-Sun Jul 04 13:43:26 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Fixed several memory leaks.
-
-Sun Jul 04 13:38:57 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - We were skipping over arguments twice if the argument as NIL in
-	    some cases. Fixed.
-
-Sun Jul 04 13:36:59 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	  - Fix the type check for the urgency level.
-
-Sun Jul 04 13:32:06 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* src/main.cpp:
-	* src/notifier.h:
-	  - Added an urgency variable to the Notification class.
-	  - Added support for the urgency variable in the Notify message.
-
-Sun Jul 04 13:20:14 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
-
-	* Makefile.am:
-	* configure.ac:
-	A notification-daemon.service.in:
-	  - Added the D-BUS service file, so that we can activate the daemon.
-
-Sun Jul  4 17:35:03 2004  Mike Hearn  <mike@navi.cx>
-	* src/popup-notifier.cpp: Basic GTK popups. Not complete yet.
-
-Sun Jul  4 00:37:23 2004  Mike Hearn  <mike@navi.cx>
-	* src/popup-notifier.cpp: Add popup notifier skeleton
-
-Sun Jul  4 00:00:27 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp (initialize_backend): Check for invalid backends,
-	  uncomment popup backend
-
-Sat Jul  3 23:53:09 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/notifier.cpp: Rename to base-notifier.cpp
-	* src/base-notifier.cpp, src/notifier.h, src/console-notifier.cpp: change
-	  return type of notify() to uint
-
-Sat Jul  3 20:31:31 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp (dispatch_notify): Dispatch Notify messages to backend
-	* src/notifier.h: Change struct notification to a class so backends can
-	  extend it more easily (to include layout info, for instance). Add method
-	  so backends can create their own Notification instances.
-	* src/logging.h (validate): Rename validateret to validate
-	* shell-funcs: Add a simple "notify" function wrapper around dbus-send
-	* src/notifier.cpp: Basic implementation of BaseNotifier, record notifications
-	  and supply unique IDs
-
+2005-11-15  John (J5) Palmieri  <johnp@redhat.com>
 	
-Sat Jul  3 17:19:10 GMT 2004  Mike Hearn  <mike@navi.cx>
-	* src/main.cpp, src/logging.cpp, src/notifier.h, src/console-notifier.cpp:
-	  Add basic implementation of the server framework
+	* Change refrences from notification to notify
 
-Tue Jun 29 15:04:14 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+2005-11-10  John (J5) Palmieri  <johnp@redhat.com>
 
-	* src/Makefile.am:
-	* src/main.c:
-	* AUTHORS:
-	A NEWS:
-	* autogen.sh:
-	* configure.ac:
-	  - Renamed gnome-notification-daemon to gnotification-daemon.
+	* Makefile.am: remove Doxyfile.in ref 
 
-Sun Jun 27 22:39:35 PDT 2004  Christian Hammond <chipx86@gnupdate.org>
+2005-11-10  John (J5) Palmieri  <johnp@redhat.com>
 
-	* src/main.c:
-	  - Added some base code that compiles.
-
+	* Initial checkin of the next generation notification daemon

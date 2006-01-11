@@ -1,19 +1,6 @@
-version 0.2.4 (6-November-2005):
-	* Support clicking on hyperlinks.
+notify-daemon 0.3.1
+===
 
-version 0.2.3 (6-November-2005):
-	* Depends on libsexy for the URL label.
-
-version 0.2.2 (10-August-2005):
-	* Fixed several run-time issues on PPC and AMD64 (Martin Pitt)
-	* Notifications that are created at the same time will disappear at
-	  the same time.
-	* Notifications that don't expire until the user clicks on them will
-	  no longer block notifications that do expire.
-
-version 0.2.1 (28-July-2005):
-	* Fixed hint support for D-BUS 0.3x.
-	* Fixed a compile issue with GCC 4.0.
-
-version 0.2.0 (28-July-2005):
-	* Initial public release.
+* First release of the notify daemon which supports the new 0.3.x protocol
+* Users of the older notification-daemon must make sure they uninstall it
+  as it will try to catch messages ment for the notify-daemon
