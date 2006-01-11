@@ -1,3 +1,8 @@
+Tue Jan 10 22:57:51 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/eggnotificationbubblewidget.c:
+	  - Fix another case of C99 usage.
+
 2006-01-03  John (J5) Palmieri  <johnp@redhat.com>
 
 	* src/eggnotificationbubblewidget.h (struct _DrawingPipeline):
@@ -17,7 +22,9 @@
 	to get arrow offsets
 	(draw_bubble_widget): Take out all calculations from this expose
 	handler and simply render the precalculated pipeline
-	 
+
+==================== 0.3.1 ====================
+
 2005-12-14  John (J5) Palmieri  <johnp@redhat.com>
 
 	* Release 0.3.1

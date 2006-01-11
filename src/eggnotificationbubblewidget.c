@@ -459,9 +459,9 @@ _drawing_pipeline_clear (EggNotificationBubbleWidget *bw)
 static void
 _populate_window (EggNotificationBubbleWidget *bubble_widget)
 {
-  g_return_if_fail (EGG_IS_NOTIFICATION_BUBBLE_WIDGET (bubble_widget));
-
   GtkWidget *widget;
+
+  g_return_if_fail (EGG_IS_NOTIFICATION_BUBBLE_WIDGET (bubble_widget));
  
   widget = GTK_WIDGET (bubble_widget);
 
