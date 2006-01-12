@@ -1,3 +1,16 @@
+Thu Jan 12 11:06:27 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Listen to the button-release-event signal instead of "clicked" for
+	    notifications.
+
+	* themes/standard/theme.c:
+	  - Another shot at setting the window shape every time. I've read that
+	    there's some gtk 2.8 bug regarding this. Anyhow, in order to
+	    guarantee it, I'm always setting the shape in the expose handler.
+	    Even doing it only once or twice in the expose handler causes issues,
+	    but setting it every time works. We need a better way...
+
 Thu Jan 12 00:57:22 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:

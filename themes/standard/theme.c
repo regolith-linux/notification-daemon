@@ -15,6 +15,7 @@ typedef struct
 	int point_y;
 	GdkGC *gc;
 	GdkPoint arrow_points[7];
+	GdkRegion *window_region;
 
 } WindowData;
 
@@ -56,6 +57,8 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 					  ARROW_OFFSET + ARROW_WIDTH / 2 - 1, 0,
 					  ARROW_OFFSET + ARROW_WIDTH - 1, ARROW_HEIGHT);
 		gdk_draw_line(win->window, windata->gc, 0, h - 1, w - 1, h - 1);
+		gdk_window_shape_combine_region(win->window, windata->window_region,
+										0, 0);
 	}
 	else
 	{
@@ -156,6 +159,9 @@ destroy_notification(GtkWindow *nw)
 	if (windata->gc != NULL)
 		g_object_unref(G_OBJECT(windata->gc));
 
+	if (windata->window_region != NULL)
+		gdk_region_destroy(windata->window_region);
+
 	gtk_widget_destroy(GTK_WIDGET(nw));
 }
 
@@ -227,7 +233,6 @@ generate_arrow(GtkWidget *nw, WindowData *windata, int *arrow_x, int *arrow_y)
 {
 	GtkRequisition req;
 	int new_height;
-	GdkRegion *region;
 
 	gtk_widget_realize(nw);
 	gtk_widget_size_request(nw, &req);
@@ -255,11 +260,10 @@ generate_arrow(GtkWidget *nw, WindowData *windata, int *arrow_x, int *arrow_y)
 	windata->arrow_points[6].x = 0;
 	windata->arrow_points[6].y = new_height;
 
-	region = gdk_region_polygon(windata->arrow_points,
-								G_N_ELEMENTS(windata->arrow_points),
-								GDK_EVEN_ODD_RULE);
-	gdk_window_shape_combine_region(nw->window, region, 0, 0);
-	gdk_region_destroy(region);
+	windata->window_region =
+		gdk_region_polygon(windata->arrow_points,
+						   G_N_ELEMENTS(windata->arrow_points),
+						   GDK_EVEN_ODD_RULE);
 
 	windata->arrow_points[4].x--;
 	windata->arrow_points[5].x--;
@@ -281,7 +285,7 @@ move_notification(GtkWindow *nw, int x, int y)
 	if (windata->has_arrow)
 	{
 		GtkRequisition req;
-		GdkDisplay *display = gtk_widget_get_display(GTK_WIDGET(nw));
+		//GdkDisplay *display = gtk_widget_get_display(GTK_WIDGET(nw));
 		//GdkScreen *screen   = gdk_display_get_screen(display, disp_screen);
 		//int screen_width    = gdk_screen_get_width(screen);
 		//int screen_height   = gdk_screen_get_height(screen);

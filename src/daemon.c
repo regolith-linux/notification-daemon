@@ -546,6 +546,7 @@ _notification_daemon_handle_bubble_widget_action(GtkWidget *b, GtkWindow *nw)
 
 static void
 _notification_daemon_handle_bubble_widget_default(GtkWindow *nw,
+												  GdkEventButton *button,
 												  NotifyDaemon *daemon)
 {
   _close_notification(daemon,
@@ -769,7 +770,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         _notify_daemon_process_icon_data(daemon, nw, data);
     }
 
-  g_signal_connect(G_OBJECT(nw), "clicked",
+  g_signal_connect(G_OBJECT(nw), "button-release-event",
 	G_CALLBACK(_notification_daemon_handle_bubble_widget_default), daemon);
 
   theme_show_notification(nw);
