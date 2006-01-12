@@ -1,3 +1,9 @@
+Thu Jan 12 00:57:22 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Make sure we shape the window correctly every time we generate the
+	    arrow so that we don't leave artifacts.
+
 Thu Jan 12 00:10:18 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/engines.c:

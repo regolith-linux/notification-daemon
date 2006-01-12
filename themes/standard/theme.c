@@ -35,31 +35,31 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 	{
 		GdkColor color;
 
-		windata->gc = gdk_gc_new(event->window);
+		windata->gc = gdk_gc_new(win->window);
 		gdk_color_parse("black", &color);
 		gdk_gc_set_rgb_fg_color(windata->gc, &color);
 	}
 
-	gdk_drawable_get_size(event->window, &w, &h);
+	gdk_drawable_get_size(win->window, &w, &h);
 
 	if (windata->has_arrow)
 	{
-		gdk_draw_polygon(event->window, windata->gc, FALSE,
+		gdk_draw_polygon(win->window, windata->gc, FALSE,
 						 windata->arrow_points,
 						 G_N_ELEMENTS(windata->arrow_points));
 
 		/* HACK! */
-		gdk_draw_line(event->window, windata->gc,
+		gdk_draw_line(win->window, windata->gc,
 					  ARROW_OFFSET + 1, ARROW_HEIGHT,
 					  ARROW_OFFSET + ARROW_WIDTH / 2 + 1, 0);
-		gdk_draw_line(event->window, windata->gc,
+		gdk_draw_line(win->window, windata->gc,
 					  ARROW_OFFSET + ARROW_WIDTH / 2 - 1, 0,
 					  ARROW_OFFSET + ARROW_WIDTH - 1, ARROW_HEIGHT);
-		gdk_draw_line(event->window, windata->gc, 0, h - 1, w - 1, h - 1);
+		gdk_draw_line(win->window, windata->gc, 0, h - 1, w - 1, h - 1);
 	}
 	else
 	{
-		gdk_draw_rectangle(event->window, windata->gc, FALSE,
+		gdk_draw_rectangle(win->window, windata->gc, FALSE,
 						   0, 0, w - 1, h - 1);
 	}
 
@@ -268,6 +268,8 @@ generate_arrow(GtkWidget *nw, WindowData *windata, int *arrow_x, int *arrow_y)
 
 	*arrow_x = ARROW_OFFSET + ARROW_WIDTH / 2;
 	*arrow_y = 0;
+
+	draw_border(nw, NULL, windata);
 }
 
 void
