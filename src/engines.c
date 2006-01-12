@@ -69,7 +69,7 @@ get_theme_engine(void)
 	if (active_engine == NULL)
 	{
 		/* XXX */
-		active_engine = load_theme_engine(ENGINES_DIR"/libbubble.so");
+		active_engine = load_theme_engine(ENGINES_DIR"/libstandard.so");
 		g_assert(active_engine != NULL);
 	}
 

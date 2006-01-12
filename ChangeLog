@@ -1,3 +1,14 @@
+Thu Jan 12 00:10:18 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/engines.c:
+	A themes/standard/Makefile.am:
+	A themes/standard/theme.c:
+	* themes/Makefile.am:
+	* configure.ac:
+	  - Add the beginnings of the "standard" theme. This is now the default.
+	    It's not complete. Many things are still missing. Theme selection
+	    will be added later.
+
 Wed Jan 11 01:51:12 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/Makefile.am:

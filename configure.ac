@@ -69,7 +69,7 @@ AM_PROG_LIBTOOL
 AC_CHECK_LIB([popt], [poptGetArg], , AC_MSG_ERROR([Popt is required]))
 
 REQ_DBUS_VERSION=0.36
-pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= $REQ_DBUS_VERSION, dbus-glib-1 >= $REQ_DBUS_VERSION"
+pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= $REQ_DBUS_VERSION, dbus-glib-1 >= $REQ_DBUS_VERSION libsexy >= 0.1.3"
 PKG_CHECK_MODULES(NOTIFICATION_DAEMON, [$pkg_modules])
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
@@ -145,6 +145,7 @@ notification-daemon.service
 src/Makefile
 themes/Makefile
 themes/bubble/Makefile
+themes/standard/Makefile
 ])
 
 AC_OUTPUT

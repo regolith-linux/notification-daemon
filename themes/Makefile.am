@@ -1,2 +1,1 @@
-#SUBDIRS = standard bubble
-SUBDIRS = bubble
+SUBDIRS = standard bubble
