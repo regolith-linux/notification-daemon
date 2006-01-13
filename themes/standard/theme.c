@@ -17,6 +17,7 @@ typedef struct
 	GdkPoint arrow_points[7];
 	GdkRegion *window_region;
 
+	GHashTable *hints;
 } WindowData;
 
 #define WIDTH         300
@@ -175,6 +176,15 @@ void
 hide_notification(GtkWindow *nw)
 {
 	gtk_widget_hide(GTK_WIDGET(nw));
+}
+
+void
+set_notification_hints(GtkWindow *nw, GHashTable *hints)
+{
+	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+	g_assert(windata != NULL);
+
+	windata->hints = hints;
 }
 
 void

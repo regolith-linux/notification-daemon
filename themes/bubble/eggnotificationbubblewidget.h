@@ -76,6 +76,8 @@ struct _EggNotificationBubbleWidget
   GdkColor bg_end_gradient;
   GdkColor border_color;
 
+	GHashTable *hints;
+
   /* drawing instructions */
   struct _DrawingPipeline dp;
 };
@@ -123,6 +125,8 @@ GtkWidget *      egg_notification_bubble_widget_create_button (EggNotificationBu
 void             egg_notification_bubble_widget_clear_buttons (EggNotificationBubbleWidget *bubble_widget);
 
 void             egg_notification_bubble_widget_set_draw_arrow (EggNotificationBubbleWidget *bubble_widget, gboolean value);
+
+void             egg_notification_bubble_widget_set_hints (EggNotificationBubbleWidget *bubble_widget, GHashTable *hints);
 
 G_END_DECLS
 

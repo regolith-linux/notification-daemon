@@ -1,3 +1,15 @@
+Fri Jan 13 11:44:00 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/engines.c:
+	* src/engines.h:
+	* themes/bubble/eggnotificationbubblewidget.c:
+	* themes/bubble/eggnotificationbubblewidget.h:
+	* themes/bubble/theme.c:
+	* themes/standard/theme.c:
+	  - Patch by Rodney Dawes to add support for passing hints to the
+	    notification engines. This will allow engines to theme based on
+	    urgency levels and other such data.
+
 Thu Jan 12 11:06:27 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

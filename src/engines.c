@@ -9,6 +9,7 @@ typedef struct
 	void (*destroy_notification)(GtkWindow *nw);
 	void (*show_notification)(GtkWindow *nw);
 	void (*hide_notification)(GtkWindow *nw);
+	void (*set_notification_hints)(GtkWindow *nw, GHashTable *hints);
 	void (*set_notification_text)(GtkWindow *nw, const char *summary,
 								  const char *body);
 	void (*set_notification_icon)(GtkWindow *nw, GdkPixbuf *pixbuf);
@@ -54,6 +55,7 @@ load_theme_engine(const char *filename)
 	BIND_REQUIRED_FUNC(destroy_notification);
 	BIND_REQUIRED_FUNC(show_notification);
 	BIND_REQUIRED_FUNC(hide_notification);
+	BIND_REQUIRED_FUNC(set_notification_hints);
 	BIND_REQUIRED_FUNC(set_notification_text);
 	BIND_REQUIRED_FUNC(set_notification_icon);
 	BIND_REQUIRED_FUNC(set_notification_arrow);
@@ -98,6 +100,12 @@ void
 theme_hide_notification(GtkWindow *nw)
 {
 	get_theme_engine()->hide_notification(nw);
+}
+
+void
+theme_set_notification_hints(GtkWindow *nw, GHashTable *hints)
+{
+	get_theme_engine()->set_notification_hints(nw, hints);
 }
 
 void

@@ -1201,4 +1201,10 @@ egg_notification_bubble_widget_set_draw_arrow (EggNotificationBubbleWidget *bubb
   bubble_widget->draw_arrow = value;
 }
 
+void
+egg_notification_bubble_widget_set_hints (EggNotificationBubbleWidget *bubble_widget,
+					  GHashTable *hints)
+{
+	bubble_widget->hints = hints;
+}
 

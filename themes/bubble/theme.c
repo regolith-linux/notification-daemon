@@ -26,6 +26,12 @@ hide_notification(GtkWindow *nw)
 }
 
 void
+set_notification_hints(GtkWindow *nw, GHashTable *hints)
+{
+	egg_notification_bubble_widget_set_hints(EGG_NOTIFICATION_BUBBLE_WIDGET(nw), hints);
+}
+
+void
 set_notification_text(GtkWindow *nw, const char *summary, const char *body)
 {
 	egg_notification_bubble_widget_set(EGG_NOTIFICATION_BUBBLE_WIDGET(nw),
