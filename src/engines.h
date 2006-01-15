@@ -3,7 +3,7 @@
 
 #include <gtk/gtk.h>
 
-gpointer theme_create_notification(void);
+GtkWindow *theme_create_notification(void);
 void theme_destroy_notification(GtkWindow *nw);
 void theme_show_notification(GtkWindow *nw);
 void theme_hide_notification(GtkWindow *nw);
