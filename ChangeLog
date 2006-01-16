@@ -1,3 +1,10 @@
+Sun Jan 15 17:51:27 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/daemon.h:
+	* src/notificationdaemon.xml:
+	  - Add back GetCapabilities and GetServerInformation.
+
 Sun Jan 15 16:07:00 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	A data/Makefile.am:

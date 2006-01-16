@@ -811,6 +811,36 @@ notify_daemon_close_notification_handler (NotifyDaemon *daemon,
   return TRUE;
 }
 
+gboolean
+notify_daemon_get_capabilities(NotifyDaemon *daemon,
+							   char ***caps)
+{
+	*caps = g_new0(char *, 6);
+	(*caps)[0] = g_strdup("actions");
+	(*caps)[1] = g_strdup("body");
+	(*caps)[2] = g_strdup("body-hyperlinks");
+	(*caps)[3] = g_strdup("body-markup");
+	(*caps)[4] = g_strdup("icon-static");
+	(*caps)[5] = NULL;
+
+	return TRUE;
+}
+
+gboolean
+notify_daemon_get_server_information(NotifyDaemon *daemon,
+									 char **out_name,
+									 char **out_vendor,
+									 char **out_version,
+									 char **out_spec_ver)
+{
+	*out_name     = g_strdup("Notification Daemon");
+	*out_vendor   = g_strdup("Galago Project");
+	*out_version  = g_strdup(VERSION);
+	*out_spec_ver = g_strdup("0.8");
+
+	return TRUE;
+}
+
 GConfClient *
 get_gconf_client(void)
 {

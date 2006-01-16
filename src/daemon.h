@@ -61,25 +61,32 @@ enum _NotifyDaemonError
   NOTIFY_DAEMON_ERROR_GENERIC = 0,
 };
 
-GType notify_daemon_get_type (void);
+GType notify_daemon_get_type(void);
 
-NotifyDaemon *notify_daemon_new (void)
-  G_GNUC_MALLOC;
+NotifyDaemon *notify_daemon_new(void) G_GNUC_MALLOC;
 
-gboolean notify_daemon_notify_handler (NotifyDaemon *daemon,
-                                       const gchar *app_name,
-                                       const gchar *icon,
-                                       guint id,
-                                       const gchar *summary,
-                                       const gchar *body,
-                                       gchar **actions,
-                                       GHashTable *hints,
-                                       int timeout,
-                                       DBusGMethodInvocation *context);
+gboolean notify_daemon_notify_handler(NotifyDaemon *daemon,
+									  const gchar *app_name,
+                                      const gchar *icon,
+                                      guint id,
+                                      const gchar *summary,
+                                      const gchar *body,
+                                      gchar **actions,
+                                      GHashTable *hints,
+                                      int timeout,
+                                      DBusGMethodInvocation *context);
 
-gboolean notify_daemon_close_notification_handler (NotifyDaemon *daemon,
-                                                   guint id,
-                                                   GError **error);
+gboolean notify_daemon_close_notification_handler(NotifyDaemon *daemon,
+												  guint id,
+												  GError **error);
+
+gboolean notify_daemon_get_capabilities(NotifyDaemon *daemon,
+										char ***out_caps);
+gboolean notify_daemon_get_server_information(NotifyDaemon *daemon,
+											  char **out_name,
+											  char **out_vendor,
+											  char **out_version,
+											  char **out_spec_ver);
 
 GConfClient *get_gconf_client(void);
 
