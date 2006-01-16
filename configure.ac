@@ -65,11 +65,18 @@ AC_TYPE_SIZE_T
 AC_EXEEXT
 
 AM_PROG_LIBTOOL
+AC_PROG_INTLTOOL
+
+ALL_LINGUAS=
+GETTEXT_PACKAGE=notification-daemon
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Gettext package])
+AM_GLIB_GNU_GETTEXT
 
 AC_CHECK_LIB([popt], [poptGetArg], , AC_MSG_ERROR([Popt is required]))
 
 REQ_DBUS_VERSION=0.36
-pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= $REQ_DBUS_VERSION, dbus-glib-1 >= $REQ_DBUS_VERSION libsexy >= 0.1.3"
+pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= $REQ_DBUS_VERSION, dbus-glib-1 >= $REQ_DBUS_VERSION libsexy >= 0.1.3 gconf-2.0"
 PKG_CHECK_MODULES(NOTIFICATION_DAEMON, [$pkg_modules])
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
@@ -86,6 +93,14 @@ AM_CONDITIONAL(HAVE_GDK, test "x$have_gdk" = "xyes")
 
 AC_SUBST(GDK_CFLAGS)
 AC_SUBST(GDK_LIBS)
+
+AC_PATH_PROG(GCONFTOOL, gconftool-2, no)
+
+if test "x$GCONFTOOL" = "xno"; then
+	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with Gconf])
+fi
+
+AM_GCONF_SOURCE_2
 
 dnl
 dnl Check the D-BUS version.
@@ -142,6 +157,8 @@ dnl ################################################################
 AC_CONFIG_FILES([
 Makefile
 notification-daemon.service
+data/Makefile
+po/Makefile.in
 src/Makefile
 themes/Makefile
 themes/bubble/Makefile

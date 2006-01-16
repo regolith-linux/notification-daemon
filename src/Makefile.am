@@ -18,5 +18,5 @@ notificationdaemon-dbus-glue.h: notificationdaemon.xml
 INCLUDES = \
 	-I$(top_srcdir) \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
-	-DENGINES_DIR=\"$(LIBDIR)/notification-daemon/engines\"
+	-DENGINES_DIR=\"$(libdir)/notification-daemon/engines\"
 

@@ -1,4 +1,4 @@
-SUBDIRS = src themes
+SUBDIRS = data po src themes
 
 servicedir       = $(DBUS_SERVICES_DIR)
 service_DATA     = notification-daemon.service

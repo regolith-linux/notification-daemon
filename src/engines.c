@@ -1,3 +1,4 @@
+#include <gconf/gconf-client.h>
 #include "engines.h"
 
 typedef struct
@@ -21,22 +22,30 @@ typedef struct
 
 } ThemeEngine;
 
+static guint theme_prop_notify_id = 0;
 static ThemeEngine *active_engine = NULL;
-/* static GList *engines = NULL; */
 
 static ThemeEngine *
-load_theme_engine(const char *filename)
+load_theme_engine(const char *name)
 {
-	ThemeEngine *engine = g_new0(ThemeEngine, 1);
+	ThemeEngine *engine;
+	char *filename;
+	char *path;
 
+	filename = g_strdup_printf("lib%s.so", name);
+	path = g_build_filename(ENGINES_DIR, filename, NULL);
+	g_free(filename);
+
+	printf("Loading path '%s'\n", path);
+	engine = g_new0(ThemeEngine, 1);
 	engine->ref_count = 1;
-	engine->module = g_module_open(filename, G_MODULE_BIND_LAZY);
+	engine->module = g_module_open(path, G_MODULE_BIND_LAZY);
+
+	g_free(path);
 
 	if (engine->module == NULL)
 	{
 		g_free(engine);
-		g_error("The default theme engine doesn't exist. Your install "
-				"likely isn't complete.");
 		return NULL;
 	}
 
@@ -77,14 +86,57 @@ destroy_engine(ThemeEngine *engine)
 	g_free(engine);
 }
 
+static void
+theme_changed_cb(GConfClient *client, guint cnxn_id, GConfEntry *entry,
+				 gpointer user_data)
+{
+	if (active_engine == NULL)
+		return;
+
+	active_engine->ref_count--;
+
+	if (active_engine->ref_count == 0)
+		destroy_engine(active_engine);
+
+	/* This is no longer the true active engine, so reset this. */
+	active_engine = NULL;
+}
+
 static ThemeEngine *
 get_theme_engine(void)
 {
 	if (active_engine == NULL)
 	{
-		/* XXX */
-		active_engine = load_theme_engine(ENGINES_DIR"/libstandard.so");
-		g_assert(active_engine != NULL);
+		GConfClient *client = get_gconf_client();
+		char *enginename = gconf_client_get_string(client,
+			"/apps/notification-daemon/theme", NULL);
+
+		if (theme_prop_notify_id == 0)
+		{
+			theme_prop_notify_id = gconf_client_notify_add(client,
+				"/apps/notification-daemon/theme", theme_changed_cb, NULL,
+				NULL, NULL);
+		}
+
+		if (enginename == NULL)
+		{
+			active_engine = load_theme_engine("standard");
+			g_assert(active_engine != NULL);
+		}
+		else
+		{
+			active_engine = load_theme_engine(enginename);
+
+			if (active_engine == NULL)
+			{
+				g_warning("Unable to load theme engine '%s'", enginename);
+				active_engine = load_theme_engine("standard");
+			}
+
+			g_free(enginename);
+
+			g_assert(active_engine != NULL);
+		}
 	}
 
 	return active_engine;

@@ -22,6 +22,7 @@
 #ifndef NOTIFY_DAEMON_H
 #define NOTIFY_DAEMON_H
 
+#include <gconf/gconf-client.h>
 #include <glib.h>
 #include <glib-object.h>
 
@@ -79,6 +80,8 @@ gboolean notify_daemon_notify_handler (NotifyDaemon *daemon,
 gboolean notify_daemon_close_notification_handler (NotifyDaemon *daemon,
                                                    guint id,
                                                    GError **error);
+
+GConfClient *get_gconf_client(void);
 
 G_END_DECLS
 #endif /* NOTIFY_DAEMON_H */

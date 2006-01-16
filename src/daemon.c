@@ -28,11 +28,11 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <glib.h>
-#include <glib-object.h>
-#include <glib/gi18n.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib.h>
+#include <glib/gi18n.h>
+#include <glib.h>
+#include <glib-object.h>
 #include <gtk/gtk.h>
 
 struct _NotifyTimeout
@@ -53,6 +53,8 @@ struct _NotifyDaemonPrivate
   GHashTable *notification_hash;
   GSList *poptart_stack;
 };
+
+static GConfClient *gconf_client = NULL;
 
 #define CHECK_DBUS_VERSION(major, minor) \
 	(DBUS_MAJOR_VER > (major) || \
@@ -809,6 +811,12 @@ notify_daemon_close_notification_handler (NotifyDaemon *daemon,
   return TRUE;
 }
 
+GConfClient *
+get_gconf_client(void)
+{
+	return gconf_client;
+}
+
 int
 main (int argc, char **argv)
 {
@@ -822,6 +830,11 @@ main (int argc, char **argv)
 
   g_message ("initializing glib type system");
   gtk_init (&argc, &argv);
+  gconf_init(argc, argv, NULL);
+
+  gconf_client = gconf_client_get_default();
+  gconf_client_add_dir(gconf_client, "/apps/notification-daemon/theme",
+					   GCONF_CLIENT_PRELOAD_NONE, NULL);
 
   error = NULL;
   connection = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
@@ -859,6 +872,8 @@ main (int argc, char **argv)
   g_message ("'daemon' object exported successfully");
 
   gtk_main();
+
+  g_object_unref(G_OBJECT(gconf_client));
 
   return 0;
 }

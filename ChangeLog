@@ -1,3 +1,17 @@
+Sun Jan 15 16:07:00 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	A data/Makefile.am:
+	A data/notification-daemon.schemas.in:
+	A po/POTFILES.in:
+	* src/daemon.c:
+	* src/daemon.h:
+	* src/engines.c:
+	* src/Makefile.am:
+	* Makefile.am:
+	* autogen.sh:
+	* configure.ac:
+	  - Added GConf support. The theme can now be set through gconf-editor.
+
 Sun Jan 15 14:49:49 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/engines.c:

@@ -1,0 +1,17 @@
+<gconfschemafile>
+ <schemalist>
+
+  <schema>
+   <key>/schemas/apps/notification-daemon/theme</key>
+   <applyto>/apps/notification-daemon/theme</applyto>
+   <owner>notification-daemon</owner>
+   <type>string</type>
+   <default>standard</default>
+   <locale name="C">
+    <short>Current theme</short>
+    <long>The theme used when displaying notifications.</long>
+   </locale>
+  </schema>
+
+ </schemalist>
+</gconfschemafile>
