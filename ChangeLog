@@ -1,3 +1,8 @@
+Thu Jan 19 01:36:16 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Add back support for hyperlinks in the standard engine.
+
 Sun Jan 15 17:51:27 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

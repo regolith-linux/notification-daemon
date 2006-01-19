@@ -70,6 +70,49 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 	return FALSE;
 }
 
+static void
+url_activated_cb(GtkWidget *url_label, const gchar *url)
+{
+	char *escaped_url;
+	char *cmd = NULL;
+
+	escaped_url = g_shell_quote(url);
+
+	/*
+	 * We can't actually check for GNOME_DESKTOP_SESSION_ID, because it's
+	 * not in the environment for this program :(
+	 */
+	if (/*g_getenv("GNOME_DESKTOP_SESSION_ID") != NULL &&*/
+		g_find_program_in_path("gnome-open") != NULL)
+	{
+		cmd = g_strdup_printf("gnome-open %s", escaped_url);
+	}
+	else if (g_find_program_in_path("mozilla-firefox") != NULL)
+	{
+		cmd = g_strdup_printf("mozilla-firefox %s", escaped_url);
+	}
+	else if (g_find_program_in_path("firefox") != NULL)
+	{
+		cmd = g_strdup_printf("firefox %s", escaped_url);
+	}
+	else if (g_find_program_in_path("mozilla") != NULL)
+	{
+		cmd = g_strdup_printf("mozilla %s", escaped_url);
+	}
+	else
+	{
+		g_warning("Unable to find a browser.");
+	}
+
+	g_free(escaped_url);
+
+	if (cmd != NULL)
+	{
+		g_spawn_command_line_async(cmd, NULL);
+		g_free(cmd);
+	}
+}
+
 GtkWindow *
 create_notification(void)
 {
@@ -140,6 +183,8 @@ create_notification(void)
 	gtk_box_pack_start(GTK_BOX(vbox), windata->body_label, TRUE, TRUE, 0);
 	gtk_misc_set_alignment(GTK_MISC(windata->body_label), 0, 0);
 	gtk_label_set_line_wrap(GTK_LABEL(windata->body_label), TRUE);
+	g_signal_connect(G_OBJECT(windata->body_label), "url_activated",
+					 G_CALLBACK(url_activated_cb), NULL);
 
 	windata->actions_box = gtk_hbox_new(FALSE, 6);
 	gtk_widget_show(windata->actions_box);
