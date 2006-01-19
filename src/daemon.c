@@ -646,16 +646,11 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	{
 		nt = (NotifyTimeout *)g_hash_table_lookup(priv->notification_hash,
 												  &id);
-	}
-
-	if (nt == NULL)
-	{
-		nw = theme_create_notification();
-		id = 0;
+		nw = nt->nw;
 	}
 	else
 	{
-		nw = nt->nw;
+		nw = theme_create_notification();
 	}
 
 	theme_set_notification_text(nw, summary, body);
