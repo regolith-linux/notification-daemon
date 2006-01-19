@@ -1,8 +1,8 @@
-/* notifydaemon.h - Implementation of the destop notification spec
+/*
+ * daemon.h - Implementation of the destop notification spec
  *
+ * Copyright (C) 2006 Christian Hammond <chipx86@chipx86.com>
  * Copyright (C) 2005 John (J5) Palmieri <johnp@redhat.com>
- *
- * Written by John (J5) Palmieri <johnp@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,58 +30,65 @@
 #include <dbus/dbus-glib-lowlevel.h>
 
 G_BEGIN_DECLS
-#define NOTIFY_TYPE_DAEMON (notify_daemon_get_type ())
-#define NOTIFY_DAEMON(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), NOTIFY_TYPE_DAEMON, NotifyDaemon))
-#define NOTIFY_DAEMON_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), NOTIFY_TYPE_DAEMON, NotifyDaemonClass))
-#define NOTIFY_IS_DAEMON(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), NOTIFY_TYPE_DAEMON))
-#define NOTIFY_IS_DAEMON_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), NOTIFY_TYPE_DAEMON))
-#define NOTIFY_DAEMON_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), NOTIFY_TYPE_DAEMON, NotifyDaemonClass))
+
+#define NOTIFY_TYPE_DAEMON (notify_daemon_get_type())
+#define NOTIFY_DAEMON(obj) \
+	(G_TYPE_CHECK_INSTANCE_CAST ((obj), NOTIFY_TYPE_DAEMON, NotifyDaemon))
+#define NOTIFY_DAEMON_CLASS(klass) \
+	(G_TYPE_CHECK_CLASS_CAST ((klass), NOTIFY_TYPE_DAEMON, NotifyDaemonClass))
+#define NOTIFY_IS_DAEMON(obj) \
+	(G_TYPE_CHECK_INSTANCE_TYPE ((obj), NOTIFY_TYPE_DAEMON))
+#define NOTIFY_IS_DAEMON_CLASS(klass) \
+	(G_TYPE_CHECK_CLASS_TYPE ((klass), NOTIFY_TYPE_DAEMON))
+#define NOTIFY_DAEMON_GET_CLASS(obj) \
+	(G_TYPE_INSTANCE_GET_CLASS((obj), NOTIFY_TYPE_DAEMON, NotifyDaemonClass))
 
 #define NOTIFY_DAEMON_DEFAULT_TIMEOUT 7000
 
-typedef struct _NotifyDaemon NotifyDaemon;
-typedef struct _NotifyDaemonClass NotifyDaemonClass;
+typedef struct _NotifyDaemon        NotifyDaemon;
+typedef struct _NotifyDaemonClass   NotifyDaemonClass;
 typedef struct _NotifyDaemonPrivate NotifyDaemonPrivate;
 
 struct _NotifyDaemon
 {
-  GObject parent;
+	GObject parent;
 
-  /*< private > */
-  NotifyDaemonPrivate *priv;
+	/*< private > */
+	NotifyDaemonPrivate *priv;
 };
 
 struct _NotifyDaemonClass
 {
-  GObjectClass parent_class;
+	GObjectClass parent_class;
 };
 
 enum _NotifyDaemonError
 {
-  NOTIFY_DAEMON_ERROR_GENERIC = 0,
+	NOTIFY_DAEMON_ERROR_GENERIC = 0,
 };
 
 GType notify_daemon_get_type(void);
 
-NotifyDaemon *notify_daemon_new(void) G_GNUC_MALLOC;
+NotifyDaemon *notify_daemon_new(void)
+	G_GNUC_MALLOC;
 
 gboolean notify_daemon_notify_handler(NotifyDaemon *daemon,
 									  const gchar *app_name,
-                                      const gchar *icon,
-                                      guint id,
-                                      const gchar *summary,
-                                      const gchar *body,
-                                      gchar **actions,
-                                      GHashTable *hints,
-                                      int timeout,
-                                      DBusGMethodInvocation *context);
+									  const gchar *icon,
+									  guint id,
+									  const gchar *summary,
+									  const gchar *body,
+									  gchar **actions,
+									  GHashTable *hints,
+									  int timeout,
+									  DBusGMethodInvocation *context);
 
 gboolean notify_daemon_close_notification_handler(NotifyDaemon *daemon,
-												  guint id,
-												  GError **error);
+												  guint id, GError **error);
 
 gboolean notify_daemon_get_capabilities(NotifyDaemon *daemon,
 										char ***out_caps);
+
 gboolean notify_daemon_get_server_information(NotifyDaemon *daemon,
 											  char **out_name,
 											  char **out_vendor,
@@ -91,4 +98,5 @@ gboolean notify_daemon_get_server_information(NotifyDaemon *daemon,
 GConfClient *get_gconf_client(void);
 
 G_END_DECLS
+
 #endif /* NOTIFY_DAEMON_H */

@@ -1,3 +1,11 @@
+Thu Jan 19 02:37:31 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/daemon.h:
+	* src/engines.c:
+	  - Reorganize the code styles to match the style of the rest of Galago
+	    and of the previous libnotify.
+
 Thu Jan 19 01:36:16 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:

@@ -1,4 +1,7 @@
+#include "config.h"
+
 #include <gconf/gconf-client.h>
+#include "daemon.h"
 #include "engines.h"
 
 typedef struct
