@@ -1,3 +1,9 @@
+Fri Jan 20 00:09:12 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Add a little hack to prevent the notification from closing when a
+	    link is clicked.
+
 Fri Jan 20 00:01:04 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

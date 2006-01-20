@@ -55,6 +55,7 @@ struct _NotifyDaemonPrivate
 	guint timeout_source;
 	GHashTable *notification_hash;
 	GSList *poptart_stack;
+	gboolean url_clicked_lock;
 };
 
 static GConfClient *gconf_client = NULL;
@@ -509,10 +510,15 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 }
 
 static void
-_notification_daemon_handle_bubble_widget_default(GtkWindow *nw,
-												  GdkEventButton *button,
-												  NotifyDaemon *daemon)
+window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 {
+	if (daemon->priv->url_clicked_lock)
+	{
+		daemon->priv->url_clicked_lock = FALSE;
+		return;
+	}
+
+	printf("Window clicked\n");
 	_close_notification(daemon,
 		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")));
 }
@@ -601,8 +607,12 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 static void
 url_clicked_cb(GtkWindow *nw, const char *url)
 {
+	NotifyDaemon *daemon = g_object_get_data(G_OBJECT(nw), "_notify_daemon");
 	char *escaped_url;
 	char *cmd = NULL;
+
+	/* Somewhat of a hack.. */
+	daemon->priv->url_clicked_lock = TRUE;
 
 	escaped_url = g_shell_quote(url);
 
@@ -672,6 +682,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	else
 	{
 		nw = theme_create_notification(url_clicked_cb);
+		g_object_set_data(G_OBJECT(nw), "_notify_daemon", daemon);
 	}
 
 	theme_set_notification_text(nw, summary, body);
@@ -764,9 +775,8 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		}
 	}
 
-	g_signal_connect(
-		G_OBJECT(nw), "button-release-event",
-		G_CALLBACK(_notification_daemon_handle_bubble_widget_default), daemon);
+	g_signal_connect(G_OBJECT(nw), "button-release-event",
+					 G_CALLBACK(window_clicked_cb), daemon);
 
 	theme_show_notification(nw);
 
