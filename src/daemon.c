@@ -36,6 +36,8 @@
 #include "engines.h"
 #include "notificationdaemon-dbus-glue.h"
 
+#define IMAGE_SIZE 48
+
 struct _NotifyTimeout
 {
 	GTimeVal expiration;
@@ -362,7 +364,8 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	int n_channels;
 	gsize expected_len;
 	GdkPixbuf *pixbuf;
-	GValueArray *image_struct;GValue *value;
+	GValueArray *image_struct;
+	GValue *value;
 	GArray *tmp_array;
 
 	if (!G_VALUE_HOLDS(icon_data, G_TYPE_VALUE_ARRAY))
@@ -658,7 +661,6 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	/*
 	 *XXX This needs to handle file URIs and all that.
 	 */
-	/* set_icon_from_data(nw, icon); */
 
 	/* deal with x, and y hints */
 	if ((data = (GValue *)g_hash_table_lookup(hints, "x")) != NULL)
@@ -723,6 +725,40 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 
 		if (data)
 			_notify_daemon_process_icon_data(daemon, nw, data);
+	}
+	else
+	{
+		GdkPixbuf *pixbuf;
+
+		if (!strncmp(icon, "file://", 7) || *icon == '/')
+		{
+			if (!strncmp(icon, "file://", 7))
+				icon += 7;
+
+			/* Load file */
+			pixbuf = gdk_pixbuf_new_from_file(icon, NULL);
+		}
+		else
+		{
+			/* Load icon theme icon */
+			GtkIconTheme *theme = gtk_icon_theme_new();
+			pixbuf = gtk_icon_theme_load_icon(theme, icon, IMAGE_SIZE,
+											  GTK_ICON_LOOKUP_USE_BUILTIN,
+											  NULL);
+			g_object_unref(G_OBJECT(theme));
+
+			if (pixbuf == NULL)
+			{
+				/* Well... maybe this is a file afterall. */
+				pixbuf = gdk_pixbuf_new_from_file(icon, NULL);
+			}
+		}
+
+		if (pixbuf != NULL)
+		{
+			theme_set_notification_icon(nw, pixbuf);
+			g_object_unref(G_OBJECT(pixbuf));
+		}
 	}
 
 	g_signal_connect(

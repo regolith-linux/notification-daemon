@@ -10,13 +10,16 @@ typedef struct
 	GtkWidget *summary_label;
 	GtkWidget *body_label;
 	GtkWidget *actions_box;
+	GtkWidget *last_sep;
+
+	guint num_actions_added;
+
 	gboolean has_arrow;
 	int point_x;
 	int point_y;
 	GdkGC *gc;
 	GdkPoint arrow_points[7];
 	GdkRegion *window_region;
-
 	GHashTable *hints;
 } WindowData;
 
@@ -186,7 +189,7 @@ create_notification(void)
 	g_signal_connect(G_OBJECT(windata->body_label), "url_activated",
 					 G_CALLBACK(url_activated_cb), NULL);
 
-	windata->actions_box = gtk_hbox_new(FALSE, 6);
+	windata->actions_box = gtk_hbox_new(FALSE, 4);
 	gtk_widget_show(windata->actions_box);
 	gtk_box_pack_start(GTK_BOX(vbox), windata->actions_box, FALSE, TRUE, 0);
 
@@ -278,9 +281,51 @@ set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 }
 
 void
-add_notification_action(GtkWindow *nw, const char *label, const char *key,
+add_notification_action(GtkWindow *nw, const char *text, const char *key,
 						GCallback cb)
 {
+	/*
+	 * TODO: Use SexyUrlLabel. This requires a way of disabling the
+	 *       right-click menu.
+	 */
+	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+	GtkWidget *evbox;
+	GtkWidget *label;
+	GdkColor color;
+	GdkCursor *cursor;
+	char *buf;
+
+	g_assert(windata != NULL);
+
+	if (windata->num_actions_added > 0)
+	{
+		label = gtk_label_new("|");
+		gtk_widget_show(label);
+		gtk_box_pack_start(GTK_BOX(windata->actions_box), label,
+						    FALSE, FALSE, 0);
+	}
+
+	evbox = gtk_event_box_new();
+	gtk_widget_show(evbox);
+	gtk_box_pack_start(GTK_BOX(windata->actions_box), evbox, FALSE, FALSE, 0);
+	gtk_widget_realize(evbox);
+	gdk_color_parse("white", &color);
+	gtk_widget_modify_bg(evbox, GTK_STATE_NORMAL, &color);
+
+	cursor = gdk_cursor_new_for_display(gtk_widget_get_display(evbox),
+										GDK_HAND2);
+	gdk_window_set_cursor(evbox->window, cursor);
+	gdk_cursor_unref(cursor);
+
+	label = gtk_label_new(NULL);
+	gtk_widget_show(label);
+	gtk_container_add(GTK_CONTAINER(evbox), label);
+	buf = g_strdup_printf("<span color=\"blue\""
+						  " underline=\"single\">%s</span>", text);
+	gtk_label_set_markup(GTK_LABEL(label), buf);
+	g_free(buf);
+
+	windata->num_actions_added++;
 }
 
 static void

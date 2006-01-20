@@ -1,3 +1,9 @@
+Thu Jan 19 23:23:55 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* themes/standard/theme.c:
+	  - Add the beginnings of action support.
+
 Thu Jan 19 22:34:16 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* data/Makefile.am:
