@@ -623,6 +623,55 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 	priv->poptart_stack = g_slist_prepend(priv->poptart_stack, nw);
 }
 
+static void
+action_invoked_cb(GtkWindow *nw, const char *key)
+{
+	printf("Action invoked: '%s'\n", key);
+}
+
+static void
+url_clicked_cb(GtkWindow *nw, const char *url)
+{
+	char *escaped_url;
+	char *cmd = NULL;
+
+	escaped_url = g_shell_quote(url);
+
+	/*
+	 * We can't actually check for GNOME_DESKTOP_SESSION_ID, because it's
+	 * not in the environment for this program :(
+	 */
+	if (/*g_getenv("GNOME_DESKTOP_SESSION_ID") != NULL &&*/
+		g_find_program_in_path("gnome-open") != NULL)
+	{
+		cmd = g_strdup_printf("gnome-open %s", escaped_url);
+	}
+	else if (g_find_program_in_path("mozilla-firefox") != NULL)
+	{
+		cmd = g_strdup_printf("mozilla-firefox %s", escaped_url);
+	}
+	else if (g_find_program_in_path("firefox") != NULL)
+	{
+		cmd = g_strdup_printf("firefox %s", escaped_url);
+	}
+	else if (g_find_program_in_path("mozilla") != NULL)
+	{
+		cmd = g_strdup_printf("mozilla %s", escaped_url);
+	}
+	else
+	{
+		g_warning("Unable to find a browser.");
+	}
+
+	g_free(escaped_url);
+
+	if (cmd != NULL)
+	{
+		g_spawn_command_line_async(cmd, NULL);
+		g_free(cmd);
+	}
+}
+
 gboolean
 notify_daemon_notify_handler(NotifyDaemon *daemon,
 							 const gchar *app_name,
@@ -653,7 +702,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	}
 	else
 	{
-		nw = theme_create_notification();
+		nw = theme_create_notification(action_invoked_cb, url_clicked_cb);
 	}
 
 	theme_set_notification_text(nw, summary, body);

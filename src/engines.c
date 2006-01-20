@@ -9,7 +9,8 @@ typedef struct
 	GModule *module;
 	guint ref_count;
 
-	GtkWindow *(*create_notification)(void);
+	GtkWindow *(*create_notification)(ActionInvokedCb action_invoked_cb,
+									  UrlClickedCb url_clicked_cb);
 	void (*destroy_notification)(GtkWindow *nw);
 	void (*show_notification)(GtkWindow *nw);
 	void (*hide_notification)(GtkWindow *nw);
@@ -146,10 +147,12 @@ get_theme_engine(void)
 }
 
 GtkWindow *
-theme_create_notification(void)
+theme_create_notification(ActionInvokedCb action_invoked_cb,
+						  UrlClickedCb url_clicked_cb)
 {
 	ThemeEngine *engine = get_theme_engine();
-	GtkWindow *nw = engine->create_notification();
+	GtkWindow *nw = engine->create_notification(action_invoked_cb,
+												url_clicked_cb);
 	g_object_set_data(G_OBJECT(nw), "_theme_engine", engine);
 	engine->ref_count++;
 	return nw;

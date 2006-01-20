@@ -1,6 +1,9 @@
 #include <gtk/gtk.h>
 #include <libsexy/sexy-url-label.h>
 
+typedef void (*ActionInvokedCb)(GtkWindow *nw, const char *key);
+typedef void (*UrlClickedCb)(GtkWindow *nw, const char *url);
+
 typedef struct
 {
 	GtkWidget *spacer;
@@ -21,6 +24,9 @@ typedef struct
 	GdkPoint arrow_points[7];
 	GdkRegion *window_region;
 	GHashTable *hints;
+
+	ActionInvokedCb action_invoked;
+	UrlClickedCb url_clicked;
 
 } WindowData;
 
@@ -74,51 +80,9 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 	return FALSE;
 }
 
-static void
-url_activated_cb(GtkWidget *url_label, const gchar *url)
-{
-	char *escaped_url;
-	char *cmd = NULL;
-
-	escaped_url = g_shell_quote(url);
-
-	/*
-	 * We can't actually check for GNOME_DESKTOP_SESSION_ID, because it's
-	 * not in the environment for this program :(
-	 */
-	if (/*g_getenv("GNOME_DESKTOP_SESSION_ID") != NULL &&*/
-		g_find_program_in_path("gnome-open") != NULL)
-	{
-		cmd = g_strdup_printf("gnome-open %s", escaped_url);
-	}
-	else if (g_find_program_in_path("mozilla-firefox") != NULL)
-	{
-		cmd = g_strdup_printf("mozilla-firefox %s", escaped_url);
-	}
-	else if (g_find_program_in_path("firefox") != NULL)
-	{
-		cmd = g_strdup_printf("firefox %s", escaped_url);
-	}
-	else if (g_find_program_in_path("mozilla") != NULL)
-	{
-		cmd = g_strdup_printf("mozilla %s", escaped_url);
-	}
-	else
-	{
-		g_warning("Unable to find a browser.");
-	}
-
-	g_free(escaped_url);
-
-	if (cmd != NULL)
-	{
-		g_spawn_command_line_async(cmd, NULL);
-		g_free(cmd);
-	}
-}
-
 GtkWindow *
-create_notification(void)
+create_notification(ActionInvokedCb action_invoked,
+					UrlClickedCb url_clicked)
 {
 	GtkWidget *win;
 	GtkWidget *main_vbox;
@@ -129,6 +93,8 @@ create_notification(void)
 	WindowData *windata;
 
 	windata = g_new0(WindowData, 1);
+	windata->action_invoked = action_invoked;
+	windata->url_clicked = url_clicked;
 
 	win = gtk_window_new(GTK_WINDOW_POPUP);
 	gtk_widget_add_events(win, GDK_BUTTON_RELEASE_MASK);
@@ -187,8 +153,8 @@ create_notification(void)
 	gtk_box_pack_start(GTK_BOX(vbox), windata->body_label, TRUE, TRUE, 0);
 	gtk_misc_set_alignment(GTK_MISC(windata->body_label), 0, 0);
 	gtk_label_set_line_wrap(GTK_LABEL(windata->body_label), TRUE);
-	g_signal_connect(G_OBJECT(windata->body_label), "url_activated",
-					 G_CALLBACK(url_activated_cb), NULL);
+	g_signal_connect_swapped(G_OBJECT(windata->body_label), "url_activated",
+							 G_CALLBACK(windata->url_clicked), win);
 
 	windata->actions_box = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(windata->actions_box);

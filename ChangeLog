@@ -1,3 +1,14 @@
+Thu Jan 19 23:44:31 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/engines.c:
+	* src/engines.h:
+	* themes/standard/theme.c:
+	  - Pass a couple of callbacks to the theme engine's
+	    create_notification() function: action_invoked and url_clicked.
+	  - Move the URL clicking callback to daemon.c from the standard engine.
+	    The standard engine now calls the passed url_clicked function.
+
 Thu Jan 19 23:33:46 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
