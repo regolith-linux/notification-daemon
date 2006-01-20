@@ -241,21 +241,15 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 	NotifyTimeout *nt = (NotifyTimeout *)value;
 	gboolean *phas_more_timeouts = (gboolean *)data;
 	GTimeVal now;
-	GTimeVal expiration;
 
 	if (!nt->has_timeout)
 		return FALSE;
 
 	g_get_current_time(&now);
-	expiration = nt->expiration;
 
-	if (now.tv_sec > expiration.tv_sec)
-	{
-		_emit_closed_signal(G_OBJECT(nt->nw));
-		return TRUE;
-	}
-	else if (now.tv_sec == expiration.tv_sec &&
-			 now.tv_usec > expiration.tv_usec)
+	if (now.tv_sec > nt->expiration.tv_sec ||
+		(now.tv_sec == nt->expiration.tv_sec &&
+		 now.tv_usec >= nt->expiration.tv_usec))
 	{
 		_emit_closed_signal(G_OBJECT(nt->nw));
 		return TRUE;

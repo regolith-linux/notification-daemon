@@ -1,3 +1,8 @@
+Fri Jan 20 00:15:04 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Small code cleanups.
+
 Fri Jan 20 00:09:12 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
