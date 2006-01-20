@@ -25,7 +25,6 @@ typedef struct
 	GdkRegion *window_region;
 	GHashTable *hints;
 
-	ActionInvokedCb action_invoked;
 	UrlClickedCb url_clicked;
 
 } WindowData;
@@ -81,8 +80,7 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 }
 
 GtkWindow *
-create_notification(ActionInvokedCb action_invoked,
-					UrlClickedCb url_clicked)
+create_notification(UrlClickedCb url_clicked)
 {
 	GtkWidget *win;
 	GtkWidget *main_vbox;
@@ -93,7 +91,6 @@ create_notification(ActionInvokedCb action_invoked,
 	WindowData *windata;
 
 	windata = g_new0(WindowData, 1);
-	windata->action_invoked = action_invoked;
 	windata->url_clicked = url_clicked;
 
 	win = gtk_window_new(GTK_WINDOW_POPUP);
@@ -247,9 +244,19 @@ set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 		gtk_widget_hide(windata->spacer);
 }
 
+static void
+action_clicked_cb(GtkWidget *evbox, GdkEventButton *event,
+				  ActionInvokedCb action_cb)
+{
+	GtkWindow *nw   = g_object_get_data(G_OBJECT(evbox), "_nw");
+	const char *key = g_object_get_data(G_OBJECT(evbox), "_action_key");
+
+	action_cb(nw, key);
+}
+
 void
 add_notification_action(GtkWindow *nw, const char *text, const char *key,
-						GCallback cb)
+						ActionInvokedCb cb)
 {
 	/*
 	 * TODO: Use SexyUrlLabel. This requires a way of disabling the
@@ -278,6 +285,12 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	gtk_widget_realize(evbox);
 	gdk_color_parse("white", &color);
 	gtk_widget_modify_bg(evbox, GTK_STATE_NORMAL, &color);
+
+	g_object_set_data(G_OBJECT(evbox), "_nw", nw);
+	g_object_set_data_full(G_OBJECT(evbox),
+						   "_action_key", g_strdup(key), g_free);
+	g_signal_connect(G_OBJECT(evbox), "button-release-event",
+					 G_CALLBACK(action_clicked_cb), cb);
 
 	cursor = gdk_cursor_new_for_display(gtk_widget_get_display(evbox),
 										GDK_HAND2);

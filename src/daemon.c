@@ -132,12 +132,8 @@ notify_daemon_new(void)
 	return g_object_new(NOTIFY_TYPE_DAEMON, NULL);
 }
 
-/*
- *XXX The notify_widget thing needs to be replaced with some struct.
- */
-#if 0
 static void
-_emit_action_invoked_signal(GObject *notify_widget, gchar *action)
+_action_invoked_cb(GtkWindow *nw, const char *key)
 {
 	DBusConnection *con;
 	DBusError error;
@@ -161,15 +157,15 @@ _emit_action_invoked_signal(GObject *notify_widget, gchar *action)
 										  "org.freedesktop.Notifications",
 										  "ActionInvoked");
 
-		dest = g_object_get_data(notify_widget, "_notify_sender");
-		id = GPOINTER_TO_UINT(g_object_get_data(notify_widget, "_notify_id"));
+		dest = g_object_get_data(G_OBJECT(nw), "_notify_sender");
+		id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id"));
 
 		g_assert(dest != NULL);
 
 		dbus_message_set_destination(message, dest);
 		dbus_message_append_args(message,
 								 DBUS_TYPE_UINT32, &id,
-								 DBUS_TYPE_STRING, &action,
+								 DBUS_TYPE_STRING, &key,
 								 DBUS_TYPE_INVALID);
 
 		dbus_connection_send(con, message, NULL);
@@ -177,13 +173,6 @@ _emit_action_invoked_signal(GObject *notify_widget, gchar *action)
 		dbus_message_unref(message);
 		dbus_connection_unref(con);
 	}
-}
-#endif
-
-static void
-_action_invoked_cb(const char *key)
-{
-	g_message("'%s' invoked", key);
 }
 
 static void
@@ -519,17 +508,6 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	return TRUE;
 }
 
-#if 0
-static void
-_notification_daemon_handle_bubble_widget_action(GtkWidget *b,
-												 GtkWindow *nw)
-{
-	gchar *action = (gchar *)g_object_get_data(G_OBJECT(b), "_notify_action");
-
-	_emit_action_invoked_signal(G_OBJECT(nw), action);
-}
-#endif
-
 static void
 _notification_daemon_handle_bubble_widget_default(GtkWindow *nw,
 												  GdkEventButton *button,
@@ -624,12 +602,6 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 }
 
 static void
-action_invoked_cb(GtkWindow *nw, const char *key)
-{
-	printf("Action invoked: '%s'\n", key);
-}
-
-static void
 url_clicked_cb(GtkWindow *nw, const char *url)
 {
 	char *escaped_url;
@@ -702,7 +674,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	}
 	else
 	{
-		nw = theme_create_notification(action_invoked_cb, url_clicked_cb);
+		nw = theme_create_notification(url_clicked_cb);
 	}
 
 	theme_set_notification_text(nw, summary, body);
@@ -739,21 +711,6 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 
 		theme_add_notification_action(nw, l, actions[i],
 									  G_CALLBACK(_action_invoked_cb));
-
-#if 0
-		b = egg_notification_bubble_widget_create_button(nw, l);
-
-		g_object_set_data_full(G_OBJECT(b),
-							   "_notify_action",
-							   g_strdup(actions[i]),
-							   (GDestroyNotify) g_free);
-
-		g_signal_connect(b,
-						 "clicked",
-						 (GCallback)
-						 _notification_daemon_handle_bubble_widget_action,
-						 nw);
-#endif
 	}
 
 	if (use_pos_data)

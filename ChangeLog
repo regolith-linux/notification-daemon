@@ -1,3 +1,13 @@
+Thu Jan 19 23:59:42 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/engines.c:
+	* src/engines.h:
+	* themes/standard/theme.c:
+	  - Add proper support for actions.
+	  - Remove the action_invoked parameter to create_notification(), since
+	    we're already passing it to add_notification_action.
+
 Thu Jan 19 23:44:31 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

@@ -3,11 +3,9 @@
 
 #include <gtk/gtk.h>
 
-typedef void (*ActionInvokedCb)(GtkWindow *nw, const char *key);
 typedef void (*UrlClickedCb)(GtkWindow *nw, const char *url);
 
-GtkWindow *theme_create_notification(ActionInvokedCb action_invoked_cb,
-									 UrlClickedCb url_clicked_cb);
+GtkWindow *theme_create_notification(UrlClickedCb url_clicked_cb);
 void theme_destroy_notification(GtkWindow *nw);
 void theme_show_notification(GtkWindow *nw);
 void theme_hide_notification(GtkWindow *nw);
