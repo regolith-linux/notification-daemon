@@ -1,3 +1,9 @@
+Fri Jan 20 00:22:38 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Respect the user's work area (the area inside the panels and stuff)
+	    when displaying notifications.
+
 Fri Jan 20 00:15:04 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

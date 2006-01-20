@@ -32,6 +32,11 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
+#include <gdk/gdkx.h>
+
 #include "daemon.h"
 #include "engines.h"
 #include "notificationdaemon-dbus-glue.h"
@@ -517,6 +522,52 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")));
 }
 
+static gboolean
+get_work_area(GdkRectangle *rect)
+{
+	Atom workarea = XInternAtom(GDK_DISPLAY(), "_NET_WORKAREA", True);
+	Atom type;
+	Window win;
+	int format;
+	gulong num, leftovers;
+	gulong max_len = 4 * 32;
+	guchar *ret_workarea;
+	long *workareas;
+	int result;
+	int disp_screen = 0; /* XXX */
+
+	/* Defaults in case of error */
+	rect->x = 0;
+	rect->y = 0;
+	rect->width = gdk_screen_width();
+	rect->height = gdk_screen_height();
+
+	if (workarea == None)
+		return FALSE;
+
+	win = XRootWindow(GDK_DISPLAY(), disp_screen);
+	result = XGetWindowProperty(GDK_DISPLAY(), win, workarea, 0,
+								max_len, False, AnyPropertyType,
+								&type, &format, &num, &leftovers,
+								&ret_workarea);
+
+	if (result != Success || type == None || format == 0 || leftovers ||
+		num % 4)
+	{
+		return FALSE;
+	}
+
+	workareas = (long *)ret_workarea;
+	rect->x      = workareas[disp_screen * 4];
+	rect->y      = workareas[disp_screen * 4 + 1];
+	rect->width  = workareas[disp_screen * 4 + 2];
+	rect->height = workareas[disp_screen * 4 + 3];
+
+	XFree(ret_workarea);
+
+	return TRUE;
+}
+
 static void
 _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 {
@@ -526,10 +577,7 @@ _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 	GSList *link;
 	gint x, y;
 
-	workarea.x = 0;
-	workarea.y = 0;
-	workarea.width = gdk_screen_width();
-	workarea.height = gdk_screen_height();
+	get_work_area(&workarea);
 
 	y = workarea.y + workarea.height;
 	x = 0;
@@ -573,10 +621,7 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 
 	gtk_widget_size_request(GTK_WIDGET(nw), &req);
 
-	workarea.x = 0;
-	workarea.y = 0;
-	workarea.width = gdk_screen_width();
-	workarea.height = gdk_screen_height();
+	get_work_area(&workarea);
 
 	x = workarea.x + workarea.width - req.width;
 	y = workarea.y + workarea.height - req.height;
