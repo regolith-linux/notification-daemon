@@ -581,8 +581,6 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 	x = workarea.x + workarea.width - req.width;
 	y = workarea.y + workarea.height - req.height;
 
-	g_message("x %i y %i width %i height %i", x, y, req.width, req.height);
-
 	theme_move_notification(nw, x, y);
 
 	for (link = priv->poptart_stack; link != NULL; link = link->next)
@@ -592,7 +590,6 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 		gtk_widget_size_request(GTK_WIDGET(nw2), &req);
 		x = workarea.x + workarea.width - req.width;
 		y = y - req.height;
-		g_message("x %i y %i width %i height %i", x, y, req.width, req.height);
 		theme_move_notification(nw2, x, y);
 	}
 
@@ -851,7 +848,6 @@ main(int argc, char **argv)
 
 	g_log_set_always_fatal(G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
 
-	g_message("initializing glib type system");
 	gtk_init(&argc, &argv);
 	gconf_init(argc, argv, NULL);
 
@@ -870,10 +866,8 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
-	g_message("register 'daemon' type with dbus-glib...");
 	dbus_g_object_type_install_info(NOTIFY_TYPE_DAEMON,
 									&dbus_glib__object_info);
-	g_message("'daemon' successfully registered");
 
 	bus_proxy = dbus_g_proxy_new_for_name(connection,
 										  "org.freedesktop.DBus",
@@ -890,15 +884,11 @@ main(int argc, char **argv)
 		g_error("Could not aquire name: %s", error->message);
 	}
 
-	g_message("creating instance of 'daemon' object...");
 	daemon = notify_daemon_new();
-	g_message("'daemon' object created successfully");
 
-	g_message("exporting instance of 'daemon' object over the bus...");
 	dbus_g_connection_register_g_object(connection,
 										"/org/freedesktop/Notifications",
 										G_OBJECT(daemon));
-	g_message("'daemon' object exported successfully");
 
 	gtk_main();
 
