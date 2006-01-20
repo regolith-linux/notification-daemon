@@ -1,3 +1,8 @@
+Thu Jan 19 22:34:16 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* data/Makefile.am:
+	  - NO! Install the schema always!
+
 Thu Jan 19 10:18:09 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
