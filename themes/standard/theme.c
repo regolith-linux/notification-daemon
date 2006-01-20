@@ -21,6 +21,7 @@ typedef struct
 	GdkPoint arrow_points[7];
 	GdkRegion *window_region;
 	GHashTable *hints;
+
 } WindowData;
 
 #define WIDTH         300
@@ -189,7 +190,7 @@ create_notification(void)
 	g_signal_connect(G_OBJECT(windata->body_label), "url_activated",
 					 G_CALLBACK(url_activated_cb), NULL);
 
-	windata->actions_box = gtk_hbox_new(FALSE, 4);
+	windata->actions_box = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(windata->actions_box);
 	gtk_box_pack_start(GTK_BOX(vbox), windata->actions_box, FALSE, TRUE, 0);
 
@@ -299,7 +300,7 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 
 	if (windata->num_actions_added > 0)
 	{
-		label = gtk_label_new("|");
+		label = gtk_label_new("‧");
 		gtk_widget_show(label);
 		gtk_box_pack_start(GTK_BOX(windata->actions_box), label,
 						    FALSE, FALSE, 0);

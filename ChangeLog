@@ -1,3 +1,8 @@
+Thu Jan 19 23:33:46 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Sexy new separator. Well, it's better than "|" anyway.
+
 Thu Jan 19 23:23:55 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
