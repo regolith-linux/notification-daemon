@@ -102,8 +102,6 @@ create_notification(UrlClickedCb url_clicked)
 	g_signal_connect(G_OBJECT(win), "expose-event",
 					 G_CALLBACK(draw_border), windata);
 
-	// TODO: Connect to button-release-event
-
 	main_vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(main_vbox);
 	gtk_container_add(GTK_CONTAINER(win), main_vbox);
@@ -142,7 +140,6 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_box_pack_start(GTK_BOX(vbox), windata->summary_label, FALSE, FALSE, 0);
 	gtk_misc_set_alignment(GTK_MISC(windata->summary_label), 0, 0);
 
-	/* TODO: Use a SexyUrlLabel, and attach to url_activated. */
 	windata->body_label = sexy_url_label_new();
 	gtk_widget_show(windata->body_label);
 	gtk_box_pack_start(GTK_BOX(vbox), windata->body_label, TRUE, TRUE, 0);
