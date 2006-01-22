@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include <libsexy/sexy-url-label.h>
+#include "bgbox.h"
 
 typedef void (*ActionInvokedCb)(GtkWindow *nw, const char *key);
 typedef void (*UrlClickedCb)(GtkWindow *nw, const char *url);
@@ -87,7 +88,6 @@ create_notification(UrlClickedCb url_clicked)
 	GtkWidget *main_vbox;
 	GtkWidget *hbox;
 	GtkWidget *vbox;
-	GdkColor color;
 	GtkRequisition req;
 	WindowData *windata;
 
@@ -128,12 +128,9 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_misc_set_alignment(GTK_MISC(windata->icon), 0.5, 0.0);
 	gtk_container_set_border_width(GTK_CONTAINER(windata->iconbox), 12);
 
-	/* TODO: Make this like a view::BaseBGBox */
-	windata->contentbox = gtk_event_box_new();
+	windata->contentbox = notifyd_bgbox_new(NOTIFYD_BASE);
 	gtk_widget_show(windata->contentbox);
 	gtk_box_pack_start(GTK_BOX(hbox), windata->contentbox, TRUE, TRUE, 0);
-	gdk_color_parse("white", &color);
-	gtk_widget_modify_bg(windata->contentbox, GTK_STATE_NORMAL, &color);
 
 	vbox = gtk_vbox_new(FALSE, 6);
 	gtk_widget_show(vbox);
@@ -251,11 +248,11 @@ set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 }
 
 static void
-action_clicked_cb(GtkWidget *evbox, GdkEventButton *event,
+action_clicked_cb(GtkWidget *w, GdkEventButton *event,
 				  ActionInvokedCb action_cb)
 {
-	GtkWindow *nw   = g_object_get_data(G_OBJECT(evbox), "_nw");
-	const char *key = g_object_get_data(G_OBJECT(evbox), "_action_key");
+	GtkWindow *nw   = g_object_get_data(G_OBJECT(w), "_nw");
+	const char *key = g_object_get_data(G_OBJECT(w), "_action_key");
 
 	action_cb(nw, key);
 }
@@ -269,9 +266,8 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	 *       right-click menu.
 	 */
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
-	GtkWidget *evbox;
+	GtkWidget *bgbox;
 	GtkWidget *label;
-	GdkColor color;
 	GdkCursor *cursor;
 	char *buf;
 
@@ -285,27 +281,24 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 						    FALSE, FALSE, 0);
 	}
 
-	evbox = gtk_event_box_new();
-	gtk_widget_show(evbox);
-	gtk_box_pack_start(GTK_BOX(windata->actions_box), evbox, FALSE, FALSE, 0);
-	gtk_widget_realize(evbox);
-	gdk_color_parse("white", &color);
-	gtk_widget_modify_bg(evbox, GTK_STATE_NORMAL, &color);
+	bgbox = notifyd_bgbox_new(NOTIFYD_BASE);
+	gtk_widget_show(bgbox);
+	gtk_box_pack_start(GTK_BOX(windata->actions_box), bgbox, FALSE, FALSE, 0);
 
-	g_object_set_data(G_OBJECT(evbox), "_nw", nw);
-	g_object_set_data_full(G_OBJECT(evbox),
+	g_object_set_data(G_OBJECT(bgbox), "_nw", nw);
+	g_object_set_data_full(G_OBJECT(bgbox),
 						   "_action_key", g_strdup(key), g_free);
-	g_signal_connect(G_OBJECT(evbox), "button-release-event",
+	g_signal_connect(G_OBJECT(bgbox), "button-release-event",
 					 G_CALLBACK(action_clicked_cb), cb);
 
-	cursor = gdk_cursor_new_for_display(gtk_widget_get_display(evbox),
+	cursor = gdk_cursor_new_for_display(gtk_widget_get_display(bgbox),
 										GDK_HAND2);
-	gdk_window_set_cursor(evbox->window, cursor);
+	gdk_window_set_cursor(bgbox->window, cursor);
 	gdk_cursor_unref(cursor);
 
 	label = gtk_label_new(NULL);
 	gtk_widget_show(label);
-	gtk_container_add(GTK_CONTAINER(evbox), label);
+	gtk_container_add(GTK_CONTAINER(bgbox), label);
 	buf = g_strdup_printf("<span color=\"blue\""
 						  " underline=\"single\">%s</span>", text);
 	gtk_label_set_markup(GTK_LABEL(label), buf);

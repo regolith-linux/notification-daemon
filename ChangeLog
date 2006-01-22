@@ -1,3 +1,13 @@
+Sun Jan 22 15:13:08 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/Makefile.am:
+	A themes/standard/bgbox.c:
+	A themes/standard/bgbox.h:
+	* themes/standard/theme.c:
+	  - Added a BgBox widget to the standard theme. This is based off of
+	    libview's BaseBGBox widget. It's being used for the themeing of the
+	    standard theme, instead of hard-coding white.
+
 Sun Jan 22 13:27:29 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
