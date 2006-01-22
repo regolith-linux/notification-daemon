@@ -1,3 +1,17 @@
+Sun Jan 22 13:27:29 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* themes/bubble/eggnotificationbubblewidget.c:
+	* themes/bubble/eggnotificationbubblewidget.h:
+	* themes/standard/theme.c:
+	* autogen.sh:
+	  - Patch by Rodney Dawes to fix a problem with keeping a pointer to
+	    the hints table in the themes. We no longer store the whole table,
+	    but rather only the parts of it we care about. This fixes a crash.
+	  - This patch also updates the required automake version to 1.9, to
+	    be compatible with the new intltool and to use a more recent
+	    gnome-common.
+
 Sun Jan 22 13:23:51 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

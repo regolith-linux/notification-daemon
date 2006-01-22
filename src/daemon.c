@@ -725,6 +725,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	}
 
 	theme_set_notification_text(nw, summary, body);
+	theme_set_notification_hints(nw, hints);
 
 	/*
 	 *XXX This needs to handle file URIs and all that.

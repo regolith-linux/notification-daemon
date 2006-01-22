@@ -1205,6 +1205,9 @@ void
 egg_notification_bubble_widget_set_hints (EggNotificationBubbleWidget *bubble_widget,
 					  GHashTable *hints)
 {
-	bubble_widget->hints = hints;
-}
+  GValue *data;
 
+  data = g_hash_table_lookup (hints, "urgency");
+  if (data)
+    bubble_widget->urgency = g_value_get_uchar (data);
+}

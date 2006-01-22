@@ -23,7 +23,8 @@ typedef struct
 	GdkGC *gc;
 	GdkPoint arrow_points[7];
 	GdkRegion *window_region;
-	GHashTable *hints;
+
+	guchar urgency;
 
 	UrlClickedCb url_clicked;
 
@@ -194,9 +195,14 @@ void
 set_notification_hints(GtkWindow *nw, GHashTable *hints)
 {
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+	GValue *value;
+
 	g_assert(windata != NULL);
 
-	windata->hints = hints;
+	value = (GValue *)g_hash_table_lookup(hints, "urgency");
+
+	if (value)
+		windata->urgency = g_value_get_uchar(value);
 }
 
 void

@@ -76,7 +76,8 @@ struct _EggNotificationBubbleWidget
   GdkColor bg_end_gradient;
   GdkColor border_color;
 
-	GHashTable *hints;
+  /* The Urgency level of the notification */
+  guchar urgency;
 
   /* drawing instructions */
   struct _DrawingPipeline dp;
