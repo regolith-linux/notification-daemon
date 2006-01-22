@@ -74,8 +74,8 @@ NotifyDaemon *notify_daemon_new(void)
 
 gboolean notify_daemon_notify_handler(NotifyDaemon *daemon,
 									  const gchar *app_name,
-									  const gchar *icon,
 									  guint id,
+									  const gchar *icon,
 									  const gchar *summary,
 									  const gchar *body,
 									  gchar **actions,

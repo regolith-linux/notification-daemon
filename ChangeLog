@@ -1,3 +1,10 @@
+Sun Jan 22 13:23:51 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/daemon.h:
+	* src/notificationdaemon.xml:
+	  - Rearrange some parameters to match the spec.
+
 Fri Jan 20 00:22:38 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
