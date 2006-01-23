@@ -763,7 +763,12 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 
 	if (use_pos_data)
 	{
-		theme_set_notification_arrow(nw, TRUE, 0, 0);
+		/*
+		 * Typically, the theme engine will set its own position based on
+		 * the arrow X, Y hints. However, in case, move the notification to
+		 * that position.
+		 */
+		theme_set_notification_arrow(nw, TRUE, x, y);
 		theme_move_notification(nw, x, y);
 	}
 	else

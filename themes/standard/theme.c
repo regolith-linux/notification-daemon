@@ -19,10 +19,20 @@ typedef struct
 	guint num_actions_added;
 
 	gboolean has_arrow;
+
 	int point_x;
 	int point_y;
+
+	int drawn_arrow_begin_x;
+	int drawn_arrow_begin_y;
+	int drawn_arrow_middle_x;
+	int drawn_arrow_middle_y;
+	int drawn_arrow_end_x;
+	int drawn_arrow_end_y;
+
 	GdkGC *gc;
-	GdkPoint arrow_points[7];
+	GdkPoint *border_points;
+	size_t num_border_points;
 	GdkRegion *window_region;
 
 	guchar urgency;
@@ -35,9 +45,9 @@ typedef struct
 #define MIN_HEIGHT    100
 #define IMAGE_SIZE    48
 #define IMAGE_PADDING 10
-#define ARROW_OFFSET  20
-#define ARROW_HEIGHT  20
-#define ARROW_WIDTH   20
+#define DEFAULT_ARROW_OFFSET  20
+#define DEFAULT_ARROW_HEIGHT  14
+#define DEFAULT_ARROW_WIDTH   28
 
 static gboolean
 draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
@@ -58,19 +68,37 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 	if (windata->has_arrow)
 	{
 		gdk_draw_polygon(win->window, windata->gc, FALSE,
-						 windata->arrow_points,
-						 G_N_ELEMENTS(windata->arrow_points));
+						 windata->border_points, windata->num_border_points);
 
 		/* HACK! */
+#if 0
 		gdk_draw_line(win->window, windata->gc,
-					  ARROW_OFFSET + 1, ARROW_HEIGHT,
-					  ARROW_OFFSET + ARROW_WIDTH / 2 + 1, 0);
+					  windata->drawn_arrow_begin_x,
+					  windata->drawn_arrow_begin_y,
+					  windata->drawn_arrow_middle_x,
+					  windata->drawn_arrow_middle_y);
 		gdk_draw_line(win->window, windata->gc,
-					  ARROW_OFFSET + ARROW_WIDTH / 2 - 1, 0,
-					  ARROW_OFFSET + ARROW_WIDTH - 1, ARROW_HEIGHT);
+					  windata->drawn_arrow_begin_x + 1,
+					  windata->drawn_arrow_begin_y,
+					  windata->drawn_arrow_middle_x + 1,
+					  windata->drawn_arrow_middle_y);
+
+		gdk_draw_line(win->window, windata->gc,
+					  windata->drawn_arrow_middle_x,
+					  windata->drawn_arrow_middle_y,
+					  windata->drawn_arrow_end_x,
+					  windata->drawn_arrow_end_y);
+		gdk_draw_line(win->window, windata->gc,
+					  windata->drawn_arrow_middle_x - 1,
+					  windata->drawn_arrow_middle_y,
+					  windata->drawn_arrow_end_x - 1,
+					  windata->drawn_arrow_end_y);
 		gdk_draw_line(win->window, windata->gc, 0, h - 1, w - 1, h - 1);
+#endif
+#if 0
 		gdk_window_shape_combine_region(win->window, windata->window_region,
 										0, 0);
+#endif
 	}
 	else
 	{
@@ -109,7 +137,7 @@ create_notification(UrlClickedCb url_clicked)
 
 	windata->spacer = gtk_image_new();
 	gtk_box_pack_start(GTK_BOX(main_vbox), windata->spacer, FALSE, FALSE, 0);
-	gtk_widget_set_size_request(windata->spacer, -1, ARROW_HEIGHT);
+	gtk_widget_set_size_request(windata->spacer, -1, DEFAULT_ARROW_HEIGHT);
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(hbox);
@@ -235,8 +263,8 @@ set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 	g_assert(windata != NULL);
 
 	windata->has_arrow = visible;
-	windata->point_x   = x;
-	windata->point_y   = y;
+	windata->point_x = x;
+	windata->point_y = y;
 
 	if (visible)
 		gtk_widget_show(windata->spacer);
@@ -305,49 +333,249 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 }
 
 static void
-generate_arrow(GtkWidget *nw, WindowData *windata, int *arrow_x, int *arrow_y)
+create_border_with_arrow(GtkWidget *nw, WindowData *windata,
+						 int arrow_tip_x, int arrow_tip_y)
 {
 	GtkRequisition req;
-	int new_height;
+	GtkArrowType arrow_type = GTK_ARROW_UP;
+	GdkRectangle border_rect;
+	GdkScreen *screen;
+	int screen_width;
+	int screen_height;
+	int arrow_side1_width = DEFAULT_ARROW_WIDTH / 2;
+	int arrow_side2_width = DEFAULT_ARROW_WIDTH / 2;
+	int arrow_offset = DEFAULT_ARROW_OFFSET;
+	int i = 0;
 
 	gtk_widget_realize(nw);
 	gtk_widget_size_request(nw, &req);
 
-	new_height = req.height + ARROW_HEIGHT;
+	border_rect.width = req.width;
+	border_rect.height = req.height;
 
-	windata->arrow_points[0].x = 0;
-	windata->arrow_points[0].y = ARROW_HEIGHT;
+	screen        = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
+	screen_width  = gdk_screen_get_width(screen);
+	screen_height = gdk_screen_get_height(screen);
 
-	windata->arrow_points[1].x = ARROW_OFFSET;
-	windata->arrow_points[1].y = ARROW_HEIGHT;
+	if (windata->border_points != NULL)
+		g_free(windata->border_points);
 
-	windata->arrow_points[2].x = ARROW_OFFSET + ARROW_WIDTH / 2;
-	windata->arrow_points[2].y = 0;
+	windata->num_border_points = 5;
 
-	windata->arrow_points[3].x = ARROW_OFFSET + ARROW_WIDTH;
-	windata->arrow_points[3].y = ARROW_HEIGHT;
+	/* Handle the offset and such */
+	switch (arrow_type)
+	{
+		case GTK_ARROW_UP:
+		case GTK_ARROW_DOWN:
+			if (arrow_tip_x < arrow_side1_width)
+			{
+				arrow_side1_width = 0;
+				arrow_offset = 0;
+			}
+			else if (arrow_tip_x > screen_width - arrow_side2_width)
+			{
+				arrow_side2_width = 0;
+				arrow_offset = req.width - arrow_side1_width;
+			}
+			else
+			{
+				if (arrow_tip_x - arrow_side2_width + req.width >= screen_width)
+				{
+					arrow_offset =
+						req.width - arrow_side1_width - arrow_side2_width -
+						(screen_width - MAX(arrow_tip_x + arrow_side1_width,
+											screen_width -
+											DEFAULT_ARROW_OFFSET));
+				}
+				else
+				{
+					arrow_offset = MIN(arrow_tip_x - arrow_side1_width,
+									   DEFAULT_ARROW_OFFSET);
+				}
 
-	windata->arrow_points[4].x = req.width;
-	windata->arrow_points[4].y = ARROW_HEIGHT;
+				if (arrow_offset == 0 ||
+					arrow_offset == req.width - arrow_side1_width)
+					windata->num_border_points++;
+				else
+					windata->num_border_points += 2;
+			}
 
-	windata->arrow_points[5].x = req.width;
-	windata->arrow_points[5].y = new_height;
+			/*
+			 * Why risk this for official builds? If it's somehow off the
+			 * screen, it won't horribly impact the user. Definitely less
+			 * than an assertion would...
+			 */
+#if 0
+			g_assert(arrow_offset + arrow_side1_width >= 0);
+			g_assert(arrow_offset + arrow_side1_width + arrow_side2_width <=
+					 req.width);
+#endif
 
-	windata->arrow_points[6].x = 0;
-	windata->arrow_points[6].y = new_height;
+			windata->border_points = g_new0(GdkPoint,
+											windata->num_border_points);
+
+			border_rect.x = arrow_tip_x - arrow_side1_width - arrow_offset;
+			border_rect.y = arrow_tip_y + (arrow_type == GTK_ARROW_UP
+										   ? DEFAULT_ARROW_HEIGHT
+										   : -DEFAULT_ARROW_HEIGHT);
+
+			windata->drawn_arrow_begin_x = arrow_offset;
+			windata->drawn_arrow_begin_y = DEFAULT_ARROW_HEIGHT;
+			windata->drawn_arrow_middle_x = arrow_offset + arrow_side1_width;
+			windata->drawn_arrow_middle_y = 0;
+			windata->drawn_arrow_end_x = arrow_offset + arrow_side1_width +
+										 arrow_side2_width;
+			windata->drawn_arrow_end_y = DEFAULT_ARROW_HEIGHT;
+
+			if (arrow_side1_width == 0)
+			{
+				windata->border_points[i].x = 0;
+				windata->border_points[i].y = 0;
+				i++;
+			}
+			else
+			{
+				windata->border_points[i].x = 0;
+				windata->border_points[i].y = DEFAULT_ARROW_HEIGHT;
+				i++;
+
+				if (arrow_offset > 0)
+				{
+					windata->border_points[i].x = arrow_offset;
+					windata->border_points[i].y = DEFAULT_ARROW_HEIGHT;
+					i++;
+				}
+
+				windata->border_points[i].x = arrow_offset +
+											  arrow_side1_width;
+				windata->border_points[i].y = 0;
+				i++;
+			}
+
+			if (arrow_side2_width > 0)
+			{
+				windata->border_points[i].x = windata->drawn_arrow_end_x;
+				windata->border_points[i].y = windata->drawn_arrow_end_y;
+				i++;
+
+				windata->border_points[i].x = req.width;
+				windata->border_points[i].y = DEFAULT_ARROW_HEIGHT;
+				i++;
+
+				windata->border_points[i].x = req.width;
+				windata->border_points[i].y = req.height +
+				                              DEFAULT_ARROW_HEIGHT;
+				i++;
+			}
+			else
+			{
+				windata->border_points[i].x = req.width;
+				windata->border_points[i].y = req.height +
+				                              DEFAULT_ARROW_HEIGHT;
+				i++;
+			}
+
+			windata->border_points[i].x = 0;
+			windata->border_points[i].y = req.height + DEFAULT_ARROW_HEIGHT;
+			i++;
+
+			g_assert(i == windata->num_border_points);
+			g_assert(arrow_tip_x - arrow_offset - arrow_side1_width >= 0);
+			gtk_window_move(GTK_WINDOW(nw),
+							arrow_tip_x - arrow_offset - arrow_side1_width,
+							arrow_tip_y);
+
+			break;
+
+		case GTK_ARROW_LEFT:
+		case GTK_ARROW_RIGHT:
+			if (arrow_tip_y < arrow_side1_width)
+			{
+				arrow_side1_width = 0;
+				arrow_offset = arrow_tip_y;
+			}
+			else if (arrow_tip_y > screen_height - arrow_side2_width)
+			{
+				arrow_side2_width = 0;
+				arrow_offset = arrow_tip_y - arrow_side1_width;
+			}
+
+			border_rect.x = arrow_tip_x + (arrow_type == GTK_ARROW_LEFT
+										   ? DEFAULT_ARROW_HEIGHT
+										   : -DEFAULT_ARROW_HEIGHT);
+			border_rect.y = arrow_tip_y + arrow_offset;
+			break;
+	}
 
 	windata->window_region =
-		gdk_region_polygon(windata->arrow_points,
-						   G_N_ELEMENTS(windata->arrow_points),
+		gdk_region_polygon(windata->border_points, windata->num_border_points,
 						   GDK_EVEN_ODD_RULE);
 
-	windata->arrow_points[4].x--;
-	windata->arrow_points[5].x--;
-	windata->arrow_points[5].y--;
-	windata->arrow_points[6].y--;
+	draw_border(nw, NULL, windata);
+}
 
-	*arrow_x = ARROW_OFFSET + ARROW_WIDTH / 2;
-	*arrow_y = 0;
+static void
+generate_arrow(GtkWidget *nw, WindowData *windata, int *arrow_x, int *arrow_y)
+{
+	GtkRequisition req;
+	int new_height;
+	int arrow_left_width  = DEFAULT_ARROW_WIDTH / 2;
+	int arrow_right_width = DEFAULT_ARROW_WIDTH / 2;
+	int arrow_offset = DEFAULT_ARROW_OFFSET;
+
+	gtk_widget_realize(nw);
+	gtk_widget_size_request(nw, &req);
+
+	new_height = req.height + DEFAULT_ARROW_HEIGHT;
+
+	printf("point_x = %d\n", windata->point_x);
+	if (windata->point_x < DEFAULT_ARROW_WIDTH / 2)
+	{
+		arrow_left_width = 0;
+		arrow_offset = 0;
+	}
+
+	windata->drawn_arrow_begin_x  = arrow_offset;
+	windata->drawn_arrow_begin_y  = DEFAULT_ARROW_HEIGHT;
+	windata->drawn_arrow_middle_x = arrow_offset + arrow_left_width;
+	windata->drawn_arrow_middle_y = 0;
+	windata->drawn_arrow_end_x    = windata->drawn_arrow_middle_x +
+	                                arrow_right_width;
+	windata->drawn_arrow_end_y    = DEFAULT_ARROW_HEIGHT;
+
+	windata->border_points[0].x = 0;
+	windata->border_points[0].y = DEFAULT_ARROW_HEIGHT;
+
+	windata->border_points[1].x = windata->drawn_arrow_begin_x;
+	windata->border_points[1].y = windata->drawn_arrow_begin_y;
+
+	windata->border_points[2].x = windata->drawn_arrow_middle_x;
+	windata->border_points[2].y = windata->drawn_arrow_middle_y;
+
+	windata->border_points[3].x = windata->drawn_arrow_end_x;
+	windata->border_points[3].y = windata->drawn_arrow_end_y;
+
+	windata->border_points[4].x = req.width;
+	windata->border_points[4].y = DEFAULT_ARROW_HEIGHT;
+
+	windata->border_points[5].x = req.width;
+	windata->border_points[5].y = new_height;
+
+	windata->border_points[6].x = 0;
+	windata->border_points[6].y = new_height;
+
+	windata->window_region =
+		gdk_region_polygon(windata->border_points,
+						   G_N_ELEMENTS(windata->border_points),
+						   GDK_EVEN_ODD_RULE);
+
+	windata->border_points[4].x--;
+	windata->border_points[5].x--;
+	windata->border_points[5].y--;
+	windata->border_points[6].y--;
+
+	*arrow_x = windata->drawn_arrow_middle_x;
+	*arrow_y = windata->drawn_arrow_middle_y;
 
 	draw_border(nw, NULL, windata);
 }
@@ -370,12 +598,15 @@ move_notification(GtkWindow *nw, int x, int y)
 		int arrow_y;
 
 		gtk_widget_size_request(GTK_WIDGET(nw), &req);
-		new_height = req.height + ARROW_HEIGHT;
-		generate_arrow(GTK_WIDGET(nw), windata, &arrow_x, &arrow_y);
+		new_height = req.height + DEFAULT_ARROW_HEIGHT;
+		create_border_with_arrow(GTK_WIDGET(nw), windata, windata->point_x,
+								 windata->point_y);
+		//generate_arrow(GTK_WIDGET(nw), windata, &arrow_x, &arrow_y);
 #if 0
 		x = CLAMP(windata->point_x, 0, screen_width  - req.width);
 		y = CLAMP(windata->point_y, 0, screen_height - new_height);
 #endif
+		return;
 	}
 	else
 	{

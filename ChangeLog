@@ -1,3 +1,11 @@
+Sun Jan 22 18:59:57 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* themes/standard/theme.c:
+	  - Be super cool when it comes to arrow placement near the left and right
+	    of the screen. The next couple of changes will add to the super
+	    coolness of all of this.
+
 Sun Jan 22 15:13:08 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/Makefile.am:
