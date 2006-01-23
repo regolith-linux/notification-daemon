@@ -156,8 +156,8 @@ dnl # Output the Makefiles
 dnl ################################################################
 AC_CONFIG_FILES([
 Makefile
-notification-daemon.service
 data/Makefile
+data/notification-daemon.service
 po/Makefile.in
 src/Makefile
 themes/Makefile
@@ -177,4 +177,3 @@ echo dbus-1 services dir.. : $DBUS_SERVICES_DIR
 echo "Now type make to compile"
 echo "Then su to root and type: make install"
 echo
-

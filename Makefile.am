@@ -1,14 +1,10 @@
 SUBDIRS = data po src themes
 
-servicedir       = $(DBUS_SERVICES_DIR)
-service_DATA     = notification-daemon.service
-
 EXTRA_DIST = \
 	AUTHORS NEWS INSTALL COPYING README \
 	ChangeLog \
 	autogen.sh \
-	configure.ac \
-	notification-daemon.service
+	configure.ac
 
 $(OBJECTS): libtool
 libtool: $(LIBTOOL_DEPS)

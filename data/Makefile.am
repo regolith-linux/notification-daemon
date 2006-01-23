@@ -1,3 +1,6 @@
+servicedir   = $(DBUS_SERVICES_DIR)
+service_DATA = notification-daemon.service
+
 schemasdir       = $(GCONF_SCHEMA_FILE_DIR)
 schemas_in_files = notification-daemon.schemas.in
 schemas_DATA     = $(schemas_in_files:.schemas.in=.schemas)
@@ -10,5 +13,8 @@ install-data-local:
 		done \
 	fi
 
-EXTRA_DIST = $(schemas_in_files)
+EXTRA_DIST = \
+	$(schemas_in_files) \
+	notification-daemon.service
+
 CLEANFILES = $(schemas_DATA)
