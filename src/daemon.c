@@ -900,7 +900,7 @@ notify_daemon_get_server_information(NotifyDaemon *daemon,
 	*out_name     = g_strdup("Notification Daemon");
 	*out_vendor   = g_strdup("Galago Project");
 	*out_version  = g_strdup(VERSION);
-	*out_spec_ver = g_strdup("0.8");
+	*out_spec_ver = g_strdup("0.9");
 
 	return TRUE;
 }

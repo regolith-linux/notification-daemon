@@ -1,3 +1,9 @@
+Mon Jan 23 00:39:34 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - We support v0.9 of the Desktop Notifications spec. Make sure we
+	    return that in GetServerInformation.
+
 Mon Jan 23 00:38:18 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* configure.ac:
