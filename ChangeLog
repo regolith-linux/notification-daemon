@@ -1,3 +1,9 @@
+Sun Jan 22 22:28:39 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Draw the border of the notification window correctly under all tested
+	    cases.
+
 Sun Jan 22 20:02:58 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
