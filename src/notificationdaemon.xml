@@ -36,14 +36,5 @@
       <arg type="s" name="return_spec_version" direction="out"/>
     </method>
 
-    <!-- DEPRECATED -->
-    <method name="GetServerInfo">
-      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="notify_daemon_get_server_information"/>
-      <arg type="s" name="return_name" direction="out"/>
-      <arg type="s" name="return_vendor" direction="out"/>
-      <arg type="s" name="return_version" direction="out"/>
-      <arg type="s" name="return_spec_version" direction="out"/>
-    </method>
-
   </interface>
 </node>
