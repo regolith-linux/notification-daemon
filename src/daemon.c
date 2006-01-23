@@ -611,7 +611,8 @@ _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 
 static void
 _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
-										   GtkWindow *nw)
+										   GtkWindow *nw,
+										   gboolean new_notification)
 {
 	NotifyDaemonPrivate *priv = daemon->priv;
 	GtkRequisition req;
@@ -632,15 +633,22 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 	{
 		GtkWindow *nw2 = GTK_WINDOW(link->data);
 
-		gtk_widget_size_request(GTK_WIDGET(nw2), &req);
-		x = workarea.x + workarea.width - req.width;
-		y = y - req.height;
-		theme_move_notification(nw2, x, y);
+		if (nw2 != nw)
+		{
+			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
+			x = workarea.x + workarea.width - req.width;
+			y = y - req.height;
+			theme_move_notification(nw2, x, y);
+		}
 	}
 
-	g_signal_connect(G_OBJECT(nw), "destroy",
-					 G_CALLBACK(_remove_bubble_from_poptart_stack), daemon);
-	priv->poptart_stack = g_slist_prepend(priv->poptart_stack, nw);
+	if (new_notification)
+	{
+		g_signal_connect(G_OBJECT(nw), "destroy",
+						 G_CALLBACK(_remove_bubble_from_poptart_stack),
+						 daemon);
+		priv->poptart_stack = g_slist_prepend(priv->poptart_stack, nw);
+	}
 }
 
 static void
@@ -706,6 +714,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	GtkWindow *nw = NULL;
 	GValue *data;
 	gboolean use_pos_data = FALSE;
+	gboolean new_notification = FALSE;
 	gint x = 0;
 	gint y = 0;
 	guint return_id;
@@ -716,12 +725,16 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	{
 		nt = (NotifyTimeout *)g_hash_table_lookup(priv->notification_hash,
 												  &id);
-		nw = nt->nw;
+
+		if (nt != NULL)
+			nw = nt->nw;
 	}
-	else
+
+	if (nw == NULL)
 	{
 		nw = theme_create_notification(url_clicked_cb);
 		g_object_set_data(G_OBJECT(nw), "_notify_daemon", daemon);
+		new_notification = TRUE;
 	}
 
 	theme_set_notification_text(nw, summary, body);
@@ -774,7 +787,8 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	else
 	{
 		theme_set_notification_arrow(nw, FALSE, 0, 0);
-		_notify_daemon_add_bubble_to_poptart_stack(daemon, nw);
+		_notify_daemon_add_bubble_to_poptart_stack(daemon, nw,
+												   new_notification);
 	}
 
 	/* check for icon_data if icon == "" */

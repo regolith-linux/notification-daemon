@@ -1,3 +1,9 @@
+Sun Jan 22 23:38:31 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Fix several bugs (placement and possible crashers) in notification
+	    replacement.
+
 Sun Jan 22 23:31:36 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
