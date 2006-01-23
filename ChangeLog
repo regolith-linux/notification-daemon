@@ -1,3 +1,9 @@
+Mon Jan 23 00:38:18 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* configure.ac:
+	* NEWS:
+	  - Add release news and bump the version up to 0.3.2.
+
 Mon Jan 23 00:33:31 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/notificationdaemon.xml:
