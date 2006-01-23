@@ -1,3 +1,10 @@
+Sun Jan 22 20:02:58 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - The arrow will now point down if there's not enough room for it
+	    to point up (such as if an icon on the bottom panel is the source for
+	    the arrow).
+
 Sun Jan 22 18:59:57 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
