@@ -70,32 +70,6 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 	{
 		gdk_draw_polygon(win->window, windata->gc, FALSE,
 						 windata->border_points, windata->num_border_points);
-
-		/* HACK! */
-#if 0
-		gdk_draw_line(win->window, windata->gc,
-					  windata->drawn_arrow_begin_x,
-					  windata->drawn_arrow_begin_y,
-					  windata->drawn_arrow_middle_x,
-					  windata->drawn_arrow_middle_y);
-		gdk_draw_line(win->window, windata->gc,
-					  windata->drawn_arrow_begin_x + 1,
-					  windata->drawn_arrow_begin_y,
-					  windata->drawn_arrow_middle_x + 1,
-					  windata->drawn_arrow_middle_y);
-
-		gdk_draw_line(win->window, windata->gc,
-					  windata->drawn_arrow_middle_x,
-					  windata->drawn_arrow_middle_y,
-					  windata->drawn_arrow_end_x,
-					  windata->drawn_arrow_end_y);
-		gdk_draw_line(win->window, windata->gc,
-					  windata->drawn_arrow_middle_x - 1,
-					  windata->drawn_arrow_middle_y,
-					  windata->drawn_arrow_end_x - 1,
-					  windata->drawn_arrow_end_y);
-		gdk_draw_line(win->window, windata->gc, 0, h - 1, w - 1, h - 1);
-#endif
 		gdk_window_shape_combine_region(win->window, windata->window_region,
 										0, 0);
 	}
@@ -551,72 +525,6 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 		gdk_region_polygon(shape_points, windata->num_border_points,
 						   GDK_EVEN_ODD_RULE);
 	g_free(shape_points);
-
-	draw_border(nw, NULL, windata);
-}
-
-static void
-generate_arrow(GtkWidget *nw, WindowData *windata, int *arrow_x, int *arrow_y)
-{
-	GtkRequisition req;
-	int new_height;
-	int arrow_left_width  = DEFAULT_ARROW_WIDTH / 2;
-	int arrow_right_width = DEFAULT_ARROW_WIDTH / 2;
-	int arrow_offset = DEFAULT_ARROW_OFFSET;
-
-	gtk_widget_realize(nw);
-	gtk_widget_size_request(nw, &req);
-
-	new_height = req.height + DEFAULT_ARROW_HEIGHT;
-
-	printf("point_x = %d\n", windata->point_x);
-	if (windata->point_x < DEFAULT_ARROW_WIDTH / 2)
-	{
-		arrow_left_width = 0;
-		arrow_offset = 0;
-	}
-
-	windata->drawn_arrow_begin_x  = arrow_offset;
-	windata->drawn_arrow_begin_y  = DEFAULT_ARROW_HEIGHT;
-	windata->drawn_arrow_middle_x = arrow_offset + arrow_left_width;
-	windata->drawn_arrow_middle_y = 0;
-	windata->drawn_arrow_end_x    = windata->drawn_arrow_middle_x +
-	                                arrow_right_width;
-	windata->drawn_arrow_end_y    = DEFAULT_ARROW_HEIGHT;
-
-	windata->border_points[0].x = 0;
-	windata->border_points[0].y = DEFAULT_ARROW_HEIGHT;
-
-	windata->border_points[1].x = windata->drawn_arrow_begin_x;
-	windata->border_points[1].y = windata->drawn_arrow_begin_y;
-
-	windata->border_points[2].x = windata->drawn_arrow_middle_x;
-	windata->border_points[2].y = windata->drawn_arrow_middle_y;
-
-	windata->border_points[3].x = windata->drawn_arrow_end_x;
-	windata->border_points[3].y = windata->drawn_arrow_end_y;
-
-	windata->border_points[4].x = req.width;
-	windata->border_points[4].y = DEFAULT_ARROW_HEIGHT;
-
-	windata->border_points[5].x = req.width;
-	windata->border_points[5].y = new_height;
-
-	windata->border_points[6].x = 0;
-	windata->border_points[6].y = new_height;
-
-	windata->window_region =
-		gdk_region_polygon(windata->border_points,
-						   G_N_ELEMENTS(windata->border_points),
-						   GDK_EVEN_ODD_RULE);
-
-	windata->border_points[4].x--;
-	windata->border_points[5].x--;
-	windata->border_points[5].y--;
-	windata->border_points[6].y--;
-
-	*arrow_x = windata->drawn_arrow_middle_x;
-	*arrow_y = windata->drawn_arrow_middle_y;
 
 	draw_border(nw, NULL, windata);
 }

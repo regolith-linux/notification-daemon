@@ -1,3 +1,8 @@
+Sun Jan 22 23:02:37 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Remove now dead code.
+
 Sun Jan 22 22:28:39 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
