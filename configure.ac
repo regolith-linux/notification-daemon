@@ -94,13 +94,12 @@ AM_CONDITIONAL(HAVE_GDK, test "x$have_gdk" = "xyes")
 AC_SUBST(GDK_CFLAGS)
 AC_SUBST(GDK_LIBS)
 
+AM_GCONF_SOURCE_2
 AC_PATH_PROG(GCONFTOOL, gconftool-2, no)
 
 if test "x$GCONFTOOL" = "xno"; then
 	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with Gconf])
 fi
-
-AM_GCONF_SOURCE_2
 
 dnl
 dnl Check the D-BUS version.

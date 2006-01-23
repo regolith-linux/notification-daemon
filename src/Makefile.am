@@ -1,5 +1,3 @@
-EXTRA_DIST = notificationdaemon.xml
-
 libexec_PROGRAMS = notification-daemon
 
 notification_daemon_SOURCES = \
@@ -13,10 +11,14 @@ notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 BUILT_SOURCES = notificationdaemon-dbus-glue.h
 
 notificationdaemon-dbus-glue.h: notificationdaemon.xml
-	dbus-binding-tool --mode=glib-server $(srcdir)/notificationdaemon.xml > notificationdaemon-dbus-glue.h
+	dbus-binding-tool --mode=glib-server \
+		$(srcdir)/notificationdaemon.xml > notificationdaemon-dbus-glue.h
 
 INCLUDES = \
 	-I$(top_srcdir) \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
 	-DENGINES_DIR=\"$(libdir)/notification-daemon/engines\"
 
+EXTRA_DIST = notificationdaemon.xml
+DISTCLEANFILES = \
+	notificationdaemon-dbus-glue.h
