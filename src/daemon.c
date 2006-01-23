@@ -82,6 +82,7 @@ struct _DBusGMethodInvocation
 
 static void notify_daemon_finalize(GObject *object);
 static void _emit_closed_signal(GObject *notify_widget);
+static void _action_invoked_cb(GtkWindow *nw, const char *key);
 
 G_DEFINE_TYPE(NotifyDaemon, notify_daemon, G_TYPE_OBJECT);
 
@@ -517,7 +518,8 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 		return;
 	}
 
-	printf("Window clicked\n");
+	_action_invoked_cb(nw, "default");
+
 	_close_notification(daemon,
 		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")));
 }
@@ -770,8 +772,11 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 			break;
 		}
 
-		theme_add_notification_action(nw, l, actions[i],
-									  G_CALLBACK(_action_invoked_cb));
+		if (strcasecmp(actions[i], "default"))
+		{
+			theme_add_notification_action(nw, l, actions[i],
+										  G_CALLBACK(_action_invoked_cb));
+		}
 	}
 
 	if (use_pos_data)
