@@ -147,6 +147,7 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_widget_show(windata->summary_label);
 	gtk_box_pack_start(GTK_BOX(vbox), windata->summary_label, FALSE, FALSE, 0);
 	gtk_misc_set_alignment(GTK_MISC(windata->summary_label), 0, 0);
+	gtk_label_set_line_wrap(GTK_LABEL(windata->summary_label), TRUE);
 
 	windata->body_label = sexy_url_label_new();
 	gtk_widget_show(windata->body_label);
@@ -275,6 +276,7 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	 *       right-click menu.
 	 */
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+	GtkWidget *eventbox;
 	GtkWidget *bgbox;
 	GtkWidget *label;
 	GdkCursor *cursor;
@@ -290,20 +292,26 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 						    FALSE, FALSE, 0);
 	}
 
-	bgbox = notifyd_bgbox_new(NOTIFYD_BASE);
-	gtk_widget_show(bgbox);
-	gtk_box_pack_start(GTK_BOX(windata->actions_box), bgbox, FALSE, FALSE, 0);
+	eventbox = gtk_event_box_new();
+	gtk_widget_show(eventbox);
+	gtk_box_pack_start(GTK_BOX(windata->actions_box), eventbox,
+					   FALSE, FALSE, 0);
 
-	g_object_set_data(G_OBJECT(bgbox), "_nw", nw);
-	g_object_set_data_full(G_OBJECT(bgbox),
+	g_object_set_data(G_OBJECT(eventbox), "_nw", nw);
+	g_object_set_data_full(G_OBJECT(eventbox),
 						   "_action_key", g_strdup(key), g_free);
-	g_signal_connect(G_OBJECT(bgbox), "button-release-event",
+	g_signal_connect(G_OBJECT(eventbox), "button-release-event",
 					 G_CALLBACK(action_clicked_cb), cb);
 
-	cursor = gdk_cursor_new_for_display(gtk_widget_get_display(bgbox),
+	cursor = gdk_cursor_new_for_display(gtk_widget_get_display(eventbox),
 										GDK_HAND2);
-	gdk_window_set_cursor(bgbox->window, cursor);
+	gtk_widget_realize(eventbox);
+	gdk_window_set_cursor(eventbox->window, cursor);
 	gdk_cursor_unref(cursor);
+
+	bgbox = notifyd_bgbox_new(NOTIFYD_BASE);
+	gtk_widget_show(bgbox);
+	gtk_container_add(GTK_CONTAINER(eventbox), bgbox);
 
 	label = gtk_label_new(NULL);
 	gtk_widget_show(label);

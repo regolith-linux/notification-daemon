@@ -1,3 +1,9 @@
+Sun Jan 22 23:31:36 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Hook the actions back up again. Switching to the BgBox widget broke
+	    this.
+
 Sun Jan 22 23:02:37 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
