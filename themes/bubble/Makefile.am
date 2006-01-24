@@ -1,4 +1,4 @@
-enginedir = $(libdir)/notification-daemon/engines
+enginedir = $(libdir)/notification-daemon-1.0/engines
 
 engine_LTLIBRARIES = libbubble.la
 
