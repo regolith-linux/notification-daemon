@@ -1,9 +1,12 @@
-version 0.3.3:
+version 0.3.3 (25-January-2006):
 	* Install and check for engines in
 	  $(libdir)/notification-daemon-1.0/engines, as opposed to
 	  $(libdir)/notification-daemon/engines.
 	* Notifications no longer appear over full screen windows or
 	  screensavers.
+	* When using icontheme icons, the icon with a size closest to 48x48
+	  is used. If the icon is smaller than 48x48, the icon is left unscaled,
+	  but if it's larger, it's scaled down.
 
 version 0.3.2 (23-January-2006):
 	* Renamed the program back to notification-daemon.

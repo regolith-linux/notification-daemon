@@ -1,3 +1,12 @@
+==================== 0.3.3 ====================
+
+Wed Jan 25 00:29:59 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* ChangeLog:
+	* NEWS:
+	* configure.ac:
+	  - Bump the version to 0.3.3. Prepare for release.
+
 Wed Jan 25 00:21:49 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
