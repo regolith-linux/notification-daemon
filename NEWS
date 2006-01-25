@@ -2,6 +2,8 @@ version 0.3.3:
 	* Install and check for engines in
 	  $(libdir)/notification-daemon-1.0/engines, as opposed to
 	  $(libdir)/notification-daemon/engines.
+	* Notifications no longer appear over full screen windows or
+	  screensavers.
 
 version 0.3.2 (23-January-2006):
 	* Renamed the program back to notification-daemon.
