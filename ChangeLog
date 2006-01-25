@@ -1,3 +1,10 @@
+Wed Jan 25 00:01:56 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* configure.ac:
+	  - Don't pop up a notification if a window is full screen or if the
+	    screensaver is active. This closes bug #4.
+
 Tue Jan 24 00:18:18 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/Makefile.am:

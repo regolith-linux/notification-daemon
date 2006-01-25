@@ -32,10 +32,15 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
+#include <X11/Xproto.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
+
+#define WNCK_I_KNOW_THIS_IS_UNSTABLE
+#include <libwnck/libwnck.h>
 
 #include "daemon.h"
 #include "engines.h"
@@ -525,7 +530,7 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 }
 
 static gboolean
-get_work_area(GdkRectangle *rect)
+get_work_area(GtkWidget *nw, GdkRectangle *rect)
 {
 	Atom workarea = XInternAtom(GDK_DISPLAY(), "_NET_WORKAREA", True);
 	Atom type;
@@ -536,13 +541,18 @@ get_work_area(GdkRectangle *rect)
 	guchar *ret_workarea;
 	long *workareas;
 	int result;
-	int disp_screen = 0; /* XXX */
+	GdkScreen *screen;
+	int disp_screen;
+
+	gtk_widget_realize(nw);
+	screen = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
+	disp_screen = GDK_SCREEN_XNUMBER(screen);
 
 	/* Defaults in case of error */
 	rect->x = 0;
 	rect->y = 0;
-	rect->width = gdk_screen_width();
-	rect->height = gdk_screen_height();
+	rect->width = gdk_screen_get_width(screen);
+	rect->height = gdk_screen_get_height(screen);
 
 	if (workarea == None)
 		return FALSE;
@@ -579,7 +589,7 @@ _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 	GSList *link;
 	gint x, y;
 
-	get_work_area(&workarea);
+	get_work_area(GTK_WIDGET(nw), &workarea);
 
 	y = workarea.y + workarea.height;
 	x = 0;
@@ -624,7 +634,7 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 
 	gtk_widget_size_request(GTK_WIDGET(nw), &req);
 
-	get_work_area(&workarea);
+	get_work_area(GTK_WIDGET(nw), &workarea);
 
 	x = workarea.x + workarea.width - req.width;
 	y = workarea.y + workarea.height - req.height;
@@ -698,6 +708,77 @@ url_clicked_cb(GtkWindow *nw, const char *url)
 		g_spawn_command_line_async(cmd, NULL);
 		g_free(cmd);
 	}
+}
+
+static gboolean
+screensaver_active(GtkWidget *nw)
+{
+	GdkDisplay *display = gdk_drawable_get_display(GDK_DRAWABLE(nw->window));
+	Atom type;
+	int format;
+	unsigned long nitems, bytes_after;
+	unsigned char *temp_data;
+	gboolean active = FALSE;
+	Atom XA_BLANK = gdk_x11_get_xatom_by_name_for_display(display, "BLANK");
+	Atom XA_LOCK = gdk_x11_get_xatom_by_name_for_display(display, "LOCK");
+
+	/* Check for a screensaver first. */
+	if (XGetWindowProperty(
+		GDK_DISPLAY_XDISPLAY(display),
+		GDK_ROOT_WINDOW(),
+		gdk_x11_get_xatom_by_name_for_display(display, "_SCREENSAVER_STATUS"),
+		0, G_MAXLONG, False, XA_INTEGER, &type, &format, &nitems,
+		&bytes_after, &temp_data) == Success &&
+		type && temp_data != NULL)
+	{
+		CARD32 *data = (CARD32 *)temp_data;
+
+		active = (type == XA_INTEGER && nitems >= 3 &&
+				  (time_t)data[1] > (time_t)666000000L &&
+				  (data[0] == XA_BLANK || data[0] == XA_LOCK));
+	}
+
+	if (temp_data != NULL)
+		free(temp_data);
+
+	return active;
+}
+
+static gboolean
+fullscreen_window_exists(GtkWidget *nw)
+{
+	WnckScreen *wnck_screen;
+	GList *l;
+
+	wnck_screen = wnck_screen_get(GDK_SCREEN_XNUMBER(
+		gdk_drawable_get_screen(GDK_DRAWABLE(GTK_WIDGET(nw)->window))));
+	wnck_screen_force_update(wnck_screen);
+
+	for (l = wnck_screen_get_windows_stacked(wnck_screen);
+		 l != NULL;
+		 l = l->next)
+	{
+		WnckWindow *wnck_win = (WnckWindow *)l->data;
+
+		if (wnck_window_is_fullscreen(wnck_win))
+		{
+			/*
+			 * Sanity check if the window is _really_ fullscreen to
+			 * work around a bug in libwnck that doesn't get all
+			 * unfullscreen events.
+			 */
+			int sw = wnck_screen_get_width(wnck_screen);
+			int sh = wnck_screen_get_height(wnck_screen);
+			int x, y, w, h;
+
+			wnck_window_get_geometry(wnck_win, &x, &y, &w, &h);
+
+			if (sw == w && sh == h)
+				return TRUE;
+		}
+	}
+
+	return FALSE;
 }
 
 gboolean
@@ -842,7 +923,12 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	g_signal_connect(G_OBJECT(nw), "button-release-event",
 					 G_CALLBACK(window_clicked_cb), daemon);
 
-	theme_show_notification(nw);
+
+	if (!screensaver_active(GTK_WIDGET(nw)) &&
+		!fullscreen_window_exists(GTK_WIDGET(nw)))
+	{
+		theme_show_notification(nw);
+	}
 
 	return_id = (id == 0 ? _store_notification(daemon, nw, timeout) : id);
 
