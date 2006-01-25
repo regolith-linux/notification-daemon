@@ -1,3 +1,10 @@
+Wed Jan 25 00:21:49 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - When using icontheme icons, use the size closest to 48x48. However,
+	    if the closest image is smaller, use the small image instead of
+	    scaling up. If it's bigger, scale down to 48x48.
+
 Wed Jan 25 00:01:56 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

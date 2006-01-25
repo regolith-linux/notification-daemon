@@ -887,7 +887,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	}
 	else
 	{
-		GdkPixbuf *pixbuf;
+		GdkPixbuf *pixbuf = NULL;
 
 		if (!strncmp(icon, "file://", 7) || *icon == '/')
 		{
@@ -901,10 +901,19 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		{
 			/* Load icon theme icon */
 			GtkIconTheme *theme = gtk_icon_theme_new();
-			pixbuf = gtk_icon_theme_load_icon(theme, icon, IMAGE_SIZE,
-											  GTK_ICON_LOOKUP_USE_BUILTIN,
-											  NULL);
-			g_object_unref(G_OBJECT(theme));
+			GtkIconInfo *icon_info =
+				gtk_icon_theme_lookup_icon(theme, icon, IMAGE_SIZE,
+										   GTK_ICON_LOOKUP_USE_BUILTIN);
+
+			if (icon_info != NULL)
+			{
+				pixbuf = gtk_icon_theme_load_icon(
+					theme, icon,
+					MAX(IMAGE_SIZE, gtk_icon_info_get_base_size(icon_info)),
+					GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
+
+				gtk_icon_info_free(icon_info);
+			}
 
 			if (pixbuf == NULL)
 			{
