@@ -230,7 +230,7 @@ _emit_closed_signal(GObject *notify_widget)
 }
 
 static void
-_close_notification(NotifyDaemon *daemon, guint id)
+_close_notification(NotifyDaemon *daemon, guint id, gboolean hide_notification)
 {
 	NotifyDaemonPrivate *priv = daemon->priv;
 	NotifyTimeout *nt;
@@ -241,9 +241,20 @@ _close_notification(NotifyDaemon *daemon, guint id)
 	{
 		_emit_closed_signal(G_OBJECT(nt->nw));
 
-		theme_hide_notification(nt->nw);
+		if (hide_notification)
+			theme_hide_notification(nt->nw);
+
 		g_hash_table_remove(priv->notification_hash, &id);
 	}
+}
+
+static void
+_notification_destroyed_cb(GtkWindow *nw, NotifyDaemon *daemon)
+{
+	_close_notification(
+		daemon,
+		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")),
+		FALSE);
 }
 
 static gboolean
@@ -525,8 +536,10 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 
 	_action_invoked_cb(nw, "default");
 
-	_close_notification(daemon,
-		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")));
+	_close_notification(
+		daemon,
+		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")),
+		TRUE);
 }
 
 static gboolean
@@ -818,6 +831,11 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		nw = theme_create_notification(url_clicked_cb);
 		g_object_set_data(G_OBJECT(nw), "_notify_daemon", daemon);
 		new_notification = TRUE;
+
+		g_signal_connect(G_OBJECT(nw), "button-release-event",
+						 G_CALLBACK(window_clicked_cb), daemon);
+		g_signal_connect(G_OBJECT(nw), "destroy",
+						 G_CALLBACK(_notification_destroyed_cb), daemon);
 	}
 
 	theme_set_notification_text(nw, summary, body);
@@ -929,10 +947,6 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		}
 	}
 
-	g_signal_connect(G_OBJECT(nw), "button-release-event",
-					 G_CALLBACK(window_clicked_cb), daemon);
-
-
 	if (!screensaver_active(GTK_WIDGET(nw)) &&
 		!fullscreen_window_exists(GTK_WIDGET(nw)))
 	{
@@ -965,7 +979,7 @@ gboolean
 notify_daemon_close_notification_handler(NotifyDaemon *daemon,
 										 guint id, GError ** error)
 {
-	_close_notification(daemon, id);
+	_close_notification(daemon, id, TRUE);
 
 	return TRUE;
 }

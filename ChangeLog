@@ -1,3 +1,19 @@
+Sun Jan 29 13:03:09 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/engines.c:
+	* themes/standard/theme.c:
+	  - Patch by Michael Vogt and modified a bit by me to add a close
+	    button to notifications. This is similar to the one used in Ubuntu
+	    Dapper, with a small placement change and functionality change: the
+	    notification no longer emits the ActionInvoked for the default action
+	    when closed. This closes ticket #8.
+	  - Moved data freeing for the standard theme and for theme engine
+	    unreffing out of the close functions and into a callback specified
+	    through g_object_set_data_full().
+	  - The daemon now listens for when notification windows are destroyed,
+	    and reacts appropriately, instead of crashing.
+
 Sun Jan 29 12:12:43 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* configure.ac:

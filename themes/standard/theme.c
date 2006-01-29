@@ -82,13 +82,29 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 	return FALSE;
 }
 
+static void
+destroy_windata(WindowData *windata)
+{
+	if (windata->gc != NULL)
+		g_object_unref(G_OBJECT(windata->gc));
+
+	if (windata->border_points != NULL)
+		g_free(windata->border_points);
+
+	if (windata->window_region != NULL)
+		gdk_region_destroy(windata->window_region);
+}
+
 GtkWindow *
 create_notification(UrlClickedCb url_clicked)
 {
 	GtkWidget *win;
 	GtkWidget *main_vbox;
 	GtkWidget *hbox;
+	GtkWidget *hbox2;
 	GtkWidget *vbox;
+	GtkWidget *close_button;
+	GtkWidget *image;
 	GtkRequisition req;
 	WindowData *windata;
 
@@ -97,7 +113,8 @@ create_notification(UrlClickedCb url_clicked)
 
 	win = gtk_window_new(GTK_WINDOW_POPUP);
 	gtk_widget_add_events(win, GDK_BUTTON_RELEASE_MASK);
-	g_object_set_data(G_OBJECT(win), "windata", windata);
+	g_object_set_data_full(G_OBJECT(win), "windata", windata,
+						   (GDestroyNotify)destroy_windata);
 	gtk_widget_set_app_paintable(win, TRUE);
 
 	g_signal_connect(G_OBJECT(win), "expose-event",
@@ -143,11 +160,29 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_container_add(GTK_CONTAINER(windata->contentbox), vbox);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
+	hbox2 = gtk_hbox_new(FALSE, 6);
+	gtk_widget_show(hbox2);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox2, FALSE, FALSE, 0);
+
 	windata->summary_label = gtk_label_new(NULL);
 	gtk_widget_show(windata->summary_label);
-	gtk_box_pack_start(GTK_BOX(vbox), windata->summary_label, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox2), windata->summary_label, TRUE, TRUE, 0);
 	gtk_misc_set_alignment(GTK_MISC(windata->summary_label), 0, 0);
 	gtk_label_set_line_wrap(GTK_LABEL(windata->summary_label), TRUE);
+
+	/* Add the close button */
+	close_button = gtk_button_new();
+	gtk_widget_show(close_button);
+	gtk_box_pack_start(GTK_BOX(hbox2), close_button, FALSE, FALSE, 0);
+	gtk_button_set_relief(GTK_BUTTON(close_button), GTK_RELIEF_NONE);
+	gtk_container_set_border_width(GTK_CONTAINER(close_button), 0);
+	gtk_widget_set_size_request(close_button, 20, 20);
+	g_signal_connect_swapped(G_OBJECT(close_button), "clicked",
+							 G_CALLBACK(gtk_widget_destroy), win);
+
+	image = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+	gtk_widget_show(image);
+	gtk_container_add(GTK_CONTAINER(close_button), image);
 
 	windata->body_label = sexy_url_label_new();
 	gtk_widget_show(windata->body_label);
@@ -170,18 +205,6 @@ create_notification(UrlClickedCb url_clicked)
 void
 destroy_notification(GtkWindow *nw)
 {
-	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
-	g_assert(windata != NULL);
-
-	if (windata->gc != NULL)
-		g_object_unref(G_OBJECT(windata->gc));
-
-	if (windata->border_points != NULL)
-		g_free(windata->border_points);
-
-	if (windata->window_region != NULL)
-		gdk_region_destroy(windata->window_region);
-
 	gtk_widget_destroy(GTK_WIDGET(nw));
 }
 

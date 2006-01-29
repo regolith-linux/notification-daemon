@@ -39,7 +39,6 @@ load_theme_engine(const char *name)
 	path = g_build_filename(ENGINES_DIR, filename, NULL);
 	g_free(filename);
 
-	printf("Loading path '%s'\n", path);
 	engine = g_new0(ThemeEngine, 1);
 	engine->ref_count = 1;
 	engine->module = g_module_open(path, G_MODULE_BIND_LAZY);
@@ -145,12 +144,22 @@ get_theme_engine(void)
 	return active_engine;
 }
 
+static void
+theme_engine_unref(ThemeEngine *engine)
+{
+	engine->ref_count--;
+
+	if (engine->ref_count == 0)
+		destroy_engine(engine);
+}
+
 GtkWindow *
 theme_create_notification(UrlClickedCb url_clicked_cb)
 {
 	ThemeEngine *engine = get_theme_engine();
 	GtkWindow *nw = engine->create_notification(url_clicked_cb);
-	g_object_set_data(G_OBJECT(nw), "_theme_engine", engine);
+	g_object_set_data_full(G_OBJECT(nw), "_theme_engine", engine,
+						   (GDestroyNotify)theme_engine_unref);
 	engine->ref_count++;
 	return nw;
 }
@@ -160,11 +169,6 @@ theme_destroy_notification(GtkWindow *nw)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 	engine->destroy_notification(nw);
-
-	engine->ref_count--;
-
-	if (engine->ref_count == 0)
-		destroy_engine(engine);
 }
 
 void
