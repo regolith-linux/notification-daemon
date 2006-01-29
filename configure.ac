@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notification-daemon, 0.3.3, galago-devel@lists.freedesktop.org)
+AC_INIT(notification-daemon, 0.3.3.90, galago-devel@lists.freedesktop.org)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2006 Christian Hammond])
@@ -15,7 +15,7 @@ dnl ################################################################
 NOTIFICATION_DAEMON_MAJOR_VERSION=0
 NOTIFICATION_DAEMON_MINOR_VERSION=3
 NOTIFICATION_DAEMON_MICRO_VERSION=3
-NOTIFICATION_DAEMON_DEVEL_VERSION=0
+NOTIFICATION_DAEMON_DEVEL_VERSION=90
 
 NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_MICRO_VERSION
 
@@ -75,15 +75,28 @@ AM_GLIB_GNU_GETTEXT
 
 AC_CHECK_LIB([popt], [poptGetArg], , AC_MSG_ERROR([Popt is required]))
 
+REQ_GTK_VERSION=2.4.0
+REQ_GLIB_VERSION=$REQ_GTK_VERSION
+REQ_SEXY_VERSION=0.1.3
 REQ_DBUS_VERSION=0.36
-pkg_modules="gtk+-2.0 >= 2.2.2 glib-2.0 >= 2.2.2, dbus-1 >= $REQ_DBUS_VERSION, dbus-glib-1 >= $REQ_DBUS_VERSION libsexy >= 0.1.3 gconf-2.0 libwnck-1.0"
-PKG_CHECK_MODULES(NOTIFICATION_DAEMON, [$pkg_modules])
+PKG_CHECK_MODULES(NOTIFICATION_DAEMON, [\
+	gtk+-2.0 >= $REQ_GTK_VERSION, \
+	glib-2.0 >= $REQ_GLIB_VERSION, \
+	dbus-1 >= $REQ_DBUS_VERSION, \
+	dbus-glib-1 >= $REQ_DBUS_VERSION, \
+	libsexy >= $REQ_SEXY_VERSION, \
+	gconf-2.0, \
+	libwnck-1.0 \
+])
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
 
-gdk_modules="gdk-2.0 gdk-pixbuf-2.0"
-PKG_CHECK_MODULES(GDK, [$gdk_modules], have_gdk=yes,
-[
+PKG_CHECK_MODULES(GDK,
+	gdk-2.0 >= $REQ_GTK_VERSION, \
+	gdk-pixbuf-2.0 >= $REQ_GTK_VERSION \
+],[
+	have_gdk=yes,
+],[
 	have_gdk=no
 
 	AC_WARN("Some test apps will not be built")
