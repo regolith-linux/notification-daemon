@@ -1,3 +1,10 @@
+Wed Feb 01 19:17:09 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/bubble/Makefile.am:
+	* themes/standard/Makefile.am:
+	  - Patch by Rodney Dawes to install the theme engines as unversioned
+	    libraries instead of versioned libraries.
+
 Sun Jan 29 13:03:09 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

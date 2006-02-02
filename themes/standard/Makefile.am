@@ -7,6 +7,8 @@ libstandard_la_SOURCES = \
 	bgbox.h \
 	theme.c
 
+libstandard_la_LDFLAGS = -module -avoid-version
+
 libstandard_la_LIBADD = $(NOTIFICATION_DAEMON_LIBS)
 
 INCLUDES = $(NOTIFICATION_DAEMON_CFLAGS)

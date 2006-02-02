@@ -9,5 +9,7 @@ libbubble_la_SOURCES = \
 	eggnotificationbubblewidget.c \
 	theme.c
 
+libbubble_la_LDFLAGS = -module -avoid-version
+
 INCLUDES = \
 	$(NOTIFICATION_DAEMON_CFLAGS)
