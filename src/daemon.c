@@ -837,6 +837,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	{
 		nw = theme_create_notification(url_clicked_cb);
 		g_object_set_data(G_OBJECT(nw), "_notify_daemon", daemon);
+		gtk_widget_realize(GTK_WIDGET(nw));
 		new_notification = TRUE;
 
 		g_signal_connect(G_OBJECT(nw), "button-release-event",

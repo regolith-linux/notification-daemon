@@ -8,12 +8,6 @@ create_notification(void)
 }
 
 void
-destroy_notification(GtkWindow *nw)
-{
-	gtk_widget_destroy(GTK_WIDGET(nw));
-}
-
-void
 show_notification(GtkWindow *nw)
 {
 	egg_notification_bubble_widget_show(EGG_NOTIFICATION_BUBBLE_WIDGET(nw));
@@ -28,7 +22,8 @@ hide_notification(GtkWindow *nw)
 void
 set_notification_hints(GtkWindow *nw, GHashTable *hints)
 {
-	egg_notification_bubble_widget_set_hints(EGG_NOTIFICATION_BUBBLE_WIDGET(nw), hints);
+	egg_notification_bubble_widget_set_hints(
+		EGG_NOTIFICATION_BUBBLE_WIDGET(nw), hints);
 }
 
 void

@@ -1,3 +1,10 @@
+Sat Feb 04 15:56:28 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* themes/bubble/theme.c:
+	  - Ensure that the notification window is always realized before we
+	    start operating on its GdkWindow. This fixes bug #10.
+
 Sat Feb 04 13:15:29 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
