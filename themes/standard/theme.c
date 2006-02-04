@@ -12,6 +12,7 @@ typedef struct
 	GtkWidget *main_hbox;
 	GtkWidget *iconbox;
 	GtkWidget *icon;
+	GtkWidget *content_hbox;
 	GtkWidget *summary_label;
 	GtkWidget *body_label;
 	GtkWidget *actions_box;
@@ -133,6 +134,25 @@ destroy_windata(WindowData *windata)
 		gdk_region_destroy(windata->window_region);
 }
 
+static void
+update_content_hbox_visibility(WindowData *windata)
+{
+	/*
+	 * This is all a hack, but until we have a libview-style ContentBox,
+	 * it'll just have to do.
+	 */
+	if (GTK_WIDGET_VISIBLE(windata->icon) ||
+		GTK_WIDGET_VISIBLE(windata->body_label) ||
+		GTK_WIDGET_VISIBLE(windata->actions_box))
+	{
+		gtk_widget_show(windata->content_hbox);
+	}
+	else
+	{
+		gtk_widget_hide(windata->content_hbox);
+	}
+}
+
 GtkWindow *
 create_notification(UrlClickedCb url_clicked)
 {
@@ -212,13 +232,13 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_widget_show(image);
 	gtk_container_add(GTK_CONTAINER(close_button), image);
 
-	hbox = gtk_hbox_new(FALSE, 6);
-	gtk_widget_show(hbox);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+	windata->content_hbox = gtk_hbox_new(FALSE, 6);
+	gtk_box_pack_start(GTK_BOX(vbox), windata->content_hbox, FALSE, FALSE, 0);
 
 	windata->iconbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(windata->iconbox);
-	gtk_box_pack_start(GTK_BOX(hbox), windata->iconbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(windata->content_hbox), windata->iconbox,
+					   FALSE, FALSE, 0);
 	gtk_widget_set_size_request(windata->iconbox, BODY_X_OFFSET, -1);
 
 	windata->icon = gtk_image_new();
@@ -228,7 +248,7 @@ create_notification(UrlClickedCb url_clicked)
 
 	vbox = gtk_vbox_new(FALSE, 6);
 	gtk_widget_show(vbox);
-	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(windata->content_hbox), vbox, TRUE, TRUE, 0);
 
 	windata->body_label = sexy_url_label_new();
 	gtk_box_pack_start(GTK_BOX(vbox), windata->body_label, TRUE, TRUE, 0);
@@ -293,6 +313,8 @@ set_notification_text(GtkWindow *nw, const char *summary, const char *body)
 	else
 		gtk_widget_show(windata->body_label);
 
+	update_content_hbox_visibility(windata);
+
 	gtk_widget_set_size_request(
 		((body != NULL && *body == '\0')
 		 ? windata->body_label : windata->summary_label),
@@ -321,6 +343,8 @@ set_notification_icon(GtkWindow *nw, GdkPixbuf *pixbuf)
 		gtk_widget_hide(windata->icon);
 		gtk_widget_set_size_request(windata->iconbox, BODY_X_OFFSET, -1);
 	}
+
+	update_content_hbox_visibility(windata);
 }
 
 void
@@ -367,7 +391,11 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 
 	g_assert(windata != NULL);
 
-	gtk_widget_show(windata->actions_box);
+	if (!GTK_WIDGET_VISIBLE(windata->actions_box))
+	{
+		gtk_widget_show(windata->actions_box);
+		update_content_hbox_visibility(windata);
+	}
 
 	if (windata->num_actions_added > 0)
 	{
