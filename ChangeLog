@@ -1,3 +1,8 @@
+Sat Feb 04 13:15:29 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Ensure that the labels in the action buttons are aligned correctly.
+
 Sat Feb 04 13:11:25 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/engines.c:

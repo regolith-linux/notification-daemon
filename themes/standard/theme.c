@@ -499,6 +499,7 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	label = gtk_label_new(NULL);
 	gtk_widget_show(label);
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 	buf = g_strdup_printf("<small>%s</small>", text);
 	gtk_label_set_markup(GTK_LABEL(label), buf);
 	g_free(buf);
