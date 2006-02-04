@@ -1,3 +1,8 @@
+Sat Feb 04 12:28:24 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Improve the alignment and the color of the countdown.
+
 Sat Feb 04 12:24:32 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

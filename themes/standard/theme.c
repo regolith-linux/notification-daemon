@@ -432,7 +432,7 @@ countdown_expose_cb(GtkWidget *pie, GdkEventExpose *event,
 
 	if (windata->timeout > 0)
 	{
-		GdkGC *pie_gc = style->bg_gc[GTK_STATE_NORMAL];
+		GdkGC *pie_gc = style->bg_gc[GTK_STATE_ACTIVE];
 		gdouble pct = (gdouble)windata->remaining / (gdouble)windata->timeout;
 
 		gdk_draw_arc(GDK_DRAWABLE(windata->pie_countdown->window),
@@ -469,13 +469,19 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 
 	if (!GTK_WIDGET_VISIBLE(windata->actions_box))
 	{
+		GtkWidget *alignment;
+
 		gtk_widget_show(windata->actions_box);
 		update_content_hbox_visibility(windata);
 
+		alignment = gtk_alignment_new(1, 0.5, 0, 0);
+		gtk_widget_show(alignment);
+		gtk_box_pack_end(GTK_BOX(windata->actions_box), alignment,
+						   FALSE, TRUE, 0);
+
 		windata->pie_countdown = gtk_drawing_area_new();
 		gtk_widget_show(windata->pie_countdown);
-		gtk_box_pack_end(GTK_BOX(windata->actions_box), windata->pie_countdown,
-						 FALSE, FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(alignment), windata->pie_countdown);
 		gtk_widget_set_size_request(windata->pie_countdown,
 									PIE_WIDTH, PIE_HEIGHT);
 		g_signal_connect(G_OBJECT(windata->pie_countdown), "expose_event",
