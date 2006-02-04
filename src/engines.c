@@ -22,6 +22,8 @@ typedef struct
 	void (*add_notification_action)(GtkWindow *nw, const char *label,
 									const char *key, GCallback cb);
 	void (*move_notification)(GtkWindow *nw, int x, int y);
+	void (*set_notification_timeout)(GtkWindow *nw, guint timeout);
+	void (*notification_tick)(GtkWindow *nw, guint timeout);
 
 } ThemeEngine;
 
@@ -62,6 +64,9 @@ load_theme_engine(const char *name)
 		g_free(engine); \
 	}
 
+#define BIND_OPTIONAL_FUNC(name) \
+	g_module_symbol(engine->module, #name, (gpointer *)&engine->name);
+
 	BIND_REQUIRED_FUNC(create_notification);
 	BIND_REQUIRED_FUNC(destroy_notification);
 	BIND_REQUIRED_FUNC(show_notification);
@@ -72,6 +77,8 @@ load_theme_engine(const char *name)
 	BIND_REQUIRED_FUNC(set_notification_arrow);
 	BIND_REQUIRED_FUNC(add_notification_action);
 	BIND_REQUIRED_FUNC(move_notification);
+	BIND_OPTIONAL_FUNC(set_notification_timeout);
+	BIND_OPTIONAL_FUNC(notification_tick);
 
 	return engine;
 }
@@ -190,6 +197,24 @@ theme_set_notification_hints(GtkWindow *nw, GHashTable *hints)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 	engine->set_notification_hints(nw, hints);
+}
+
+void
+theme_set_notification_timeout(GtkWindow *nw, guint timeout)
+{
+	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
+
+	if (engine->set_notification_timeout != NULL)
+		engine->set_notification_timeout(nw, timeout);
+}
+
+void
+theme_notification_tick(GtkWindow *nw, guint remaining)
+{
+	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
+
+	if (engine->notification_tick != NULL)
+		engine->notification_tick(nw, remaining);
 }
 
 void

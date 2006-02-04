@@ -1,3 +1,13 @@
+Sat Feb 04 12:24:32 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/engines.c:
+	* src/engines.h:
+	* themes/standard/theme.c:
+	  - Add a pie-based countdown timer to notifications containing actions,
+	    so that the user knows how long they have until the notification
+	    simply expires.
+
 Sat Feb 04 02:04:35 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:

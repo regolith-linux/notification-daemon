@@ -269,6 +269,9 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 
 	g_get_current_time(&now);
 
+	theme_notification_tick(nt->nw,
+							(nt->expiration.tv_sec - now.tv_sec) * 1000);
+
 	if (now.tv_sec > nt->expiration.tv_sec ||
 		(now.tv_sec == nt->expiration.tv_sec &&
 		 now.tv_usec >= nt->expiration.tv_usec))
@@ -310,6 +313,8 @@ _calculate_timeout(NotifyDaemon *daemon, NotifyTimeout *nt, int timeout)
 
 		if (timeout == -1)
 			timeout = NOTIFY_DAEMON_DEFAULT_TIMEOUT;
+
+		theme_set_notification_timeout(nt->nw, timeout);
 
 		usec = timeout * 1000;	/* convert from msec to usec */
 		g_get_current_time(&nt->expiration);

@@ -7,6 +7,7 @@ typedef void (*UrlClickedCb)(GtkWindow *nw, const char *url);
 
 typedef struct
 {
+	GtkWidget *win;
 	GtkWidget *top_spacer;
 	GtkWidget *bottom_spacer;
 	GtkWidget *main_hbox;
@@ -18,6 +19,7 @@ typedef struct
 	GtkWidget *actions_box;
 	GtkWidget *last_sep;
 	GtkWidget *stripe_spacer;
+	GtkWidget *pie_countdown;
 
 	gboolean has_arrow;
 
@@ -37,6 +39,8 @@ typedef struct
 	GdkRegion *window_region;
 
 	guchar urgency;
+	guint timeout;
+	guint remaining;
 
 	UrlClickedCb url_clicked;
 
@@ -53,6 +57,8 @@ enum
 #define IMAGE_SIZE    32
 #define IMAGE_PADDING 10
 #define STRIPE_WIDTH  25
+#define PIE_WIDTH     24
+#define PIE_HEIGHT    24
 #define BODY_X_OFFSET (IMAGE_SIZE + 8)
 #define DEFAULT_ARROW_OFFSET  (STRIPE_WIDTH + 2)
 #define DEFAULT_ARROW_HEIGHT  14
@@ -191,6 +197,7 @@ create_notification(UrlClickedCb url_clicked)
 	windata->url_clicked = url_clicked;
 
 	win = gtk_window_new(GTK_WINDOW_POPUP);
+	windata->win = win;
 	gtk_widget_add_events(win, GDK_BUTTON_RELEASE_MASK);
 	gtk_widget_realize(win);
 	g_object_set_data_full(G_OBJECT(win), "windata", windata,
@@ -323,6 +330,28 @@ set_notification_hints(GtkWindow *nw, GHashTable *hints)
 }
 
 void
+set_notification_timeout(GtkWindow *nw, guint timeout)
+{
+	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+	g_assert(windata != NULL);
+
+	windata->timeout = timeout;
+}
+
+void
+notification_tick(GtkWindow *nw, guint remaining)
+{
+	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+	windata->remaining = remaining;
+
+	if (windata->pie_countdown != NULL)
+	{
+		gtk_widget_queue_draw_area(windata->pie_countdown, 0, 0,
+								   PIE_WIDTH, PIE_HEIGHT);
+	}
+}
+
+void
 set_notification_text(GtkWindow *nw, const char *summary, const char *body)
 {
 	char *str;
@@ -391,6 +420,30 @@ set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 	}
 }
 
+static gboolean
+countdown_expose_cb(GtkWidget *pie, GdkEventExpose *event,
+					WindowData *windata)
+{
+	GtkStyle *style = gtk_widget_get_style(windata->win);
+	GdkGC *bg_gc = style->base_gc[GTK_STATE_NORMAL];
+
+	gdk_draw_rectangle(GDK_DRAWABLE(pie->window), bg_gc, TRUE,
+					   0, 0, pie->allocation.width, pie->allocation.height);
+
+	if (windata->timeout > 0)
+	{
+		GdkGC *pie_gc = style->bg_gc[GTK_STATE_NORMAL];
+		gdouble pct = (gdouble)windata->remaining / (gdouble)windata->timeout;
+
+		gdk_draw_arc(GDK_DRAWABLE(windata->pie_countdown->window),
+					 pie_gc, TRUE,
+					 0, 0, PIE_WIDTH, PIE_HEIGHT,
+					 90 * 64, pct * 360.0 * 64.0);
+	}
+
+	return TRUE;
+}
+
 static void
 action_clicked_cb(GtkWidget *w, GdkEventButton *event,
 				  ActionInvokedCb action_cb)
@@ -418,6 +471,15 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	{
 		gtk_widget_show(windata->actions_box);
 		update_content_hbox_visibility(windata);
+
+		windata->pie_countdown = gtk_drawing_area_new();
+		gtk_widget_show(windata->pie_countdown);
+		gtk_box_pack_end(GTK_BOX(windata->actions_box), windata->pie_countdown,
+						 FALSE, FALSE, 0);
+		gtk_widget_set_size_request(windata->pie_countdown,
+									PIE_WIDTH, PIE_HEIGHT);
+		g_signal_connect(G_OBJECT(windata->pie_countdown), "expose_event",
+						 G_CALLBACK(countdown_expose_cb), windata);
 	}
 
 	button = gtk_button_new();

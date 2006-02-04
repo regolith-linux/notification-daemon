@@ -10,6 +10,8 @@ void theme_destroy_notification(GtkWindow *nw);
 void theme_show_notification(GtkWindow *nw);
 void theme_hide_notification(GtkWindow *nw);
 void theme_set_notification_hints(GtkWindow *nw, GHashTable *hints);
+void theme_set_notification_timeout(GtkWindow *nw, guint timeout);
+void theme_notification_tick(GtkWindow *nw, guint remaining);
 void theme_set_notification_text(GtkWindow *nw, const char *summary,
 								 const char *body);
 void theme_set_notification_icon(GtkWindow *nw, GdkPixbuf *pixbuf);
