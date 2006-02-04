@@ -1,3 +1,8 @@
+Sat Feb 04 02:04:35 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Color the stripe based on the urgency level.
+
 Sat Feb 04 01:48:50 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

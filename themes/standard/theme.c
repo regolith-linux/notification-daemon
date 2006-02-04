@@ -42,6 +42,13 @@ typedef struct
 
 } WindowData;
 
+enum
+{
+	URGENCY_LOW,
+	URGENCY_NORMAL,
+	URGENCY_CRITICAL
+};
+
 #define WIDTH         300
 #define IMAGE_SIZE    32
 #define IMAGE_PADDING 10
@@ -72,7 +79,22 @@ draw_stripe(GtkWidget *win, WindowData *windata)
 	GdkGC *gc = gdk_gc_new(GDK_DRAWABLE(win->window));
 	GdkColor color;
 
-	gdk_color_parse("#729FCF", &color);
+	switch (windata->urgency)
+	{
+		case URGENCY_LOW: // LOW
+			gdk_color_parse("#9DB029", &color);
+			break;
+
+		case URGENCY_CRITICAL: // CRITICAL
+			gdk_color_parse("#CC0000", &color);
+			break;
+
+		case URGENCY_NORMAL: // NORMAL
+		default:
+			gdk_color_parse("#729FCF", &color);
+			break;
+	}
+
 	gdk_gc_set_rgb_fg_color(gc, &color);
 #endif
 
@@ -165,6 +187,7 @@ create_notification(UrlClickedCb url_clicked)
 	WindowData *windata;
 
 	windata = g_new0(WindowData, 1);
+	windata->urgency = URGENCY_NORMAL;
 	windata->url_clicked = url_clicked;
 
 	win = gtk_window_new(GTK_WINDOW_POPUP);
@@ -418,6 +441,7 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 		GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
 		gtk_widget_show(image);
 		gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+		gtk_misc_set_alignment(GTK_MISC(image), 0.5, 0.5);
 	}
 
 	label = gtk_label_new(NULL);
