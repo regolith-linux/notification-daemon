@@ -1,3 +1,8 @@
+Sat Feb 04 01:48:50 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Check notification expiration every 100ms instead of every 500ms.
+
 Sat Feb 04 01:26:41 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:

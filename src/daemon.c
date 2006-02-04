@@ -317,7 +317,7 @@ _calculate_timeout(NotifyDaemon *daemon, NotifyTimeout *nt, int timeout)
 
 		if (daemon->priv->timeout_source == 0)
 		{
-			daemon->priv->timeout_source = g_timeout_add(500,
+			daemon->priv->timeout_source = g_timeout_add(100,
 														 _check_expiration,
 														 daemon);
 		}
