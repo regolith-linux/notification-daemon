@@ -56,7 +56,7 @@ enum
 #define WIDTH         300
 #define IMAGE_SIZE    32
 #define IMAGE_PADDING 10
-#define STRIPE_WIDTH  25
+#define STRIPE_WIDTH  30
 #define PIE_WIDTH     24
 #define PIE_HEIGHT    24
 #define BODY_X_OFFSET (IMAGE_SIZE + 8)
