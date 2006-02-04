@@ -1,3 +1,13 @@
+Sat Feb 04 00:37:55 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/bgbox.c:
+	* themes/standard/bgbox.h:
+	* themes/standard/theme.c:
+	  - Make some changes to the Standard theme in order to bring it a
+	    bit closer to the style used in the December GNOME mockups. The
+	    mockups had some nice stylistic and usability ideas that were
+	    worth looking into.
+
 Wed Feb 01 19:17:09 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/bubble/Makefile.am:

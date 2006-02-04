@@ -9,13 +9,14 @@ typedef struct
 {
 	GtkWidget *top_spacer;
 	GtkWidget *bottom_spacer;
+	GtkWidget *main_hbox;
 	GtkWidget *iconbox;
 	GtkWidget *icon;
-	GtkWidget *contentbox;
 	GtkWidget *summary_label;
 	GtkWidget *body_label;
 	GtkWidget *actions_box;
 	GtkWidget *last_sep;
+	GtkWidget *stripe_spacer;
 
 	guint num_actions_added;
 
@@ -43,17 +44,52 @@ typedef struct
 } WindowData;
 
 #define WIDTH         300
-#define MIN_HEIGHT    100
-#define IMAGE_SIZE    48
+#define IMAGE_SIZE    32
 #define IMAGE_PADDING 10
-#define DEFAULT_ARROW_OFFSET  20
+#define STRIPE_WIDTH  25
+#define BODY_X_OFFSET (IMAGE_SIZE + 8)
+#define DEFAULT_ARROW_OFFSET  (STRIPE_WIDTH + 2)
 #define DEFAULT_ARROW_HEIGHT  14
 #define DEFAULT_ARROW_WIDTH   28
+
+static void
+fill_background(GtkWidget *win, WindowData *windata)
+{
+	GtkStyle *style = gtk_widget_get_style(win);
+	GdkGC *gc = style->base_gc[GTK_STATE_NORMAL];
+
+	gdk_draw_rectangle(GDK_DRAWABLE(win->window), gc, TRUE,
+					   win->allocation.x, win->allocation.y,
+					   win->allocation.width, win->allocation.height);
+}
+
+static void
+draw_stripe(GtkWidget *win, WindowData *windata)
+{
+#if USE_THEMED_STRIPE
+	GtkStyle *style = gtk_widget_get_style(win);
+	GdkGC *gc = style->bg_gc[GTK_STATE_NORMAL];
+#else
+	GdkGC *gc = gdk_gc_new(GDK_DRAWABLE(win->window));
+	GdkColor color;
+
+	gdk_color_parse("#729FCF", &color);
+	gdk_gc_set_rgb_fg_color(gc, &color);
+#endif
+
+	gdk_draw_rectangle(win->window, gc, TRUE,
+					   windata->main_hbox->allocation.x + 1,
+					   windata->main_hbox->allocation.y + 1,
+					   STRIPE_WIDTH,
+					   windata->main_hbox->allocation.height - 2);
+}
 
 static gboolean
 draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 {
 	int w, h;
+
+	fill_background(win, windata);
 
 	if (windata->gc == NULL)
 	{
@@ -79,6 +115,8 @@ draw_border(GtkWidget *win, GdkEventExpose *event, WindowData *windata)
 						   0, 0, w - 1, h - 1);
 	}
 
+	draw_stripe(win, windata);
+
 	return FALSE;
 }
 
@@ -98,14 +136,13 @@ destroy_windata(WindowData *windata)
 GtkWindow *
 create_notification(UrlClickedCb url_clicked)
 {
+	GtkWidget *spacer;
 	GtkWidget *win;
 	GtkWidget *main_vbox;
 	GtkWidget *hbox;
-	GtkWidget *hbox2;
 	GtkWidget *vbox;
 	GtkWidget *close_button;
 	GtkWidget *image;
-	GtkRequisition req;
 	WindowData *windata;
 
 	windata = g_new0(WindowData, 1);
@@ -130,9 +167,10 @@ create_notification(UrlClickedCb url_clicked)
 					   FALSE, FALSE, 0);
 	gtk_widget_set_size_request(windata->top_spacer, -1, DEFAULT_ARROW_HEIGHT);
 
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_widget_show(hbox);
-	gtk_box_pack_start(GTK_BOX(main_vbox), hbox, FALSE, FALSE, 0);
+	windata->main_hbox = gtk_hbox_new(FALSE, 0);
+	gtk_widget_show(windata->main_hbox);
+	gtk_box_pack_start(GTK_BOX(main_vbox), windata->main_hbox,
+					   FALSE, FALSE, 0);
 
 	windata->bottom_spacer = gtk_image_new();
 	gtk_box_pack_start(GTK_BOX(main_vbox), windata->bottom_spacer,
@@ -140,40 +178,30 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_widget_set_size_request(windata->bottom_spacer, -1,
 								DEFAULT_ARROW_HEIGHT);
 
-	windata->iconbox = gtk_event_box_new();
-	gtk_widget_show(windata->iconbox);
-	gtk_box_pack_start(GTK_BOX(hbox), windata->iconbox, FALSE, TRUE, 0);
-
-	windata->icon = gtk_image_new_from_stock(GTK_STOCK_DIALOG_INFO,
-											 GTK_ICON_SIZE_DIALOG);
-	gtk_widget_show(windata->icon);
-	gtk_container_add(GTK_CONTAINER(windata->iconbox), windata->icon);
-	gtk_misc_set_alignment(GTK_MISC(windata->icon), 0.5, 0.0);
-	gtk_container_set_border_width(GTK_CONTAINER(windata->iconbox), 12);
-
-	windata->contentbox = notifyd_bgbox_new(NOTIFYD_BASE);
-	gtk_widget_show(windata->contentbox);
-	gtk_box_pack_start(GTK_BOX(hbox), windata->contentbox, TRUE, TRUE, 0);
-
 	vbox = gtk_vbox_new(FALSE, 6);
 	gtk_widget_show(vbox);
-	gtk_container_add(GTK_CONTAINER(windata->contentbox), vbox);
+	gtk_box_pack_start(GTK_BOX(windata->main_hbox), vbox, TRUE, TRUE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 10);
 
-	hbox2 = gtk_hbox_new(FALSE, 6);
-	gtk_widget_show(hbox2);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox2, FALSE, FALSE, 0);
+	hbox = gtk_hbox_new(FALSE, 6);
+	gtk_widget_show(hbox);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+
+	spacer = gtk_image_new();
+	gtk_widget_show(spacer);
+	gtk_box_pack_start(GTK_BOX(hbox), spacer, FALSE, FALSE, 0);
+	gtk_widget_set_size_request(spacer, STRIPE_WIDTH, -1);
 
 	windata->summary_label = gtk_label_new(NULL);
 	gtk_widget_show(windata->summary_label);
-	gtk_box_pack_start(GTK_BOX(hbox2), windata->summary_label, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), windata->summary_label, TRUE, TRUE, 0);
 	gtk_misc_set_alignment(GTK_MISC(windata->summary_label), 0, 0);
 	gtk_label_set_line_wrap(GTK_LABEL(windata->summary_label), TRUE);
 
 	/* Add the close button */
 	close_button = gtk_button_new();
 	gtk_widget_show(close_button);
-	gtk_box_pack_start(GTK_BOX(hbox2), close_button, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), close_button, FALSE, FALSE, 0);
 	gtk_button_set_relief(GTK_BUTTON(close_button), GTK_RELIEF_NONE);
 	gtk_container_set_border_width(GTK_CONTAINER(close_button), 0);
 	gtk_widget_set_size_request(close_button, 20, 20);
@@ -184,8 +212,25 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_widget_show(image);
 	gtk_container_add(GTK_CONTAINER(close_button), image);
 
+	hbox = gtk_hbox_new(FALSE, 6);
+	gtk_widget_show(hbox);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+
+	windata->iconbox = gtk_hbox_new(FALSE, 0);
+	gtk_widget_show(windata->iconbox);
+	gtk_box_pack_start(GTK_BOX(hbox), windata->iconbox, FALSE, FALSE, 0);
+	gtk_widget_set_size_request(windata->iconbox, BODY_X_OFFSET, -1);
+
+	windata->icon = gtk_image_new();
+	gtk_box_pack_start(GTK_BOX(windata->iconbox), windata->icon,
+					   TRUE, TRUE, 0);
+	gtk_misc_set_alignment(GTK_MISC(windata->icon), 0.5, 0.0);
+
+	vbox = gtk_vbox_new(FALSE, 6);
+	gtk_widget_show(vbox);
+	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+
 	windata->body_label = sexy_url_label_new();
-	gtk_widget_show(windata->body_label);
 	gtk_box_pack_start(GTK_BOX(vbox), windata->body_label, TRUE, TRUE, 0);
 	gtk_misc_set_alignment(GTK_MISC(windata->body_label), 0, 0);
 	gtk_label_set_line_wrap(GTK_LABEL(windata->body_label), TRUE);
@@ -193,11 +238,7 @@ create_notification(UrlClickedCb url_clicked)
 							 G_CALLBACK(windata->url_clicked), win);
 
 	windata->actions_box = gtk_hbox_new(FALSE, 0);
-	gtk_widget_show(windata->actions_box);
 	gtk_box_pack_start(GTK_BOX(vbox), windata->actions_box, FALSE, TRUE, 0);
-
-	gtk_widget_size_request(hbox, &req);
-	gtk_widget_set_size_request(hbox, -1, MAX(MIN_HEIGHT, req.height));
 
 	return GTK_WINDOW(win);
 }
@@ -247,6 +288,11 @@ set_notification_text(GtkWindow *nw, const char *summary, const char *body)
 
 	sexy_url_label_set_markup(SEXY_URL_LABEL(windata->body_label), body);
 
+	if (body == NULL || *body == '\0')
+		gtk_widget_hide(windata->body_label);
+	else
+		gtk_widget_show(windata->body_label);
+
 	gtk_widget_set_size_request(
 		((body != NULL && *body == '\0')
 		 ? windata->body_label : windata->summary_label),
@@ -261,6 +307,20 @@ set_notification_icon(GtkWindow *nw, GdkPixbuf *pixbuf)
 	g_assert(windata != NULL);
 
 	gtk_image_set_from_pixbuf(GTK_IMAGE(windata->icon), pixbuf);
+
+	if (pixbuf != NULL)
+	{
+		int pixbuf_width = gdk_pixbuf_get_width(pixbuf);
+
+		gtk_widget_show(windata->icon);
+		gtk_widget_set_size_request(windata->iconbox,
+									MAX(BODY_X_OFFSET, pixbuf_width), -1);
+	}
+	else
+	{
+		gtk_widget_hide(windata->icon);
+		gtk_widget_set_size_request(windata->iconbox, BODY_X_OFFSET, -1);
+	}
 }
 
 void
@@ -306,6 +366,8 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	char *buf;
 
 	g_assert(windata != NULL);
+
+	gtk_widget_show(windata->actions_box);
 
 	if (windata->num_actions_added > 0)
 	{
@@ -569,7 +631,6 @@ move_notification(GtkWindow *nw, int x, int y)
 	if (windata->has_arrow)
 	{
 		create_border_with_arrow(GTK_WIDGET(nw), windata);
-		return;
 	}
 	else
 	{

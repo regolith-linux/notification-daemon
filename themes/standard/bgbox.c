@@ -1,6 +1,6 @@
 #include "bgbox.h"
 
-G_DEFINE_TYPE(NotifydBgBox, notifyd_bgbox, GTK_TYPE_HBOX);
+G_DEFINE_TYPE(NotifydBgBox, notifyd_bgbox, GTK_TYPE_VBOX);
 
 static gboolean
 notifyd_bgbox_expose_event(GtkWidget *bgbox, GdkEventExpose *event)
@@ -10,8 +10,8 @@ notifyd_bgbox_expose_event(GtkWidget *bgbox, GdkEventExpose *event)
 		GtkStyle *style = gtk_widget_get_style(bgbox);
 		GtkStateType state = GTK_WIDGET_STATE(bgbox);
 		GdkGC *gc;
-
-		printf("Expose\n");
+		guint border_width =
+			gtk_container_get_border_width(GTK_CONTAINER(bgbox));
 
 		switch (NOTIFYD_BGBOX(bgbox)->palette)
 		{
@@ -31,11 +31,13 @@ notifyd_bgbox_expose_event(GtkWidget *bgbox, GdkEventExpose *event)
 				g_assert_not_reached();
 		}
 
+#if 0
 		gdk_draw_rectangle(GDK_DRAWABLE(bgbox->window), gc, TRUE,
-						   bgbox->allocation.x,
-						   bgbox->allocation.y,
-						   bgbox->allocation.width,
-						   bgbox->allocation.height);
+						   bgbox->allocation.x + border_width,
+						   bgbox->allocation.y + border_width,
+						   bgbox->allocation.width  - 2 * border_width,
+						   bgbox->allocation.height - 2 * border_width);
+#endif
 	}
 
 	return GTK_WIDGET_CLASS(notifyd_bgbox_parent_class)->expose_event(bgbox,

@@ -28,14 +28,14 @@ typedef enum
 
 struct _NotifydBgBox
 {
-	GtkHBox parent_object;
+	GtkVBox parent_object;
 
 	NotifydPalette palette;
 };
 
 struct _NotifydBgBoxClass
 {
-	GtkHBoxClass parent_class;
+	GtkVBoxClass parent_class;
 };
 
 GType notifyd_bgbox_get_type(void);
