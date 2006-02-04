@@ -19,8 +19,6 @@ typedef struct
 	GtkWidget *last_sep;
 	GtkWidget *stripe_spacer;
 
-	guint num_actions_added;
-
 	gboolean has_arrow;
 
 	int point_x;
@@ -163,6 +161,7 @@ create_notification(UrlClickedCb url_clicked)
 	GtkWidget *vbox;
 	GtkWidget *close_button;
 	GtkWidget *image;
+	GtkWidget *alignment;
 	WindowData *windata;
 
 	windata = g_new0(WindowData, 1);
@@ -257,8 +256,12 @@ create_notification(UrlClickedCb url_clicked)
 	g_signal_connect_swapped(G_OBJECT(windata->body_label), "url_activated",
 							 G_CALLBACK(windata->url_clicked), win);
 
-	windata->actions_box = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), windata->actions_box, FALSE, TRUE, 0);
+	alignment = gtk_alignment_new(1, 0.5, 0, 0);
+	gtk_widget_show(alignment);
+	gtk_box_pack_start(GTK_BOX(vbox), alignment, FALSE, TRUE, 0);
+
+	windata->actions_box = gtk_hbox_new(FALSE, 6);
+	gtk_container_add(GTK_CONTAINER(alignment), windata->actions_box);
 
 	return GTK_WINDOW(win);
 }
@@ -378,15 +381,9 @@ void
 add_notification_action(GtkWindow *nw, const char *text, const char *key,
 						ActionInvokedCb cb)
 {
-	/*
-	 * TODO: Use SexyUrlLabel. This requires a way of disabling the
-	 *       right-click menu.
-	 */
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
-	GtkWidget *eventbox;
-	GtkWidget *bgbox;
 	GtkWidget *label;
-	GdkCursor *cursor;
+	GtkWidget *button;
 	char *buf;
 
 	g_assert(windata != NULL);
@@ -397,44 +394,22 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 		update_content_hbox_visibility(windata);
 	}
 
-	if (windata->num_actions_added > 0)
-	{
-		label = gtk_label_new("‧");
-		gtk_widget_show(label);
-		gtk_box_pack_start(GTK_BOX(windata->actions_box), label,
-						    FALSE, FALSE, 0);
-	}
-
-	eventbox = gtk_event_box_new();
-	gtk_widget_show(eventbox);
-	gtk_box_pack_start(GTK_BOX(windata->actions_box), eventbox,
-					   FALSE, FALSE, 0);
-
-	g_object_set_data(G_OBJECT(eventbox), "_nw", nw);
-	g_object_set_data_full(G_OBJECT(eventbox),
-						   "_action_key", g_strdup(key), g_free);
-	g_signal_connect(G_OBJECT(eventbox), "button-release-event",
-					 G_CALLBACK(action_clicked_cb), cb);
-
-	cursor = gdk_cursor_new_for_display(gtk_widget_get_display(eventbox),
-										GDK_HAND2);
-	gtk_widget_realize(eventbox);
-	gdk_window_set_cursor(eventbox->window, cursor);
-	gdk_cursor_unref(cursor);
-
-	bgbox = notifyd_bgbox_new(NOTIFYD_BASE);
-	gtk_widget_show(bgbox);
-	gtk_container_add(GTK_CONTAINER(eventbox), bgbox);
+	button = gtk_button_new();
+	gtk_widget_show(button);
+	gtk_box_pack_start(GTK_BOX(windata->actions_box), button, FALSE, FALSE, 0);
 
 	label = gtk_label_new(NULL);
 	gtk_widget_show(label);
-	gtk_container_add(GTK_CONTAINER(bgbox), label);
-	buf = g_strdup_printf("<span color=\"blue\""
-						  " underline=\"single\">%s</span>", text);
+	gtk_container_add(GTK_CONTAINER(button), label);
+	buf = g_strdup_printf("<small>%s</small>", text);
 	gtk_label_set_markup(GTK_LABEL(label), buf);
 	g_free(buf);
 
-	windata->num_actions_added++;
+	g_object_set_data(G_OBJECT(button), "_nw", nw);
+	g_object_set_data_full(G_OBJECT(button),
+						   "_action_key", g_strdup(key), g_free);
+	g_signal_connect(G_OBJECT(button), "button-release-event",
+					 G_CALLBACK(action_clicked_cb), cb);
 }
 
 #define ADD_POINT(_x, _y, shapeoffset_x, shapeoffset_y) \
