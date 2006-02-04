@@ -169,6 +169,7 @@ create_notification(UrlClickedCb url_clicked)
 
 	win = gtk_window_new(GTK_WINDOW_POPUP);
 	gtk_widget_add_events(win, GDK_BUTTON_RELEASE_MASK);
+	gtk_widget_realize(win);
 	g_object_set_data_full(G_OBJECT(win), "windata", windata,
 						   (GDestroyNotify)destroy_windata);
 	gtk_widget_set_app_paintable(win, TRUE);
@@ -384,6 +385,8 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
 	GtkWidget *label;
 	GtkWidget *button;
+	GtkWidget *hbox;
+	GdkPixbuf *pixbuf;
 	char *buf;
 
 	g_assert(windata != NULL);
@@ -398,9 +401,28 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 	gtk_widget_show(button);
 	gtk_box_pack_start(GTK_BOX(windata->actions_box), button, FALSE, FALSE, 0);
 
+	hbox = gtk_hbox_new(FALSE, 6);
+	gtk_widget_show(hbox);
+	gtk_container_add(GTK_CONTAINER(button), hbox);
+
+	/* Try to be smart and find a suitable icon. */
+	buf = g_strdup_printf("stock_%s", key);
+	pixbuf = gtk_icon_theme_load_icon(
+		gtk_icon_theme_get_for_screen(
+			gdk_drawable_get_screen(GTK_WIDGET(nw)->window)),
+		buf, 16, GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
+	g_free(buf);
+
+	if (pixbuf != NULL)
+	{
+		GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+		gtk_widget_show(image);
+		gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+	}
+
 	label = gtk_label_new(NULL);
 	gtk_widget_show(label);
-	gtk_container_add(GTK_CONTAINER(button), label);
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
 	buf = g_strdup_printf("<small>%s</small>", text);
 	gtk_label_set_markup(GTK_LABEL(label), buf);
 	g_free(buf);

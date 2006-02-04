@@ -1,3 +1,9 @@
+Sat Feb 04 01:26:41 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Use the action key to look up an icon theme stock icon. If one
+	    exists, display it next to the name.
+
 Sat Feb 04 01:07:02 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
