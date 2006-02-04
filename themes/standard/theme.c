@@ -78,37 +78,39 @@ fill_background(GtkWidget *win, WindowData *windata)
 static void
 draw_stripe(GtkWidget *win, WindowData *windata)
 {
-#if USE_THEMED_STRIPE
 	GtkStyle *style = gtk_widget_get_style(win);
-	GdkGC *gc = style->bg_gc[GTK_STATE_NORMAL];
-#else
-	GdkGC *gc = gdk_gc_new(GDK_DRAWABLE(win->window));
+	gboolean custom_gc = FALSE;
 	GdkColor color;
+	GdkGC *gc;
 
 	switch (windata->urgency)
 	{
 		case URGENCY_LOW: // LOW
-			gdk_color_parse("#9DB029", &color);
+			gc = style->bg_gc[GTK_STATE_NORMAL];
 			break;
 
 		case URGENCY_CRITICAL: // CRITICAL
+			custom_gc = TRUE;
+			gc = gdk_gc_new(GDK_DRAWABLE(win->window));
 			gdk_color_parse("#CC0000", &color);
+			gdk_gc_set_rgb_fg_color(gc, &color);
 			break;
 
 		case URGENCY_NORMAL: // NORMAL
 		default:
-			gdk_color_parse("#729FCF", &color);
+			gc = style->bg_gc[GTK_STATE_SELECTED];
 			break;
 	}
 
-	gdk_gc_set_rgb_fg_color(gc, &color);
-#endif
 
 	gdk_draw_rectangle(win->window, gc, TRUE,
 					   windata->main_hbox->allocation.x + 1,
 					   windata->main_hbox->allocation.y + 1,
 					   STRIPE_WIDTH,
 					   windata->main_hbox->allocation.height - 2);
+
+	if (custom_gc)
+		g_object_unref(G_OBJECT(gc));
 }
 
 static gboolean

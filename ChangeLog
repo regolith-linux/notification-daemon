@@ -1,3 +1,11 @@
+Sat Feb 04 12:38:22 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Use the theme colors to draw the low and normal urgency stripes.
+	    Low is the style's nomral BG state. Normal is the selected state.
+	    Critical is custom. We hard-code it red. Eventually, I'd like all
+	    this to change when the themeable gtk colors are supported.
+
 Sat Feb 04 12:28:24 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:
