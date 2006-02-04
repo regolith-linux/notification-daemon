@@ -68,16 +68,17 @@ load_theme_engine(const char *name)
 	g_module_symbol(engine->module, #name, (gpointer *)&engine->name);
 
 	BIND_REQUIRED_FUNC(create_notification);
-	BIND_REQUIRED_FUNC(destroy_notification);
-	BIND_REQUIRED_FUNC(show_notification);
-	BIND_REQUIRED_FUNC(hide_notification);
-	BIND_REQUIRED_FUNC(set_notification_hints);
 	BIND_REQUIRED_FUNC(set_notification_text);
 	BIND_REQUIRED_FUNC(set_notification_icon);
 	BIND_REQUIRED_FUNC(set_notification_arrow);
 	BIND_REQUIRED_FUNC(add_notification_action);
 	BIND_REQUIRED_FUNC(move_notification);
+
+	BIND_OPTIONAL_FUNC(destroy_notification);
+	BIND_OPTIONAL_FUNC(show_notification);
+	BIND_OPTIONAL_FUNC(hide_notification);
 	BIND_OPTIONAL_FUNC(set_notification_timeout);
+	BIND_OPTIONAL_FUNC(set_notification_hints);
 	BIND_OPTIONAL_FUNC(notification_tick);
 
 	return engine;
@@ -175,28 +176,42 @@ void
 theme_destroy_notification(GtkWindow *nw)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
-	engine->destroy_notification(nw);
+
+	if (engine->destroy_notification != NULL)
+		engine->destroy_notification(nw);
+	else
+		gtk_widget_destroy(GTK_WIDGET(nw));
 }
 
 void
 theme_show_notification(GtkWindow *nw)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
-	engine->show_notification(nw);
+
+	if (engine->show_notification != NULL)
+		engine->show_notification(nw);
+	else
+		gtk_widget_show(GTK_WIDGET(nw));
 }
 
 void
 theme_hide_notification(GtkWindow *nw)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
-	engine->hide_notification(nw);
+
+	if (engine->hide_notification != NULL)
+		engine->hide_notification(nw);
+	else
+		gtk_widget_hide(GTK_WIDGET(nw));
 }
 
 void
 theme_set_notification_hints(GtkWindow *nw, GHashTable *hints)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
-	engine->set_notification_hints(nw, hints);
+
+	if (engine->set_notification_hints != NULL)
+		engine->set_notification_hints(nw, hints);
 }
 
 void

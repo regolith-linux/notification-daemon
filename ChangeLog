@@ -1,3 +1,10 @@
+Sat Feb 04 13:11:25 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/engines.c:
+	* themes/standard/theme.c:
+	  - Make more theme functions optional. Fall back to defaults in cases
+	    like destroying, showing, or hiding notifications.
+
 Sat Feb 04 13:08:02 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

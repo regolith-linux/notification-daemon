@@ -300,24 +300,6 @@ create_notification(UrlClickedCb url_clicked)
 }
 
 void
-destroy_notification(GtkWindow *nw)
-{
-	gtk_widget_destroy(GTK_WIDGET(nw));
-}
-
-void
-show_notification(GtkWindow *nw)
-{
-	gtk_widget_show(GTK_WIDGET(nw));
-}
-
-void
-hide_notification(GtkWindow *nw)
-{
-	gtk_widget_hide(GTK_WIDGET(nw));
-}
-
-void
 set_notification_hints(GtkWindow *nw, GHashTable *hints)
 {
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
