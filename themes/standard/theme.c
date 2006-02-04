@@ -39,8 +39,8 @@ typedef struct
 	GdkRegion *window_region;
 
 	guchar urgency;
-	guint timeout;
-	guint remaining;
+	glong timeout;
+	glong remaining;
 
 	UrlClickedCb url_clicked;
 
@@ -332,7 +332,7 @@ set_notification_hints(GtkWindow *nw, GHashTable *hints)
 }
 
 void
-set_notification_timeout(GtkWindow *nw, guint timeout)
+set_notification_timeout(GtkWindow *nw, glong timeout)
 {
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
 	g_assert(windata != NULL);
@@ -341,7 +341,7 @@ set_notification_timeout(GtkWindow *nw, guint timeout)
 }
 
 void
-notification_tick(GtkWindow *nw, guint remaining)
+notification_tick(GtkWindow *nw, glong remaining)
 {
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
 	windata->remaining = remaining;

@@ -262,6 +262,7 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 {
 	NotifyTimeout *nt = (NotifyTimeout *)value;
 	gboolean *phas_more_timeouts = (gboolean *)data;
+	glong remaining;
 	GTimeVal now;
 
 	if (!nt->has_timeout)
@@ -269,12 +270,13 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 
 	g_get_current_time(&now);
 
-	theme_notification_tick(nt->nw,
-							(nt->expiration.tv_sec - now.tv_sec) * 1000);
+	remaining = ((nt->expiration.tv_sec * 1000) +
+				 (nt->expiration.tv_usec / 1000)) -
+	            ((now.tv_sec * 1000) + (now.tv_usec / 1000));
 
-	if (now.tv_sec > nt->expiration.tv_sec ||
-		(now.tv_sec == nt->expiration.tv_sec &&
-		 now.tv_usec >= nt->expiration.tv_usec))
+	theme_notification_tick(nt->nw, remaining);
+
+	if (remaining <= 0)
 	{
 		_emit_closed_signal(G_OBJECT(nt->nw));
 		return TRUE;

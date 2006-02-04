@@ -1,3 +1,11 @@
+Sat Feb 04 13:08:02 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* src/engines.c:
+	* src/engines.h:
+	* themes/standard/theme.c:
+	  - Make the timer ticks passed to the theme engine more precise.
+
 Sat Feb 04 12:44:32 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/standard/theme.c:

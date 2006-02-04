@@ -22,8 +22,8 @@ typedef struct
 	void (*add_notification_action)(GtkWindow *nw, const char *label,
 									const char *key, GCallback cb);
 	void (*move_notification)(GtkWindow *nw, int x, int y);
-	void (*set_notification_timeout)(GtkWindow *nw, guint timeout);
-	void (*notification_tick)(GtkWindow *nw, guint timeout);
+	void (*set_notification_timeout)(GtkWindow *nw, glong timeout);
+	void (*notification_tick)(GtkWindow *nw, glong timeout);
 
 } ThemeEngine;
 
@@ -200,7 +200,7 @@ theme_set_notification_hints(GtkWindow *nw, GHashTable *hints)
 }
 
 void
-theme_set_notification_timeout(GtkWindow *nw, guint timeout)
+theme_set_notification_timeout(GtkWindow *nw, glong timeout)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 
@@ -209,7 +209,7 @@ theme_set_notification_timeout(GtkWindow *nw, guint timeout)
 }
 
 void
-theme_notification_tick(GtkWindow *nw, guint remaining)
+theme_notification_tick(GtkWindow *nw, glong remaining)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 
