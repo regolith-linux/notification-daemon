@@ -1,6 +1,8 @@
 #include <gtk/gtk.h>
 #include "eggnotificationbubblewidget.h"
 
+typedef void (*ActionInvokedCb)(GtkWindow *nw, const char *key);
+
 GtkWindow *
 create_notification(void)
 {
@@ -48,14 +50,26 @@ set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 		EGG_NOTIFICATION_BUBBLE_WIDGET(nw), visible);
 }
 
+static void
+action_clicked_cb(GtkWidget *w, ActionInvokedCb action_cb)
+{
+	GtkWindow *nw   = g_object_get_data(G_OBJECT(w), "_nw");
+	const char *key = g_object_get_data(G_OBJECT(w), "_action_key");
+
+	action_cb(nw, key);
+}
+
 void
 add_notification_action(GtkWindow *nw, const char *label, const char *key,
-						GCallback cb)
+						ActionInvokedCb cb)
 {
 	GtkWidget *b = egg_notification_bubble_widget_create_button(
 		EGG_NOTIFICATION_BUBBLE_WIDGET(nw), label);
+	g_object_set_data(G_OBJECT(b), "_nw", nw);
+	g_object_set_data_full(G_OBJECT(b), "_action_key", g_strdup(key), g_free);
 
-	g_signal_connect_swapped(G_OBJECT(b), "clicked", cb, (GtkWindow *)key);
+	g_signal_connect(G_OBJECT(b), "clicked",
+					 G_CALLBACK(action_clicked_cb), cb);
 }
 
 void

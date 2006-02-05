@@ -1,3 +1,8 @@
+Sat Feb 04 16:23:30 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/bubble/theme.c:
+	  - Fixed a crash when clicking an action in the bubble theme.
+
 Sat Feb 04 15:56:28 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
