@@ -256,12 +256,15 @@ _layout_window (EggNotificationBubbleWidget *bubble_widget,
 
     if (bubble_widget->button_hbox != NULL)
       {
+        GtkWidget *alignment = gtk_alignment_new(1.0, 0.5, 0, 0);
+        gtk_widget_show(alignment);
         gtk_table_attach (GTK_TABLE (bubble_widget->table),
-                          bubble_widget->button_hbox,
+                          alignment,
                           0, 2, 2, 3,
                           GTK_FILL, GTK_FILL,
                           0, 0);
 
+        gtk_container_add(GTK_CONTAINER(alignment), bubble_widget->button_hbox);
       }
 
     gtk_widget_show_all (bubble_widget->table);
@@ -1177,10 +1180,7 @@ egg_notification_bubble_widget_create_button (EggNotificationBubbleWidget *bubbl
   if (bubble_widget->button_hbox == NULL)
     bubble_widget->button_hbox = gtk_hbox_new (FALSE, 0);
 
-  gtk_box_pack_end (GTK_BOX (bubble_widget->button_hbox),
-                    b,
-                    FALSE, FALSE,
-                    0);
+  gtk_box_pack_start(GTK_BOX (bubble_widget->button_hbox), b, FALSE, FALSE, 0);
 
   return (b);
 }

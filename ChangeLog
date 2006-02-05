@@ -1,3 +1,11 @@
+Sat Feb 04 16:39:00 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* themes/bubble/eggnotificationbubblewidget.c:
+	  - Attempt to fix button ordering in the Bubble widget. The structure
+	    of the widget is a bit jumbled, so there may be side-effects with
+	    the alignment.
+
 Sat Feb 04 16:23:30 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/bubble/theme.c:

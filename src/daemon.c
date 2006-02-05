@@ -86,6 +86,8 @@ struct _DBusGMethodInvocation
 #endif /* D-BUS < 0.60 */
 
 static void notify_daemon_finalize(GObject *object);
+static void _close_notification(NotifyDaemon *daemon, guint id,
+								gboolean hide_notification);
 static void _emit_closed_signal(GObject *notify_widget);
 static void _action_invoked_cb(GtkWindow *nw, const char *key);
 
@@ -147,6 +149,7 @@ notify_daemon_new(void)
 static void
 _action_invoked_cb(GtkWindow *nw, const char *key)
 {
+	NotifyDaemon *daemon = g_object_get_data(G_OBJECT(nw), "_notify_daemon");
 	DBusConnection *con;
 	DBusError error;
 
@@ -185,6 +188,11 @@ _action_invoked_cb(GtkWindow *nw, const char *key)
 		dbus_message_unref(message);
 		dbus_connection_unref(con);
 	}
+
+	_close_notification(
+		daemon,
+		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")),
+		TRUE);
 }
 
 static void
