@@ -1,3 +1,11 @@
+Sat Feb 04 19:48:49 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	D themes/standard/bgbox.c:
+	D themes/standard/bgbox.h:
+	* themes/standard/Makefile.am:
+	* themes/standard/theme.c:
+	  - Get rid of bgbox.[ch]. We don't use it anymore.
+
 Sat Feb 04 16:39:00 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

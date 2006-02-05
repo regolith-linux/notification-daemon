@@ -1,6 +1,5 @@
 #include <gtk/gtk.h>
 #include <libsexy/sexy-url-label.h>
-#include "bgbox.h"
 
 typedef void (*ActionInvokedCb)(GtkWindow *nw, const char *key);
 typedef void (*UrlClickedCb)(GtkWindow *nw, const char *url);
