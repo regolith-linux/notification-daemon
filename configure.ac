@@ -79,7 +79,7 @@ REQ_GTK_VERSION=2.4.0
 REQ_GLIB_VERSION=$REQ_GTK_VERSION
 REQ_SEXY_VERSION=0.1.3
 REQ_DBUS_VERSION=0.36
-PKG_CHECK_MODULES(NOTIFICATION_DAEMON, [\
+pkg_modules="
 	gtk+-2.0 >= $REQ_GTK_VERSION, \
 	glib-2.0 >= $REQ_GLIB_VERSION, \
 	dbus-1 >= $REQ_DBUS_VERSION, \
@@ -87,18 +87,18 @@ PKG_CHECK_MODULES(NOTIFICATION_DAEMON, [\
 	libsexy >= $REQ_SEXY_VERSION, \
 	gconf-2.0, \
 	libwnck-1.0 \
-])
+"
+PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
 
-PKG_CHECK_MODULES(GDK,
+gdk_modules="
 	gdk-2.0 >= $REQ_GTK_VERSION, \
 	gdk-pixbuf-2.0 >= $REQ_GTK_VERSION \
-],[
-	have_gdk=yes,
-],[
+"
+PKG_CHECK_MODULES(GDK, $gdk_modules, have_gdk=yes,
+[
 	have_gdk=no
-
 	AC_WARN("Some test apps will not be built")
 ])
 
