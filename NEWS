@@ -1,3 +1,29 @@
+version 0.3.4 (4-February-2006):
+	* Added a Close button to notifications. This closed ticket #8. Thanks
+	  to Michael Vogt for the basis of this patch.
+	* Fixed a few bugs (including crashes) involving the freeing of
+	  memory when notifications and theme enginers are destroyed.
+	* Fixed the theme engines to be installed as unversioned libraries.
+	  Thanks to Rodney Dawes for this patch.
+	* Fixed a bug where the notification window was not realized, causing
+	  a crash. This fixes bug #10.
+	* Fixed a crash in the Bubble theme when clicking an action.
+	* Fixed action ordering in the Bubble theme.
+	* Made the destroy_notification, show_notification, hide_notification,
+	  and set_notification_hints theme engine functions optional.
+	* Added set_notification_timeout and notification_tick theme engine
+	  functions.
+	* Made several improvements to the Standard theme:
+	  - The left-hand color stripe has been made smaller and now reflects
+	    the urgency level set.
+	  - Added a pie-based countdown timer for notifications containing
+	    actions. This allows the user to see how long they have to react to
+	    a notification.
+	  - Converted the action links into buttons. These are now left-aligned
+	    and make a reasonable attempt to find an appropriate stock icon.
+	  - Allow the notification to be very short when no icons, body text or
+	    actions are specified.
+
 version 0.3.3 (25-January-2006):
 	* Install and check for engines in
 	  $(libdir)/notification-daemon-1.0/engines, as opposed to
