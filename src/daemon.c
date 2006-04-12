@@ -934,7 +934,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		else
 		{
 			/* Load icon theme icon */
-			GtkIconTheme *theme = gtk_icon_theme_new();
+			GtkIconTheme *theme = gtk_icon_theme_get_default();
 			GtkIconInfo *icon_info =
 				gtk_icon_theme_lookup_icon(theme, icon, IMAGE_SIZE,
 										   GTK_ICON_LOOKUP_USE_BUILTIN);

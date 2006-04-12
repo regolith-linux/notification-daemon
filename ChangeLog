@@ -1,3 +1,9 @@
+Tue Apr 11 22:50:22 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Patch by Rodney Dawes to fix usage of GtkIconTheme. This closes
+	    bug #38.
+
 ==================== 0.3.4 ====================
 
 Sat Feb 04 20:18:54 PST 2006  Christian Hammond <chipx86@chipx86.com>
