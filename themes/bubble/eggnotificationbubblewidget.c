@@ -468,7 +468,7 @@ _populate_window (EggNotificationBubbleWidget *bubble_widget)
 
   widget = GTK_WIDGET (bubble_widget);
 
-  gtk_widget_add_events (widget, GDK_BUTTON_PRESS_MASK);
+  gtk_widget_add_events (widget, GDK_BUTTON_RELEASE_MASK);
   gtk_widget_set_app_paintable (widget, TRUE);
   gtk_window_set_resizable (GTK_WINDOW (bubble_widget), FALSE);
 

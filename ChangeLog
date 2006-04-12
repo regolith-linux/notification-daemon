@@ -1,3 +1,9 @@
+Tue Apr 11 22:54:13 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/bubble/eggnotificationbubblewidget.c:
+	  - Patch by Rodney Dawes to fix closing of notifications using the
+	    bubble theme when clicked. This closes bug #39.
+
 Tue Apr 11 22:50:22 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
