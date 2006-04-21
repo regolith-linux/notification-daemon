@@ -1,3 +1,10 @@
+Fri Apr 21 15:54:01 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* NEWS:
+	  - Fix notifications with a timeout >= 2147484ms expiring in less
+	    than a second. This fixes bug #22.
+
 Fri Apr 21 15:21:45 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/engines.c:

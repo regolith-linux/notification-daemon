@@ -5,6 +5,9 @@ version 0.3.5:
 	  theme).
 	* Disabled the Bubble theme for this release. It's the source of too
 	  many bugs.
+	* Fixed incorrect usage of GtkIconTheme. (Bug #38)
+	* Fixed notifications with a timeout of 2147484ms or longer expiring
+	  in less than a second. (Bug #22)
 
 version 0.3.4 (4-February-2006):
 	* Added a Close button to notifications. This closed ticket #8. Thanks

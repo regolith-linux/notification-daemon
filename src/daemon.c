@@ -270,7 +270,7 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 {
 	NotifyTimeout *nt = (NotifyTimeout *)value;
 	gboolean *phas_more_timeouts = (gboolean *)data;
-	glong remaining;
+	gulong remaining;
 	GTimeVal now;
 
 	if (!nt->has_timeout)
