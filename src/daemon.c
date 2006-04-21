@@ -270,7 +270,8 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 {
 	NotifyTimeout *nt = (NotifyTimeout *)value;
 	gboolean *phas_more_timeouts = (gboolean *)data;
-	gulong remaining;
+	time_t now_time;
+	time_t expiration_time;
 	GTimeVal now;
 
 	if (!nt->has_timeout)
@@ -278,17 +279,18 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 
 	g_get_current_time(&now);
 
-	remaining = ((nt->expiration.tv_sec * 1000) +
-				 (nt->expiration.tv_usec / 1000)) -
-	            ((now.tv_sec * 1000) + (now.tv_usec / 1000));
+	expiration_time = (nt->expiration.tv_sec * 1000) +
+	                  (nt->expiration.tv_usec / 1000);
+	now_time = (now.tv_sec * 1000) + (now.tv_usec / 1000);
 
-	theme_notification_tick(nt->nw, remaining);
-
-	if (remaining <= 0)
+	if (now_time > expiration_time)
 	{
+		theme_notification_tick(nt->nw, 0);
 		_emit_closed_signal(G_OBJECT(nt->nw));
 		return TRUE;
 	}
+	else
+		theme_notification_tick(nt->nw, expiration_time - now_time);
 
 	*phas_more_timeouts = TRUE;
 
@@ -317,7 +319,7 @@ _calculate_timeout(NotifyDaemon *daemon, NotifyTimeout *nt, int timeout)
 		nt->has_timeout = FALSE;
 	else
 	{
-		gulong usec;
+		glong usec;
 
 		nt->has_timeout = TRUE;
 
@@ -327,6 +329,15 @@ _calculate_timeout(NotifyDaemon *daemon, NotifyTimeout *nt, int timeout)
 		theme_set_notification_timeout(nt->nw, timeout);
 
 		usec = timeout * 1000;	/* convert from msec to usec */
+
+		/*
+		 * If it's less than 0, wrap around back to MAXLONG.
+		 * g_time_val_add() requires a glong, and anything larger than
+		 * MAXLONG will be treated as a negative value.
+		 */
+		if (usec < 0)
+			usec = G_MAXLONG;
+
 		g_get_current_time(&nt->expiration);
 		g_time_val_add(&nt->expiration, usec);
 

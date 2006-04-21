@@ -1,3 +1,10 @@
+Fri Apr 21 16:33:56 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Fix notifications no longer expiring due to the fix for bug #22.
+	    The logic is now a bit smarter and more hacky. But it works. And
+	    really, if it didn't, would I be committing this? Yes, probably.
+
 Fri Apr 21 15:54:01 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
