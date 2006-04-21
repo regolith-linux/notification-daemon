@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <gtk/gtk.h>
 #include <libsexy/sexy-url-label.h>
 
@@ -737,4 +739,28 @@ move_notification(GtkWindow *nw, int x, int y)
 	{
 		gtk_window_move(GTK_WINDOW(nw), x, y);
 	}
+}
+
+void
+get_theme_info(char **theme_name,
+			   char **theme_ver,
+			   char **author,
+			   char **homepage)
+{
+	*theme_name = g_strdup("Standard");
+	*theme_ver  = g_strdup_printf("%d.%d.%d",
+								  NOTIFICATION_DAEMON_MAJOR_VERSION,
+								  NOTIFICATION_DAEMON_MINOR_VERSION,
+								  NOTIFICATION_DAEMON_MICRO_VERSION);
+	*author = g_strdup("Christian Hammond");
+	*homepage = g_strdup("http://www.galago-project.org/");
+}
+
+gboolean
+theme_check_init(unsigned int major_ver, unsigned int minor_ver,
+				 unsigned int micro_ver)
+{
+	return major_ver == NOTIFICATION_DAEMON_MAJOR_VERSION &&
+	       minor_ver == NOTIFICATION_DAEMON_MINOR_VERSION &&
+	       micro_ver == NOTIFICATION_DAEMON_MICRO_VERSION;
 }

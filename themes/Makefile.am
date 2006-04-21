@@ -1,1 +1,2 @@
-SUBDIRS = standard bubble
+SUBDIRS = standard
+DIST_SUBDIRS = $(SUBDIRS) bubble

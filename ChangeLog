@@ -1,3 +1,17 @@
+Fri Apr 21 15:21:45 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/engines.c:
+	* themes/Makefile.am:
+	* themes/standard/theme.c:
+	* NEWS:
+	* configure.ac:
+	  - Add two new required theme functions, theme_check_init (which
+	    determines if the theme is compatible with the version of
+	    notification-daemon) and get_theme_info (which returns info on the
+	    theme).
+	  - Disabled the Bubble theme for this release. It's the source of too
+	    many bugs.
+
 Tue Apr 11 22:54:13 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* themes/bubble/eggnotificationbubblewidget.c:

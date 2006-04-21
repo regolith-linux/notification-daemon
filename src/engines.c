@@ -9,6 +9,11 @@ typedef struct
 	GModule *module;
 	guint ref_count;
 
+	gboolean (*theme_check_init)(unsigned int major_ver,
+								 unsigned int minor_ver,
+								 unsigned int micro_ver);
+	void (*get_theme_info)(char **theme_name, char **theme_ver,
+						   char **author, char **homepage);
 	GtkWindow *(*create_notification)(UrlClickedCb url_clicked_cb);
 	void (*destroy_notification)(GtkWindow *nw);
 	void (*show_notification)(GtkWindow *nw);
@@ -48,25 +53,21 @@ load_theme_engine(const char *name)
 	g_free(path);
 
 	if (engine->module == NULL)
-	{
-		g_free(engine);
-		return NULL;
-	}
+		goto error;
 
 #define BIND_REQUIRED_FUNC(name) \
 	if (!g_module_symbol(engine->module, #name, (gpointer *)&engine->name)) \
 	{ \
 		/* Too harsh! Fall back to default. */ \
 		g_error("Theme doesn't provide the required function '%s'", #name); \
-		if (!g_module_close(engine->module)) \
-			g_warning("%s: %s", filename, g_module_error()); \
-		\
-		g_free(engine); \
+		goto error; \
 	}
 
 #define BIND_OPTIONAL_FUNC(name) \
 	g_module_symbol(engine->module, #name, (gpointer *)&engine->name);
 
+	BIND_REQUIRED_FUNC(theme_check_init);
+	BIND_REQUIRED_FUNC(get_theme_info);
 	BIND_REQUIRED_FUNC(create_notification);
 	BIND_REQUIRED_FUNC(set_notification_text);
 	BIND_REQUIRED_FUNC(set_notification_icon);
@@ -81,7 +82,22 @@ load_theme_engine(const char *name)
 	BIND_OPTIONAL_FUNC(set_notification_hints);
 	BIND_OPTIONAL_FUNC(notification_tick);
 
+	if (!engine->theme_check_init(NOTIFICATION_DAEMON_MAJOR_VERSION,
+								  NOTIFICATION_DAEMON_MINOR_VERSION,
+								  NOTIFICATION_DAEMON_MICRO_VERSION))
+	{
+		g_error("Theme doesn't work with this version of notification-daemon");
+		goto error;
+	}
+
 	return engine;
+
+error:
+	if (engine->module != NULL && !g_module_close(engine->module))
+		g_warning("%s: %s", filename, g_module_error());
+
+	g_free(engine);
+	return NULL;
 }
 
 static void
