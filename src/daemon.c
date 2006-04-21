@@ -905,23 +905,6 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		}
 	}
 
-	if (use_pos_data)
-	{
-		/*
-		 * Typically, the theme engine will set its own position based on
-		 * the arrow X, Y hints. However, in case, move the notification to
-		 * that position.
-		 */
-		theme_set_notification_arrow(nw, TRUE, x, y);
-		theme_move_notification(nw, x, y);
-	}
-	else
-	{
-		theme_set_notification_arrow(nw, FALSE, 0, 0);
-		_notify_daemon_add_bubble_to_poptart_stack(daemon, nw,
-												   new_notification);
-	}
-
 	/* check for icon_data if icon == "" */
 	if (*icon == '\0')
 	{
@@ -972,6 +955,23 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 			theme_set_notification_icon(nw, pixbuf);
 			g_object_unref(G_OBJECT(pixbuf));
 		}
+	}
+
+	if (use_pos_data)
+	{
+		/*
+		 * Typically, the theme engine will set its own position based on
+		 * the arrow X, Y hints. However, in case, move the notification to
+		 * that position.
+		 */
+		theme_set_notification_arrow(nw, TRUE, x, y);
+		theme_move_notification(nw, x, y);
+	}
+	else
+	{
+		theme_set_notification_arrow(nw, FALSE, 0, 0);
+		_notify_daemon_add_bubble_to_poptart_stack(daemon, nw,
+												   new_notification);
 	}
 
 	if (!screensaver_active(GTK_WIDGET(nw)) &&

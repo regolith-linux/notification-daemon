@@ -1,3 +1,10 @@
+Fri Apr 21 16:42:46 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Patch by M.S. to fix the problem where icons were being clipped in
+	    notifications if the text didn't wrap enough lines. This fixes
+	    bug #21.
+
 Fri Apr 21 16:33:56 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
