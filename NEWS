@@ -5,6 +5,10 @@ version 0.3.5:
 	  theme).
 	* Disabled the Bubble theme for this release. It's the source of too
 	  many bugs.
+	* Fix the scaling of different icon sizes. Now small icons display as
+	  small, and larger icons are scaled down to 48x48.
+	* Fixed a problem where icons were being clipped in notifications.
+	  Patch by M.S. (Bug #21)
 	* Fixed incorrect usage of GtkIconTheme. (Bug #38)
 	* Fixed notifications with a timeout of 2147484ms or longer expiring
 	  in less than a second. (Bug #22)

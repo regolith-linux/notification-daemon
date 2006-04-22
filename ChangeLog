@@ -1,3 +1,10 @@
+Fri Apr 21 17:17:40 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Fix the scaling of different icon sizes. I was using a MAX when
+	    I should have used a MIN. Now small icons display as small, and
+	    larger icons are scaled down to 48x48.
+
 Fri Apr 21 16:42:46 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

@@ -937,7 +937,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 			{
 				pixbuf = gtk_icon_theme_load_icon(
 					theme, icon,
-					MAX(IMAGE_SIZE, gtk_icon_info_get_base_size(icon_info)),
+					MIN(IMAGE_SIZE, gtk_icon_info_get_base_size(icon_info)),
 					GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
 
 				gtk_icon_info_free(icon_info);
