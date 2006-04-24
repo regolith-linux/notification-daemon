@@ -58,8 +58,9 @@ enum
 #define IMAGE_SIZE    32
 #define IMAGE_PADDING 10
 #define STRIPE_WIDTH  30
-#define PIE_WIDTH     24
-#define PIE_HEIGHT    24
+#define PIE_RADIUS    12
+#define PIE_WIDTH     (2 * PIE_RADIUS)
+#define PIE_HEIGHT    (2 * PIE_RADIUS)
 #define BODY_X_OFFSET (IMAGE_SIZE + 8)
 #define DEFAULT_ARROW_OFFSET  (STRIPE_WIDTH + 2)
 #define DEFAULT_ARROW_HEIGHT  14
@@ -417,13 +418,25 @@ countdown_expose_cb(GtkWidget *pie, GdkEventExpose *event,
 
 	if (windata->timeout > 0)
 	{
-		GdkGC *pie_gc = style->bg_gc[GTK_STATE_ACTIVE];
 		gdouble pct = (gdouble)windata->remaining / (gdouble)windata->timeout;
 
+#if GTK_CHECK_VERSION(2, 8, 0)
+		cairo_t *cr;
+
+		cr = gdk_cairo_create(GDK_DRAWABLE(windata->pie_countdown->window));
+		gdk_cairo_set_source_color(cr, &style->bg[GTK_STATE_ACTIVE]);
+
+		cairo_move_to(cr, PIE_RADIUS, PIE_RADIUS);
+		cairo_arc_negative(cr, PIE_RADIUS, PIE_RADIUS, PIE_RADIUS,
+						   -G_PI_2, -(pct * G_PI * 2) - G_PI_2);
+		cairo_line_to(cr, PIE_RADIUS, PIE_RADIUS);
+		cairo_fill(cr);
+#else
 		gdk_draw_arc(GDK_DRAWABLE(windata->pie_countdown->window),
-					 pie_gc, TRUE,
+					 style->bg_gc[GTK_STATE_ACTIVE], TRUE,
 					 0, 0, PIE_WIDTH, PIE_HEIGHT,
 					 90 * 64, pct * 360.0 * 64.0);
+#endif
 	}
 
 	return TRUE;
@@ -512,14 +525,26 @@ add_notification_action(GtkWindow *nw, const char *text, const char *key,
 					 G_CALLBACK(action_clicked_cb), cb);
 }
 
+void
+clear_notification_actions(GtkWindow *nw)
+{
+	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+
+	windata->pie_countdown = NULL;
+
+	gtk_widget_hide(windata->actions_box);
+	gtk_container_foreach(GTK_CONTAINER(windata->actions_box),
+						  (GtkCallback)gtk_object_destroy, NULL);
+}
+
 #define ADD_POINT(_x, _y, shapeoffset_x, shapeoffset_y) \
-	do { \
+	G_STMT_START { \
 		windata->border_points[i].x = (_x); \
 		windata->border_points[i].y = (_y); \
 		shape_points[i].x = (_x) + (shapeoffset_x); \
 		shape_points[i].y = (_y) + (shapeoffset_y); \
 		i++;\
-	} while (0)
+	} G_STMT_END
 
 static void
 create_border_with_arrow(GtkWidget *nw, WindowData *windata)

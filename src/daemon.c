@@ -864,6 +864,10 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		g_signal_connect(G_OBJECT(nw), "destroy",
 						 G_CALLBACK(_notification_destroyed_cb), daemon);
 	}
+	else
+	{
+		theme_clear_notification_actions(nw);
+	}
 
 	theme_set_notification_text(nw, summary, body);
 	theme_set_notification_hints(nw, hints);

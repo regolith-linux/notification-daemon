@@ -26,6 +26,7 @@ typedef struct
 								   int x, int y);
 	void (*add_notification_action)(GtkWindow *nw, const char *label,
 									const char *key, GCallback cb);
+	void (*clear_notification_actions)(GtkWindow *nw);
 	void (*move_notification)(GtkWindow *nw, int x, int y);
 	void (*set_notification_timeout)(GtkWindow *nw, glong timeout);
 	void (*notification_tick)(GtkWindow *nw, glong timeout);
@@ -73,6 +74,7 @@ load_theme_engine(const char *name)
 	BIND_REQUIRED_FUNC(set_notification_icon);
 	BIND_REQUIRED_FUNC(set_notification_arrow);
 	BIND_REQUIRED_FUNC(add_notification_action);
+	BIND_REQUIRED_FUNC(clear_notification_actions);
 	BIND_REQUIRED_FUNC(move_notification);
 
 	BIND_OPTIONAL_FUNC(destroy_notification);
@@ -276,6 +278,13 @@ theme_add_notification_action(GtkWindow *nw, const char *label,
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 	engine->add_notification_action(nw, label, key, cb);
+}
+
+void
+theme_clear_notification_actions(GtkWindow *nw)
+{
+	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
+	engine->clear_notification_actions(nw);
 }
 
 void
