@@ -19,6 +19,8 @@ version 0.3.5 (26-April-2006):
 	* The Standard theme's countdown timer is now rendered using Cairo when
 	  compiled against Gtk 2.8.0 or higher. This improves the timer by making
 	  it antialiased.
+	* Renamed notification-daemon.service to
+	  org.freedesktop.Notifications.service.
 
 version 0.3.4 (4-February-2006):
 	* Added a Close button to notifications. This closed ticket #8. Thanks
