@@ -1,5 +1,14 @@
 ==================== 0.3.5 ====================
 
+Wed Apr 26 01:44:17 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* data/Makefile.am:
+	A data/org.freedesktop.Notifications.service.in:
+	D data/notification-daemon.service.in:
+	* configure.ac:
+	  - Rename notification-daemon.service to
+	    org.freedesktop.Notifications.service.
+
 Wed Apr 26 01:32:17 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* NEWS:

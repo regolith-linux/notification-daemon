@@ -1,5 +1,5 @@
 servicedir   = $(DBUS_SERVICES_DIR)
-service_DATA = notification-daemon.service
+service_DATA = org.freedesktop.Notifications.service
 
 schemasdir       = $(GCONF_SCHEMA_FILE_DIR)
 schemas_in_files = notification-daemon.schemas.in
@@ -16,6 +16,6 @@ endif
 
 EXTRA_DIST = \
 	$(schemas_in_files) \
-	notification-daemon.service
+	$(service_DATA)
 
 CLEANFILES = $(schemas_DATA)
