@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notification-daemon, 0.3.5, galago-devel@lists.freedesktop.org)
+AC_INIT(notification-daemon, 0.3.5.90, galago-devel@lists.freedesktop.org)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2006 Christian Hammond])
@@ -15,7 +15,7 @@ dnl ################################################################
 NOTIFICATION_DAEMON_MAJOR_VERSION=0
 NOTIFICATION_DAEMON_MINOR_VERSION=3
 NOTIFICATION_DAEMON_MICRO_VERSION=5
-NOTIFICATION_DAEMON_DEVEL_VERSION=0
+NOTIFICATION_DAEMON_DEVEL_VERSION=90
 
 NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_MICRO_VERSION
 
@@ -67,7 +67,7 @@ AC_EXEEXT
 AM_PROG_LIBTOOL
 AC_PROG_INTLTOOL
 
-ALL_LINGUAS=
+ALL_LINGUAS="nl"
 GETTEXT_PACKAGE=notification-daemon
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Gettext package])
