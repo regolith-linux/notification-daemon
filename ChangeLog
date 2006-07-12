@@ -1,3 +1,13 @@
+Wed Jul 12 03:27:39 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* NEWS:
+	  - A notification's timeout will now pause while the mouse is hovering
+	    over the notification. This allows users to respond to notifications
+	    without it suddenly disappearing before the user clicks.
+	    This closes ticket #73.
+
+
 Thu Apr 27 22:26:10 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* po/nl.po:

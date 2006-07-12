@@ -51,7 +51,9 @@
 struct _NotifyTimeout
 {
 	GTimeVal expiration;
+	GTimeVal paused_diff;
 	gboolean has_timeout;
+	gboolean paused;
 	guint id;
 
 	GtkWindow *nw;
@@ -265,6 +267,50 @@ _notification_destroyed_cb(GtkWindow *nw, NotifyDaemon *daemon)
 		FALSE);
 }
 
+static void
+_mouse_entered_cb(GtkWindow *nw, GdkEventCrossing *event, NotifyDaemon *daemon)
+{
+	NotifyTimeout *nt;
+	guint id;
+	GTimeVal now;
+
+	if (event->detail == GDK_NOTIFY_INFERIOR)
+		return;
+
+	id = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(nw), "_notify_id"));
+	nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash,
+											  &id);
+
+	nt->paused = TRUE;
+	g_get_current_time(&now);
+
+	nt->paused_diff.tv_usec = nt->expiration.tv_usec - now.tv_usec;
+	nt->paused_diff.tv_sec  = nt->expiration.tv_sec  - now.tv_sec;
+
+	if (nt->paused_diff.tv_usec < 0)
+	{
+		nt->paused_diff.tv_usec += G_USEC_PER_SEC;
+		nt->paused_diff.tv_sec--;
+	}
+}
+
+static void
+_mouse_exitted_cb(GtkWindow *nw, GdkEventCrossing *event,
+				  NotifyDaemon *daemon)
+{
+	NotifyTimeout *nt;
+	guint id;
+
+	if (event->detail == GDK_NOTIFY_INFERIOR)
+		return;
+
+	id = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(nw), "_notify_id"));
+	nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash,
+											  &id);
+
+	nt->paused = FALSE;
+}
+
 static gboolean
 _is_expired(gpointer key, gpointer value, gpointer data)
 {
@@ -289,8 +335,21 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 		_emit_closed_signal(G_OBJECT(nt->nw));
 		return TRUE;
 	}
+	else if (nt->paused)
+	{
+		nt->expiration.tv_usec = nt->paused_diff.tv_usec + now.tv_usec;
+		nt->expiration.tv_sec  = nt->paused_diff.tv_sec  + now.tv_sec;
+
+		if (nt->expiration.tv_usec >= G_USEC_PER_SEC)
+		{
+			nt->expiration.tv_usec -= G_USEC_PER_SEC;
+			nt->expiration.tv_sec++;
+		}
+	}
 	else
+	{
 		theme_notification_tick(nt->nw, expiration_time - now_time);
+	}
 
 	*phas_more_timeouts = TRUE;
 
@@ -343,9 +402,8 @@ _calculate_timeout(NotifyDaemon *daemon, NotifyTimeout *nt, int timeout)
 
 		if (daemon->priv->timeout_source == 0)
 		{
-			daemon->priv->timeout_source = g_timeout_add(100,
-														 _check_expiration,
-														 daemon);
+			daemon->priv->timeout_source =
+				g_timeout_add(100, _check_expiration, daemon);
 		}
 	}
 }
@@ -863,6 +921,10 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 						 G_CALLBACK(window_clicked_cb), daemon);
 		g_signal_connect(G_OBJECT(nw), "destroy",
 						 G_CALLBACK(_notification_destroyed_cb), daemon);
+		g_signal_connect(G_OBJECT(nw), "enter-notify-event",
+						 G_CALLBACK(_mouse_entered_cb), daemon);
+		g_signal_connect(G_OBJECT(nw), "leave-notify-event",
+						 G_CALLBACK(_mouse_exitted_cb), daemon);
 	}
 	else
 	{
@@ -1008,7 +1070,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 
 gboolean
 notify_daemon_close_notification_handler(NotifyDaemon *daemon,
-										 guint id, GError ** error)
+										 guint id, GError **error)
 {
 	_close_notification(daemon, id, TRUE);
 
