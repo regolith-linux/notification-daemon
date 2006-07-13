@@ -1001,10 +1001,15 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 
 			if (icon_info != NULL)
 			{
-				pixbuf = gtk_icon_theme_load_icon(
-					theme, icon,
-					MIN(IMAGE_SIZE, gtk_icon_info_get_base_size(icon_info)),
-					GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
+				gint icon_size = MIN(IMAGE_SIZE,
+									 gtk_icon_info_get_base_size(icon_info));
+
+				if (icon_size == 0)
+					icon_size = IMAGE_SIZE;
+
+				pixbuf = gtk_icon_theme_load_icon(theme, icon, icon_size,
+												  GTK_ICON_LOOKUP_USE_BUILTIN,
+												  NULL);
 
 				gtk_icon_info_free(icon_info);
 			}

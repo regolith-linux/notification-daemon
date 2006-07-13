@@ -2,6 +2,8 @@ version 0.3.6:
 	* A notification's timeout will now pause while the mouse is hovering over
 	  the notification. This allows users to respond to notifications without
 	  it suddenly disappearing before the user clicks. (Ticket #73)
+	* Fixed a crash under some icon themes where the base size of an icon
+	  was being returned as 0. (Bug #61)
 	* Added a Dutch translation from Wouter Bolsterlee. (Bug #55)
 
 version 0.3.5 (26-April-2006):

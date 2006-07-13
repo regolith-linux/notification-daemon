@@ -1,3 +1,12 @@
+Thu Jul 13 00:50:05 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	* AUTHORS:
+	* NEWS:
+	  - Patch by felix-at-hsgheli.de that fixes a crash when
+	    gtk_icon_info_get_base_size() returns 0, which happens on some icon
+	    themes. This closes ticket #61.
+
 Wed Jul 12 03:27:39 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
