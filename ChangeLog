@@ -1,3 +1,11 @@
+Wed Jul 26 23:44:24 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* NEWS:
+	* src/daemon.c:
+	  - Patch by Ed Catmur to fix an assertion failure when destroying a
+	    notification caused by gtk_widget_realize() being called somewhere
+	    in the destructor chain. This closes ticket #77.
+
 Thu Jul 13 00:50:05 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

@@ -716,6 +716,9 @@ _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 		priv->poptart_stack = g_slist_remove_link(priv->poptart_stack,
 												  remove_link);
 	}
+
+	if (GTK_WIDGET_REALIZED(GTK_WIDGET(nw)))
+		gtk_widget_unrealize(GTK_WIDGET(nw));
 }
 
 static void
