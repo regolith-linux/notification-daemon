@@ -925,6 +925,8 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 
 		if (nt != NULL)
 			nw = nt->nw;
+		else
+			id = 0;
 	}
 
 	if (nw == NULL)

@@ -1,3 +1,11 @@
+Sat Jul 29 03:11:15 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Patch by Ed Catmur to handle the case where a replaces_id of a
+	    non-existant notification was set. Under this case, we now generate a
+	    new ID and send it back in the notification, rather than creating a
+	    broken notification. This closes ticket #76.
+
 Sat Jul 29 02:43:25 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:
