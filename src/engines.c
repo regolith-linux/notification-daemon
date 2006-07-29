@@ -136,8 +136,8 @@ get_theme_engine(void)
 	if (active_engine == NULL)
 	{
 		GConfClient *client = get_gconf_client();
-		char *enginename = gconf_client_get_string(client,
-			"/apps/notification-daemon/theme", NULL);
+		char *enginename = gconf_client_get_string(client, GCONF_KEY_THEME,
+												   NULL);
 
 		if (theme_prop_notify_id == 0)
 		{

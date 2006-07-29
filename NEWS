@@ -1,4 +1,7 @@
 version 0.3.6:
+	* Added a GConf key to allow users to specify which corner of the screen
+	  notifications should appear in. Patch by M.S. (Ticket #57)
+	* Added a Dutch translation from Wouter Bolsterlee. (Bug #55)
 	* Fixed compatibility problems with D-BUS v0.61. (Bugs #67, #75)
 	* A notification's timeout will now pause while the mouse is hovering over
 	  the notification. This allows users to respond to notifications without
@@ -13,7 +16,6 @@ version 0.3.6:
 	  notification would cause a broken notification where timeouts and
 	  action invoking fails. In this case, a new ID is generated. Patch by
 	  Ed Catmur. (Bug #76)
-	* Added a Dutch translation from Wouter Bolsterlee. (Bug #55)
 
 version 0.3.5 (26-April-2006):
 	* Add three new required theme functions:

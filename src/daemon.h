@@ -29,6 +29,10 @@
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-lowlevel.h>
 
+#define GCONF_KEY_DAEMON         "/apps/notification-daemon"
+#define GCONF_KEY_THEME          GCONF_KEY_DAEMON "/theme"
+#define GCONF_KEY_POPUP_LOCATION GCONF_KEY_DAEMON "/popup_location"
+
 G_BEGIN_DECLS
 
 #define NOTIFY_TYPE_DAEMON (notify_daemon_get_type())

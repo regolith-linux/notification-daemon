@@ -48,6 +48,32 @@
 
 #define IMAGE_SIZE 48
 
+enum {
+	POPUP_STACK_LOCATION_TOP_LEFT,
+	POPUP_STACK_LOCATION_TOP_RIGHT,
+	POPUP_STACK_LOCATION_BOTTOM_LEFT,
+	POPUP_STACK_LOCATION_BOTTOM_RIGHT,
+	POPUP_STACK_LOCATION_UNKNOWN
+};
+
+#define POPUP_STACK_LOCATION_DEFAULT \
+	POPUP_STACK_LOCATION_BOTTOM_RIGHT
+
+struct PopupStackLocation
+{
+	gchar id;
+	const gchar *identifier;
+};
+
+const struct PopupStackLocation popup_stack_locations[] =
+{
+	{ POPUP_STACK_LOCATION_TOP_LEFT,     "top_left"     },
+	{ POPUP_STACK_LOCATION_TOP_RIGHT,    "top_right"    },
+	{ POPUP_STACK_LOCATION_BOTTOM_LEFT,  "bottom_left"  },
+	{ POPUP_STACK_LOCATION_BOTTOM_RIGHT, "bottom_right" },
+	{ -1, NULL }
+};
+
 struct _NotifyTimeout
 {
 	GTimeVal expiration;
@@ -68,6 +94,8 @@ struct _NotifyDaemonPrivate
 	GHashTable *notification_hash;
 	GSList *poptart_stack;
 	gboolean url_clicked_lock;
+	gboolean stack_only;
+	gchar popup_stack_location;
 };
 
 static GConfClient *gconf_client = NULL;
@@ -87,6 +115,7 @@ struct _DBusGMethodInvocation
 };
 #endif /* D-BUS < 0.60 */
 
+static gchar _notify_daemon_stack_location_from_string(const gchar *slocation);
 static void notify_daemon_finalize(GObject *object);
 static void _close_notification(NotifyDaemon *daemon, guint id,
 								gboolean hide_notification);
@@ -115,11 +144,34 @@ _notify_timeout_destroy(NotifyTimeout *nt)
 static void
 notify_daemon_init(NotifyDaemon *daemon)
 {
+	GConfClient *client;
+
 	daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE(daemon, NOTIFY_TYPE_DAEMON,
 											   NotifyDaemonPrivate);
 
 	daemon->priv->next_id = 1;
 	daemon->priv->timeout_source = 0;
+	daemon->priv->stack_only = FALSE;
+	daemon->priv->popup_stack_location = POPUP_STACK_LOCATION_DEFAULT;
+
+	client = get_gconf_client();
+
+	if (client != NULL)
+	{
+		gchar *slocation = gconf_client_get_string(client,
+												   GCONF_KEY_POPUP_LOCATION,
+												   NULL);
+
+		if (slocation != NULL && *slocation != '\0')
+		{
+			gchar location =
+				_notify_daemon_stack_location_from_string(slocation);
+
+			if (location != POPUP_STACK_LOCATION_UNKNOWN)
+				daemon->priv->popup_stack_location = location;
+		}
+	}
+
 	daemon->priv->notification_hash =
 		g_hash_table_new_full(g_int_hash, g_int_equal, g_free,
 							  (GDestroyNotify)_notify_timeout_destroy);
@@ -691,6 +743,128 @@ get_work_area(GtkWidget *nw, GdkRectangle *rect)
 	return TRUE;
 }
 
+static gchar
+_notify_daemon_stack_location_from_string(const gchar *slocation)
+{
+	const struct PopupStackLocation* l;
+
+	for (l = popup_stack_locations; l->id != -1; l++)
+	{
+		if (!strcmp(slocation, l->identifier))
+			return l->id;
+	}
+
+	return POPUP_STACK_LOCATION_UNKNOWN;
+}
+
+static void
+_pop_stack_get_origin_coordinates(const gchar location,
+                                  GdkRectangle workarea,
+                                  gint *x, gint *y, gint *shx, gint *shy,
+                                  const gint width, const gint height)
+{
+	switch (location)
+	{
+		case POPUP_STACK_LOCATION_TOP_LEFT:
+			*x = workarea.x;
+			*y = workarea.y;
+			*shy = height;
+			break;
+
+		case POPUP_STACK_LOCATION_TOP_RIGHT:
+			*x = workarea.x + workarea.width - width;
+			*y = workarea.y;
+			*shy = height;
+			break;
+
+		case POPUP_STACK_LOCATION_BOTTOM_LEFT:
+			*x = workarea.x;
+			*y = workarea.y + workarea.height - height;
+			break;
+
+		case POPUP_STACK_LOCATION_BOTTOM_RIGHT:
+			*x = workarea.x + workarea.width - width;
+			*y = workarea.y + workarea.height - height;
+			break;
+
+		default:
+			g_assert_not_reached();
+	}
+}
+
+static void
+_pop_stack_translate_coordinates(const gchar location,
+								 GdkRectangle workarea,
+								 gint *x, gint *y, gint *shx, gint *shy,
+								 const gint width, const gint height,
+								 const gint index)
+{
+	switch (location)
+	{
+		case POPUP_STACK_LOCATION_TOP_LEFT:
+			*x = workarea.x;
+			*y += *shy;
+			*shy = height;
+			break;
+
+		case POPUP_STACK_LOCATION_TOP_RIGHT:
+			*x = workarea.x + workarea.width - width;
+			*y += *shy;
+			*shy = height;
+			break;
+
+		case POPUP_STACK_LOCATION_BOTTOM_LEFT:
+			*x = workarea.x;
+			*y -= height;
+			break;
+
+		case POPUP_STACK_LOCATION_BOTTOM_RIGHT:
+			*x = workarea.x + workarea.width - width;
+			*y -= height;
+			break;
+
+		default:
+			g_assert_not_reached();
+	}
+}
+
+static void
+popup_location_changed_cb(GConfClient *client, guint cnxn_id,
+						  GConfEntry *entry, gpointer user_data)
+{
+	NotifyDaemon *daemon = (NotifyDaemon*)user_data;
+	GConfValue *value;
+
+	if (daemon == NULL)
+		return;
+
+	value = gconf_entry_get_value(entry);
+
+	if (value != NULL)
+	{
+		const char *slocation = gconf_value_get_string(value);
+
+		if (slocation != NULL)
+		{
+			gchar location =
+				_notify_daemon_stack_location_from_string(slocation);
+
+			if (location != POPUP_STACK_LOCATION_UNKNOWN)
+			{
+				daemon->priv->popup_stack_location = location;
+				return;
+			}
+		}
+	}
+
+	gconf_client_set_string(client,
+		"/apps/notification-daemon/popup_location",
+		popup_stack_locations[POPUP_STACK_LOCATION_DEFAULT].identifier,
+		NULL);
+
+	daemon->priv->popup_stack_location = POPUP_STACK_LOCATION_DEFAULT;
+}
+
 static void
 _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 {
@@ -698,12 +872,13 @@ _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 	GdkRectangle workarea;
 	GSList *remove_link = NULL;
 	GSList *link;
-	gint x, y;
+	gint x, y, shiftx = 0, shifty = 0, index = 0;
 
 	get_work_area(GTK_WIDGET(nw), &workarea);
 
-	y = workarea.y + workarea.height;
-	x = 0;
+	_pop_stack_get_origin_coordinates(priv->popup_stack_location,
+									  workarea, &x, &y, &shiftx, &shifty,
+									  0, 0);
 
 	for (link = priv->poptart_stack; link != NULL; link = link->next)
 	{
@@ -714,8 +889,11 @@ _remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
 		{
 			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
 
-			x = workarea.x + workarea.width - req.width;
-			y = y - req.height;
+			_pop_stack_translate_coordinates(priv->popup_stack_location,
+											 workarea, &x, &y,
+											 &shiftx, &shifty,
+											 req.width, req.height,
+											 index++);
 
 			theme_move_notification(nw2, x, y);
 		}
@@ -744,14 +922,15 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 	GtkRequisition req;
 	GdkRectangle workarea;
 	GSList *link;
-	gint x, y;
+	gint x, y, shiftx = 0, shifty = 0, index = 1;
 
 	gtk_widget_size_request(GTK_WIDGET(nw), &req);
 
 	get_work_area(GTK_WIDGET(nw), &workarea);
 
-	x = workarea.x + workarea.width - req.width;
-	y = workarea.y + workarea.height - req.height;
+	_pop_stack_get_origin_coordinates(priv->popup_stack_location, workarea,
+									  &x, &y, &shiftx, &shifty,
+									  req.width, req.height);
 
 	theme_move_notification(nw, x, y);
 
@@ -762,8 +941,13 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 		if (nw2 != nw)
 		{
 			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
-			x = workarea.x + workarea.width - req.width;
-			y = y - req.height;
+
+			_pop_stack_translate_coordinates(priv->popup_stack_location,
+											 workarea, &x, &y,
+											 &shiftx, &shifty,
+											 req.width, req.height,
+											 index++);
+
 			theme_move_notification(nw2, x, y);
 		}
 	}
@@ -1152,10 +1336,11 @@ main(int argc, char **argv)
 	gconf_init(argc, argv, NULL);
 
 	gconf_client = gconf_client_get_default();
-	gconf_client_add_dir(gconf_client, "/apps/notification-daemon/theme",
+	gconf_client_add_dir(gconf_client, GCONF_KEY_DAEMON,
 						 GCONF_CLIENT_PRELOAD_NONE, NULL);
 
 	error = NULL;
+
 	connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 
 	if (connection == NULL)
@@ -1185,6 +1370,13 @@ main(int argc, char **argv)
 	}
 
 	daemon = notify_daemon_new();
+
+	gconf_client_notify_add(gconf_client, GCONF_KEY_POPUP_LOCATION,
+							popup_location_changed_cb, daemon,
+							NULL, NULL);
+
+	/* Emit signal to verify/set current key */
+	gconf_client_notify(gconf_client, GCONF_KEY_POPUP_LOCATION);
 
 	dbus_g_connection_register_g_object(connection,
 										"/org/freedesktop/Notifications",
