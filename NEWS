@@ -1,4 +1,5 @@
 version 0.3.6:
+	* Fixed compatibility problems with D-BUS v0.61. (Bugs #67, #75)
 	* A notification's timeout will now pause while the mouse is hovering over
 	  the notification. This allows users to respond to notifications without
 	  it suddenly disappearing before the user clicks. (Ticket #73)

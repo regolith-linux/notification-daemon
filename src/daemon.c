@@ -457,13 +457,27 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	GValueArray *image_struct;
 	GValue *value;
 	GArray *tmp_array;
+#if CHECK_DBUS_VERSION(0, 61)
+	GType struct_type;
 
-	if (!G_VALUE_HOLDS(icon_data, G_TYPE_VALUE_ARRAY))
+	struct_type = dbus_g_type_get_struct(
+		"GValueArray",
+		G_TYPE_INT,
+		G_TYPE_INT,
+		G_TYPE_INT,
+		G_TYPE_BOOLEAN,
+		G_TYPE_INT,
+		G_TYPE_INT,
+		dbus_g_type_get_collection("GArray", G_TYPE_UCHAR),
+		G_TYPE_INVALID);
+
+	if (!G_VALUE_HOLDS(icon_data, struct_type))
 	{
 		g_warning("_notify_daemon_process_icon_data expected a "
 				  "GValue of type GValueArray");
 		return FALSE;
 	}
+#endif /* D-BUS >= 0.61 */
 
 	image_struct = (GValueArray *)g_value_get_boxed(icon_data);
 	value = g_value_array_get_nth(image_struct, 0);
