@@ -123,9 +123,9 @@ struct _DBusGMethodInvocation
 };
 #endif /* D-BUS < 0.60 */
 
-static void update_stack_location_from_string(NotifyDaemon *daemon,
-											  const char *slocation);
 static void notify_daemon_finalize(GObject *object);
+static void _update_stack_location_from_string(NotifyDaemon *daemon,
+											   const char *slocation);
 static void _close_notification(NotifyDaemon *daemon, guint id,
 								gboolean hide_notification);
 static void _emit_closed_signal(GtkWindow *nw);
@@ -185,12 +185,6 @@ notify_daemon_finalize(GObject *object)
 
 	if (parent_class->finalize != NULL)
 		parent_class->finalize(object);
-}
-
-NotifyDaemon *
-notify_daemon_new(void)
-{
-	return g_object_new(NOTIFY_TYPE_DAEMON, NULL);
 }
 
 static void
@@ -1308,7 +1302,7 @@ main(int argc, char **argv)
 		g_error("Could not aquire name: %s", error->message);
 	}
 
-	daemon = notify_daemon_new();
+	daemon = g_object_new(NOTIFY_TYPE_DAEMON, NULL);
 
 	gconf_client_notify_add(gconf_client, GCONF_KEY_POPUP_LOCATION,
 							popup_location_changed_cb, daemon,
