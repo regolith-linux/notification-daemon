@@ -72,6 +72,8 @@ const PopupNotifyStackLocation popup_stack_locations[] =
 	{ NOTIFY_STACK_LOCATION_UNKNOWN,      NULL }
 };
 
+#define POPUP_STACK_DEFAULT_INDEX 3 /* XXX Hack! */
+
 typedef struct
 {
 	GTimeVal expiration;
@@ -192,7 +194,7 @@ get_stack_location_from_string(const char *slocation)
 {
 	NotifyStackLocation stack_location = NOTIFY_STACK_LOCATION_DEFAULT;
 
-	if (slocation != NULL && *slocation != '\0')
+	if (slocation == NULL || *slocation == '\0')
 		return NOTIFY_STACK_LOCATION_DEFAULT;
 	else
 	{
@@ -675,7 +677,7 @@ popup_location_changed_cb(GConfClient *client, guint cnxn_id,
 	{
 		gconf_client_set_string(get_gconf_client(),
 			"/apps/notification-daemon/popup_location",
-			popup_stack_locations[NOTIFY_STACK_LOCATION_DEFAULT].identifier,
+			popup_stack_locations[POPUP_STACK_DEFAULT_INDEX].identifier,
 			NULL);
 
 		stack_location = NOTIFY_STACK_LOCATION_DEFAULT;

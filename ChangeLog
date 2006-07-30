@@ -1,3 +1,9 @@
+Sun Jul 30 15:32:10 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Fix a crash. We were making bad assumptions about the ordering of
+	    enum values for stack locations.
+
 Sun Jul 30 14:22:47 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/Makefile.am:
