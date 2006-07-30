@@ -48,20 +48,21 @@
 
 #define IMAGE_SIZE 48
 
-enum {
+typedef enum {
+	POPUP_STACK_LOCATION_UNKNOWN = -1,
 	POPUP_STACK_LOCATION_TOP_LEFT,
 	POPUP_STACK_LOCATION_TOP_RIGHT,
 	POPUP_STACK_LOCATION_BOTTOM_LEFT,
-	POPUP_STACK_LOCATION_BOTTOM_RIGHT,
-	POPUP_STACK_LOCATION_UNKNOWN
-};
+	POPUP_STACK_LOCATION_BOTTOM_RIGHT
+
+} PopupStackLocationType;
 
 #define POPUP_STACK_LOCATION_DEFAULT \
 	POPUP_STACK_LOCATION_BOTTOM_RIGHT
 
 struct PopupStackLocation
 {
-	gchar id;
+	PopupStackLocationType type;
 	const gchar *identifier;
 };
 
@@ -71,7 +72,7 @@ const struct PopupStackLocation popup_stack_locations[] =
 	{ POPUP_STACK_LOCATION_TOP_RIGHT,    "top_right"    },
 	{ POPUP_STACK_LOCATION_BOTTOM_LEFT,  "bottom_left"  },
 	{ POPUP_STACK_LOCATION_BOTTOM_RIGHT, "bottom_right" },
-	{ -1, NULL }
+	{ POPUP_STACK_LOCATION_UNKNOWN,      NULL }
 };
 
 struct _NotifyTimeout
@@ -115,7 +116,8 @@ struct _DBusGMethodInvocation
 };
 #endif /* D-BUS < 0.60 */
 
-static gchar _notify_daemon_stack_location_from_string(const gchar *slocation);
+static PopupStackLocationType
+	_notify_daemon_stack_location_type_from_string(const gchar *slocation);
 static void notify_daemon_finalize(GObject *object);
 static void _close_notification(NotifyDaemon *daemon, guint id,
 								gboolean hide_notification);
@@ -165,11 +167,13 @@ notify_daemon_init(NotifyDaemon *daemon)
 		if (slocation != NULL && *slocation != '\0')
 		{
 			gchar location =
-				_notify_daemon_stack_location_from_string(slocation);
+				_notify_daemon_stack_location_type_from_string(slocation);
 
 			if (location != POPUP_STACK_LOCATION_UNKNOWN)
 				daemon->priv->popup_stack_location = location;
 		}
+
+		g_free(slocation);
 	}
 
 	daemon->priv->notification_hash =
@@ -743,27 +747,29 @@ get_work_area(GtkWidget *nw, GdkRectangle *rect)
 	return TRUE;
 }
 
-static gchar
-_notify_daemon_stack_location_from_string(const gchar *slocation)
+static PopupStackLocationType
+_notify_daemon_stack_location_type_from_string(const gchar *slocation)
 {
-	const struct PopupStackLocation* l;
+	const struct PopupStackLocation *l;
 
-	for (l = popup_stack_locations; l->id != -1; l++)
+	for (l = popup_stack_locations;
+		 l->type != POPUP_STACK_LOCATION_UNKNOWN;
+		 l++)
 	{
 		if (!strcmp(slocation, l->identifier))
-			return l->id;
+			return l->type;
 	}
 
 	return POPUP_STACK_LOCATION_UNKNOWN;
 }
 
 static void
-_pop_stack_get_origin_coordinates(const gchar location,
+_pop_stack_get_origin_coordinates(PopupStackLocationType location_type,
                                   GdkRectangle workarea,
                                   gint *x, gint *y, gint *shx, gint *shy,
                                   const gint width, const gint height)
 {
-	switch (location)
+	switch (location_type)
 	{
 		case POPUP_STACK_LOCATION_TOP_LEFT:
 			*x = workarea.x;
@@ -793,13 +799,13 @@ _pop_stack_get_origin_coordinates(const gchar location,
 }
 
 static void
-_pop_stack_translate_coordinates(const gchar location,
+_pop_stack_translate_coordinates(PopupStackLocationType location_type,
 								 GdkRectangle workarea,
 								 gint *x, gint *y, gint *shx, gint *shy,
 								 const gint width, const gint height,
 								 const gint index)
 {
-	switch (location)
+	switch (location_type)
 	{
 		case POPUP_STACK_LOCATION_TOP_LEFT:
 			*x = workarea.x;
@@ -846,12 +852,12 @@ popup_location_changed_cb(GConfClient *client, guint cnxn_id,
 
 		if (slocation != NULL)
 		{
-			gchar location =
-				_notify_daemon_stack_location_from_string(slocation);
+			PopupStackLocationType location_type =
+				_notify_daemon_stack_location_type_from_string(slocation);
 
-			if (location != POPUP_STACK_LOCATION_UNKNOWN)
+			if (location_type != POPUP_STACK_LOCATION_UNKNOWN)
 			{
-				daemon->priv->popup_stack_location = location;
+				daemon->priv->popup_stack_location = location_type;
 				return;
 			}
 		}

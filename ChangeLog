@@ -1,3 +1,10 @@
+Sat Jul 29 19:19:34 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Typedef the popup location type enum so that we can refer to it as a
+	    name, rather than assigning the values to a gchar.
+	  - Fix a memory leak when retrieving the stack location pref string.
+
 Sat Jul 29 15:35:44 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* data/notification-daemon.schemas.in:
