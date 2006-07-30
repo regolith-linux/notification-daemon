@@ -1,10 +1,12 @@
 libexec_PROGRAMS = notification-daemon
 
 notification_daemon_SOURCES = \
+	daemon.c \
+	daemon.h \
 	engines.c \
 	engines.h \
-	daemon.c \
-	daemon.h
+	stack.c \
+	stack.h
 
 notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 

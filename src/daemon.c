@@ -44,6 +44,7 @@
 
 #include "daemon.h"
 #include "engines.h"
+#include "stack.h"
 #include "notificationdaemon-dbus-glue.h"
 
 #define IMAGE_SIZE 48
@@ -55,54 +56,41 @@
 #define NW_GET_DAEMON(nw) \
 	(g_object_get_data(G_OBJECT(nw), "_notify_daemon"))
 
-typedef enum
+typedef struct
 {
-	POPUP_STACK_LOCATION_UNKNOWN = -1,
-	POPUP_STACK_LOCATION_TOP_LEFT,
-	POPUP_STACK_LOCATION_TOP_RIGHT,
-	POPUP_STACK_LOCATION_BOTTOM_LEFT,
-	POPUP_STACK_LOCATION_BOTTOM_RIGHT,
-	POPUP_STACK_LOCATION_DEFAULT = POPUP_STACK_LOCATION_BOTTOM_RIGHT
-
-} PopupStackLocationType;
-
-struct PopupStackLocation
-{
-	PopupStackLocationType type;
+	NotifyStackLocation type;
 	const gchar *identifier;
-};
 
-const struct PopupStackLocation popup_stack_locations[] =
+} PopupNotifyStackLocation;
+
+const PopupNotifyStackLocation popup_stack_locations[] =
 {
-	{ POPUP_STACK_LOCATION_TOP_LEFT,     "top_left"     },
-	{ POPUP_STACK_LOCATION_TOP_RIGHT,    "top_right"    },
-	{ POPUP_STACK_LOCATION_BOTTOM_LEFT,  "bottom_left"  },
-	{ POPUP_STACK_LOCATION_BOTTOM_RIGHT, "bottom_right" },
-	{ POPUP_STACK_LOCATION_UNKNOWN,      NULL }
+	{ NOTIFY_STACK_LOCATION_TOP_LEFT,     "top_left"     },
+	{ NOTIFY_STACK_LOCATION_TOP_RIGHT,    "top_right"    },
+	{ NOTIFY_STACK_LOCATION_BOTTOM_LEFT,  "bottom_left"  },
+	{ NOTIFY_STACK_LOCATION_BOTTOM_RIGHT, "bottom_right" },
+	{ NOTIFY_STACK_LOCATION_UNKNOWN,      NULL }
 };
 
-struct _NotifyTimeout
+typedef struct
 {
 	GTimeVal expiration;
 	GTimeVal paused_diff;
 	gboolean has_timeout;
 	gboolean paused;
 	guint id;
-
 	GtkWindow *nw;
-};
 
-typedef struct _NotifyTimeout NotifyTimeout;
+} NotifyTimeout;
 
 struct _NotifyDaemonPrivate
 {
 	guint next_id;
 	guint timeout_source;
 	GHashTable *notification_hash;
-	GSList *poptart_stack;
 	gboolean url_clicked_lock;
-	gboolean stack_only;
-	PopupStackLocationType popup_stack_location;
+	NotifyStack **stacks;
+	gint stacks_size;
 };
 
 static GConfClient *gconf_client = NULL;
@@ -124,12 +112,11 @@ struct _DBusGMethodInvocation
 #endif /* D-BUS < 0.60 */
 
 static void notify_daemon_finalize(GObject *object);
-static void _update_stack_location_from_string(NotifyDaemon *daemon,
-											   const char *slocation);
 static void _close_notification(NotifyDaemon *daemon, guint id,
 								gboolean hide_notification);
 static void _emit_closed_signal(GtkWindow *nw);
 static void _action_invoked_cb(GtkWindow *nw, const char *key);
+static NotifyStackLocation get_stack_location_from_string(const char *slocation);
 
 G_DEFINE_TYPE(NotifyDaemon, notify_daemon, G_TYPE_OBJECT);
 
@@ -153,20 +140,34 @@ _notify_timeout_destroy(NotifyTimeout *nt)
 static void
 notify_daemon_init(NotifyDaemon *daemon)
 {
+	NotifyStackLocation location;
 	GConfClient *client = get_gconf_client();
+	GdkDisplay *display;
+	GdkScreen *screen;
 	gchar *slocation;
+	gint i;
 
 	daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE(daemon, NOTIFY_TYPE_DAEMON,
 											   NotifyDaemonPrivate);
 
 	daemon->priv->next_id = 1;
 	daemon->priv->timeout_source = 0;
-	daemon->priv->stack_only = FALSE;
 
 	slocation = gconf_client_get_string(client, GCONF_KEY_POPUP_LOCATION,
 										NULL);
-	update_stack_location_from_string(daemon, slocation);
+	location = get_stack_location_from_string(slocation);
 	g_free(slocation);
+
+	display = gdk_display_get_default();
+	screen = gdk_display_get_default_screen(display);
+	daemon->priv->stacks_size = gdk_screen_get_n_monitors(screen);
+	daemon->priv->stacks = g_new0(NotifyStack *, daemon->priv->stacks_size);
+
+	for (i = 0; i < daemon->priv->stacks_size; i++)
+	{
+		daemon->priv->stacks[i] = notify_stack_new(daemon, screen,
+												   i, location);
+	}
 
 	daemon->priv->notification_hash =
 		g_hash_table_new_full(g_int_hash, g_int_equal, g_free,
@@ -180,41 +181,33 @@ notify_daemon_finalize(GObject *object)
 	GObjectClass *parent_class = G_OBJECT_CLASS(notify_daemon_parent_class);
 
 	g_hash_table_destroy(daemon->priv->notification_hash);
-	g_slist_free(daemon->priv->poptart_stack);
 	g_free(daemon->priv);
 
 	if (parent_class->finalize != NULL)
 		parent_class->finalize(object);
 }
 
-static void
-update_stack_location_from_string(NotifyDaemon *daemon, const char *slocation)
+static NotifyStackLocation
+get_stack_location_from_string(const char *slocation)
 {
+	NotifyStackLocation stack_location = NOTIFY_STACK_LOCATION_DEFAULT;
+
 	if (slocation != NULL && *slocation != '\0')
+		return NOTIFY_STACK_LOCATION_DEFAULT;
+	else
 	{
-		PopupStackLocationType location_type = POPUP_STACK_LOCATION_DEFAULT;
-		const struct PopupStackLocation *l;
+		const PopupNotifyStackLocation *l;
 
 		for (l = popup_stack_locations;
-			 l->type != POPUP_STACK_LOCATION_UNKNOWN;
+			 l->type != NOTIFY_STACK_LOCATION_UNKNOWN;
 			 l++)
 		{
 			if (!strcmp(slocation, l->identifier))
-				location_type = l->type;
+				stack_location = l->type;
 		}
-
-		if (location_type != POPUP_STACK_LOCATION_UNKNOWN)
-			daemon->priv->popup_stack_location = location_type;
 	}
-	else
-	{
-		gconf_client_set_string(get_gconf_client(),
-			"/apps/notification-daemon/popup_location",
-			popup_stack_locations[POPUP_STACK_LOCATION_DEFAULT].identifier,
-			NULL);
 
-		daemon->priv->popup_stack_location = POPUP_STACK_LOCATION_DEFAULT;
-	}
+	return stack_location;
 }
 
 static DBusMessage *
@@ -658,238 +651,38 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), TRUE);
 }
 
-static gboolean
-get_work_area(GtkWidget *nw, GdkRectangle *rect)
-{
-	Atom workarea = XInternAtom(GDK_DISPLAY(), "_NET_WORKAREA", True);
-	Atom type;
-	Window win;
-	int format;
-	gulong num, leftovers;
-	gulong max_len = 4 * 32;
-	guchar *ret_workarea;
-	long *workareas;
-	int result;
-	GdkScreen *screen;
-	int disp_screen;
-
-	gtk_widget_realize(nw);
-	screen = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
-	disp_screen = GDK_SCREEN_XNUMBER(screen);
-
-	/* Defaults in case of error */
-	rect->x = 0;
-	rect->y = 0;
-	rect->width = gdk_screen_get_width(screen);
-	rect->height = gdk_screen_get_height(screen);
-
-	if (workarea == None)
-		return FALSE;
-
-	win = XRootWindow(GDK_DISPLAY(), disp_screen);
-	result = XGetWindowProperty(GDK_DISPLAY(), win, workarea, 0,
-								max_len, False, AnyPropertyType,
-								&type, &format, &num, &leftovers,
-								&ret_workarea);
-
-	if (result != Success || type == None || format == 0 || leftovers ||
-		num % 4)
-	{
-		return FALSE;
-	}
-
-	workareas = (long *)ret_workarea;
-	rect->x      = workareas[disp_screen * 4];
-	rect->y      = workareas[disp_screen * 4 + 1];
-	rect->width  = workareas[disp_screen * 4 + 2];
-	rect->height = workareas[disp_screen * 4 + 3];
-
-	XFree(ret_workarea);
-
-	return TRUE;
-}
-
-static void
-_pop_stack_get_origin_coordinates(PopupStackLocationType location_type,
-                                  GdkRectangle workarea,
-                                  gint *x, gint *y, gint *shx, gint *shy,
-                                  const gint width, const gint height)
-{
-	switch (location_type)
-	{
-		case POPUP_STACK_LOCATION_TOP_LEFT:
-			*x = workarea.x;
-			*y = workarea.y;
-			*shy = height;
-			break;
-
-		case POPUP_STACK_LOCATION_TOP_RIGHT:
-			*x = workarea.x + workarea.width - width;
-			*y = workarea.y;
-			*shy = height;
-			break;
-
-		case POPUP_STACK_LOCATION_BOTTOM_LEFT:
-			*x = workarea.x;
-			*y = workarea.y + workarea.height - height;
-			break;
-
-		case POPUP_STACK_LOCATION_BOTTOM_RIGHT:
-			*x = workarea.x + workarea.width - width;
-			*y = workarea.y + workarea.height - height;
-			break;
-
-		default:
-			g_assert_not_reached();
-	}
-}
-
-static void
-_pop_stack_translate_coordinates(PopupStackLocationType location_type,
-								 GdkRectangle workarea,
-								 gint *x, gint *y, gint *shx, gint *shy,
-								 const gint width, const gint height,
-								 const gint index)
-{
-	switch (location_type)
-	{
-		case POPUP_STACK_LOCATION_TOP_LEFT:
-			*x = workarea.x;
-			*y += *shy;
-			*shy = height;
-			break;
-
-		case POPUP_STACK_LOCATION_TOP_RIGHT:
-			*x = workarea.x + workarea.width - width;
-			*y += *shy;
-			*shy = height;
-			break;
-
-		case POPUP_STACK_LOCATION_BOTTOM_LEFT:
-			*x = workarea.x;
-			*y -= height;
-			break;
-
-		case POPUP_STACK_LOCATION_BOTTOM_RIGHT:
-			*x = workarea.x + workarea.width - width;
-			*y -= height;
-			break;
-
-		default:
-			g_assert_not_reached();
-	}
-}
-
 static void
 popup_location_changed_cb(GConfClient *client, guint cnxn_id,
 						  GConfEntry *entry, gpointer user_data)
 {
 	NotifyDaemon *daemon = (NotifyDaemon*)user_data;
+	NotifyStackLocation stack_location;
+	const char *slocation;
 	GConfValue *value;
+	gint i;
 
 	if (daemon == NULL)
 		return;
 
 	value = gconf_entry_get_value(entry);
-	update_stack_location_from_string(
-		daemon,
-		value != NULL ? gconf_value_get_string(value) : NULL);
-}
+	slocation = (value != NULL ? gconf_value_get_string(value) : NULL);
 
-static void
-_remove_bubble_from_poptart_stack(GtkWindow *nw, NotifyDaemon *daemon)
-{
-	NotifyDaemonPrivate *priv = daemon->priv;
-	GdkRectangle workarea;
-	GSList *remove_link = NULL;
-	GSList *link;
-	gint x, y, shiftx = 0, shifty = 0, index = 0;
-
-	get_work_area(GTK_WIDGET(nw), &workarea);
-
-	_pop_stack_get_origin_coordinates(priv->popup_stack_location,
-									  workarea, &x, &y, &shiftx, &shifty,
-									  0, 0);
-
-	for (link = priv->poptart_stack; link != NULL; link = link->next)
+	if (slocation != NULL && *slocation != '\0')
 	{
-		GtkWindow *nw2 = link->data;
-		GtkRequisition req;
+		stack_location = get_stack_location_from_string(slocation);
+	}
+	else
+	{
+		gconf_client_set_string(get_gconf_client(),
+			"/apps/notification-daemon/popup_location",
+			popup_stack_locations[NOTIFY_STACK_LOCATION_DEFAULT].identifier,
+			NULL);
 
-		if (nw2 != nw)
-		{
-			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
-
-			_pop_stack_translate_coordinates(priv->popup_stack_location,
-											 workarea, &x, &y,
-											 &shiftx, &shifty,
-											 req.width, req.height,
-											 index++);
-
-			theme_move_notification(nw2, x, y);
-		}
-		else
-		{
-			remove_link = link;
-		}
+		stack_location = NOTIFY_STACK_LOCATION_DEFAULT;
 	}
 
-	if (remove_link)
-	{
-		priv->poptart_stack = g_slist_remove_link(priv->poptart_stack,
-												  remove_link);
-	}
-
-	if (GTK_WIDGET_REALIZED(GTK_WIDGET(nw)))
-		gtk_widget_unrealize(GTK_WIDGET(nw));
-}
-
-static void
-_notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
-										   GtkWindow *nw,
-										   gboolean new_notification)
-{
-	NotifyDaemonPrivate *priv = daemon->priv;
-	GtkRequisition req;
-	GdkRectangle workarea;
-	GSList *link;
-	gint x, y, shiftx = 0, shifty = 0, index = 1;
-
-	gtk_widget_size_request(GTK_WIDGET(nw), &req);
-
-	get_work_area(GTK_WIDGET(nw), &workarea);
-
-	_pop_stack_get_origin_coordinates(priv->popup_stack_location, workarea,
-									  &x, &y, &shiftx, &shifty,
-									  req.width, req.height);
-
-	theme_move_notification(nw, x, y);
-
-	for (link = priv->poptart_stack; link != NULL; link = link->next)
-	{
-		GtkWindow *nw2 = GTK_WINDOW(link->data);
-
-		if (nw2 != nw)
-		{
-			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
-
-			_pop_stack_translate_coordinates(priv->popup_stack_location,
-											 workarea, &x, &y,
-											 &shiftx, &shifty,
-											 req.width, req.height,
-											 index++);
-
-			theme_move_notification(nw2, x, y);
-		}
-	}
-
-	if (new_notification)
-	{
-		g_signal_connect(G_OBJECT(nw), "destroy",
-						 G_CALLBACK(_remove_bubble_from_poptart_stack),
-						 daemon);
-		priv->poptart_stack = g_slist_prepend(priv->poptart_stack, nw);
-	}
+	for (i = 0; i < daemon->priv->stacks_size; i++)
+		notify_stack_set_location(daemon->priv->stacks[i], stack_location);
 }
 
 static void
@@ -1174,9 +967,18 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	}
 	else
 	{
+		gint monitor;
+		GdkScreen *screen;
+		gint x, y;
+
 		theme_set_notification_arrow(nw, FALSE, 0, 0);
-		_notify_daemon_add_bubble_to_poptart_stack(daemon, nw,
-												   new_notification);
+
+		gdk_display_get_pointer(gdk_display_get_default(),
+								&screen, &x, &y, NULL);
+		monitor = gdk_screen_get_monitor_at_point(screen, x, y);
+		g_assert(monitor >= 0 && monitor < priv->stacks_size);
+
+		notify_stack_add_window(priv->stacks[monitor], nw, new_notification);
 	}
 
 	if (!screensaver_active(GTK_WIDGET(nw)) &&

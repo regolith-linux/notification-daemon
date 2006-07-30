@@ -33,8 +33,6 @@
 #define GCONF_KEY_THEME          GCONF_KEY_DAEMON "/theme"
 #define GCONF_KEY_POPUP_LOCATION GCONF_KEY_DAEMON "/popup_location"
 
-G_BEGIN_DECLS
-
 #define NOTIFY_TYPE_DAEMON (notify_daemon_get_type())
 #define NOTIFY_DAEMON(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST ((obj), NOTIFY_TYPE_DAEMON, NotifyDaemon))
@@ -70,6 +68,8 @@ enum _NotifyDaemonError
 {
 	NOTIFY_DAEMON_ERROR_GENERIC = 0,
 };
+
+G_BEGIN_DECLS
 
 GType notify_daemon_get_type(void);
 
