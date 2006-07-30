@@ -1,3 +1,8 @@
+Sat Jul 29 21:00:45 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Condense a bunch of code. This saves 42 lines.
+
 Sat Jul 29 20:30:42 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

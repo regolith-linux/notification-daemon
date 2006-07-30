@@ -48,6 +48,13 @@
 
 #define IMAGE_SIZE 48
 
+#define NW_GET_NOTIFY_ID(nw) \
+	(GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")))
+#define NW_GET_NOTIFY_SENDER(nw) \
+	(g_object_get_data(G_OBJECT(nw), "_notify_sender"))
+#define NW_GET_DAEMON(nw) \
+	(g_object_get_data(G_OBJECT(nw), "_notify_daemon"))
+
 typedef enum
 {
 	POPUP_STACK_LOCATION_UNKNOWN = -1,
@@ -99,6 +106,7 @@ struct _NotifyDaemonPrivate
 };
 
 static GConfClient *gconf_client = NULL;
+static DBusConnection *dbus_conn = NULL;
 
 #define CHECK_DBUS_VERSION(major, minor) \
 	(DBUS_MAJOR_VER > (major) || \
@@ -120,7 +128,7 @@ static void update_stack_location_from_string(NotifyDaemon *daemon,
 static void notify_daemon_finalize(GObject *object);
 static void _close_notification(NotifyDaemon *daemon, guint id,
 								gboolean hide_notification);
-static void _emit_closed_signal(GObject *notify_widget);
+static void _emit_closed_signal(GtkWindow *nw);
 static void _action_invoked_cb(GtkWindow *nw, const char *key);
 
 G_DEFINE_TYPE(NotifyDaemon, notify_daemon, G_TYPE_OBJECT);
@@ -154,7 +162,6 @@ notify_daemon_init(NotifyDaemon *daemon)
 	daemon->priv->next_id = 1;
 	daemon->priv->timeout_source = 0;
 	daemon->priv->stack_only = FALSE;
-	daemon->priv->popup_stack_location = POPUP_STACK_LOCATION_DEFAULT;
 
 	slocation = gconf_client_get_string(client, GCONF_KEY_POPUP_LOCATION,
 										NULL);
@@ -216,95 +223,51 @@ update_stack_location_from_string(NotifyDaemon *daemon, const char *slocation)
 	}
 }
 
-static void
-_action_invoked_cb(GtkWindow *nw, const char *key)
+static DBusMessage *
+create_signal(GtkWindow *nw, const char *signal_name)
 {
-	NotifyDaemon *daemon = g_object_get_data(G_OBJECT(nw), "_notify_daemon");
-	DBusConnection *con;
-	DBusError error;
+	guint id = NW_GET_NOTIFY_ID(nw);
+	gchar *dest = NW_GET_NOTIFY_SENDER(nw);
+	DBusMessage *message;
 
-	dbus_error_init(&error);
+	g_assert(dest != NULL);
 
-	con = dbus_bus_get(DBUS_BUS_SESSION, &error);
+	message = dbus_message_new_signal("/org/freedesktop/Notifications",
+									  "org.freedesktop.Notifications",
+									  signal_name);
 
-	if (con == NULL)
-	{
-		g_warning("Error sending ActionInvoked signal: %s", error.message);
-		dbus_error_free(&error);
-	}
-	else
-	{
-		DBusMessage *message;
-		gchar *dest;
-		guint id;
+	dbus_message_set_destination(message, dest);
+	dbus_message_append_args(message,
+							 DBUS_TYPE_UINT32, &id,
+							 DBUS_TYPE_INVALID);
 
-		message = dbus_message_new_signal("/org/freedesktop/Notifications",
-										  "org.freedesktop.Notifications",
-										  "ActionInvoked");
-
-		dest = g_object_get_data(G_OBJECT(nw), "_notify_sender");
-		id = GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id"));
-
-		g_assert(dest != NULL);
-
-		dbus_message_set_destination(message, dest);
-		dbus_message_append_args(message,
-								 DBUS_TYPE_UINT32, &id,
-								 DBUS_TYPE_STRING, &key,
-								 DBUS_TYPE_INVALID);
-
-		dbus_connection_send(con, message, NULL);
-
-		dbus_message_unref(message);
-		dbus_connection_unref(con);
-	}
-
-	_close_notification(
-		daemon,
-		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")),
-		TRUE);
+	return message;
 }
 
 static void
-_emit_closed_signal(GObject *notify_widget)
+_action_invoked_cb(GtkWindow *nw, const char *key)
 {
-	DBusConnection *con;
-	DBusError error;
+	NotifyDaemon *daemon = NW_GET_DAEMON(nw);
+	guint id = NW_GET_NOTIFY_ID(nw);
+	DBusMessage *message;
 
-	dbus_error_init(&error);
+	message = create_signal(nw, "ActionInvoked");
+	dbus_message_append_args(message,
+							 DBUS_TYPE_STRING, &key,
+							 DBUS_TYPE_INVALID);
 
-	con = dbus_bus_get(DBUS_BUS_SESSION, &error);
+	dbus_connection_send(dbus_conn, message, NULL);
+	dbus_message_unref(message);
 
-	if (con == NULL)
-	{
-		g_warning("Error sending Close signal: %s", error.message);
-		dbus_error_free(&error);
-	}
-	else
-	{
-		DBusMessage *message;
-		gchar *dest;
-		guint id;
+	_close_notification(daemon, id, TRUE);
+}
 
-		message = dbus_message_new_signal("/org/freedesktop/Notifications",
-										  "org.freedesktop.Notifications",
-										  "NotificationClosed");
-
-		dest = g_object_get_data(notify_widget, "_notify_sender");
-		id = GPOINTER_TO_UINT(g_object_get_data(notify_widget, "_notify_id"));
-
-		g_assert(dest != NULL);
-
-		dbus_message_set_destination(message, dest);
-		dbus_message_append_args(message,
-								 DBUS_TYPE_UINT32, &id,
-								 DBUS_TYPE_INVALID);
-
-		dbus_connection_send(con, message, NULL);
-
-		dbus_message_unref(message);
-		dbus_connection_unref(con);
-	}
+static void
+_emit_closed_signal(GtkWindow *nw)
+{
+	DBusMessage *message = create_signal(nw, "NotificationClosed");
+	dbus_connection_send(dbus_conn, message, NULL);
+	dbus_message_unref(message);
 }
 
 static void
@@ -317,7 +280,7 @@ _close_notification(NotifyDaemon *daemon, guint id, gboolean hide_notification)
 
 	if (nt != NULL)
 	{
-		_emit_closed_signal(G_OBJECT(nt->nw));
+		_emit_closed_signal(nt->nw);
 
 		if (hide_notification)
 			theme_hide_notification(nt->nw);
@@ -329,10 +292,7 @@ _close_notification(NotifyDaemon *daemon, guint id, gboolean hide_notification)
 static void
 _notification_destroyed_cb(GtkWindow *nw, NotifyDaemon *daemon)
 {
-	_close_notification(
-		daemon,
-		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")),
-		FALSE);
+	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), FALSE);
 }
 
 static void
@@ -345,7 +305,7 @@ _mouse_entered_cb(GtkWindow *nw, GdkEventCrossing *event, NotifyDaemon *daemon)
 	if (event->detail == GDK_NOTIFY_INFERIOR)
 		return;
 
-	id = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(nw), "_notify_id"));
+	id = NW_GET_NOTIFY_ID(nw);
 	nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash,
 											  &id);
 
@@ -372,7 +332,7 @@ _mouse_exitted_cb(GtkWindow *nw, GdkEventCrossing *event,
 	if (event->detail == GDK_NOTIFY_INFERIOR)
 		return;
 
-	id = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(nw), "_notify_id"));
+	id = NW_GET_NOTIFY_ID(nw);
 	nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash,
 											  &id);
 
@@ -400,7 +360,7 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 	if (now_time > expiration_time)
 	{
 		theme_notification_tick(nt->nw, 0);
-		_emit_closed_signal(G_OBJECT(nt->nw));
+		_emit_closed_signal(nt->nw);
 		return TRUE;
 	}
 	else if (nt->paused)
@@ -701,11 +661,7 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 	}
 
 	_action_invoked_cb(nw, "default");
-
-	_close_notification(
-		daemon,
-		GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")),
-		TRUE);
+	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), TRUE);
 }
 
 static gboolean
@@ -945,7 +901,7 @@ _notify_daemon_add_bubble_to_poptart_stack(NotifyDaemon *daemon,
 static void
 url_clicked_cb(GtkWindow *nw, const char *url)
 {
-	NotifyDaemon *daemon = g_object_get_data(G_OBJECT(nw), "_notify_daemon");
+	NotifyDaemon *daemon = NW_GET_DAEMON(nw);
 	char *escaped_url;
 	char *cmd = NULL;
 
@@ -1331,6 +1287,8 @@ main(int argc, char **argv)
 		g_error_free(error);
 		exit(1);
 	}
+
+	dbus_conn = dbus_g_connection_get_connection(connection);
 
 	dbus_g_object_type_install_info(NOTIFY_TYPE_DAEMON,
 									&dbus_glib__object_info);
