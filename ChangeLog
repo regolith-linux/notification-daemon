@@ -1,3 +1,10 @@
+Sat Jul 29 20:30:42 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon.c:
+	  - Move POPUP_STACK_LOCATION_DEFAULT into PopupStackLocationType.
+	  - Remove _notify_daemon_stack_location_type_from_string.
+	  - Moved some duplicate logic into update_stack_location_from_string.
+
 Sat Jul 29 19:19:34 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

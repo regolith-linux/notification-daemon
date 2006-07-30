@@ -48,17 +48,16 @@
 
 #define IMAGE_SIZE 48
 
-typedef enum {
+typedef enum
+{
 	POPUP_STACK_LOCATION_UNKNOWN = -1,
 	POPUP_STACK_LOCATION_TOP_LEFT,
 	POPUP_STACK_LOCATION_TOP_RIGHT,
 	POPUP_STACK_LOCATION_BOTTOM_LEFT,
-	POPUP_STACK_LOCATION_BOTTOM_RIGHT
+	POPUP_STACK_LOCATION_BOTTOM_RIGHT,
+	POPUP_STACK_LOCATION_DEFAULT = POPUP_STACK_LOCATION_BOTTOM_RIGHT
 
 } PopupStackLocationType;
-
-#define POPUP_STACK_LOCATION_DEFAULT \
-	POPUP_STACK_LOCATION_BOTTOM_RIGHT
 
 struct PopupStackLocation
 {
@@ -96,7 +95,7 @@ struct _NotifyDaemonPrivate
 	GSList *poptart_stack;
 	gboolean url_clicked_lock;
 	gboolean stack_only;
-	gchar popup_stack_location;
+	PopupStackLocationType popup_stack_location;
 };
 
 static GConfClient *gconf_client = NULL;
@@ -116,8 +115,8 @@ struct _DBusGMethodInvocation
 };
 #endif /* D-BUS < 0.60 */
 
-static PopupStackLocationType
-	_notify_daemon_stack_location_type_from_string(const gchar *slocation);
+static void update_stack_location_from_string(NotifyDaemon *daemon,
+											  const char *slocation);
 static void notify_daemon_finalize(GObject *object);
 static void _close_notification(NotifyDaemon *daemon, guint id,
 								gboolean hide_notification);
@@ -146,7 +145,8 @@ _notify_timeout_destroy(NotifyTimeout *nt)
 static void
 notify_daemon_init(NotifyDaemon *daemon)
 {
-	GConfClient *client;
+	GConfClient *client = get_gconf_client();
+	gchar *slocation;
 
 	daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE(daemon, NOTIFY_TYPE_DAEMON,
 											   NotifyDaemonPrivate);
@@ -156,25 +156,10 @@ notify_daemon_init(NotifyDaemon *daemon)
 	daemon->priv->stack_only = FALSE;
 	daemon->priv->popup_stack_location = POPUP_STACK_LOCATION_DEFAULT;
 
-	client = get_gconf_client();
-
-	if (client != NULL)
-	{
-		gchar *slocation = gconf_client_get_string(client,
-												   GCONF_KEY_POPUP_LOCATION,
-												   NULL);
-
-		if (slocation != NULL && *slocation != '\0')
-		{
-			gchar location =
-				_notify_daemon_stack_location_type_from_string(slocation);
-
-			if (location != POPUP_STACK_LOCATION_UNKNOWN)
-				daemon->priv->popup_stack_location = location;
-		}
-
-		g_free(slocation);
-	}
+	slocation = gconf_client_get_string(client, GCONF_KEY_POPUP_LOCATION,
+										NULL);
+	update_stack_location_from_string(daemon, slocation);
+	g_free(slocation);
 
 	daemon->priv->notification_hash =
 		g_hash_table_new_full(g_int_hash, g_int_equal, g_free,
@@ -184,15 +169,12 @@ notify_daemon_init(NotifyDaemon *daemon)
 static void
 notify_daemon_finalize(GObject *object)
 {
-	NotifyDaemon *daemon;
-	GObjectClass *parent_class;
-
-	daemon = NOTIFY_DAEMON(object);
+	NotifyDaemon *daemon       = NOTIFY_DAEMON(object);
+	GObjectClass *parent_class = G_OBJECT_CLASS(notify_daemon_parent_class);
 
 	g_hash_table_destroy(daemon->priv->notification_hash);
 	g_slist_free(daemon->priv->poptart_stack);
-
-	parent_class = G_OBJECT_CLASS(notify_daemon_parent_class);
+	g_free(daemon->priv);
 
 	if (parent_class->finalize != NULL)
 		parent_class->finalize(object);
@@ -202,6 +184,36 @@ NotifyDaemon *
 notify_daemon_new(void)
 {
 	return g_object_new(NOTIFY_TYPE_DAEMON, NULL);
+}
+
+static void
+update_stack_location_from_string(NotifyDaemon *daemon, const char *slocation)
+{
+	if (slocation != NULL && *slocation != '\0')
+	{
+		PopupStackLocationType location_type = POPUP_STACK_LOCATION_DEFAULT;
+		const struct PopupStackLocation *l;
+
+		for (l = popup_stack_locations;
+			 l->type != POPUP_STACK_LOCATION_UNKNOWN;
+			 l++)
+		{
+			if (!strcmp(slocation, l->identifier))
+				location_type = l->type;
+		}
+
+		if (location_type != POPUP_STACK_LOCATION_UNKNOWN)
+			daemon->priv->popup_stack_location = location_type;
+	}
+	else
+	{
+		gconf_client_set_string(get_gconf_client(),
+			"/apps/notification-daemon/popup_location",
+			popup_stack_locations[POPUP_STACK_LOCATION_DEFAULT].identifier,
+			NULL);
+
+		daemon->priv->popup_stack_location = POPUP_STACK_LOCATION_DEFAULT;
+	}
 }
 
 static void
@@ -747,22 +759,6 @@ get_work_area(GtkWidget *nw, GdkRectangle *rect)
 	return TRUE;
 }
 
-static PopupStackLocationType
-_notify_daemon_stack_location_type_from_string(const gchar *slocation)
-{
-	const struct PopupStackLocation *l;
-
-	for (l = popup_stack_locations;
-		 l->type != POPUP_STACK_LOCATION_UNKNOWN;
-		 l++)
-	{
-		if (!strcmp(slocation, l->identifier))
-			return l->type;
-	}
-
-	return POPUP_STACK_LOCATION_UNKNOWN;
-}
-
 static void
 _pop_stack_get_origin_coordinates(PopupStackLocationType location_type,
                                   GdkRectangle workarea,
@@ -845,30 +841,9 @@ popup_location_changed_cb(GConfClient *client, guint cnxn_id,
 		return;
 
 	value = gconf_entry_get_value(entry);
-
-	if (value != NULL)
-	{
-		const char *slocation = gconf_value_get_string(value);
-
-		if (slocation != NULL)
-		{
-			PopupStackLocationType location_type =
-				_notify_daemon_stack_location_type_from_string(slocation);
-
-			if (location_type != POPUP_STACK_LOCATION_UNKNOWN)
-			{
-				daemon->priv->popup_stack_location = location_type;
-				return;
-			}
-		}
-	}
-
-	gconf_client_set_string(client,
-		"/apps/notification-daemon/popup_location",
-		popup_stack_locations[POPUP_STACK_LOCATION_DEFAULT].identifier,
-		NULL);
-
-	daemon->priv->popup_stack_location = POPUP_STACK_LOCATION_DEFAULT;
+	update_stack_location_from_string(
+		daemon,
+		value != NULL ? gconf_value_get_string(value) : NULL);
 }
 
 static void
