@@ -16,6 +16,8 @@ version 0.3.6:
 	  notification would cause a broken notification where timeouts and
 	  action invoking fails. In this case, a new ID is generated. Patch by
 	  Ed Catmur. (Bug #76)
+	* Fixed a memory leak that occurred every time a notification went away.
+	  Patch by Nick Schermer.
 
 version 0.3.5 (26-April-2006):
 	* Add three new required theme functions:

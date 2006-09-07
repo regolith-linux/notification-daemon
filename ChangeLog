@@ -1,3 +1,9 @@
+Thu Sep 07 10:28:50 PDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* themes/standard/theme.c:
+	  - Patch by Nick Schermer to fix a memory leak. We lost 4 bytes for
+	    every notification displayed with the standard theme.
+
 Sun Jul 30 15:32:10 PDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon.c:

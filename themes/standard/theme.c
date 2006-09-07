@@ -162,6 +162,8 @@ destroy_windata(WindowData *windata)
 
 	if (windata->window_region != NULL)
 		gdk_region_destroy(windata->window_region);
+
+	g_free(windata);
 }
 
 static void
