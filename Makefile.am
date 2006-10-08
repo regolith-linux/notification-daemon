@@ -1,4 +1,4 @@
-SUBDIRS = data po src themes
+SUBDIRS = data po src
 
 EXTRA_DIST = \
 	AUTHORS NEWS INSTALL COPYING README \

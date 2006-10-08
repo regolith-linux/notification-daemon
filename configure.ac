@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notification-daemon, 0.3.6, galago-devel@lists.freedesktop.org)
+AC_INIT(notification-daemon, 0.3.6.90, galago-devel@lists.freedesktop.org)
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2006 Christian Hammond])
@@ -15,7 +15,7 @@ dnl ################################################################
 NOTIFICATION_DAEMON_MAJOR_VERSION=0
 NOTIFICATION_DAEMON_MINOR_VERSION=3
 NOTIFICATION_DAEMON_MICRO_VERSION=6
-NOTIFICATION_DAEMON_DEVEL_VERSION=0
+NOTIFICATION_DAEMON_DEVEL_VERSION=90
 
 NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_MICRO_VERSION
 
@@ -172,9 +172,10 @@ data/Makefile
 data/org.freedesktop.Notifications.service
 po/Makefile.in
 src/Makefile
-themes/Makefile
-themes/bubble/Makefile
-themes/standard/Makefile
+src/daemon/Makefile
+src/themes/Makefile
+src/themes/bubble/Makefile
+src/themes/standard/Makefile
 ])
 
 AC_OUTPUT
