@@ -1,3 +1,30 @@
+Sun Oct 08 17:10:57 EDT 2006  Christian Hammond <chipx86@chipx86.com>
+
+	A src/daemon:
+	A src/daemon/daemon.c:
+	A src/daemon/daemon.h:
+	A src/daemon/engines.c:
+	A src/daemon/engines.h:
+	A src/daemon/Makefile.am:
+	A src/daemon/notificationdaemon.xml:
+	A src/daemon/stack.c:
+	A src/daemon/stack.h:
+	A src/themes:
+	D src/daemon.c:
+	D src/daemon.h:
+	D src/engines.c:
+	D src/engines.h:
+	D src/notificationdaemon.xml:
+	D src/stack.c:
+	D src/stack.h:
+	D themes:
+	* src/Makefile.am:
+	* configure.ac:
+	* Makefile.am:
+	  - Move the src/ directory's contents into src/daemon/.
+	  - Moved themes/ into src/.
+	  - Bump the version to 0.3.6.90.
+
 ==================== 0.3.6 ====================
 
 Thu Sep 07 10:28:50 PDT 2006  Christian Hammond <chipx86@chipx86.com>
