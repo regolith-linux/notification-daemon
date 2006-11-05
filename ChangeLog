@@ -1,3 +1,9 @@
+Sun Nov 05 12:18:00 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* configure.ac:
+	  - Patch by compnerd to drop the check for popt during configure, as we
+	    no longer use it. This closes bug #88.
+
 Sun Nov 05 12:17:07 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	A src/capplet/Makefile.am:
