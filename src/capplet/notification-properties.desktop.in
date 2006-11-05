@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+_Name=Pop-Up Notifications
+_Comment=Set your pop-up notification preferences
+Exec=notification-properties
+Icon=notification-properties
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;Settings;
+OnlyShowIn=GNOME;
