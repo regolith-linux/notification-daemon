@@ -1089,7 +1089,7 @@ main(int argc, char **argv)
 	dbus_conn = dbus_g_connection_get_connection(connection);
 
 	dbus_g_object_type_install_info(NOTIFY_TYPE_DAEMON,
-									&dbus_glib__object_info);
+									&dbus_glib_notification_daemon_object_info);
 
 	bus_proxy = dbus_g_proxy_new_for_name(connection,
 										  "org.freedesktop.DBus",

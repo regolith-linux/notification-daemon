@@ -13,7 +13,7 @@ notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 BUILT_SOURCES = notificationdaemon-dbus-glue.h
 
 notificationdaemon-dbus-glue.h: notificationdaemon.xml
-	dbus-binding-tool --mode=glib-server \
+	dbus-binding-tool --mode=glib-server --prefix=notification_daemon \
 		$(srcdir)/notificationdaemon.xml > notificationdaemon-dbus-glue.h
 
 INCLUDES = \

@@ -1,3 +1,10 @@
+Sun Nov 05 12:12:35 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/Makefile.am:
+	* src/daemon/daemon.c:
+	  - Patch by Pawel Worach to fix the dbus-binding-tool usage to be
+	    compatible with dbus-glib 0.72. This closes bug #95.
+
 Sun Oct 08 17:10:57 EDT 2006  Christian Hammond <chipx86@chipx86.com>
 
 	A src/daemon:
