@@ -1,3 +1,9 @@
+Sun Nov 05 16:33:36 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Make the standard notification theme (mostly) accessible to screen
+	    readers. This could stand some improvement.
+
 Sun Nov 05 12:18:00 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* configure.ac:

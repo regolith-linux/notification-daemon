@@ -1,7 +1,7 @@
 version 0.3.7:
 	* Fixed a compatibility issue with dbus-glib 0.72. Patch by Pawel Worach.
 	  (Bug #95)
-
+	* Added initial accessibility support with the standard theme engine.
 
 version 0.3.6 (8-October-2006):
 	* Added a GConf key to allow users to specify which corner of the screen

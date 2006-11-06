@@ -196,6 +196,7 @@ create_notification(UrlClickedCb url_clicked)
 	GtkWidget *close_button;
 	GtkWidget *image;
 	GtkWidget *alignment;
+	AtkObject *atkobj;
 	WindowData *windata;
 
 	windata = g_new0(WindowData, 1);
@@ -204,11 +205,14 @@ create_notification(UrlClickedCb url_clicked)
 
 	win = gtk_window_new(GTK_WINDOW_POPUP);
 	windata->win = win;
+	gtk_window_set_title(GTK_WINDOW(win), "Notification");
 	gtk_widget_add_events(win, GDK_BUTTON_RELEASE_MASK);
 	gtk_widget_realize(win);
+
 	g_object_set_data_full(G_OBJECT(win), "windata", windata,
 						   (GDestroyNotify)destroy_windata);
 	gtk_widget_set_app_paintable(win, TRUE);
+	atk_object_set_role(gtk_widget_get_accessible(win), ATK_ROLE_ALERT);
 
 	g_signal_connect(G_OBJECT(win), "expose-event",
 					 G_CALLBACK(draw_border), windata);
@@ -254,6 +258,9 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_misc_set_alignment(GTK_MISC(windata->summary_label), 0, 0);
 	gtk_label_set_line_wrap(GTK_LABEL(windata->summary_label), TRUE);
 
+	atkobj = gtk_widget_get_accessible(windata->summary_label);
+	atk_object_set_description(atkobj, "Notification summary text.");
+
 	/* Add the close button */
 	close_button = gtk_button_new();
 	gtk_widget_show(close_button);
@@ -263,6 +270,12 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_widget_set_size_request(close_button, 20, 20);
 	g_signal_connect_swapped(G_OBJECT(close_button), "clicked",
 							 G_CALLBACK(gtk_widget_destroy), win);
+
+	atkobj = gtk_widget_get_accessible(close_button);
+	atk_action_set_description(ATK_ACTION(atkobj), 0,
+							   "Closes the notification.");
+	atk_object_set_name(atkobj, "");
+	atk_object_set_description(atkobj, "Closes the notification.");
 
 	image = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
 	gtk_widget_show(image);
@@ -293,6 +306,9 @@ create_notification(UrlClickedCb url_clicked)
 	g_signal_connect_swapped(G_OBJECT(windata->body_label), "url_activated",
 							 G_CALLBACK(windata->url_clicked), win);
 
+	atkobj = gtk_widget_get_accessible(windata->body_label);
+	atk_object_set_description(atkobj, "Notification body text.");
+
 	alignment = gtk_alignment_new(1, 0.5, 0, 0);
 	gtk_widget_show(alignment);
 	gtk_box_pack_start(GTK_BOX(vbox), alignment, FALSE, TRUE, 0);
@@ -314,7 +330,15 @@ set_notification_hints(GtkWindow *nw, GHashTable *hints)
 	value = (GValue *)g_hash_table_lookup(hints, "urgency");
 
 	if (value)
+	{
 		windata->urgency = g_value_get_uchar(value);
+
+		if (windata->urgency == URGENCY_CRITICAL) {
+			gtk_window_set_title(GTK_WINDOW(nw), "Critical Notification");
+		} else {
+			gtk_window_set_title(GTK_WINDOW(nw), "Notification");
+		}
+	}
 }
 
 void
