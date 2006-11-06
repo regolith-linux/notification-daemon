@@ -1,6 +1,7 @@
 version 0.3.7:
 	* Fixed a compatibility issue with dbus-glib 0.72. Patch by Pawel Worach.
 	  (Bug #95)
+	* Fix several rendering glitches with the borders in the standard theme.
 	* Added initial accessibility support with the standard theme engine.
 
 version 0.3.6 (8-October-2006):

@@ -1,3 +1,10 @@
+Sun Nov 05 23:56:43 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Fix several rendering glitches with the borders in the standard theme.
+	    There's a couple bugs left, but they're less glaring. Also, cleaned up
+	    some of the code a bit.
+
 Sun Nov 05 16:33:36 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
