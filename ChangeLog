@@ -1,3 +1,9 @@
+Thu Nov 09 16:42:58 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Fix a crash caused by destroying an already freed array of points
+	    during the destruction of windows with arrows.
+
 Thu Nov 09 16:35:34 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:

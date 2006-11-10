@@ -139,7 +139,7 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 	int arrow_side1_width = DEFAULT_ARROW_WIDTH / 2;
 	int arrow_side2_width = DEFAULT_ARROW_WIDTH / 2;
 	int arrow_offset = DEFAULT_ARROW_OFFSET;
-	GdkPoint *shape_points;
+	GdkPoint *shape_points = NULL;
 	int i = 0;
 
 	width  = windata->width;
@@ -321,10 +321,13 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 			break;
 	}
 
-	windata->window_region =
-		gdk_region_polygon(shape_points, windata->num_border_points,
-						   GDK_EVEN_ODD_RULE);
-	g_free(shape_points);
+	if (shape_points != NULL)
+	{
+		windata->window_region =
+			gdk_region_polygon(shape_points, windata->num_border_points,
+							   GDK_EVEN_ODD_RULE);
+		g_free(shape_points);
+	}
 }
 
 static gboolean
@@ -333,9 +336,6 @@ draw_border(GtkWidget *win,
 			WindowData *windata)
 {
 	fill_background(win, windata);
-
-	if (windata->has_arrow)
-		create_border_with_arrow(win, windata);
 
 	if (windata->gc == NULL)
 	{
@@ -348,11 +348,14 @@ draw_border(GtkWidget *win,
 
 	if (windata->has_arrow)
 	{
+		create_border_with_arrow(win, windata);
+
 		gdk_draw_polygon(win->window, windata->gc, FALSE,
 						 windata->border_points, windata->num_border_points);
 		gdk_window_shape_combine_region(win->window, windata->window_region,
 										0, 0);
 		g_free(windata->border_points);
+		windata->border_points = NULL;
 	}
 	else
 	{
@@ -370,9 +373,6 @@ destroy_windata(WindowData *windata)
 {
 	if (windata->gc != NULL)
 		g_object_unref(G_OBJECT(windata->gc));
-
-	if (windata->border_points != NULL)
-		g_free(windata->border_points);
 
 	if (windata->window_region != NULL)
 		gdk_region_destroy(windata->window_region);
