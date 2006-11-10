@@ -330,13 +330,10 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 	}
 }
 
-static gboolean
+static void
 draw_border(GtkWidget *win,
-			GdkEventExpose *event,
 			WindowData *windata)
 {
-	fill_background(win, windata);
-
 	if (windata->gc == NULL)
 	{
 		GdkColor color;
@@ -363,6 +360,15 @@ draw_border(GtkWidget *win,
 						   0, 0, windata->width - 1, windata->height - 1);
 	}
 
+}
+
+static gboolean
+paint_window(GtkWidget *win,
+			 GdkEventExpose *event,
+			 WindowData *windata)
+{
+	fill_background(win, windata);
+	draw_border(win, windata);
 	draw_stripe(win, windata);
 
 	return FALSE;
@@ -440,7 +446,7 @@ create_notification(UrlClickedCb url_clicked)
 	atk_object_set_role(gtk_widget_get_accessible(win), ATK_ROLE_ALERT);
 
 	g_signal_connect(G_OBJECT(win), "expose_event",
-					 G_CALLBACK(draw_border), windata);
+					 G_CALLBACK(paint_window), windata);
 	g_signal_connect(G_OBJECT(win), "configure_event",
 					 G_CALLBACK(configure_event_cb), windata);
 

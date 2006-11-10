@@ -1,3 +1,10 @@
+Thu Nov 09 16:49:39 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Split the background filling and stripe painting out of draw_border().
+	    Put the calls into paint_window() and connect that to the expose
+	    event.
+
 Thu Nov 09 16:42:58 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
