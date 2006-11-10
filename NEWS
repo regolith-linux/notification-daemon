@@ -3,6 +3,8 @@ version 0.3.7:
 	  (Bug #95)
 	* Fix several rendering glitches with the borders in the standard theme.
 	* Added initial accessibility support with the standard theme engine.
+	* Clicking anywhere in a notification should now close the notification.
+	  This was happening only on the body text sometimes.
 
 version 0.3.6 (8-October-2006):
 	* Added a GConf key to allow users to specify which corner of the screen

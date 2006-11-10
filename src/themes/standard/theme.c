@@ -431,7 +431,7 @@ create_notification(UrlClickedCb url_clicked)
 	win = gtk_window_new(GTK_WINDOW_POPUP);
 	windata->win = win;
 	gtk_window_set_title(GTK_WINDOW(win), "Notification");
-	gtk_widget_add_events(win, GDK_BUTTON_RELEASE_MASK);
+	gtk_widget_add_events(win, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	gtk_widget_realize(win);
 
 	g_object_set_data_full(G_OBJECT(win), "windata", windata,

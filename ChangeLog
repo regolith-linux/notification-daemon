@@ -1,3 +1,10 @@
+Thu Nov 09 16:35:34 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	* NEWS:
+	  - Clicking anywhere in a notification should now close the notification.
+	    This was happening only on the body text sometimes.
+
 Thu Nov 09 16:34:03 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
