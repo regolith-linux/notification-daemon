@@ -321,13 +321,12 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 			break;
 	}
 
-	if (shape_points != NULL)
-	{
-		windata->window_region =
-			gdk_region_polygon(shape_points, windata->num_border_points,
-							   GDK_EVEN_ODD_RULE);
-		g_free(shape_points);
-	}
+	g_assert(shape_points != NULL);
+
+	windata->window_region =
+		gdk_region_polygon(shape_points, windata->num_border_points,
+						   GDK_EVEN_ODD_RULE);
+	g_free(shape_points);
 }
 
 static void
