@@ -131,6 +131,7 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 {
 	int width;
 	int height;
+	int y;
 	GtkArrowType arrow_type;
 	GdkScreen *screen;
 	int screen_width;
@@ -141,16 +142,12 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 	GdkPoint *shape_points;
 	int i = 0;
 
-	width = windata->width;
+	width  = windata->width;
 	height = windata->height;
-	g_print("Creating border with height %d\n", height);
 
 	screen        = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
 	screen_width  = gdk_screen_get_width(screen);
 	screen_height = gdk_screen_get_height(screen);
-
-	if (windata->border_points != NULL)
-		g_free(windata->border_points);
 
 	windata->num_border_points = 5;
 
@@ -252,9 +249,10 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 					ADD_POINT(width - 1, DEFAULT_ARROW_HEIGHT, 1, 0);
 				}
 
-				g_print("Bottom is %d\n", height - 1);
 				ADD_POINT(width - 1, height - 1, 1, 1);
 				ADD_POINT(0, height - 1, 0, 1);
+
+				y = windata->point_y;
 			}
 			else
 			{
@@ -293,6 +291,8 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 							  windata->drawn_arrow_begin_y, 0, 0);
 					ADD_POINT(0, height - DEFAULT_ARROW_HEIGHT, 0, 1);
 				}
+
+				y = windata->point_y - height;
 			}
 
 #if 0
@@ -302,9 +302,7 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 			gtk_window_move(GTK_WINDOW(nw),
 							windata->point_x - arrow_offset -
 							arrow_side1_width,
-							(arrow_type == GTK_ARROW_UP
-							 ? windata->point_y
-							 : windata->point_y - height));
+							y);
 
 			break;
 
@@ -354,6 +352,7 @@ draw_border(GtkWidget *win,
 						 windata->border_points, windata->num_border_points);
 		gdk_window_shape_combine_region(win->window, windata->window_region,
 										0, 0);
+		g_free(windata->border_points);
 	}
 	else
 	{

@@ -1,3 +1,9 @@
+Thu Nov 09 16:34:03 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Clean up a little bit more code. Free the array of shape points
+	    earlier.
+
 Sun Nov 05 23:56:43 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
