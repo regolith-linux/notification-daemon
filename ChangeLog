@@ -1,3 +1,10 @@
+Thu Nov 09 18:03:31 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Update the top and bottom spacers outside of the window painting code,
+	    as that ended up unsurprisingly causing graphical glitches. We now
+	    update it when moving/resizing the window or setting the arrow info.
+
 Thu Nov 09 17:45:01 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:

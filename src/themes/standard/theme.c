@@ -117,6 +117,26 @@ draw_stripe(GtkWidget *win, WindowData *windata)
 		g_object_unref(G_OBJECT(gc));
 }
 
+static GtkArrowType
+get_notification_arrow_type(GtkWidget *nw)
+{
+	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+	int screen_height;
+
+	screen_height = gdk_screen_get_height(
+		gdk_drawable_get_screen(GDK_DRAWABLE(nw->window)));
+
+	if (windata->point_y + windata->height + DEFAULT_ARROW_HEIGHT >
+		screen_height)
+	{
+		return GTK_ARROW_DOWN;
+	}
+	else
+	{
+		return GTK_ARROW_UP;
+	}
+}
+
 #define ADD_POINT(_x, _y, shapeoffset_x, shapeoffset_y) \
 	G_STMT_START { \
 		windata->border_points[i].x = (_x); \
@@ -151,10 +171,7 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 
 	windata->num_border_points = 5;
 
-	if (windata->point_y + height + DEFAULT_ARROW_HEIGHT > screen_height)
-		arrow_type = GTK_ARROW_DOWN;
-	else
-		arrow_type = GTK_ARROW_UP;
+	arrow_type = get_notification_arrow_type(nw);
 
 	/* Handle the offset and such */
 	switch (arrow_type)
@@ -218,8 +235,6 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 
 			if (arrow_type == GTK_ARROW_UP)
 			{
-				gtk_widget_show(windata->top_spacer);
-				gtk_widget_hide(windata->bottom_spacer);
 				windata->drawn_arrow_begin_y = DEFAULT_ARROW_HEIGHT;
 				windata->drawn_arrow_middle_y = 0;
 				windata->drawn_arrow_end_y = DEFAULT_ARROW_HEIGHT;
@@ -256,8 +271,6 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 			}
 			else
 			{
-				gtk_widget_hide(windata->top_spacer);
-				gtk_widget_show(windata->bottom_spacer);
 				windata->drawn_arrow_begin_y = height - DEFAULT_ARROW_HEIGHT;
 				windata->drawn_arrow_middle_y = height;
 				windata->drawn_arrow_end_y = height - DEFAULT_ARROW_HEIGHT;
@@ -386,6 +399,36 @@ destroy_windata(WindowData *windata)
 }
 
 static void
+update_spacers(GtkWidget *nw)
+{
+	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
+
+	if (windata->has_arrow)
+	{
+		switch (get_notification_arrow_type(GTK_WIDGET(nw)))
+		{
+			case GTK_ARROW_UP:
+				gtk_widget_show(windata->top_spacer);
+				gtk_widget_hide(windata->bottom_spacer);
+				break;
+
+			case GTK_ARROW_DOWN:
+				gtk_widget_hide(windata->top_spacer);
+				gtk_widget_show(windata->bottom_spacer);
+				break;
+
+			default:
+				g_assert_not_reached();
+		}
+	}
+	else
+	{
+		gtk_widget_hide(windata->top_spacer);
+		gtk_widget_hide(windata->bottom_spacer);
+	}
+}
+
+static void
 update_content_hbox_visibility(WindowData *windata)
 {
 	/*
@@ -411,6 +454,8 @@ configure_event_cb(GtkWidget *nw,
 {
 	windata->width = event->width;
 	windata->height = event->height;
+
+	update_spacers(nw);
 
 	return FALSE;
 }
@@ -648,7 +693,7 @@ set_notification_icon(GtkWindow *nw, GdkPixbuf *pixbuf)
 }
 
 void
-set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
+set_notification_arrow(GtkWidget *nw, gboolean visible, int x, int y)
 {
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
 	g_assert(windata != NULL);
@@ -657,11 +702,7 @@ set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 	windata->point_x = x;
 	windata->point_y = y;
 
-	if (!visible)
-	{
-		gtk_widget_hide(windata->top_spacer);
-		gtk_widget_hide(windata->bottom_spacer);
-	}
+	update_spacers(nw);
 }
 
 static gboolean
@@ -796,18 +837,18 @@ clear_notification_actions(GtkWindow *nw)
 }
 
 void
-move_notification(GtkWindow *nw, int x, int y)
+move_notification(GtkWidget *nw, int x, int y)
 {
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
 	g_assert(windata != NULL);
 
 	if (windata->has_arrow)
 	{
-		gtk_widget_queue_resize(GTK_WIDGET(nw));
+		gtk_widget_queue_resize(nw);
 	}
 	else
 	{
-		gtk_window_move(nw, x, y);
+		gtk_window_move(GTK_WINDOW(nw), x, y);
 	}
 }
 
