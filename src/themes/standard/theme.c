@@ -70,13 +70,15 @@ enum
 #define DEFAULT_ARROW_WIDTH   28
 
 static void
-fill_background(GtkWidget *win, WindowData *windata)
+fill_background(GtkWidget *widget, WindowData *windata)
 {
-	GtkStyle *style = gtk_widget_get_style(win);
-	GdkGC *gc = style->base_gc[GTK_STATE_NORMAL];
+	GtkStyle *style = gtk_widget_get_style(windata->win);
 
-	gdk_draw_rectangle(GDK_DRAWABLE(win->window), gc, TRUE,
-					   0, 0, windata->width, windata->height);
+	gdk_draw_rectangle(GDK_DRAWABLE(widget->window),
+					   style->base_gc[GTK_STATE_NORMAL], TRUE,
+					   0, 0,
+					   widget->allocation.width,
+					   widget->allocation.height);
 }
 
 static void
@@ -710,10 +712,8 @@ countdown_expose_cb(GtkWidget *pie, GdkEventExpose *event,
 					WindowData *windata)
 {
 	GtkStyle *style = gtk_widget_get_style(windata->win);
-	GdkGC *bg_gc = style->base_gc[GTK_STATE_NORMAL];
 
-	gdk_draw_rectangle(GDK_DRAWABLE(pie->window), bg_gc, TRUE,
-					   0, 0, pie->allocation.width, pie->allocation.height);
+	fill_background(pie, windata);
 
 	if (windata->timeout > 0)
 	{
