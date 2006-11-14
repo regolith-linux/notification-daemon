@@ -57,7 +57,7 @@ enum
 	URGENCY_CRITICAL
 };
 
-#define WIDTH         300
+#define WIDTH         400
 #define IMAGE_SIZE    32
 #define IMAGE_PADDING 10
 #define STRIPE_WIDTH  30
@@ -485,6 +485,7 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_window_set_title(GTK_WINDOW(win), "Notification");
 	gtk_widget_add_events(win, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	gtk_widget_realize(win);
+	gtk_widget_set_size_request(win, WIDTH, -1);
 
 	g_object_set_data_full(G_OBJECT(win), "windata", windata,
 						   (GDestroyNotify)destroy_windata);

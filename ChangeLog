@@ -1,3 +1,9 @@
+Mon Nov 13 22:47:42 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Make sure the default width is actually set on the notification.
+	  - Increase the default width to 400px.
+
 Mon Nov 13 21:48:11 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon/stack.c:
