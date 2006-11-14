@@ -1,3 +1,11 @@
+Tue Nov 14 00:09:41 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Fix some odd little graphics drawing bugs by drawing onto the main
+	    vbox and sticking an eventbox between the window and that. This fixes
+	    the weird problems that shouldn't exist in the first place by using,
+	    I don't know, magic or something.
+
 Mon Nov 13 23:31:07 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon/stack.c:

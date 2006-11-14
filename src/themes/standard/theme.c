@@ -82,9 +82,9 @@ fill_background(GtkWidget *widget, WindowData *windata)
 }
 
 static void
-draw_stripe(GtkWidget *win, WindowData *windata)
+draw_stripe(GtkWidget *widget, WindowData *windata)
 {
-	GtkStyle *style = gtk_widget_get_style(win);
+	GtkStyle *style = gtk_widget_get_style(widget);
 	gboolean custom_gc = FALSE;
 	GdkColor color;
 	GdkGC *gc;
@@ -97,7 +97,7 @@ draw_stripe(GtkWidget *win, WindowData *windata)
 
 		case URGENCY_CRITICAL: // CRITICAL
 			custom_gc = TRUE;
-			gc = gdk_gc_new(GDK_DRAWABLE(win->window));
+			gc = gdk_gc_new(GDK_DRAWABLE(widget->window));
 			gdk_color_parse("#CC0000", &color);
 			gdk_gc_set_rgb_fg_color(gc, &color);
 			break;
@@ -109,7 +109,7 @@ draw_stripe(GtkWidget *win, WindowData *windata)
 	}
 
 
-	gdk_draw_rectangle(win->window, gc, TRUE,
+	gdk_draw_rectangle(widget->window, gc, TRUE,
 					   windata->main_hbox->allocation.x + 1,
 					   windata->main_hbox->allocation.y + 1,
 					   STRIPE_WIDTH,
@@ -149,7 +149,7 @@ get_notification_arrow_type(GtkWidget *nw)
 	} G_STMT_END
 
 static void
-create_border_with_arrow(GtkWidget *nw, WindowData *windata)
+create_border_with_arrow(GtkWidget *widget, WindowData *windata)
 {
 	int width;
 	int height;
@@ -167,13 +167,13 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 	width  = windata->width;
 	height = windata->height;
 
-	screen        = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
+	screen        = gdk_drawable_get_screen(GDK_DRAWABLE(widget->window));
 	screen_width  = gdk_screen_get_width(screen);
 	screen_height = gdk_screen_get_height(screen);
 
 	windata->num_border_points = 5;
 
-	arrow_type = get_notification_arrow_type(nw);
+	arrow_type = get_notification_arrow_type(widget);
 
 	/* Handle the offset and such */
 	switch (arrow_type)
@@ -314,7 +314,7 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 			g_assert(i == windata->num_border_points);
 			g_assert(windata->point_x - arrow_offset - arrow_side1_width >= 0);
 #endif
-			gtk_window_move(GTK_WINDOW(nw),
+			gtk_window_move(GTK_WINDOW(widget),
 							windata->point_x - arrow_offset -
 							arrow_side1_width,
 							y);
@@ -345,45 +345,45 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 }
 
 static void
-draw_border(GtkWidget *win,
+draw_border(GtkWidget *widget,
 			WindowData *windata)
 {
 	if (windata->gc == NULL)
 	{
 		GdkColor color;
 
-		windata->gc = gdk_gc_new(win->window);
+		windata->gc = gdk_gc_new(widget->window);
 		gdk_color_parse("black", &color);
 		gdk_gc_set_rgb_fg_color(windata->gc, &color);
 	}
 
 	if (windata->has_arrow)
 	{
-		create_border_with_arrow(win, windata);
+		create_border_with_arrow(widget, windata);
 
-		gdk_draw_polygon(win->window, windata->gc, FALSE,
+		gdk_draw_polygon(widget->window, windata->gc, FALSE,
 						 windata->border_points, windata->num_border_points);
-		gdk_window_shape_combine_region(win->window, windata->window_region,
+		gdk_window_shape_combine_region(widget->window, windata->window_region,
 										0, 0);
 		g_free(windata->border_points);
 		windata->border_points = NULL;
 	}
 	else
 	{
-		gdk_draw_rectangle(win->window, windata->gc, FALSE,
+		gdk_draw_rectangle(widget->window, windata->gc, FALSE,
 						   0, 0, windata->width - 1, windata->height - 1);
 	}
 
 }
 
 static gboolean
-paint_window(GtkWidget *win,
+paint_window(GtkWidget *widget,
 			 GdkEventExpose *event,
 			 WindowData *windata)
 {
-	fill_background(win, windata);
-	draw_border(win, windata);
-	draw_stripe(win, windata);
+	fill_background(widget, windata);
+	draw_border(widget, windata);
+	draw_stripe(widget, windata);
 
 	return FALSE;
 }
@@ -467,6 +467,7 @@ create_notification(UrlClickedCb url_clicked)
 {
 	GtkWidget *spacer;
 	GtkWidget *win;
+	GtkWidget *drawbox;
 	GtkWidget *main_vbox;
 	GtkWidget *hbox;
 	GtkWidget *vbox;
@@ -489,18 +490,29 @@ create_notification(UrlClickedCb url_clicked)
 
 	g_object_set_data_full(G_OBJECT(win), "windata", windata,
 						   (GDestroyNotify)destroy_windata);
-	gtk_widget_set_app_paintable(win, TRUE);
 	atk_object_set_role(gtk_widget_get_accessible(win), ATK_ROLE_ALERT);
 
-	g_signal_connect(G_OBJECT(win), "expose_event",
-					 G_CALLBACK(paint_window), windata);
 	g_signal_connect(G_OBJECT(win), "configure_event",
 					 G_CALLBACK(configure_event_cb), windata);
 
+	/*
+	 * For some reason, there are occasionally graphics glitches when
+	 * repainting the window. Despite filling the window with a background
+	 * color, parts of the other windows on the screen or the shadows around
+	 * notifications will appear on the notification. Somehow, adding this
+	 * eventbox makes that problem just go away. Whatever works for now.
+	 */
+	drawbox = gtk_event_box_new();
+	gtk_widget_show(drawbox);
+	gtk_container_add(GTK_CONTAINER(win), drawbox);
+
 	main_vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(main_vbox);
-	gtk_container_add(GTK_CONTAINER(win), main_vbox);
+	gtk_container_add(GTK_CONTAINER(drawbox), main_vbox);
 	gtk_container_set_border_width(GTK_CONTAINER(main_vbox), 1);
+
+	g_signal_connect(G_OBJECT(main_vbox), "expose_event",
+					 G_CALLBACK(paint_window), windata);
 
 	windata->top_spacer = gtk_image_new();
 	gtk_box_pack_start(GTK_BOX(main_vbox), windata->top_spacer,
