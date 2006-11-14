@@ -226,7 +226,7 @@ notify_stack_shift_notifications(NotifyStack *stack,
 
 		if (nw2 != nw)
 		{
-			gtk_widget_size_request(GTK_WIDGET(nw), &req);
+			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
 
 			translate_coordinates(stack->location, &workarea, &x, &y,
 								  &shiftx, &shifty, req.width, req.height,
@@ -238,7 +238,6 @@ notify_stack_shift_notifications(NotifyStack *stack,
 			*nw_l = l;
 		}
 	}
-
 }
 
 void

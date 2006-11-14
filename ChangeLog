@@ -1,3 +1,10 @@
+Mon Nov 13 23:31:07 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/stack.c:
+	  - Fix a bug I introduced where we were getting the size request of the
+	    window being added/removed, instead of the current one being iterated
+	    over. This was causing massive ugliness of the fourth kind.
+
 Mon Nov 13 22:47:42 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
