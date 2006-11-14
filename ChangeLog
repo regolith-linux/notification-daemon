@@ -1,3 +1,9 @@
+Mon Nov 13 21:48:11 PST 2006  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/stack.c:
+	  - Condense a lot of duplicate logic from notify_stack_add_window() and
+	    notify_stack_remove_window() into notify_stack_shift_notifications().
+
 Mon Nov 13 00:49:42 PST 2006  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:

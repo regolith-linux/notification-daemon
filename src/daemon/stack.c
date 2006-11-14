@@ -90,32 +90,32 @@ get_work_area(GtkWidget *nw, GdkRectangle *rect)
 
 static void
 get_origin_coordinates(NotifyStackLocation stack_location,
-					   GdkRectangle workarea,
+					   GdkRectangle *workarea,
 					   gint *x, gint *y, gint *shiftx, gint *shifty,
 					   gint width, gint height)
 {
 	switch (stack_location)
 	{
 		case NOTIFY_STACK_LOCATION_TOP_LEFT:
-			*x = workarea.x;
-			*y = workarea.y;
+			*x = workarea->x;
+			*y = workarea->y;
 			*shifty = height;
 			break;
 
 		case NOTIFY_STACK_LOCATION_TOP_RIGHT:
-			*x = workarea.x + workarea.width - width;
-			*y = workarea.y;
+			*x = workarea->x + workarea->width - width;
+			*y = workarea->y;
 			*shifty = height;
 			break;
 
 		case NOTIFY_STACK_LOCATION_BOTTOM_LEFT:
-			*x = workarea.x;
-			*y = workarea.y + workarea.height - height;
+			*x = workarea->x;
+			*y = workarea->y + workarea->height - height;
 			break;
 
 		case NOTIFY_STACK_LOCATION_BOTTOM_RIGHT:
-			*x = workarea.x + workarea.width - width;
-			*y = workarea.y + workarea.height - height;
+			*x = workarea->x + workarea->width - width;
+			*y = workarea->y + workarea->height - height;
 			break;
 
 		default:
@@ -125,31 +125,31 @@ get_origin_coordinates(NotifyStackLocation stack_location,
 
 static void
 translate_coordinates(NotifyStackLocation stack_location,
-					  GdkRectangle workarea,
+					  GdkRectangle *workarea,
 					  gint *x, gint *y, gint *shiftx, gint *shifty,
 					  gint width, gint height, gint index)
 {
 	switch (stack_location)
 	{
 		case NOTIFY_STACK_LOCATION_TOP_LEFT:
-			*x = workarea.x;
+			*x = workarea->x;
 			*y += *shifty;
 			*shifty = height;
 			break;
 
 		case NOTIFY_STACK_LOCATION_TOP_RIGHT:
-			*x = workarea.x + workarea.width - width;
+			*x = workarea->x + workarea->width - width;
 			*y += *shifty;
 			*shifty = height;
 			break;
 
 		case NOTIFY_STACK_LOCATION_BOTTOM_LEFT:
-			*x = workarea.x;
+			*x = workarea->x;
 			*y -= height;
 			break;
 
 		case NOTIFY_STACK_LOCATION_BOTTOM_RIGHT:
-			*x = workarea.x + workarea.width - width;
+			*x = workarea->x + workarea->width - width;
 			*y -= height;
 			break;
 
@@ -196,38 +196,63 @@ notify_stack_set_location(NotifyStack *stack,
 	stack->location = location;
 }
 
+static void
+notify_stack_shift_notifications(NotifyStack *stack,
+								 GtkWindow *nw,
+								 GSList **nw_l,
+								 gint init_width,
+								 gint init_height,
+								 gint *nw_x,
+								 gint *nw_y)
+{
+	GdkRectangle workarea;
+	GSList *l;
+	gint x, y, shiftx = 0, shifty = 0, index = 1;
+
+	get_work_area(GTK_WIDGET(nw), &workarea);
+	get_origin_coordinates(stack->location, &workarea, &x, &y,
+						   &shiftx, &shifty, init_width, init_height);
+
+	if (nw_x != NULL)
+		*nw_x = x;
+
+	if (nw_y != NULL)
+		*nw_y = y;
+
+	for (l = stack->windows; l != NULL; l = l->next)
+	{
+		GtkWindow *nw2 = GTK_WINDOW(l->data);
+		GtkRequisition req;
+
+		if (nw2 != nw)
+		{
+			gtk_widget_size_request(GTK_WIDGET(nw), &req);
+
+			translate_coordinates(stack->location, &workarea, &x, &y,
+								  &shiftx, &shifty, req.width, req.height,
+								  index++);
+			theme_move_notification(nw2, x, y);
+		}
+		else if (nw_l != NULL)
+		{
+			*nw_l = l;
+		}
+	}
+
+}
+
 void
 notify_stack_add_window(NotifyStack *stack,
 						GtkWindow *nw,
 						gboolean new_notification)
 {
 	GtkRequisition req;
-	GdkRectangle workarea;
-	GSList *l;
-	gint x, y, shiftx = 0, shifty = 0, index = 1;
+	gint x, y;
 
 	gtk_widget_size_request(GTK_WIDGET(nw), &req);
-
-	get_work_area(GTK_WIDGET(nw), &workarea);
-	get_origin_coordinates(stack->location, workarea, &x, &y,
-						   &shiftx, &shifty, req.width, req.height);
-
+	notify_stack_shift_notifications(stack, nw, NULL,
+									 req.width, req.height, &x, &y);
 	theme_move_notification(nw, x, y);
-
-	for (l = stack->windows; l != NULL; l = l->next)
-	{
-		GtkWindow *nw2 = GTK_WINDOW(l->data);
-
-		if (nw2 != nw)
-		{
-			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
-
-			translate_coordinates(stack->location, workarea, &x, &y,
-								  &shiftx, &shifty, req.width, req.height,
-								  index++);
-			theme_move_notification(nw2, x, y);
-		}
-	}
 
 	if (new_notification)
 	{
@@ -242,34 +267,9 @@ void
 notify_stack_remove_window(NotifyStack *stack,
 						   GtkWindow *nw)
 {
-	GdkRectangle workarea;
-	GSList *l, *remove_l = NULL;
-	gint x, y, shiftx = 0, shifty = 0, index = 0;
+	GSList *remove_l = NULL;
 
-	get_work_area(GTK_WIDGET(nw), &workarea);
-
-	get_origin_coordinates(stack->location, workarea, &x, &y,
-						   &shiftx, &shifty, 0, 0);
-
-	for (l = stack->windows; l != NULL; l = l->next)
-	{
-		GtkWindow *nw2 = GTK_WINDOW(l->data);
-		GtkRequisition req;
-
-		if (nw2 != nw)
-		{
-			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
-
-			translate_coordinates(stack->location, workarea, &x, &y,
-								  &shiftx, &shifty, req.width, req.height,
-								  index++);
-			theme_move_notification(nw2, x, y);
-		}
-		else
-		{
-			remove_l = l;
-		}
-	}
+	notify_stack_shift_notifications(stack, nw, &remove_l, 0, 0, NULL, NULL);
 
 	if (remove_l != NULL)
 		stack->windows = g_slist_remove_link(stack->windows, remove_l);
