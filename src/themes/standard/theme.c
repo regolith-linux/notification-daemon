@@ -149,7 +149,7 @@ get_notification_arrow_type(GtkWidget *nw)
 	} G_STMT_END
 
 static void
-create_border_with_arrow(GtkWidget *widget, WindowData *windata)
+create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 {
 	int width;
 	int height;
@@ -167,13 +167,13 @@ create_border_with_arrow(GtkWidget *widget, WindowData *windata)
 	width  = windata->width;
 	height = windata->height;
 
-	screen        = gdk_drawable_get_screen(GDK_DRAWABLE(widget->window));
+	screen        = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
 	screen_width  = gdk_screen_get_width(screen);
 	screen_height = gdk_screen_get_height(screen);
 
 	windata->num_border_points = 5;
 
-	arrow_type = get_notification_arrow_type(widget);
+	arrow_type = get_notification_arrow_type(windata->win);
 
 	/* Handle the offset and such */
 	switch (arrow_type)
@@ -314,7 +314,7 @@ create_border_with_arrow(GtkWidget *widget, WindowData *windata)
 			g_assert(i == windata->num_border_points);
 			g_assert(windata->point_x - arrow_offset - arrow_side1_width >= 0);
 #endif
-			gtk_window_move(GTK_WINDOW(widget),
+			gtk_window_move(GTK_WINDOW(windata->win),
 							windata->point_x - arrow_offset -
 							arrow_side1_width,
 							y);
@@ -334,6 +334,9 @@ create_border_with_arrow(GtkWidget *widget, WindowData *windata)
 				arrow_offset = windata->point_y - arrow_side1_width;
 			}
 			break;
+
+		default:
+			g_assert_not_reached();
 	}
 
 	g_assert(shape_points != NULL);
@@ -359,11 +362,12 @@ draw_border(GtkWidget *widget,
 
 	if (windata->has_arrow)
 	{
-		create_border_with_arrow(widget, windata);
+		create_border_with_arrow(windata->win, windata);
 
 		gdk_draw_polygon(widget->window, windata->gc, FALSE,
 						 windata->border_points, windata->num_border_points);
-		gdk_window_shape_combine_region(widget->window, windata->window_region,
+		gdk_window_shape_combine_region(windata->win->window,
+										windata->window_region,
 										0, 0);
 		g_free(windata->border_points);
 		windata->border_points = NULL;

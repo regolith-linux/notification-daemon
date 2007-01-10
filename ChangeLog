@@ -1,3 +1,11 @@
+Wed Jan 10 15:05:28 PST 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Fix a crash when displaying notifications with arrows. I can't believe
+	    I didn't catch this before. There's still a bug though where you can't
+	    display a notification with arrows while a normal notification is on
+	    the screen, but I have no clue why.
+
 Fri Jan 05 15:06:51 PST 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* po/ChangeLog:
