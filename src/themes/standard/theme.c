@@ -385,6 +385,11 @@ paint_window(GtkWidget *widget,
 			 GdkEventExpose *event,
 			 WindowData *windata)
 {
+	if (windata->width == 0) {
+		/* We haven't seen configure_event yet. Bail for now. */
+		return FALSE;
+	}
+
 	fill_background(widget, windata);
 	draw_border(widget, windata);
 	draw_stripe(widget, windata);
@@ -462,6 +467,7 @@ configure_event_cb(GtkWidget *nw,
 	windata->height = event->height;
 
 	update_spacers(nw);
+	gtk_widget_queue_draw(nw);
 
 	return FALSE;
 }

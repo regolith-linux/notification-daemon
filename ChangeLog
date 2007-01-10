@@ -1,3 +1,12 @@
+Wed Jan 10 15:43:12 PST 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - We were trying to compute a border in expose_event, which sometimes
+	    was called before configure_event. configure_event sets stuff that
+	    our border computerator needed, so it blew up or screwed up. We now
+	    wait for the configure_event before even trying it, and
+	    the configure_event handler now ensures that we get an expose_event.
+
 Wed Jan 10 15:05:28 PST 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
