@@ -58,18 +58,27 @@ enum
 	URGENCY_CRITICAL
 };
 
+//#define ENABLE_GRADIENT_LOOK
+
+#ifdef ENABLE_GRADIENT_LOOK
+# define STRIPE_WIDTH  45
+#else
+# define STRIPE_WIDTH  30
+#endif
+
 #define WIDTH         400
 #define IMAGE_SIZE    32
 #define IMAGE_PADDING 10
-#define STRIPE_WIDTH  30
+#define SPACER_LEFT   30
 #define PIE_RADIUS    12
 #define PIE_WIDTH     (2 * PIE_RADIUS)
 #define PIE_HEIGHT    (2 * PIE_RADIUS)
 #define BODY_X_OFFSET (IMAGE_SIZE + 8)
-#define DEFAULT_ARROW_OFFSET  (STRIPE_WIDTH + 2)
+#define DEFAULT_ARROW_OFFSET  (SPACER_LEFT + 2)
 #define DEFAULT_ARROW_HEIGHT  14
 #define DEFAULT_ARROW_WIDTH   28
 #define BACKGROUND_OPACITY    0.92
+#define BOTTOM_GRADIENT_HEIGHT 30
 
 #if GTK_CHECK_VERSION(2, 8, 0)
 # define USE_CAIRO
@@ -86,6 +95,10 @@ fill_background(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 {
 	GtkStyle *style = gtk_widget_get_style(widget);
 	GdkColor *background_color = &style->base[GTK_STATE_NORMAL];
+#ifdef ENABLE_GRADIENT_LOOK
+	cairo_pattern_t *gradient;
+	int gradient_y = widget->allocation.height - BOTTOM_GRADIENT_HEIGHT;
+#endif
 
 	if (windata->enable_transparency)
 	{
@@ -104,6 +117,19 @@ fill_background(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 					widget->allocation.width,
 					widget->allocation.height);
 	cairo_fill(cr);
+
+#ifdef ENABLE_GRADIENT_LOOK
+	/* Add a very subtle gradient to the bottom of the notification */
+	gradient = cairo_pattern_create_linear(0, gradient_y, 0,
+										   widget->allocation.height);
+	cairo_pattern_add_color_stop_rgba(gradient, 0, 0, 0, 0, 0);
+	cairo_pattern_add_color_stop_rgba(gradient, 1, 0, 0, 0, 0.15);
+	cairo_rectangle(cr, 0, gradient_y, widget->allocation.width,
+					BOTTOM_GRADIENT_HEIGHT);
+	cairo_set_source(cr, gradient);
+	cairo_fill(cr);
+	cairo_pattern_destroy(gradient);
+#endif
 }
 #else /* !USE_CAIRO */
 static void
@@ -125,6 +151,13 @@ draw_stripe(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 {
 	GtkStyle *style = gtk_widget_get_style(widget);
 	GdkColor color;
+	int stripe_x = windata->main_hbox->allocation.x + 1;
+	int stripe_y = windata->main_hbox->allocation.y + 1;
+	int stripe_height = windata->main_hbox->allocation.height - 2;
+#ifdef ENABLE_GRADIENT_LOOK
+	cairo_pattern_t *gradient;
+	double r, g, b;
+#endif
 
 	switch (windata->urgency)
 	{
@@ -142,13 +175,23 @@ draw_stripe(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 			break;
 	}
 
-	gdk_cairo_set_source_color(cr, &color);
-	cairo_rectangle(cr,
-			windata->main_hbox->allocation.x + 1,
-			windata->main_hbox->allocation.y + 1,
-			STRIPE_WIDTH,
-			windata->main_hbox->allocation.height - 2);
+	cairo_rectangle(cr, stripe_x, stripe_y, STRIPE_WIDTH, stripe_height);
+
+#ifdef ENABLE_GRADIENT_LOOK
+	r = color.red   / 65535.0;
+	g = color.green / 65535.0;
+	b = color.blue  / 65535.0;
+
+	gradient = cairo_pattern_create_linear(stripe_x, 0, STRIPE_WIDTH, 0);
+	cairo_pattern_add_color_stop_rgba(gradient, 0, r, g, b, 1);
+	cairo_pattern_add_color_stop_rgba(gradient, 1, r, g, b, 0);
+	cairo_set_source(cr, gradient);
 	cairo_fill(cr);
+	cairo_pattern_destroy(gradient);
+#else
+	gdk_cairo_set_source_color(cr, &color);
+	cairo_fill(cr);
+#endif
 }
 #else /* !USE_CAIRO */
 static void
@@ -707,7 +750,7 @@ create_notification(UrlClickedCb url_clicked)
 	spacer = gtk_image_new();
 	gtk_widget_show(spacer);
 	gtk_box_pack_start(GTK_BOX(hbox), spacer, FALSE, FALSE, 0);
-	gtk_widget_set_size_request(spacer, STRIPE_WIDTH, -1);
+	gtk_widget_set_size_request(spacer, SPACER_LEFT, -1);
 
 	windata->summary_label = gtk_label_new(NULL);
 	gtk_widget_show(windata->summary_label);

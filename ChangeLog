@@ -1,3 +1,9 @@
+Sat Jan 13 01:20:23 PST 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Added a work in progress gradient-happy mode that must be enabled by
+	    defining ENABLE_GRADIENT_LOOK in theme.c.
+
 Sat Jan 13 00:18:40 PST 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
