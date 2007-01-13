@@ -1,6 +1,9 @@
 version 0.3.7:
 	* Fixed a compatibility issue with dbus-glib 0.72. Patch by Pawel Worach.
 	  (Bug #95)
+	* The background of the window in the standard theme is now just slightly
+	  transparent when compiled against GTK+ 2.10 and when using a composite
+	  manager. Patch by Matt Walton. (Ticket #110)
 	* Fix several rendering glitches with the borders in the standard theme.
 	* Added initial accessibility support with the standard theme engine.
 	* Clicking anywhere in a notification should now close the notification.

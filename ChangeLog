@@ -1,3 +1,10 @@
+Fri Jan 12 23:57:15 PST 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Added support for a semi-transparent background in the notification
+	    window on the standard theme on GTK+ 2.10 when a compositing manager
+	    is active. Patch by Matt Walton. Closes ticket #110.
+
 Fri Jan 12 23:06:15 PST 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
