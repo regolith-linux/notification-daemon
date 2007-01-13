@@ -386,8 +386,8 @@ paint_window(GtkWidget *widget,
 			 WindowData *windata)
 {
 	if (windata->width == 0) {
-		/* We haven't seen configure_event yet. Bail for now. */
-		return FALSE;
+		windata->width = windata->win->allocation.width;
+		windata->height = windata->win->allocation.height;
 	}
 
 	fill_background(widget, windata);
