@@ -5,6 +5,8 @@ version 0.3.7:
 	  transparent when compiled against GTK+ 2.10 and when using a composite
 	  manager. Patch by Matt Walton. (Ticket #110)
 	* Fix several rendering glitches with the borders in the standard theme.
+	* Fix a memory leak when removing a notification. Patch by Sven Wegener.
+	  (Bug #105).
 	* Added initial accessibility support with the standard theme engine.
 	* Clicking anywhere in a notification should now close the notification.
 	  This was happening only on the body text sometimes.

@@ -271,7 +271,7 @@ notify_stack_remove_window(NotifyStack *stack,
 	notify_stack_shift_notifications(stack, nw, &remove_l, 0, 0, NULL, NULL);
 
 	if (remove_l != NULL)
-		stack->windows = g_slist_remove_link(stack->windows, remove_l);
+		stack->windows = g_slist_delete_link(stack->windows, remove_l);
 
 	if (GTK_WIDGET_REALIZED(GTK_WIDGET(nw)))
 		gtk_widget_unrealize(GTK_WIDGET(nw));
