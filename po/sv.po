@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-11-27 14:05+0100\n"
+"POT-Creation-Date: 2007-02-15 03:02-0800\n"
 "PO-Revision-Date: 2006-11-27 14:08+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -20,8 +20,12 @@ msgid "Current theme"
 msgstr "Aktuellt tema"
 
 #: ../data/notification-daemon.schemas.in.h:2
-msgid "Default popup location on the workspace for stack notifications. Allowed values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr "Standardposition för popup-rutor på arbetsutan för notifieringar. Tillåtna värden: \"top_left\",\"top_right\",\"bottom_left\" och \"bottom_right\""
+msgid ""
+"Default popup location on the workspace for stack notifications. Allowed "
+"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+msgstr ""
+"Standardposition för popup-rutor på arbetsutan för notifieringar. Tillåtna "
+"värden: \"top_left\",\"top_right\",\"bottom_left\" och \"bottom_right\""
 
 #: ../data/notification-daemon.schemas.in.h:3
 msgid "Popup location"
@@ -38,4 +42,3 @@ msgstr "Popup-notifieringar"
 #: ../src/capplet/notification-properties.desktop.in.h:2
 msgid "Set your pop-up notification preferences"
 msgstr "Ställ in dina popup-notifieringsinställningar"
-

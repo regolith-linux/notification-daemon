@@ -1,3 +1,12 @@
+Thu Feb 15 03:03:07 PST 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* POTFILES.in:
+	* de.po:
+	* nl.po:
+	A notification-daemon.pot:
+	* sv.po:
+	  - Add src/capplet/notification-properties.desktop.in to POTFILES.in.
+
 Thu Feb 15 02:49:52 PST 2007  Christian Hammond <chipx86@chipx86.com>
 
 	A sv.po:
