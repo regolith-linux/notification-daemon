@@ -1,3 +1,11 @@
+==================== 0.3.7 ====================
+
+Tue Feb 27 23:19:00 PST 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* configure.ac:
+	* NEWS:
+	  - Bump to version 0.3.7.
+
 Tue Feb 27 23:15:53 PST 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* po/POTFILES.in:
