@@ -6,9 +6,11 @@ notification_daemon_SOURCES = \
 	engines.c \
 	engines.h \
 	stack.c \
-	stack.h
+	stack.h \
+	sound.c \
+	sound.h
 
-notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
+notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS) $(GSTREAMER_LIBS)
 
 BUILT_SOURCES = notificationdaemon-dbus-glue.h
 
@@ -19,6 +21,7 @@ notificationdaemon-dbus-glue.h: notificationdaemon.xml
 INCLUDES = \
 	-I$(top_srcdir) \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
+	$(GSTREAMER_CFLAGS) \
 	-DENGINES_DIR=\"$(libdir)/notification-daemon-1.0/engines\"
 
 EXTRA_DIST = notificationdaemon.xml

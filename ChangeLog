@@ -1,3 +1,16 @@
+Sun Apr 29 03:43:13 PDT 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* data/notification-daemon.schemas.in:
+	* src/daemon/daemon.c:
+	* src/daemon/daemon.h:
+	* src/daemon/Makefile.am:
+	* AUTHORS:
+	* NEWS:
+	* configure.ac:
+	  - Added support for playing sounds when the "sound-file" hint is set or
+	    when the default_sound GConf key is set, as well as support for the
+	    "suppress-sound" hint. Patch by Jim Ramsay. (Ticket #111)
+
 Sun Apr 29 02:38:12 PDT 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:

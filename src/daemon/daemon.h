@@ -32,6 +32,8 @@
 #define GCONF_KEY_DAEMON         "/apps/notification-daemon"
 #define GCONF_KEY_THEME          GCONF_KEY_DAEMON "/theme"
 #define GCONF_KEY_POPUP_LOCATION GCONF_KEY_DAEMON "/popup_location"
+#define GCONF_KEY_SOUND_ENABLED  GCONF_KEY_DAEMON "/sound_enabled"
+#define GCONF_KEY_DEFAULT_SOUND  GCONF_KEY_DAEMON "/default_sound"
 
 #define NOTIFY_TYPE_DAEMON (notify_daemon_get_type())
 #define NOTIFY_DAEMON(obj) \
@@ -46,6 +48,12 @@
 	(G_TYPE_INSTANCE_GET_CLASS((obj), NOTIFY_TYPE_DAEMON, NotifyDaemonClass))
 
 #define NOTIFY_DAEMON_DEFAULT_TIMEOUT 7000
+
+enum {
+	URGENCY_LOW,
+	URGENCY_NORMAL,
+	URGENCY_CRITICAL
+};
 
 typedef struct _NotifyDaemon        NotifyDaemon;
 typedef struct _NotifyDaemonClass   NotifyDaemonClass;

@@ -162,6 +162,34 @@ fi
 AC_SUBST(CFLAGS)
 
 dnl ################################################################
+dnl # Sound Support 
+dnl ################################################################
+
+AC_ARG_ENABLE(sound,
+  [[  --enable-sound=[auto,gstreamer,no]  Sound support (default=auto)]] )
+
+if test x$enable_sound != xno -a x$enable_sound != xgstreamer; then
+	enable_sound=auto
+fi
+
+if test x$enable_sound != xno; then
+	gstreampkg="gstreamer-0.10"
+
+	if test x$enable_sound = xauto; then
+		PKG_CHECK_MODULES(GSTREAMER, $gstreampkg,
+		                  [enable_sound=gstreamer], [enable_sound=no])
+	else
+		PKG_CHECK_MODULES(GSTREAMER, $gstreampkg, [enable_sound=gstreamer])
+	fi
+
+	if test x$enable_sound = xgstreamer; then
+		AC_DEFINE([HAVE_GSTREAMER], 1, [Defined if Gstreamer is detected])
+		AC_SUBST(GSTREAMER_CFLAGS)
+		AC_SUBST(GSTREAMER_LIBS)
+	fi
+fi
+
+dnl ################################################################
 dnl # Output the Makefiles
 dnl ################################################################
 AC_CONFIG_FILES([
@@ -184,6 +212,7 @@ echo
 echo prefix............... : $prefix
 echo dbus-1 system.d dir.. : $DBUS_SYS_DIR
 echo dbus-1 services dir.. : $DBUS_SERVICES_DIR
+echo sound support........ : $enable_sound
 echo
 echo "Now type make to compile"
 echo "Then su to root and type: make install"

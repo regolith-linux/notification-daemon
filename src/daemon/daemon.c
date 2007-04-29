@@ -45,6 +45,7 @@
 #include "daemon.h"
 #include "engines.h"
 #include "stack.h"
+#include "sound.h"
 #include "notificationdaemon-dbus-glue.h"
 
 #define IMAGE_SIZE 48
@@ -826,6 +827,8 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	gint y = 0;
 	guint return_id;
 	gchar *sender;
+	gchar *sound_file = NULL;
+	gboolean sound_enabled;
 	gint i;
 
 	if (id > 0)
@@ -876,6 +879,63 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		{
 			y = g_value_get_int(data);
 			use_pos_data = TRUE;
+		}
+	}
+
+	/* Deal with sound hints */
+	sound_enabled = gconf_client_get_bool(gconf_client,
+										  GCONF_KEY_SOUND_ENABLED, NULL);
+	data = (GValue *)g_hash_table_lookup(hints, "suppress-sound");
+
+	if (data != NULL)
+	{
+		if (G_VALUE_HOLDS_BOOLEAN(data))
+			sound_enabled = !g_value_get_boolean(data);
+		else if (G_VALUE_HOLDS_INT(data))
+			sound_enabled = (g_value_get_int(data) != 0);
+		else
+		{
+			g_warning("suppress-sound is of type %s (expected bool or int)\n",
+					  g_type_name(G_VALUE_TYPE(data)));
+		}
+	}
+
+	if (sound_enabled)
+	{
+		data = (GValue *)g_hash_table_lookup(hints, "sound-file");
+
+		if (data != NULL)
+		{
+			sound_file = g_value_dup_string(data);
+
+			if (*sound_file == '\0' ||
+				!g_file_test(sound_file, G_FILE_TEST_EXISTS))
+			{
+				g_free(sound_file);
+				sound_file = NULL;
+			}
+		}
+
+		/*
+		 * TODO: If we don't have a sound_file yet, get the urgency hint, then
+		 *       get the corresponding system event sound
+		 *
+		 *       We will need to parse /etc/sound/events/gnome-2.soundlist
+		 *       and ~/.gnome2/sound/events/gnome-2.soundlist.
+		 */
+
+		/* If we don't have a sound file yet, use our gconf default */
+		if (sound_file == NULL)
+		{
+			sound_file = gconf_client_get_string(gconf_client,
+												 GCONF_KEY_DEFAULT_SOUND, NULL);
+			if (sound_file != NULL &&
+				(*sound_file == '\0' ||
+				 !g_file_test(sound_file, G_FILE_TEST_EXISTS)))
+			{
+				g_free(sound_file);
+				sound_file = NULL;
+			}
 		}
 	}
 
@@ -987,7 +1047,11 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		!fullscreen_window_exists(GTK_WIDGET(nw)))
 	{
 		theme_show_notification(nw);
+		if (sound_file != NULL)
+			sound_play(sound_file);
 	}
+
+	g_free(sound_file);
 
 	return_id = (id == 0 ? _store_notification(daemon, nw, timeout) : id);
 
@@ -1066,6 +1130,8 @@ main(int argc, char **argv)
 	guint request_name_result;
 
 	g_log_set_always_fatal(G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
+
+	sound_init();
 
 	gtk_init(&argc, &argv);
 	gconf_init(argc, argv, NULL);

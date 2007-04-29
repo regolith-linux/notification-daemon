@@ -25,5 +25,29 @@
    </locale>
   </schema>
 
+  <schema>
+   <key>/schemas/apps/notification-daemon/sound_enabled</key>
+   <applyto>/apps/notification-daemon/sound_enabled</applyto>
+   <owner>notification-daemon</owner>
+   <type>bool</type>
+   <default>1</default>
+   <locale name="C">
+    <short>Sound Enabled</short>
+    <long>Turns on and off sound support for notifications.</long>
+   </locale>
+  </schema>
+
+  <schema>
+   <key>/schemas/apps/notification-daemon/default_sound</key>
+   <applyto>/apps/notification-daemon/default_sound</applyto>
+   <owner>notification-daemon</owner>
+   <type>string</type>
+   <default></default>
+   <locale name="C">
+    <short>Default Sound</short>
+	 <long>The default sound file used unless a notification supplies the 'sound-file' or 'suppress-sound' hint.  Leave empty for no default sound.</long>
+   </locale>
+  </schema>
+
  </schemalist>
 </gconfschemafile>

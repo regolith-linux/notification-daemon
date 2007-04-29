@@ -1,5 +1,8 @@
 version 0.3.8:
 	* Bumped up the required minimum version of GTK+ to 2.8.0.
+	* Added support for playing sounds when the "sound-file" hint is set or
+	  when the default_sound GConf key is set, as well as support for the
+	  "suppress-sound" hint. Patch by Jim Ramsay. (Ticket #111)
 	* Fixed a bug where we were quitting on theme engine failure, instead of
 	  falling back to the default theme engine. Patch by
 	  driehuis-at-playbeing.org. (Ticket #128)
