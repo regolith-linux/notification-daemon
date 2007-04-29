@@ -1,4 +1,5 @@
 version 0.3.8:
+	* Bumped up the required minimum version of GTK+ to 2.8.0.
 	* Fixed a bug where we were quitting on theme engine failure, instead of
 	  falling back to the default theme engine. Patch by
 	  driehuis-at-playbeing.org. (Ticket #128)

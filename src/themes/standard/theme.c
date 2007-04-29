@@ -80,16 +80,11 @@ enum
 #define BACKGROUND_OPACITY    0.92
 #define BOTTOM_GRADIENT_HEIGHT 30
 
-#if GTK_CHECK_VERSION(2, 8, 0)
-# define USE_CAIRO
-#endif
-
 #if GTK_CHECK_VERSION(2, 10, 0)
 # define USE_COMPOSITE
 #endif
 
 
-#ifdef USE_CAIRO
 static void
 fill_background(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 {
@@ -131,21 +126,7 @@ fill_background(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 	cairo_pattern_destroy(gradient);
 #endif
 }
-#else /* !USE_CAIRO */
-static void
-fill_background(GtkWidget *widget, WindowData *windata)
-{
-	GtkStyle *style = gtk_widget_get_style(windata->win);
 
-	gdk_draw_rectangle(GDK_DRAWABLE(widget->window),
-					   style->base_gc[GTK_STATE_NORMAL], TRUE,
-					   0, 0,
-					   widget->allocation.width,
-					   widget->allocation.height);
-}
-#endif
-
-#ifdef USE_CAIRO
 static void
 draw_stripe(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 {
@@ -193,45 +174,6 @@ draw_stripe(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 	cairo_fill(cr);
 #endif
 }
-#else /* !USE_CAIRO */
-static void
-draw_stripe(GtkWidget *widget, WindowData *windata)
-{
-	GtkStyle *style = gtk_widget_get_style(widget);
-	gboolean custom_gc = FALSE;
-	GdkColor color;
-	GdkGC *gc;
-
-	switch (windata->urgency)
-	{
-		case URGENCY_LOW: // LOW
-			gc = style->bg_gc[GTK_STATE_NORMAL];
-			break;
-
-		case URGENCY_CRITICAL: // CRITICAL
-			custom_gc = TRUE;
-			gc = gdk_gc_new(GDK_DRAWABLE(widget->window));
-			gdk_color_parse("#CC0000", &color);
-			gdk_gc_set_rgb_fg_color(gc, &color);
-			break;
-
-		case URGENCY_NORMAL: // NORMAL
-		default:
-			gc = style->bg_gc[GTK_STATE_SELECTED];
-			break;
-	}
-
-
-	gdk_draw_rectangle(widget->window, gc, TRUE,
-					   windata->main_hbox->allocation.x + 1,
-					   windata->main_hbox->allocation.y + 1,
-					   STRIPE_WIDTH,
-					   windata->main_hbox->allocation.height - 2);
-
-	if (custom_gc)
-		g_object_unref(G_OBJECT(gc));
-}
-#endif
 
 static GtkArrowType
 get_notification_arrow_type(GtkWidget *nw)
@@ -463,7 +405,6 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 	g_free(shape_points);
 }
 
-#ifdef USE_CAIRO
 static void
 draw_border(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 {
@@ -501,55 +442,20 @@ draw_border(GtkWidget *widget, WindowData *windata, cairo_t *cr)
 
 	cairo_stroke(cr);
 }
-#else /* !USE_CAIRO */
-static void
-draw_border(GtkWidget *widget,
-			WindowData *windata)
-{
-	if (windata->gc == NULL)
-	{
-		GdkColor color;
-
-		windata->gc = gdk_gc_new(widget->window);
-		gdk_color_parse("black", &color);
-		gdk_gc_set_rgb_fg_color(windata->gc, &color);
-	}
-
-	if (windata->has_arrow)
-	{
-		create_border_with_arrow(windata->win, windata);
-
-		gdk_draw_polygon(widget->window, windata->gc, FALSE,
-						 windata->border_points, windata->num_border_points);
-		gdk_window_shape_combine_region(windata->win->window,
-										windata->window_region,
-										0, 0);
-		g_free(windata->border_points);
-		windata->border_points = NULL;
-	}
-	else
-	{
-		gdk_draw_rectangle(widget->window, windata->gc, FALSE,
-						   0, 0, windata->width - 1, windata->height - 1);
-	}
-
-}
-#endif
 
 static gboolean
 paint_window(GtkWidget *widget,
 			 GdkEventExpose *event,
 			 WindowData *windata)
 {
+	cairo_t *context;
+	cairo_surface_t *surface;
+	cairo_t *cr;
+
 	if (windata->width == 0) {
 		windata->width = windata->win->allocation.width;
 		windata->height = windata->win->allocation.height;
 	}
-
-#ifdef USE_CAIRO
-	cairo_t *context;
-	cairo_surface_t *surface;
-	cairo_t *cr;
 
 	context = gdk_cairo_create(widget->window);
 
@@ -569,11 +475,6 @@ paint_window(GtkWidget *widget,
 	cairo_paint(context);
 	cairo_surface_destroy(surface);
 	cairo_destroy(context);
-#else /* !USE_CAIRO */
-	fill_background(widget, windata);
-	draw_border(widget, windata);
-	draw_stripe(widget, windata);
-#endif
 
 	return FALSE;
 }
@@ -943,11 +844,10 @@ countdown_expose_cb(GtkWidget *pie, GdkEventExpose *event,
 					WindowData *windata)
 {
 	GtkStyle *style = gtk_widget_get_style(windata->win);
-
-#ifdef USE_CAIRO
 	cairo_t *context;
 	cairo_surface_t *surface;
 	cairo_t *cr;
+
 	context = gdk_cairo_create(GDK_DRAWABLE(windata->pie_countdown->window));
 	cairo_set_operator(context, CAIRO_OPERATOR_SOURCE);
 	surface = cairo_surface_create_similar(
@@ -958,15 +858,11 @@ countdown_expose_cb(GtkWidget *pie, GdkEventExpose *event,
 	cr = cairo_create(surface);
 
 	fill_background(pie, windata, cr);
-#else /* !USE_CAIRO */
-	fill_background(pie, windata);
-#endif
 
 	if (windata->timeout > 0)
 	{
 		gdouble pct = (gdouble)windata->remaining / (gdouble)windata->timeout;
 
-#ifdef USE_CAIRO
 		gdk_cairo_set_source_color(cr, &style->bg[GTK_STATE_ACTIVE]);
 
 		cairo_move_to(cr, PIE_RADIUS, PIE_RADIUS);
@@ -974,21 +870,13 @@ countdown_expose_cb(GtkWidget *pie, GdkEventExpose *event,
 						   -G_PI_2, -(pct * G_PI * 2) - G_PI_2);
 		cairo_line_to(cr, PIE_RADIUS, PIE_RADIUS);
 		cairo_fill(cr);
-#else /* !USE_CAIRO */
-		gdk_draw_arc(GDK_DRAWABLE(windata->pie_countdown->window),
-					 style->bg_gc[GTK_STATE_ACTIVE], TRUE,
-					 0, 0, PIE_WIDTH, PIE_HEIGHT,
-					 90 * 64, pct * 360.0 * 64.0);
-#endif
 	}
 
-#ifdef USE_CAIRO
 	cairo_destroy(cr);
 	cairo_set_source_surface(context, surface, 0, 0);
 	cairo_paint(context);
 	cairo_surface_destroy(surface);
 	cairo_destroy(context);
-#endif
 
 	return TRUE;
 }
