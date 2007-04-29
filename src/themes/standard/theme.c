@@ -666,6 +666,7 @@ create_notification(UrlClickedCb url_clicked)
 	GtkWidget *image;
 	GtkWidget *alignment;
 	AtkObject *atkobj;
+	GtkRcStyle *rcstyle;
 	WindowData *windata;
 #ifdef USE_COMPOSITE
 	GdkColormap *colormap;
@@ -762,14 +763,23 @@ create_notification(UrlClickedCb url_clicked)
 	atk_object_set_description(atkobj, "Notification summary text.");
 
 	/* Add the close button */
+	alignment = gtk_alignment_new(1, 0, 0, 0);
+	gtk_widget_show(alignment);
+	gtk_box_pack_start(GTK_BOX(hbox), alignment, FALSE, FALSE, 0);
+
 	close_button = gtk_button_new();
 	gtk_widget_show(close_button);
-	gtk_box_pack_start(GTK_BOX(hbox), close_button, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(alignment), close_button);
 	gtk_button_set_relief(GTK_BUTTON(close_button), GTK_RELIEF_NONE);
 	gtk_container_set_border_width(GTK_CONTAINER(close_button), 0);
-	gtk_widget_set_size_request(close_button, 20, 20);
+	//gtk_widget_set_size_request(close_button, 20, 20);
 	g_signal_connect_swapped(G_OBJECT(close_button), "clicked",
 							 G_CALLBACK(gtk_widget_destroy), win);
+
+	rcstyle = gtk_rc_style_new();
+	rcstyle->xthickness = rcstyle->ythickness = 0;
+	gtk_widget_modify_style(close_button, rcstyle);
+	gtk_rc_style_unref(rcstyle);
 
 	atkobj = gtk_widget_get_accessible(close_button);
 	atk_action_set_description(ATK_ACTION(atkobj), 0,
