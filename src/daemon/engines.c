@@ -60,7 +60,7 @@ load_theme_engine(const char *name)
 	if (!g_module_symbol(engine->module, #name, (gpointer *)&engine->name)) \
 	{ \
 		/* Too harsh! Fall back to default. */ \
-		g_error("Theme doesn't provide the required function '%s'", #name); \
+		g_warning("Theme doesn't provide the required function '%s'", #name); \
 		goto error; \
 	}
 

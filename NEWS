@@ -1,3 +1,8 @@
+version 0.3.8:
+	* Fixed a bug where we were quitting on theme engine failure, instead of
+	  falling back to the default theme engine. Patch by
+	  driehuis-at-playbeing.org. (Ticket #128)
+
 version 0.3.7 (27-February-2007):
 	* Fixed a compatibility issue with dbus-glib 0.72. Patch by Pawel Worach.
 	  (Bug #95)
