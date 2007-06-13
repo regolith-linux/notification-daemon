@@ -179,13 +179,17 @@ static GtkArrowType
 get_notification_arrow_type(GtkWidget *nw)
 {
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
-	int screen_height;
+	GdkScreen *screen;
+	GdkRectangle monitor_geometry;
+	int monitor;
 
-	screen_height = gdk_screen_get_height(
-		gdk_drawable_get_screen(GDK_DRAWABLE(nw->window)));
+	screen = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
+	monitor = gdk_screen_get_monitor_at_point(screen, windata->point_x,
+											  windata->point_y);
+	gdk_screen_get_monitor_geometry(screen, monitor, &monitor_geometry);
 
-	if (windata->point_y + windata->height + DEFAULT_ARROW_HEIGHT >
-		screen_height)
+	if (windata->point_y - monitor_geometry.y + windata->height +
+		DEFAULT_ARROW_HEIGHT > monitor_geometry.height)
 	{
 		return GTK_ARROW_DOWN;
 	}
@@ -210,63 +214,71 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 	int width;
 	int height;
 	int y;
+	int norm_point_x;
+	int norm_point_y;
 	GtkArrowType arrow_type;
 	GdkScreen *screen;
-	int screen_width;
-	int screen_height;
 	int arrow_side1_width = DEFAULT_ARROW_WIDTH / 2;
 	int arrow_side2_width = DEFAULT_ARROW_WIDTH / 2;
 	int arrow_offset = DEFAULT_ARROW_OFFSET;
 	GdkPoint *shape_points = NULL;
 	int i = 0;
+	int monitor;
+	GdkRectangle monitor_geometry;
 
 	width  = windata->width;
 	height = windata->height;
 
-	screen        = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
-	screen_width  = gdk_screen_get_width(screen);
-	screen_height = gdk_screen_get_height(screen);
+	screen  = gdk_drawable_get_screen(GDK_DRAWABLE(nw->window));
+	monitor = gdk_screen_get_monitor_at_point(screen,
+											  windata->point_x,
+											  windata->point_y);
+	gdk_screen_get_monitor_geometry(screen, monitor, &monitor_geometry);
 
 	windata->num_border_points = 5;
 
 	arrow_type = get_notification_arrow_type(windata->win);
+
+	norm_point_x = windata->point_x - monitor_geometry.x;
+	norm_point_y = windata->point_y - monitor_geometry.y;
 
 	/* Handle the offset and such */
 	switch (arrow_type)
 	{
 		case GTK_ARROW_UP:
 		case GTK_ARROW_DOWN:
-			if (windata->point_x < arrow_side1_width)
+			if (norm_point_x < arrow_side1_width)
 			{
 				arrow_side1_width = 0;
 				arrow_offset = 0;
 			}
-			else if (windata->point_x > screen_width - arrow_side2_width)
+			else if (norm_point_x > monitor_geometry.width - arrow_side2_width)
 			{
 				arrow_side2_width = 0;
 				arrow_offset = width - arrow_side1_width;
 			}
 			else
 			{
-				if (windata->point_x - arrow_side2_width + width >=
-					screen_width)
+				if (norm_point_x - arrow_side2_width + width >=
+					monitor_geometry.width)
 				{
 					arrow_offset =
 						width - arrow_side1_width - arrow_side2_width -
-						(screen_width - MAX(windata->point_x +
-											arrow_side1_width,
-											screen_width -
-											DEFAULT_ARROW_OFFSET));
+						monitor_geometry.width -
+						MAX(norm_point_x + arrow_side1_width,
+							monitor_geometry.width - DEFAULT_ARROW_OFFSET);
 				}
 				else
 				{
-					arrow_offset = MIN(windata->point_x - arrow_side1_width,
+					arrow_offset = MIN(norm_point_x - arrow_side1_width,
 									   DEFAULT_ARROW_OFFSET);
 				}
 
 				if (arrow_offset == 0 ||
 					arrow_offset == width - arrow_side1_width)
+				{
 					windata->num_border_points++;
+				}
 				else
 					windata->num_border_points += 2;
 			}
@@ -381,15 +393,15 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 
 		case GTK_ARROW_LEFT:
 		case GTK_ARROW_RIGHT:
-			if (windata->point_y < arrow_side1_width)
+			if (norm_point_y < arrow_side1_width)
 			{
 				arrow_side1_width = 0;
-				arrow_offset = windata->point_y;
+				arrow_offset = norm_point_y;
 			}
-			else if (windata->point_y > screen_height - arrow_side2_width)
+			else if (norm_point_y > monitor_geometry.height - arrow_side2_width)
 			{
 				arrow_side2_width = 0;
-				arrow_offset = windata->point_y - arrow_side1_width;
+				arrow_offset = norm_point_y - arrow_side1_width;
 			}
 			break;
 

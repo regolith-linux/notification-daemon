@@ -1,3 +1,10 @@
+Wed Jun 13 03:12:31 PDT 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Patch by M.S. to fix a bug where notifications with arrows were
+	    crossing the monitor on multihead setups instead of staying on their
+	    head. (Bug #5)
+
 Wed Jun 13 02:58:07 PDT 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* po/POTFILES.in:
