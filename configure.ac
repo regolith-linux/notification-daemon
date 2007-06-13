@@ -90,6 +90,10 @@ PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
 
+PKG_CHECK_MODULES(NOTIFICATION_CAPPLET, glib-2.0 >= $REQ_GLIB_VERSION gtk+-2.0 >= $REQ_GTK_VERSION libglade-2.0 gconf-2.0 libnotify dbus-1 dbus-glib-1)
+AC_SUBST(NOTIFICATION_CAPPLET_CFLAGS)
+AC_SUBST(NOTIFICATION_CAPPLET_LIBS)
+
 gdk_modules="
 	gdk-2.0 >= $REQ_GTK_VERSION, \
 	gdk-pixbuf-2.0 >= $REQ_GTK_VERSION \
@@ -199,6 +203,7 @@ data/org.freedesktop.Notifications.service
 po/Makefile.in
 src/Makefile
 src/daemon/Makefile
+src/capplet/Makefile
 src/themes/Makefile
 src/themes/bubble/Makefile
 src/themes/standard/Makefile

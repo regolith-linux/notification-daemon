@@ -1,1 +1,1 @@
-SUBDIRS = daemon themes
+SUBDIRS = daemon themes capplet
