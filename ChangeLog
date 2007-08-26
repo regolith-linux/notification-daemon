@@ -1,3 +1,10 @@
+Sat Aug 25 19:10:18 PDT 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Only set the urgency in the standard theme if the value is actually a
+	    uchar. We were assuming it would be, but that made it easy to crash
+	    things. Now we make sure. Fixes bug #135.
+
 Sat Aug 25 18:55:34 PDT 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon/daemon.c:
