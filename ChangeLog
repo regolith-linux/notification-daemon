@@ -1,3 +1,12 @@
+Sat Aug 25 21:42:50 PDT 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/capplet/notification-properties.c:
+	A po/notification-daemon.it.po:
+	* AUTHORS:
+	* NEWS:
+	* configure.ac:
+	  - Added an Italian translation by Luca Ferretti.
+
 Sat Aug 25 19:42:05 PDT 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:

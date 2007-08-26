@@ -167,7 +167,7 @@ notification_properties_dialog_setup_positions(NotificationAppletDialog *dialog)
 	{
 		gtk_list_store_append(store, &iter);
 		gtk_list_store_set(store, &iter,
-			NOTIFY_POSITION_LABEL, popup_stack_locations[i].label,
+			NOTIFY_POSITION_LABEL, _(popup_stack_locations[i].label),
 			NOTIFY_POSITION_NAME,  popup_stack_locations[i].identifier,
 			-1);
 	}

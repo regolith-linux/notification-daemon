@@ -15,6 +15,7 @@ version 0.3.8:
 	  notification theme and popup positions. Patch by John Wendell.
 	  (Ticket #126)
 	* Added an Arabic translation. Patch by Djihed Afifi. (Ticket #131)
+	* Added an Italian translation. Patch by Luca Ferretti.
 	* Fixed a bug where notifications weren't displayed if a fullscreen
 	  window was minimized. (Bug #142)
 	* Fixed a bug where we were quitting on theme engine failure, instead of
