@@ -116,8 +116,9 @@ struct _DBusGMethodInvocation
 
 static void notify_daemon_finalize(GObject *object);
 static void _close_notification(NotifyDaemon *daemon, guint id,
-								gboolean hide_notification);
-static void _emit_closed_signal(GtkWindow *nw);
+								gboolean hide_notification,
+								NotifydClosedReason reason);
+static void _emit_closed_signal(GtkWindow *nw, NotifydClosedReason reason);
 static void _action_invoked_cb(GtkWindow *nw, const char *key);
 static NotifyStackLocation get_stack_location_from_string(const char *slocation);
 
@@ -249,31 +250,32 @@ _action_invoked_cb(GtkWindow *nw, const char *key)
 	dbus_connection_send(dbus_conn, message, NULL);
 	dbus_message_unref(message);
 
-	_close_notification(daemon, id, TRUE);
+	_close_notification(daemon, id, TRUE, NOTIFYD_CLOSED_USER);
 }
 
 static void
-_emit_closed_signal(GtkWindow *nw)
+_emit_closed_signal(GtkWindow *nw, NotifydClosedReason reason)
 {
 	DBusMessage *message = create_signal(nw, "NotificationClosed");
+	dbus_message_append_args(message,
+							 DBUS_TYPE_UINT32, &reason,
+							 DBUS_TYPE_INVALID);
 	dbus_connection_send(dbus_conn, message, NULL);
 	dbus_message_unref(message);
 }
 
 static void
-_close_notification(NotifyDaemon *daemon, guint id, gboolean hide_notification)
+_close_notification(NotifyDaemon *daemon, guint id,
+					gboolean hide_notification, NotifydClosedReason reason)
 {
 	NotifyDaemonPrivate *priv = daemon->priv;
 	NotifyTimeout *nt;
-
-	printf("Closing notification %d (%d)\n", id, hide_notification);
 
 	nt = (NotifyTimeout *)g_hash_table_lookup(priv->notification_hash, &id);
 
 	if (nt != NULL)
 	{
-		printf("Found.\n");
-		_emit_closed_signal(nt->nw);
+		_emit_closed_signal(nt->nw, reason);
 
 		if (hide_notification)
 			theme_hide_notification(nt->nw);
@@ -285,7 +287,12 @@ _close_notification(NotifyDaemon *daemon, guint id, gboolean hide_notification)
 static void
 _notification_destroyed_cb(GtkWindow *nw, NotifyDaemon *daemon)
 {
-	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), FALSE);
+	/*
+	 * This usually won't happen, but can if notification-daemon dies before
+	 * all notifications are closed. Mark them as expired.
+	 */
+	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), FALSE,
+						NOTIFYD_CLOSED_EXPIRED);
 }
 
 static void
@@ -353,7 +360,7 @@ _is_expired(gpointer key, gpointer value, gpointer data)
 	if (now_time > expiration_time)
 	{
 		theme_notification_tick(nt->nw, 0);
-		_emit_closed_signal(nt->nw);
+		_emit_closed_signal(nt->nw, NOTIFYD_CLOSED_EXPIRED);
 		return TRUE;
 	}
 	else if (nt->paused)
@@ -656,7 +663,8 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 	}
 
 	_action_invoked_cb(nw, "default");
-	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), TRUE);
+	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), TRUE,
+						NOTIFYD_CLOSED_USER);
 }
 
 static void
@@ -1101,7 +1109,7 @@ notify_daemon_close_notification_handler(NotifyDaemon *daemon,
 					_("%u is not a valid notification ID"), id);
 		return FALSE;
 	} else {
-		_close_notification(daemon, id, TRUE);
+		_close_notification(daemon, id, TRUE, NOTIFYD_CLOSED_API);
 		return TRUE;
 	}
 }
@@ -1131,7 +1139,7 @@ notify_daemon_get_server_information(NotifyDaemon *daemon,
 	*out_name     = g_strdup("Notification Daemon");
 	*out_vendor   = g_strdup("Galago Project");
 	*out_version  = g_strdup(VERSION);
-	*out_spec_ver = g_strdup("0.9");
+	*out_spec_ver = g_strdup("1.0");
 
 	return TRUE;
 }

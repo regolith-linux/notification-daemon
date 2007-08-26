@@ -49,11 +49,21 @@
 
 #define NOTIFY_DAEMON_DEFAULT_TIMEOUT 7000
 
-enum {
+enum
+{
 	URGENCY_LOW,
 	URGENCY_NORMAL,
 	URGENCY_CRITICAL
 };
+
+typedef enum
+{
+	NOTIFYD_CLOSED_EXPIRED = 1,
+	NOTIFYD_CLOSED_USER = 2,
+	NOTIFYD_CLOSED_API = 3,
+	NOTIFYD_CLOSED_RESERVED = 4
+
+} NotifydClosedReason;
 
 typedef struct _NotifyDaemon        NotifyDaemon;
 typedef struct _NotifyDaemonClass   NotifyDaemonClass;
