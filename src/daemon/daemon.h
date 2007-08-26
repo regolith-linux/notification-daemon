@@ -72,17 +72,11 @@ struct _NotifyDaemonClass
 	GObjectClass parent_class;
 };
 
-enum _NotifyDaemonError
-{
-	NOTIFY_DAEMON_ERROR_GENERIC = 0,
-};
-
 G_BEGIN_DECLS
 
 GType notify_daemon_get_type(void);
 
-NotifyDaemon *notify_daemon_new(void)
-	G_GNUC_MALLOC;
+GQuark notify_daemon_error_quark(void);
 
 gboolean notify_daemon_notify_handler(NotifyDaemon *daemon,
 									  const gchar *app_name,

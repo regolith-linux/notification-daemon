@@ -266,10 +266,13 @@ _close_notification(NotifyDaemon *daemon, guint id, gboolean hide_notification)
 	NotifyDaemonPrivate *priv = daemon->priv;
 	NotifyTimeout *nt;
 
+	printf("Closing notification %d (%d)\n", id, hide_notification);
+
 	nt = (NotifyTimeout *)g_hash_table_lookup(priv->notification_hash, &id);
 
 	if (nt != NULL)
 	{
+		printf("Found.\n");
 		_emit_closed_signal(nt->nw);
 
 		if (hide_notification)
@@ -450,6 +453,8 @@ _store_notification(NotifyDaemon *daemon, GtkWindow *nw, int timeout)
 	nt = g_new0(NotifyTimeout, 1);
 	nt->id = id;
 	nt->nw = nw;
+
+	printf("Assigning id %d\n",id);
 
 	_calculate_timeout(daemon, nt, timeout);
 
@@ -806,6 +811,17 @@ fullscreen_window_exists(GtkWidget *nw)
 	return FALSE;
 }
 
+GQuark
+notify_daemon_error_quark(void)
+{
+	static GQuark q = 0;
+
+	if (q == 0)
+		q = g_quark_from_static_string("notification-daemon-error-quark");
+
+	return q;
+}
+
 gboolean
 notify_daemon_notify_handler(NotifyDaemon *daemon,
 							 const gchar *app_name,
@@ -1079,9 +1095,15 @@ gboolean
 notify_daemon_close_notification_handler(NotifyDaemon *daemon,
 										 guint id, GError **error)
 {
-	_close_notification(daemon, id, TRUE);
-
-	return TRUE;
+	if (id == 0)
+	{
+		g_set_error(error, notify_daemon_error_quark(), 100,
+					_("%u is not a valid notification ID"), id);
+		return FALSE;
+	} else {
+		_close_notification(daemon, id, TRUE);
+		return TRUE;
+	}
 }
 
 gboolean
