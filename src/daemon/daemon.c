@@ -461,8 +461,6 @@ _store_notification(NotifyDaemon *daemon, GtkWindow *nw, int timeout)
 	nt->id = id;
 	nt->nw = nw;
 
-	printf("Assigning id %d\n",id);
-
 	_calculate_timeout(daemon, nt, timeout);
 
 	g_hash_table_insert(priv->notification_hash,

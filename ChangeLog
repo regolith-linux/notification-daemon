@@ -3,7 +3,7 @@ Sat Aug 25 18:55:34 PDT 2007  Christian Hammond <chipx86@chipx86.com>
 	* src/daemon/daemon.c:
 	* src/daemon/daemon.h:
 	  - Send the reason the notification closed when emitting
-	    the NotificationClosed signal, as per the spec.
+	    the NotificationClosed signal, as per the spec. Fixes bug #137.
 	  - Bump spec compliance to 1.0.
 
 Sat Aug 25 18:15:02 PDT 2007  Christian Hammond <chipx86@chipx86.com>

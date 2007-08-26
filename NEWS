@@ -1,11 +1,25 @@
 version 0.3.8:
 	* Bumped up the required minimum version of GTK+ to 2.8.0.
+	* Bump the notification spec version we're compliant with to 1.0.
+	* Send the reason code along with the NotificationClosed signal in order
+	  to indicate why the notification was closed. (Bug #137)
+	* Send an error if the user attempts to close an already closed
+	  notification.
 	* Added support for playing sounds when the "sound-file" hint is set or
 	  when the default_sound GConf key is set, as well as support for the
 	  "suppress-sound" hint. Patch by Jim Ramsay. (Ticket #111)
+	* Added a control panel applet for controlling such things as the
+	  notification theme and popup positions. Patch by John Wendell.
+	  (Ticket #126)
+	* Added an Arabic translation. Patch by Djihed Afifi. (Ticket #131)
 	* Fixed a bug where we were quitting on theme engine failure, instead of
 	  falling back to the default theme engine. Patch by
 	  driehuis-at-playbeing.org. (Ticket #128)
+	* Fixed a bug where notifications with arrows were crossing the monitor
+	  on multihead setups instead of staying on their head. Patch by M.S.
+	  (Bug #5)
+	* Fixed the close button size on the notifications so that they don't
+	  stretch. Patch by Luca Cavelli. (Bug #127)
 
 version 0.3.7 (27-February-2007):
 	* Fixed a compatibility issue with dbus-glib 0.72. Patch by Pawel Worach.
