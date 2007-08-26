@@ -1,3 +1,9 @@
+Sat Aug 25 19:42:05 PDT 2007  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Escape the text in the summary so that & and < don't cause problems.
+	    Fixes bug #132.
+
 Sat Aug 25 19:31:16 PDT 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon/daemon.c:

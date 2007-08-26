@@ -789,11 +789,14 @@ notification_tick(GtkWindow *nw, glong remaining)
 void
 set_notification_text(GtkWindow *nw, const char *summary, const char *body)
 {
-	char *str;
+	char *str, *quoted;
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
 	g_assert(windata != NULL);
 
-	str = g_strdup_printf("<b><big>%s</big></b>", summary);
+	quoted = g_markup_escape_text(summary, -1);
+	str = g_strdup_printf("<b><big>%s</big></b>", quoted);
+	g_free(quoted);
+
 	gtk_label_set_markup(GTK_LABEL(windata->summary_label), str);
 	g_free(str);
 
