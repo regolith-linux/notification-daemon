@@ -12,6 +12,8 @@ version 0.3.8:
 	  notification theme and popup positions. Patch by John Wendell.
 	  (Ticket #126)
 	* Added an Arabic translation. Patch by Djihed Afifi. (Ticket #131)
+	* Fixed a bug where notifications weren't displayed if a fullscreen
+	  window was minimized. (Bug #142)
 	* Fixed a bug where we were quitting on theme engine failure, instead of
 	  falling back to the default theme engine. Patch by
 	  driehuis-at-playbeing.org. (Ticket #128)
@@ -20,6 +22,8 @@ version 0.3.8:
 	  (Bug #5)
 	* Fixed the close button size on the notifications so that they don't
 	  stretch. Patch by Luca Cavelli. (Bug #127)
+	* Fixed a crash when an unsupported value type was passed in for the
+	  urgency when using the standard theme. (Bug #135)
 
 version 0.3.7 (27-February-2007):
 	* Fixed a compatibility issue with dbus-glib 0.72. Patch by Pawel Worach.

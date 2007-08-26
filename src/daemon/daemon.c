@@ -796,7 +796,8 @@ fullscreen_window_exists(GtkWidget *nw)
 	{
 		WnckWindow *wnck_win = (WnckWindow *)l->data;
 
-		if (wnck_window_is_fullscreen(wnck_win))
+		if (wnck_window_is_fullscreen(wnck_win) &&
+			wnck_window_is_active(wnck_win))
 		{
 			/*
 			 * Sanity check if the window is _really_ fullscreen to
