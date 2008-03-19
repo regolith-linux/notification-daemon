@@ -1,3 +1,9 @@
+Tue Mar 18 21:39:53 PDT 2008  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/daemon.c:
+	  - Patch by parasti to prevent our notification blocking when the
+	    fullscreen window is not on the current workspace. Fixes bug #142.
+
 Tue Mar 18 20:55:27 PDT 2008  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/bubble/eggnotificationbubblewidget.c:
