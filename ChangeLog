@@ -1,3 +1,10 @@
+Tue Mar 18 20:55:27 PDT 2008  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/bubble/eggnotificationbubblewidget.c:
+	* src/themes/standard/theme.c:
+	  - Patch by maniac to set the NOTIFICATION type hint for the notification
+		windows. Fixes bug #161.
+
 Sat Aug 25 21:42:50 PDT 2007  Christian Hammond <chipx86@chipx86.com>
 
 	* src/capplet/notification-properties.c:

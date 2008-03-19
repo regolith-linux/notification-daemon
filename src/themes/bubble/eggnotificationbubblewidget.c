@@ -1125,6 +1125,7 @@ egg_notification_bubble_widget_new (void)
 {
   return g_object_new (EGG_TYPE_NOTIFICATION_BUBBLE_WIDGET,
                        "type", GTK_WINDOW_POPUP,
+                       "type-hint", GDK_WINDOW_TYPE_HINT_NOTIFICATION,
                        NULL);
 }
 
