@@ -1,5 +1,5 @@
 version 0.3.8:
-	* Bumped up the required minimum version of GTK+ to 2.8.0.
+	* Bumped up the required minimum version of GTK+ to 2.10.0.
 	* Bump the notification spec version we're compliant with to 1.0.
 	* Send the reason code along with the NotificationClosed signal in order
 	  to indicate why the notification was closed. (Bug #137)
