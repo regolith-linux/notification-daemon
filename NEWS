@@ -8,6 +8,7 @@ version 0.3.8:
 	* Text is now escaped in the summary in the Standard theme so that
 	  ampersands and other special characters show up instead of disappearing.
 	  (Bug #132)
+	* Set the type hint for notifications to TYPE_NOTIFICATION. (Bug #146)
 	* Added support for playing sounds when the "sound-file" hint is set or
 	  when the default_sound GConf key is set, as well as support for the
 	  "suppress-sound" hint. Patch by Jim Ramsay. (Ticket #111)
