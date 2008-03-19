@@ -1,0 +1,43 @@
+# translation of pl.po to Polish
+# Piotr Drąg <raven@pmail.pl>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pl\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-02-15 03:02-0800\n"
+"PO-Revision-Date: 2007-12-28 01:15+0200\n"
+"Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
+"Language-Team: Polish <pl@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/notification-daemon.schemas.in.h:1
+msgid "Current theme"
+msgstr "Obecny motyw"
+
+#: ../data/notification-daemon.schemas.in.h:2
+msgid ""
+"Default popup location on the workspace for stack notifications. Allowed "
+"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+msgstr ""
+"Domyślne położenie wyskakującego okna na obszarze roboczym dla stosu "
+"powiadomień. Dozwolone wartości: \"top_left\",\"top_right\",\"bottom_left\" "
+"i \"bottom_right\""
+
+#: ../data/notification-daemon.schemas.in.h:3
+msgid "Popup location"
+msgstr "Położenie wyskakującego okna"
+
+#: ../data/notification-daemon.schemas.in.h:4
+msgid "The theme used when displaying notifications."
+msgstr "Motyw używany podczas wyświetlania powiadomień."
+
+#: ../src/capplet/notification-properties.desktop.in.h:1
+msgid "Pop-Up Notifications"
+msgstr "Wyskakujące powiadomienia"
+
+#: ../src/capplet/notification-properties.desktop.in.h:2
+msgid "Set your pop-up notification preferences"
+msgstr "Preferencje wyskakujących powiadomień"
