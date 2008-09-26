@@ -406,8 +406,10 @@ static void
 notification_properties_dialog_preview_closed(NotifyNotification *preview,
 											  NotificationAppletDialog *dialog)
 {
-	g_object_unref(dialog->preview);
-	dialog->preview = NULL;
+	if (preview == dialog->preview)
+		dialog->preview = NULL;
+
+	g_object_unref(preview);
 }
 
 static void
@@ -415,13 +417,10 @@ notification_properties_dialog_preview(NotificationAppletDialog *dialog)
 {
 	GError *error;
 
-	if (!notify_is_initted())
+	if (!notify_is_initted() && !notify_init("n-d"))
 	{
-		if (!notify_init("n-d"))
-		{
-			show_message(dialog, _("Error initializing libnotify"));
-			return;
-		}
+		show_message(dialog, _("Error initializing libnotify"));
+		return;
 	}
 
 	error = NULL;
