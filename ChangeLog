@@ -1,3 +1,10 @@
+Thu Sep 25 18:25:36 PDT 2008  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/daemon.c:
+	* NEWS:
+	  - Added better support for attaching context notifications to an icon on
+	    the system tray, even when it moves. Patch by Colin Walters.
+
 Tue Mar 18 21:39:53 PDT 2008  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon/daemon.c:

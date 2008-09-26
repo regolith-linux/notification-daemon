@@ -15,6 +15,8 @@ version 0.3.8:
 	* Added a control panel applet for controlling such things as the
 	  notification theme and popup positions. Patch by John Wendell.
 	  (Ticket #126)
+	* Added better support for attaching context notifications to an icon on
+	  the system tray, even when it moves. Patch by Colin Walters.
 	* Added an Arabic translation. Patch by Djihed Afifi. (Ticket #131)
 	* Added an Italian translation. Patch by Luca Ferretti.
 	* Fixed a bug where notifications weren't displayed if a fullscreen
