@@ -352,8 +352,11 @@ _queue_idle_reposition_notification(NotifyDaemon *daemon, gint notify_id)
 
 	/* Do we already have an idle update pending? */
 	if (g_hash_table_lookup_extended(daemon->priv->idle_reposition_notify_ids,
-					 GINT_TO_POINTER(notify_id), &orig_key, &value))
+									 GINT_TO_POINTER(notify_id),
+									 &orig_key, &value))
+	{
 		return;
+	}
 
 	data = g_new0(IdleRepositionData, 1);
 	data->daemon = g_object_ref(daemon);
