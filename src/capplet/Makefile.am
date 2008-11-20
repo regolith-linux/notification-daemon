@@ -20,4 +20,4 @@ INCLUDES = \
 	-DNOTIFICATION_GLADEDIR=\"$(datadir)/notification-daemon\"
 
 CLEANFILES = $(desktop_DATA)
-EXTRA_DIST = $(glade_DATA) $(pixmap_DATA)
+EXTRA_DIST = $(glade_DATA) $(pixmap_DATA) $(desktop_in_files)
