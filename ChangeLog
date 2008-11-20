@@ -1,3 +1,15 @@
+Thu Nov 20 02:32:54 PST 2008  Christian Hammond <chipx86@chipx86.com>
+
+	A data/icons/16x16/notification-properties.png:
+	A data/icons/22x22/notification-properties.png:
+	A data/icons/24x24/notification-properties.png:
+	A data/icons/32x32/notification-properties.png:
+	A data/icons/48x48/notification-properties.png:
+	A data/icons/scalable/notification-properties.svg:
+	* data/Makefile.am:
+	* src/capplet/notification-properties.glade:
+	  - Added the new icons.
+
 Thu Nov 20 01:23:56 PST 2008  Christian Hammond <chipx86@chipx86.com>
 
 	* src/themes/standard/theme.c:
