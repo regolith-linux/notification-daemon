@@ -1,3 +1,11 @@
+==================== 0.4.0 ====================
+
+Thu Nov 20 02:54:36 PST 2008  Christian Hammond <chipx86@chipx86.com>
+
+	* configure.ac:
+	* NEWS:
+	  - Bump to version 0.4.0 for release.
+
 Thu Nov 20 02:32:54 PST 2008  Christian Hammond <chipx86@chipx86.com>
 
 	A data/icons/16x16/notification-properties.png:

@@ -1,4 +1,4 @@
-version 0.3.8:
+version 0.4.0 (20-November-2008):
 	* Bumped up the required minimum version of GTK+ to 2.10.0.
 	* Bump the notification spec version we're compliant with to 1.0.
 	* Send the reason code along with the NotificationClosed signal in order
@@ -19,6 +19,7 @@ version 0.3.8:
 	  the system tray, even when it moves. Patch by Colin Walters.
 	* Added an Arabic translation. Patch by Djihed Afifi. (Ticket #131)
 	* Added an Italian translation. Patch by Luca Ferretti.
+	* Fixed a bug where text would sometimes get truncated. (Ticket #162)
 	* Fixed a bug where notifications weren't displayed if a fullscreen
 	  window was minimized. (Bug #142)
 	* Fixed a bug where we were quitting on theme engine failure, instead of
