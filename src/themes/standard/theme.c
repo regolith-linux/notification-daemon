@@ -262,11 +262,8 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 				if (norm_point_x - arrow_side2_width + width >=
 					monitor_geometry.width)
 				{
-					arrow_offset =
-						width - arrow_side1_width - arrow_side2_width -
-						monitor_geometry.width -
-						MAX(norm_point_x + arrow_side1_width,
-							monitor_geometry.width - DEFAULT_ARROW_OFFSET);
+					arrow_offset = width - monitor_geometry.width +
+						           norm_point_x;
 				}
 				else
 				{
@@ -302,7 +299,6 @@ create_border_with_arrow(GtkWidget *nw, WindowData *windata)
 			windata->drawn_arrow_middle_x = arrow_offset + arrow_side1_width;
 			windata->drawn_arrow_end_x = arrow_offset + arrow_side1_width +
 										 arrow_side2_width;
-
 			if (arrow_type == GTK_ARROW_UP)
 			{
 				windata->drawn_arrow_begin_y = DEFAULT_ARROW_HEIGHT;

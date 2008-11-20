@@ -1,3 +1,11 @@
+Thu Nov 20 01:23:56 PST 2008  Christian Hammond <chipx86@chipx86.com>
+
+	* src/themes/standard/theme.c:
+	  - Fix the new multihead notification code so that we don't just stick
+	    notifications off-screen when the notification window would be slightly
+	    off-screen. The code was just broken and this new code should be working a
+	    lot better.
+
 Thu Sep 25 18:53:21 PDT 2008  Christian Hammond <chipx86@chipx86.com>
 
 	* src/capplet/notification-properties.glade:
