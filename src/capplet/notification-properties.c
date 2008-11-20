@@ -397,7 +397,7 @@ show_message(NotificationAppletDialog *dialog,
 							   GTK_DIALOG_DESTROY_WITH_PARENT,
 							   GTK_MESSAGE_ERROR,
 							   GTK_BUTTONS_CLOSE,
-							   message);
+							   "%s", message);
 	gtk_dialog_run(GTK_DIALOG(d));
 	gtk_widget_destroy(d);
 }

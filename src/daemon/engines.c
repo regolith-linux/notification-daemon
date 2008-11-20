@@ -115,6 +115,15 @@ destroy_engine(ThemeEngine *engine)
 }
 
 static void
+theme_engine_unref(ThemeEngine *engine)
+{
+	engine->ref_count--;
+
+	if (engine->ref_count == 0)
+		destroy_engine(engine);
+}
+
+static void
 theme_changed_cb(GConfClient *client, guint cnxn_id, GConfEntry *entry,
 				 gpointer user_data)
 {
@@ -165,15 +174,6 @@ get_theme_engine(void)
 	}
 
 	return active_engine;
-}
-
-static void
-theme_engine_unref(ThemeEngine *engine)
-{
-	engine->ref_count--;
-
-	if (engine->ref_count == 0)
-		destroy_engine(engine);
 }
 
 GtkWindow *
