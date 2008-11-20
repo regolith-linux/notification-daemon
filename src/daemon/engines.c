@@ -121,10 +121,7 @@ theme_changed_cb(GConfClient *client, guint cnxn_id, GConfEntry *entry,
 	if (active_engine == NULL)
 		return;
 
-	active_engine->ref_count--;
-
-	if (active_engine->ref_count == 0)
-		destroy_engine(active_engine);
+	theme_engine_unref(active_engine);
 
 	/* This is no longer the true active engine, so reset this. */
 	active_engine = NULL;
