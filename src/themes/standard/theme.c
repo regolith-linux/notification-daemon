@@ -16,6 +16,7 @@ typedef struct
 	GtkWidget *icon;
 	GtkWidget *content_hbox;
 	GtkWidget *summary_label;
+	GtkWidget *close_button;
 	GtkWidget *body_label;
 	GtkWidget *actions_box;
 	GtkWidget *last_sep;
@@ -679,6 +680,7 @@ create_notification(UrlClickedCb url_clicked)
 	gtk_box_pack_start(GTK_BOX(hbox), alignment, FALSE, FALSE, 0);
 
 	close_button = gtk_button_new();
+	windata->close_button = close_button;
 	gtk_widget_show(close_button);
 	gtk_container_add(GTK_CONTAINER(alignment), close_button);
 	gtk_button_set_relief(GTK_BUTTON(close_button), GTK_RELIEF_NONE);
@@ -788,6 +790,7 @@ void
 set_notification_text(GtkWindow *nw, const char *summary, const char *body)
 {
 	char *str, *quoted;
+	GtkRequisition req;
 	WindowData *windata = g_object_get_data(G_OBJECT(nw), "windata");
 	g_assert(windata != NULL);
 
@@ -807,10 +810,24 @@ set_notification_text(GtkWindow *nw, const char *summary, const char *body)
 
 	update_content_hbox_visibility(windata);
 
+	if (body != NULL && *body != '\0')
+	{
+		gtk_widget_size_request (windata->iconbox, &req);
+		gtk_widget_set_size_request(
+			windata->body_label,
+			/* -1: border width for
+			   -6: spacing for hbox */
+			WIDTH - (1*2) - (10*2) - req.width - 6,
+			-1);
+	}
+
+	gtk_widget_size_request (windata->close_button, &req);
 	gtk_widget_set_size_request(
-		((body != NULL && *body == '\0')
-		 ? windata->body_label : windata->summary_label),
-		WIDTH - (IMAGE_SIZE + IMAGE_PADDING) - 10,
+		windata->summary_label,
+		/* -1: main_vbox border width
+		   -10: vbox border width
+		   -6: spacing for hbox */
+		WIDTH - (1*2) - (10*2) - SPACER_LEFT - req.width - (6*2),
 		-1);
 }
 
