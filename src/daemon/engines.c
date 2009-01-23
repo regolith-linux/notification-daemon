@@ -88,7 +88,7 @@ load_theme_engine(const char *name)
 								  NOTIFICATION_DAEMON_MINOR_VERSION,
 								  NOTIFICATION_DAEMON_MICRO_VERSION))
 	{
-		g_error("Theme doesn't work with this version of notification-daemon");
+		g_warning("Theme doesn't work with this version of notification-daemon");
 		goto error;
 	}
 

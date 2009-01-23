@@ -1,3 +1,10 @@
+Fri Jan 23 01:28:28 PST 2009  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/engines.c:
+	  - Fix a problem when using themes that aren't version-compatible with
+	    notification-daemon. We were exiting when we should have just used
+	    the standard theme.
+
 Tue Jan 13 22:48:19 PST 2009  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon/sound.c:
