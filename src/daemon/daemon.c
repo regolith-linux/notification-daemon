@@ -77,6 +77,7 @@ const PopupNotifyStackLocation popup_stack_locations[] =
 
 typedef struct
 {
+	NotifyDaemon *daemon;
 	GTimeVal expiration;
 	GTimeVal paused_diff;
 	gboolean has_timeout;
@@ -117,6 +118,7 @@ struct _DBusGMethodInvocation
 #endif /* D-BUS < 0.60 */
 
 static void notify_daemon_finalize(GObject *object);
+static void _notification_destroyed_cb(GtkWindow *nw, NotifyDaemon *daemon);
 static void _close_notification(NotifyDaemon *daemon, guint id,
 								gboolean hide_notification,
 								NotifydClosedReason reason);
@@ -147,6 +149,14 @@ notify_daemon_class_init(NotifyDaemonClass *daemon_class)
 static void
 _notify_timeout_destroy(NotifyTimeout *nt)
 {
+	/*
+	 * Disconnect the destroy handler to avoid a loop since the id
+	 * won't be removed from the hash table before the widget is
+	 * destroyed.
+	 */
+	g_signal_handlers_disconnect_by_func(nt->nw, _notification_destroyed_cb,
+										 nt->daemon);
+
 	gtk_widget_destroy(GTK_WIDGET(nt->nw));
 	g_free(nt);
 }
@@ -582,6 +592,7 @@ _store_notification(NotifyDaemon *daemon, GtkWindow *nw, int timeout)
 	nt = g_new0(NotifyTimeout, 1);
 	nt->id = id;
 	nt->nw = nw;
+	nt->daemon = daemon;
 
 	_calculate_timeout(daemon, nt, timeout);
 

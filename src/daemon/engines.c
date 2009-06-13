@@ -114,13 +114,27 @@ destroy_engine(ThemeEngine *engine)
 	g_free(engine);
 }
 
+static gboolean
+theme_engine_destroy(ThemeEngine *engine)
+{
+	destroy_engine(engine);
+	return FALSE;
+}
+
 static void
 theme_engine_unref(ThemeEngine *engine)
 {
 	engine->ref_count--;
 
 	if (engine->ref_count == 0)
-		destroy_engine(engine);
+		/*
+		 * Destroy the engine in an idle loop since the last reference
+		 * might have been the one of a notification which is being
+		 * destroyed and that still has references to the engine
+		 * module. This way, we're sure the notification is completely
+		 * destroyed before the engine is.
+		 */
+		g_idle_add((GSourceFunc) theme_engine_destroy, engine);
 }
 
 static void
