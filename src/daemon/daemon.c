@@ -898,8 +898,7 @@ screensaver_active(GtkWidget *nw)
 	}
 
 	if (temp_data != NULL)
-		free(temp_data);
-
+		XFree(temp_data);
 	return active;
 }
 
