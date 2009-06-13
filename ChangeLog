@@ -1,3 +1,14 @@
+Sat Jun 13 16:27:42 PST 2009  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/daemon.c:
+	* src/daemon/engines.c:
+	  - Fix a crash when switching themes. Patch by Vincent Untz.
+
+Sat Jun 13 16:27:42 PST 2009  Christian Hammond <chipx86@chipx86.com>
+
+	* src/daemon/daemon.c:
+	  - Fix a memory leak in the daemon. Patch by Vincent Untz.
+
 Fri Jan 23 01:28:28 PST 2009  Christian Hammond <chipx86@chipx86.com>
 
 	* src/daemon/engines.c:
