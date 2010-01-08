@@ -6,7 +6,7 @@
    <applyto>/apps/notification-daemon/popup_location</applyto>
    <owner>notification-daemon</owner>
    <type>string</type>
-   <default>bottom_right</default>
+   <default>top_right</default>
    <locale name="C">
     <short>Popup location</short>
     <long>Default popup location on the workspace for stack notifications. Allowed values: &quot;top_left&quot;,&quot;top_right&quot;,&quot;bottom_left&quot; and &quot;bottom_right&quot;</long>
