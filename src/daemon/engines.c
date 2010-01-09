@@ -1,3 +1,5 @@
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
+
 #include "config.h"
 
 #include <gconf/gconf-client.h>
@@ -10,22 +12,24 @@ typedef struct
 	guint ref_count;
 
 	gboolean (*theme_check_init)(unsigned int major_ver,
-								 unsigned int minor_ver,
-								 unsigned int micro_ver);
-	void (*get_theme_info)(char **theme_name, char **theme_ver,
-						   char **author, char **homepage);
+				     unsigned int minor_ver,
+				     unsigned int micro_ver);
+	void (*get_theme_info)(char **theme_name,
+			       char **theme_ver,
+			       char **author,
+			       char **homepage);
 	GtkWindow *(*create_notification)(UrlClickedCb url_clicked_cb);
 	void (*destroy_notification)(GtkWindow *nw);
 	void (*show_notification)(GtkWindow *nw);
 	void (*hide_notification)(GtkWindow *nw);
 	void (*set_notification_hints)(GtkWindow *nw, GHashTable *hints);
 	void (*set_notification_text)(GtkWindow *nw, const char *summary,
-								  const char *body);
+                                      const char *body);
 	void (*set_notification_icon)(GtkWindow *nw, GdkPixbuf *pixbuf);
 	void (*set_notification_arrow)(GtkWindow *nw, gboolean visible,
-								   int x, int y);
+                                       int x, int y);
 	void (*add_notification_action)(GtkWindow *nw, const char *label,
-									const char *key, GCallback cb);
+                                        const char *key, GCallback cb);
 	void (*clear_notification_actions)(GtkWindow *nw);
 	void (*move_notification)(GtkWindow *nw, int x, int y);
 	void (*set_notification_timeout)(GtkWindow *nw, glong timeout);
@@ -87,8 +91,8 @@ load_theme_engine(const char *name)
 	BIND_OPTIONAL_FUNC(get_always_stack);
 
 	if (!engine->theme_check_init(NOTIFICATION_DAEMON_MAJOR_VERSION,
-								  NOTIFICATION_DAEMON_MINOR_VERSION,
-								  NOTIFICATION_DAEMON_MICRO_VERSION))
+				      NOTIFICATION_DAEMON_MINOR_VERSION,
+				      NOTIFICATION_DAEMON_MICRO_VERSION))
 	{
 		g_warning("Theme doesn't work with this version of notification-daemon");
 		goto error;
@@ -140,8 +144,10 @@ theme_engine_unref(ThemeEngine *engine)
 }
 
 static void
-theme_changed_cb(GConfClient *client, guint cnxn_id, GConfEntry *entry,
-				 gpointer user_data)
+theme_changed_cb(GConfClient *client,
+		 guint cnxn_id,
+		 GConfEntry *entry,
+		 gpointer user_data)
 {
 	if (active_engine == NULL)
 		return;
@@ -164,8 +170,8 @@ get_theme_engine(void)
 		if (theme_prop_notify_id == 0)
 		{
 			theme_prop_notify_id = gconf_client_notify_add(client,
-				"/apps/notification-daemon/theme", theme_changed_cb, NULL,
-				NULL, NULL);
+								       "/apps/notification-daemon/theme", theme_changed_cb, NULL,
+								       NULL, NULL);
 		}
 
 		if (enginename == NULL)
@@ -198,7 +204,7 @@ theme_create_notification(UrlClickedCb url_clicked_cb)
 	ThemeEngine *engine = get_theme_engine();
 	GtkWindow *nw = engine->create_notification(url_clicked_cb);
 	g_object_set_data_full(G_OBJECT(nw), "_theme_engine", engine,
-						   (GDestroyNotify)theme_engine_unref);
+			       (GDestroyNotify)theme_engine_unref);
 	engine->ref_count++;
 	return nw;
 }
@@ -264,8 +270,9 @@ theme_notification_tick(GtkWindow *nw, glong remaining)
 }
 
 void
-theme_set_notification_text(GtkWindow *nw, const char *summary,
-							const char *body)
+theme_set_notification_text(GtkWindow *nw,
+                            const char *summary,
+                            const char *body)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 	engine->set_notification_text(nw, summary, body);
@@ -286,8 +293,10 @@ theme_set_notification_arrow(GtkWindow *nw, gboolean visible, int x, int y)
 }
 
 void
-theme_add_notification_action(GtkWindow *nw, const char *label,
-							  const char *key, GCallback cb)
+theme_add_notification_action(GtkWindow *nw,
+			      const char *label,
+			      const char *key,
+			      GCallback cb)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 	engine->add_notification_action(nw, label, key, cb);

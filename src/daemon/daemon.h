@@ -1,4 +1,5 @@
-/*
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
+ *
  * daemon.h - Implementation of the destop notification spec
  *
  * Copyright (C) 2006 Christian Hammond <chipx86@chipx86.com>
@@ -89,27 +90,28 @@ GType notify_daemon_get_type(void);
 GQuark notify_daemon_error_quark(void);
 
 gboolean notify_daemon_notify_handler(NotifyDaemon *daemon,
-									  const gchar *app_name,
-									  guint id,
-									  const gchar *icon,
-									  const gchar *summary,
-									  const gchar *body,
-									  gchar **actions,
-									  GHashTable *hints,
-									  int timeout,
-									  DBusGMethodInvocation *context);
+				      const gchar *app_name,
+				      guint id,
+				      const gchar *icon,
+				      const gchar *summary,
+				      const gchar *body,
+				      gchar **actions,
+				      GHashTable *hints,
+				      int timeout,
+				      DBusGMethodInvocation *context);
 
 gboolean notify_daemon_close_notification_handler(NotifyDaemon *daemon,
-												  guint id, GError **error);
+						  guint id,
+						  GError **error);
 
 gboolean notify_daemon_get_capabilities(NotifyDaemon *daemon,
-										char ***out_caps);
+					char ***out_caps);
 
 gboolean notify_daemon_get_server_information(NotifyDaemon *daemon,
-											  char **out_name,
-											  char **out_vendor,
-											  char **out_version,
-											  char **out_spec_ver);
+					      char **out_name,
+					      char **out_vendor,
+					      char **out_version,
+					      char **out_spec_ver);
 
 GConfClient *get_gconf_client(void);
 

@@ -121,19 +121,19 @@ struct _DBusGMethodInvocation
 static void notify_daemon_finalize(GObject *object);
 static void _notification_destroyed_cb(GtkWindow *nw, NotifyDaemon *daemon);
 static void _close_notification(NotifyDaemon *daemon, guint id,
-								gboolean hide_notification,
-								NotifydClosedReason reason);
+				gboolean hide_notification,
+				NotifydClosedReason reason);
 static GdkFilterReturn _notify_x11_filter(GdkXEvent *xevent,
-										  GdkEvent *event,
-										  gpointer user_data);
+					  GdkEvent *event,
+					  gpointer user_data);
 static void _emit_closed_signal(GtkWindow *nw, NotifydClosedReason reason);
 static void _action_invoked_cb(GtkWindow *nw, const char *key);
 static NotifyStackLocation get_stack_location_from_string(const char *slocation);
 static void sync_notification_position(NotifyDaemon *daemon, GtkWindow *nw,
-									   Window source);
+				       Window source);
 static void monitor_notification_source_windows(NotifyDaemon *daemon,
-												NotifyTimeout *nt,
-												Window source);
+						NotifyTimeout *nt,
+						Window source);
 
 G_DEFINE_TYPE(NotifyDaemon, notify_daemon, G_TYPE_OBJECT);
 
@@ -156,7 +156,7 @@ _notify_timeout_destroy(NotifyTimeout *nt)
 	 * destroyed.
 	 */
 	g_signal_handlers_disconnect_by_func(nt->nw, _notification_destroyed_cb,
-										 nt->daemon);
+					     nt->daemon);
 
 	gtk_widget_destroy(GTK_WIDGET(nt->nw));
 	g_free(nt);
@@ -214,7 +214,7 @@ notify_daemon_init(NotifyDaemon *daemon)
 	daemon->priv->monitored_window_hash = g_hash_table_new(NULL, NULL);
 	daemon->priv->notification_hash =
 		g_hash_table_new_full(g_int_hash, g_int_equal, g_free,
-				  (GDestroyNotify)_notify_timeout_destroy);
+				      (GDestroyNotify)_notify_timeout_destroy);
 }
 
 static void
@@ -247,8 +247,8 @@ get_stack_location_from_string(const char *slocation)
 		const PopupNotifyStackLocation *l;
 
 		for (l = popup_stack_locations;
-			 l->type != NOTIFY_STACK_LOCATION_UNKNOWN;
-			 l++)
+		     l->type != NOTIFY_STACK_LOCATION_UNKNOWN;
+		     l++)
 		{
 			if (!strcmp(slocation, l->identifier))
 				stack_location = l->type;
@@ -268,13 +268,13 @@ create_signal(GtkWindow *nw, const char *signal_name)
 	g_assert(dest != NULL);
 
 	message = dbus_message_new_signal("/org/freedesktop/Notifications",
-									  "org.freedesktop.Notifications",
-									  signal_name);
+					  "org.freedesktop.Notifications",
+					  signal_name);
 
 	dbus_message_set_destination(message, dest);
 	dbus_message_append_args(message,
-							 DBUS_TYPE_UINT32, &id,
-							 DBUS_TYPE_INVALID);
+				 DBUS_TYPE_UINT32, &id,
+				 DBUS_TYPE_INVALID);
 
 	return message;
 }
@@ -288,8 +288,8 @@ _action_invoked_cb(GtkWindow *nw, const char *key)
 
 	message = create_signal(nw, "ActionInvoked");
 	dbus_message_append_args(message,
-							 DBUS_TYPE_STRING, &key,
-							 DBUS_TYPE_INVALID);
+				 DBUS_TYPE_STRING, &key,
+				 DBUS_TYPE_INVALID);
 
 	dbus_connection_send(dbus_conn, message, NULL);
 	dbus_message_unref(message);
@@ -302,15 +302,17 @@ _emit_closed_signal(GtkWindow *nw, NotifydClosedReason reason)
 {
 	DBusMessage *message = create_signal(nw, "NotificationClosed");
 	dbus_message_append_args(message,
-							 DBUS_TYPE_UINT32, &reason,
-							 DBUS_TYPE_INVALID);
+				 DBUS_TYPE_UINT32, &reason,
+				 DBUS_TYPE_INVALID);
 	dbus_connection_send(dbus_conn, message, NULL);
 	dbus_message_unref(message);
 }
 
 static void
-_close_notification(NotifyDaemon *daemon, guint id,
-					gboolean hide_notification, NotifydClosedReason reason)
+_close_notification(NotifyDaemon *daemon,
+		    guint id,
+		    gboolean hide_notification,
+		    NotifydClosedReason reason)
 {
 	NotifyDaemonPrivate *priv = daemon->priv;
 	NotifyTimeout *nt;
@@ -336,7 +338,7 @@ _notification_destroyed_cb(GtkWindow *nw, NotifyDaemon *daemon)
 	 * all notifications are closed. Mark them as expired.
 	 */
 	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), FALSE,
-						NOTIFYD_CLOSED_EXPIRED);
+			    NOTIFYD_CLOSED_EXPIRED);
 }
 
 typedef struct
@@ -357,13 +359,13 @@ idle_reposition_notification(gpointer datap)
 
 	/* Look up the timeout, if it's completed we don't need to do anything */
 	nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash,
-											  &notify_id);
+						  &notify_id);
 	if (nt != NULL) {
 		sync_notification_position(daemon, nt->nw, nt->src_window_xid);
 	}
 
 	g_hash_table_remove(daemon->priv->idle_reposition_notify_ids,
-						GINT_TO_POINTER(notify_id));
+			    GINT_TO_POINTER(notify_id));
 	g_object_unref(daemon);
 	g_free(data);
 
@@ -380,8 +382,8 @@ _queue_idle_reposition_notification(NotifyDaemon *daemon, gint notify_id)
 
 	/* Do we already have an idle update pending? */
 	if (g_hash_table_lookup_extended(daemon->priv->idle_reposition_notify_ids,
-									 GINT_TO_POINTER(notify_id),
-									 &orig_key, &value))
+					 GINT_TO_POINTER(notify_id),
+					 &orig_key, &value))
 	{
 		return;
 	}
@@ -392,15 +394,15 @@ _queue_idle_reposition_notification(NotifyDaemon *daemon, gint notify_id)
 
 	/* We do this as a short timeout to avoid repositioning spam */
 	idle_id = g_timeout_add_full(G_PRIORITY_LOW, 50,
-								 idle_reposition_notification, data, NULL);
+				     idle_reposition_notification, data, NULL);
 	g_hash_table_insert(daemon->priv->idle_reposition_notify_ids,
-						GINT_TO_POINTER(notify_id), GUINT_TO_POINTER(idle_id));
+			    GINT_TO_POINTER(notify_id), GUINT_TO_POINTER(idle_id));
 }
 
 static GdkFilterReturn
 _notify_x11_filter(GdkXEvent *xevent,
-				   GdkEvent *event,
-				   gpointer user_data)
+		   GdkEvent *event,
+		   gpointer user_data)
 {
 	NotifyDaemon *daemon = NOTIFY_DAEMON(user_data);
 	XEvent *xev = (XEvent *)xevent;
@@ -412,14 +414,14 @@ _notify_x11_filter(GdkXEvent *xevent,
 	if (xev->xany.type == DestroyNotify)
 	{
 		g_hash_table_remove(daemon->priv->monitored_window_hash,
-							GUINT_TO_POINTER(xev->xany.window));
+				    GUINT_TO_POINTER(xev->xany.window));
 		if (g_hash_table_size(daemon->priv->monitored_window_hash) == 0)
 			gdk_window_remove_filter(NULL, _notify_x11_filter, daemon);
 		return GDK_FILTER_CONTINUE;
 	}
 
 	if (!g_hash_table_lookup_extended(daemon->priv->monitored_window_hash,
-					 GUINT_TO_POINTER(xev->xany.window), &orig_key, &value))
+					  GUINT_TO_POINTER(xev->xany.window), &orig_key, &value))
 		return GDK_FILTER_CONTINUE;
 
 	notify_id = GPOINTER_TO_INT(value);
@@ -430,8 +432,7 @@ _notify_x11_filter(GdkXEvent *xevent,
 	}
 	else if (xev->xany.type == ReparentNotify)
 	{
-		nt = (NotifyTimeout *)g_hash_table_lookup(
-			daemon->priv->notification_hash, &notify_id);
+		nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash, &notify_id);
 
 		if (nt == NULL)
 			return GDK_FILTER_CONTINUE;
@@ -448,7 +449,9 @@ _notify_x11_filter(GdkXEvent *xevent,
 }
 
 static void
-_mouse_entered_cb(GtkWindow *nw, GdkEventCrossing *event, NotifyDaemon *daemon)
+_mouse_entered_cb(GtkWindow *nw,
+		  GdkEventCrossing *event,
+		  NotifyDaemon *daemon)
 {
 	NotifyTimeout *nt;
 	guint id;
@@ -459,7 +462,7 @@ _mouse_entered_cb(GtkWindow *nw, GdkEventCrossing *event, NotifyDaemon *daemon)
 
 	id = NW_GET_NOTIFY_ID(nw);
 	nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash,
-											  &id);
+						  &id);
 
 	nt->paused = TRUE;
 	g_get_current_time(&now);
@@ -475,8 +478,9 @@ _mouse_entered_cb(GtkWindow *nw, GdkEventCrossing *event, NotifyDaemon *daemon)
 }
 
 static void
-_mouse_exitted_cb(GtkWindow *nw, GdkEventCrossing *event,
-				  NotifyDaemon *daemon)
+_mouse_exitted_cb(GtkWindow *nw,
+		  GdkEventCrossing *event,
+		  NotifyDaemon *daemon)
 {
 	NotifyTimeout *nt;
 	guint id;
@@ -486,7 +490,7 @@ _mouse_exitted_cb(GtkWindow *nw, GdkEventCrossing *event,
 
 	id = NW_GET_NOTIFY_ID(nw);
 	nt = (NotifyTimeout *)g_hash_table_lookup(daemon->priv->notification_hash,
-											  &id);
+						  &id);
 
 	nt->paused = FALSE;
 }
@@ -543,7 +547,7 @@ _check_expiration(gpointer data)
 	gboolean has_more_timeouts = FALSE;
 
 	g_hash_table_foreach_remove(daemon->priv->notification_hash,
-								_is_expired, (gpointer)&has_more_timeouts);
+				    _is_expired, (gpointer)&has_more_timeouts);
 
 	if (!has_more_timeouts)
 		daemon->priv->timeout_source = 0;
@@ -617,14 +621,15 @@ _store_notification(NotifyDaemon *daemon, GtkWindow *nw, int timeout)
 	_calculate_timeout(daemon, nt, timeout);
 
 	g_hash_table_insert(priv->notification_hash,
-						g_memdup(&id, sizeof(guint)), nt);
+			    g_memdup(&id, sizeof(guint)), nt);
 
 	return nt;
 }
 
 static gboolean
-_notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
-								 GValue *icon_data)
+_notify_daemon_process_icon_data(NotifyDaemon *daemon,
+				 GtkWindow *nw,
+				 GValue *icon_data)
 {
 	const guchar *data = NULL;
 	gboolean has_alpha;
@@ -641,21 +646,20 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 #if CHECK_DBUS_VERSION(0, 61)
 	GType struct_type;
 
-	struct_type = dbus_g_type_get_struct(
-		"GValueArray",
-		G_TYPE_INT,
-		G_TYPE_INT,
-		G_TYPE_INT,
-		G_TYPE_BOOLEAN,
-		G_TYPE_INT,
-		G_TYPE_INT,
-		dbus_g_type_get_collection("GArray", G_TYPE_UCHAR),
-		G_TYPE_INVALID);
+	struct_type = dbus_g_type_get_struct("GValueArray",
+					     G_TYPE_INT,
+					     G_TYPE_INT,
+					     G_TYPE_INT,
+					     G_TYPE_BOOLEAN,
+					     G_TYPE_INT,
+					     G_TYPE_INT,
+					     dbus_g_type_get_collection("GArray", G_TYPE_UCHAR),
+					     G_TYPE_INVALID);
 
 	if (!G_VALUE_HOLDS(icon_data, struct_type))
 	{
 		g_warning("_notify_daemon_process_icon_data expected a "
-				  "GValue of type GValueArray");
+			  "GValue of type GValueArray");
 		return FALSE;
 	}
 #endif /* D-BUS >= 0.61 */
@@ -666,14 +670,14 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (value == NULL)
 	{
 		g_warning("_notify_daemon_process_icon_data expected position "
-				  "0 of the GValueArray to exist");
+			  "0 of the GValueArray to exist");
 		return FALSE;
 	}
 
 	if (!G_VALUE_HOLDS(value, G_TYPE_INT))
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 0 of the GValueArray to be of type int");
+			  "position 0 of the GValueArray to be of type int");
 		return FALSE;
 	}
 
@@ -683,14 +687,14 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (value == NULL)
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 1 of the GValueArray to exist");
+			  "position 1 of the GValueArray to exist");
 		return FALSE;
 	}
 
 	if (!G_VALUE_HOLDS(value, G_TYPE_INT))
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 1 of the GValueArray to be of type int");
+			  "position 1 of the GValueArray to be of type int");
 		return FALSE;
 	}
 
@@ -700,14 +704,14 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (value == NULL)
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 2 of the GValueArray to exist");
+			  "position 2 of the GValueArray to exist");
 		return FALSE;
 	}
 
 	if (!G_VALUE_HOLDS(value, G_TYPE_INT))
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 2 of the GValueArray to be of type int");
+			  "position 2 of the GValueArray to be of type int");
 		return FALSE;
 	}
 
@@ -717,14 +721,14 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (value == NULL)
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 3 of the GValueArray to exist");
+			  "position 3 of the GValueArray to exist");
 		return FALSE;
 	}
 
 	if (!G_VALUE_HOLDS(value, G_TYPE_BOOLEAN))
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 3 of the GValueArray to be of type gboolean");
+			  "position 3 of the GValueArray to be of type gboolean");
 		return FALSE;
 	}
 
@@ -734,14 +738,14 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (value == NULL)
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 4 of the GValueArray to exist");
+			  "position 4 of the GValueArray to exist");
 		return FALSE;
 	}
 
 	if (!G_VALUE_HOLDS(value, G_TYPE_INT))
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 4 of the GValueArray to be of type int");
+			  "position 4 of the GValueArray to be of type int");
 		return FALSE;
 	}
 
@@ -751,14 +755,14 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (value == NULL)
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 5 of the GValueArray to exist");
+			  "position 5 of the GValueArray to exist");
 		return FALSE;
 	}
 
 	if (!G_VALUE_HOLDS(value, G_TYPE_INT))
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 5 of the GValueArray to be of type int");
+			  "position 5 of the GValueArray to be of type int");
 		return FALSE;
 	}
 
@@ -768,15 +772,15 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (value == NULL)
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 6 of the GValueArray to exist");
+			  "position 6 of the GValueArray to exist");
 		return FALSE;
 	}
 
 	if (!G_VALUE_HOLDS(value,
-					   dbus_g_type_get_collection("GArray", G_TYPE_UCHAR)))
+			   dbus_g_type_get_collection("GArray", G_TYPE_UCHAR)))
 	{
 		g_warning("_notify_daemon_process_icon_data expected "
-				  "position 6 of the GValueArray to be of type GArray");
+			  "position 6 of the GValueArray to be of type GArray");
 		return FALSE;
 	}
 
@@ -787,9 +791,9 @@ _notify_daemon_process_icon_data(NotifyDaemon *daemon, GtkWindow *nw,
 	if (expected_len != tmp_array->len)
 	{
 		g_warning("_notify_daemon_process_icon_data expected image "
-				  "data to be of length %" G_GSIZE_FORMAT " but got a "
-				  "length of %u",
-				  expected_len, tmp_array->len);
+			  "data to be of length %" G_GSIZE_FORMAT " but got a "
+			  "length of %u",
+			  expected_len, tmp_array->len);
 		return FALSE;
 	}
 
@@ -816,12 +820,14 @@ window_clicked_cb(GtkWindow *nw, GdkEventButton *button, NotifyDaemon *daemon)
 
 	_action_invoked_cb(nw, "default");
 	_close_notification(daemon, NW_GET_NOTIFY_ID(nw), TRUE,
-						NOTIFYD_CLOSED_USER);
+			    NOTIFYD_CLOSED_USER);
 }
 
 static void
-popup_location_changed_cb(GConfClient *client, guint cnxn_id,
-						  GConfEntry *entry, gpointer user_data)
+popup_location_changed_cb(GConfClient *client,
+			  guint cnxn_id,
+			  GConfEntry *entry,
+			  gpointer user_data)
 {
 	NotifyDaemon *daemon = (NotifyDaemon*)user_data;
 	NotifyStackLocation stack_location;
@@ -842,9 +848,9 @@ popup_location_changed_cb(GConfClient *client, guint cnxn_id,
 	else
 	{
 		gconf_client_set_string(get_gconf_client(),
-			"/apps/notification-daemon/popup_location",
-			popup_stack_locations[POPUP_STACK_DEFAULT_INDEX].identifier,
-			NULL);
+					"/apps/notification-daemon/popup_location",
+					popup_stack_locations[POPUP_STACK_DEFAULT_INDEX].identifier,
+					NULL);
 
 		stack_location = NOTIFY_STACK_LOCATION_DEFAULT;
 	}
@@ -943,14 +949,14 @@ fullscreen_window_exists(GtkWidget *nw)
 	wnck_workspace = wnck_screen_get_active_workspace(wnck_screen);
 
 	for (l = wnck_screen_get_windows_stacked(wnck_screen);
-		 l != NULL;
-		 l = l->next)
+	     l != NULL;
+	     l = l->next)
 	{
 		WnckWindow *wnck_win = (WnckWindow *)l->data;
 
 		if (wnck_window_is_on_workspace(wnck_win, wnck_workspace) &&
-			wnck_window_is_fullscreen(wnck_win) &&
-			wnck_window_is_active(wnck_win))
+		    wnck_window_is_fullscreen(wnck_win) &&
+		    wnck_window_is_active(wnck_win))
 		{
 			/*
 			 * Sanity check if the window is _really_ fullscreen to
@@ -973,8 +979,8 @@ fullscreen_window_exists(GtkWidget *nw)
 
 static Window
 get_window_parent(Display *display,
-				  Window window,
-				  Window *root)
+		  Window window,
+		  Window *root)
 {
 	Window parent;
 	Window *children = NULL;
@@ -998,8 +1004,8 @@ get_window_parent(Display *display,
  */
 static void
 monitor_notification_source_windows(NotifyDaemon *daemon,
-									NotifyTimeout *nt,
-									Window source)
+				    NotifyTimeout *nt,
+				    Window source)
 {
 	Display *display = GDK_DISPLAY_XDISPLAY(gdk_display_get_default());
 	Window root = None;
@@ -1027,8 +1033,8 @@ monitor_notification_source_windows(NotifyDaemon *daemon,
 /* Use a source X Window ID to reposition a notification. */
 static void
 sync_notification_position(NotifyDaemon *daemon,
-						   GtkWindow *nw,
-						   Window source)
+			   GtkWindow *nw,
+			   Window source)
 {
 	Display *display = GDK_DISPLAY_XDISPLAY(gdk_display_get_default());
 	Status result;
@@ -1042,7 +1048,7 @@ sync_notification_position(NotifyDaemon *daemon,
 
 	/* Get the root for this window */
 	result = XGetGeometry(display, source, &root, &x, &y,
-						  &width, &height, &border_width, &depth);
+			      &width, &height, &border_width, &depth);
 	if (gdk_error_trap_pop() || !result)
 		return;
 
@@ -1052,7 +1058,7 @@ sync_notification_position(NotifyDaemon *daemon,
 	 */
 	gdk_error_trap_push ();
 	result = XTranslateCoordinates(display, source, root, 0, 0,
-								   &x, &y, &child);
+				       &x, &y, &child);
 	if (gdk_error_trap_pop() || !result)
 		return;
 
@@ -1085,14 +1091,15 @@ notify_daemon_error_quark(void)
 
 gboolean
 notify_daemon_notify_handler(NotifyDaemon *daemon,
-							 const gchar *app_name,
-							 guint id,
-							 const gchar *icon,
-							 const gchar *summary,
-							 const gchar *body,
-							 gchar **actions,
-							 GHashTable *hints,
-							 int timeout, DBusGMethodInvocation *context)
+			     const gchar *app_name,
+			     guint id,
+			     const gchar *icon,
+			     const gchar *summary,
+			     const gchar *body,
+			     gchar **actions,
+			     GHashTable *hints,
+			     int timeout,
+			     DBusGMethodInvocation *context)
 {
 	NotifyDaemonPrivate *priv = daemon->priv;
 	NotifyTimeout *nt = NULL;
@@ -1128,13 +1135,13 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		new_notification = TRUE;
 
 		g_signal_connect(G_OBJECT(nw), "button-release-event",
-						 G_CALLBACK(window_clicked_cb), daemon);
+				 G_CALLBACK(window_clicked_cb), daemon);
 		g_signal_connect(G_OBJECT(nw), "destroy",
-						 G_CALLBACK(_notification_destroyed_cb), daemon);
+				 G_CALLBACK(_notification_destroyed_cb), daemon);
 		g_signal_connect(G_OBJECT(nw), "enter-notify-event",
-						 G_CALLBACK(_mouse_entered_cb), daemon);
+				 G_CALLBACK(_mouse_entered_cb), daemon);
 		g_signal_connect(G_OBJECT(nw), "leave-notify-event",
-						 G_CALLBACK(_mouse_exitted_cb), daemon);
+				 G_CALLBACK(_mouse_exitted_cb), daemon);
 	}
 	else
 	{
@@ -1179,7 +1186,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		else
 		{
 			g_warning("suppress-sound is of type %s (expected bool or int)\n",
-					  g_type_name(G_VALUE_TYPE(data)));
+				  g_type_name(G_VALUE_TYPE(data)));
 		}
 	}
 
@@ -1208,8 +1215,8 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 		if (l == NULL)
 		{
 			g_warning("Label not found for action %s. "
-					  "The protocol specifies that a label must "
-					  "follow an action in the actions array", actions[i]);
+				  "The protocol specifies that a label must "
+				  "follow an action in the actions array", actions[i]);
 
 			break;
 		}
@@ -1252,7 +1259,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 			if (icon_info != NULL)
 			{
 				gint icon_size = MIN(IMAGE_SIZE,
-									 gtk_icon_info_get_base_size(icon_info));
+						     gtk_icon_info_get_base_size(icon_info));
 
 				if (icon_size == 0)
 					icon_size = IMAGE_SIZE;
@@ -1351,9 +1358,9 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 #endif
 
 	g_object_set_data(G_OBJECT(nw), "_notify_id",
-					  GUINT_TO_POINTER(return_id));
+			  GUINT_TO_POINTER(return_id));
 	g_object_set_data_full(G_OBJECT(nw), "_notify_sender", sender,
-						   (GDestroyNotify)g_free);
+			       (GDestroyNotify)g_free);
 
 	if (nt)
 		_calculate_timeout(daemon, nt, timeout);
@@ -1370,7 +1377,7 @@ notify_daemon_close_notification_handler(NotifyDaemon *daemon,
 	if (id == 0)
 	{
 		g_set_error(error, notify_daemon_error_quark(), 100,
-					_("%u is not a valid notification ID"), id);
+			    _("%u is not a valid notification ID"), id);
 		return FALSE;
 	} else {
 		_close_notification(daemon, id, TRUE, NOTIFYD_CLOSED_API);
@@ -1430,7 +1437,7 @@ main(int argc, char **argv)
 
 	gconf_client = gconf_client_get_default();
 	gconf_client_add_dir(gconf_client, GCONF_KEY_DAEMON,
-						 GCONF_CLIENT_PRELOAD_NONE, NULL);
+			     GCONF_CLIENT_PRELOAD_NONE, NULL);
 
 	error = NULL;
 
@@ -1455,11 +1462,11 @@ main(int argc, char **argv)
 										  "org.freedesktop.DBus");
 
 	if (!dbus_g_proxy_call(bus_proxy, "RequestName", &error,
-						   G_TYPE_STRING, "org.freedesktop.Notifications",
-						   G_TYPE_UINT, 0,
-						   G_TYPE_INVALID,
-						   G_TYPE_UINT, &request_name_result,
-						   G_TYPE_INVALID))
+			       G_TYPE_STRING, "org.freedesktop.Notifications",
+			       G_TYPE_UINT, 0,
+			       G_TYPE_INVALID,
+			       G_TYPE_UINT, &request_name_result,
+			       G_TYPE_INVALID))
 	{
 		g_error("Could not aquire name: %s", error->message);
 	}

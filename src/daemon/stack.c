@@ -70,9 +70,9 @@ get_work_area(GtkWidget *nw, GdkRectangle *rect)
 
 	win = XRootWindow(GDK_DISPLAY(), disp_screen);
 	result = XGetWindowProperty(GDK_DISPLAY(), win, workarea, 0,
-								max_len, False, AnyPropertyType,
-								&type, &format, &num, &leftovers,
-								&ret_workarea);
+				    max_len, False, AnyPropertyType,
+				    &type, &format, &num, &leftovers,
+				    &ret_workarea);
 
 	if (result != Success || type == None || format == 0 || leftovers ||
 		num % 4)
@@ -93,9 +93,10 @@ get_work_area(GtkWidget *nw, GdkRectangle *rect)
 
 static void
 get_origin_coordinates(NotifyStackLocation stack_location,
-					   GdkRectangle *workarea,
-					   gint *x, gint *y, gint *shiftx, gint *shifty,
-					   gint width, gint height)
+		       GdkRectangle *workarea,
+		       gint *x, gint *y,
+		       gint *shiftx, gint *shifty,
+		       gint width, gint height)
 {
 	switch (stack_location)
 	{
@@ -128,9 +129,11 @@ get_origin_coordinates(NotifyStackLocation stack_location,
 
 static void
 translate_coordinates(NotifyStackLocation stack_location,
-					  GdkRectangle *workarea,
-					  gint *x, gint *y, gint *shiftx, gint *shifty,
-					  gint width, gint height, gint index)
+		      GdkRectangle *workarea,
+		      gint *x, gint *y,
+		      gint *shiftx, gint *shifty,
+		      gint width, gint height,
+		      gint index)
 {
 	switch (stack_location)
 	{
@@ -163,9 +166,9 @@ translate_coordinates(NotifyStackLocation stack_location,
 
 NotifyStack *
 notify_stack_new(NotifyDaemon *daemon,
-				 GdkScreen *screen,
-				 guint monitor,
-				 NotifyStackLocation location)
+		 GdkScreen *screen,
+		 guint monitor,
+		 NotifyStackLocation location)
 {
 	NotifyStack *stack;
 
@@ -194,19 +197,19 @@ notify_stack_destroy(NotifyStack *stack)
 
 void
 notify_stack_set_location(NotifyStack *stack,
-						  NotifyStackLocation location)
+			  NotifyStackLocation location)
 {
 	stack->location = location;
 }
 
 static void
 notify_stack_shift_notifications(NotifyStack *stack,
-								 GtkWindow *nw,
-								 GSList **nw_l,
-								 gint init_width,
-								 gint init_height,
-								 gint *nw_x,
-								 gint *nw_y)
+				 GtkWindow *nw,
+				 GSList **nw_l,
+				 gint init_width,
+				 gint init_height,
+				 gint *nw_x,
+				 gint *nw_y)
 {
 	GdkRectangle workarea;
 	GdkRectangle monitor;
@@ -218,7 +221,7 @@ notify_stack_shift_notifications(NotifyStack *stack,
 	gdk_rectangle_intersect (&monitor, &workarea, &workarea);
 
 	get_origin_coordinates(stack->location, &workarea, &x, &y,
-						   &shiftx, &shifty, init_width, init_height);
+			       &shiftx, &shifty, init_width, init_height);
 
 	if (nw_x != NULL)
 		*nw_x = x;
@@ -249,8 +252,8 @@ notify_stack_shift_notifications(NotifyStack *stack,
 
 void
 notify_stack_add_window(NotifyStack *stack,
-						GtkWindow *nw,
-						gboolean new_notification)
+			GtkWindow *nw,
+			gboolean new_notification)
 {
 	GtkRequisition req;
 	gint x, y;
@@ -263,15 +266,15 @@ notify_stack_add_window(NotifyStack *stack,
 	if (new_notification)
 	{
 		g_signal_connect_swapped(G_OBJECT(nw), "destroy",
-								 G_CALLBACK(notify_stack_remove_window),
-								 stack);
+					 G_CALLBACK(notify_stack_remove_window),
+					 stack);
 		stack->windows = g_slist_prepend(stack->windows, nw);
 	}
 }
 
 void
 notify_stack_remove_window(NotifyStack *stack,
-						   GtkWindow *nw)
+			   GtkWindow *nw)
 {
 	GSList *remove_l = NULL;
 
