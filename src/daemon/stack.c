@@ -206,10 +206,14 @@ notify_stack_shift_notifications(NotifyStack *stack,
 								 gint *nw_y)
 {
 	GdkRectangle workarea;
+	GdkRectangle monitor;
 	GSList *l;
 	gint x, y, shiftx = 0, shifty = 0, index = 1;
 
 	get_work_area(GTK_WIDGET(nw), &workarea);
+	gdk_screen_get_monitor_geometry (stack->screen, stack->monitor, &monitor);
+	gdk_rectangle_intersect (&monitor, &workarea, &workarea);
+
 	get_origin_coordinates(stack->location, &workarea, &x, &y,
 						   &shiftx, &shifty, init_width, init_height);
 
