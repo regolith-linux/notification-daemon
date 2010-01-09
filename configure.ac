@@ -45,6 +45,8 @@ PACKAGE=notification-daemon
 
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
 dnl ################################################################
 dnl # Specify a header configuration file
 dnl ################################################################
