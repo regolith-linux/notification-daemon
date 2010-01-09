@@ -21,10 +21,9 @@
 #ifndef _SOUND_H
 #define _SOUND_H
 
-#include <glib.h>
+#include <gtk/gtk.h>
 
-void sound_init(void);
-
-void sound_play(const gchar *filename);
+void sound_play_file(GtkWidget *widget,
+                     const char *filename);
 
 #endif /* _SOUND_H */

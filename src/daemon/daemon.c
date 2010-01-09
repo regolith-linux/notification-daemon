@@ -1,4 +1,5 @@
-/* daemon.c - Implementation of the destop notification spec
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
+ * daemon.c - Implementation of the destop notification spec
  *
  * Copyright (C) 2006 Christian Hammond <chipx86@chipx86.com>
  * Copyright (C) 2005 John (J5) Palmieri <johnp@redhat.com>
@@ -1197,28 +1198,6 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 				sound_file = NULL;
 			}
 		}
-
-		/*
-		 * TODO: If we don't have a sound_file yet, get the urgency hint, then
-		 *       get the corresponding system event sound
-		 *
-		 *       We will need to parse /etc/sound/events/gnome-2.soundlist
-		 *       and ~/.gnome2/sound/events/gnome-2.soundlist.
-		 */
-
-		/* If we don't have a sound file yet, use our gconf default */
-		if (sound_file == NULL)
-		{
-			sound_file = gconf_client_get_string(gconf_client,
-												 GCONF_KEY_DEFAULT_SOUND, NULL);
-			if (sound_file != NULL &&
-				(*sound_file == '\0' ||
-				 !g_file_test(sound_file, G_FILE_TEST_EXISTS)))
-			{
-				g_free(sound_file);
-				sound_file = NULL;
-			}
-		}
 	}
 
 	/* set up action buttons */
@@ -1359,7 +1338,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	{
 		theme_show_notification(nw);
 		if (sound_file != NULL)
-			sound_play(sound_file);
+			sound_play_file(GTK_WIDGET(nw), sound_file);
 	}
 
 	g_free(sound_file);
@@ -1445,8 +1424,6 @@ main(int argc, char **argv)
 	guint request_name_result;
 
 	g_log_set_always_fatal(G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
-
-	sound_init();
 
 	gtk_init(&argc, &argv);
 	gconf_init(argc, argv, NULL);
