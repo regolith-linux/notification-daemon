@@ -211,7 +211,6 @@ notify_daemon_init(NotifyDaemon *daemon)
 
 	daemon->priv->idle_reposition_notify_ids = g_hash_table_new(NULL, NULL);
 	daemon->priv->monitored_window_hash = g_hash_table_new(NULL, NULL);
-	gdk_window_add_filter(NULL, _notify_x11_filter, daemon);
 	daemon->priv->notification_hash =
 		g_hash_table_new_full(g_int_hash, g_int_equal, g_free,
 				  (GDestroyNotify)_notify_timeout_destroy);
@@ -222,6 +221,9 @@ notify_daemon_finalize(GObject *object)
 {
 	NotifyDaemon *daemon       = NOTIFY_DAEMON(object);
 	GObjectClass *parent_class = G_OBJECT_CLASS(notify_daemon_parent_class);
+
+	if (g_hash_table_size(daemon->priv->monitored_window_hash) > 0)
+		gdk_window_remove_filter(NULL, _notify_x11_filter, daemon);
 
 	g_hash_table_destroy(daemon->priv->monitored_window_hash);
 	g_hash_table_destroy(daemon->priv->idle_reposition_notify_ids);
@@ -410,6 +412,8 @@ _notify_x11_filter(GdkXEvent *xevent,
 	{
 		g_hash_table_remove(daemon->priv->monitored_window_hash,
 							GUINT_TO_POINTER(xev->xany.window));
+		if (g_hash_table_size(daemon->priv->monitored_window_hash) == 0)
+			gdk_window_remove_filter(NULL, _notify_x11_filter, daemon);
 		return GDK_FILTER_CONTINUE;
 	}
 
@@ -999,6 +1003,11 @@ monitor_notification_source_windows(NotifyDaemon *daemon,
 	Display *display = GDK_DISPLAY_XDISPLAY(gdk_display_get_default());
 	Window root = None;
 	Window parent;
+
+	/* Start monitoring events if necessary.  We don't want to
+           filter events unless we absolutely have to. */
+	if (g_hash_table_size(daemon->priv->monitored_window_hash) == 0)
+		gdk_window_add_filter(NULL, _notify_x11_filter, daemon);
 
 	/* Store the window in the timeout */
 	g_assert(nt != NULL);
