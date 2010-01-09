@@ -158,9 +158,46 @@ AC_SUBST(DBUS_SERVICES_DIR)
 AC_DEFINE_UNQUOTED(DBUS_SYSTEMD_DIR, "$DBUS_SYS_DIR", [Where system.d dir for DBUS is])
 AC_DEFINE_UNQUOTED(DBUS_SERVICES_DIR, "$DBUS_SERVICES_DIR", [Where services dir for DBUS is])
 
-dnl # Use wall if we have GCC
-if test "x$GCC" = "xyes"; then
-	CFLAGS="$CFLAGS -Wall"
+
+# Turn on the additional warnings last
+
+AC_ARG_ENABLE(more-warnings,
+              AS_HELP_STRING([--enable-more-warnings],
+                             [Maximum compiler warnings]),
+              set_more_warnings="$enableval",[
+	      if test -d $srcdir/.git; then
+	        set_more_warnings=yes
+	      else
+	        set_more_warnings=no
+              fi])
+
+AC_MSG_CHECKING(for more warnings)
+if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+        AC_MSG_RESULT(yes)
+        CFLAGS="\
+        -Wall \
+        -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
+        -Wnested-externs -Wpointer-arith \
+        -Wcast-align -Wsign-compare -Wp,-D_FORTIFY_SOURCE=2 \
+        $CFLAGS"
+
+        for option in -Wno-strict-aliasing -Wno-sign-compare; do
+                SAVE_CFLAGS="$CFLAGS"
+                CFLAGS="$CFLAGS $option"
+                AC_MSG_CHECKING([whether gcc understands $option])
+                AC_TRY_COMPILE([], [],
+                        has_option=yes,
+                        has_option=no,)
+                if test $has_option = no; then
+                        CFLAGS="$SAVE_CFLAGS"
+                fi
+                AC_MSG_RESULT($has_option)
+                unset has_option
+                unset SAVE_CFLAGS
+        done
+        unset option
+else
+        AC_MSG_RESULT(no)
 fi
 
 AC_SUBST(CFLAGS)
