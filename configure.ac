@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT(notification-daemon, 0.4.2, galago-devel@lists.freedesktop.org)
+AC_INIT([notification-daemon], [0.4.2], [galago-devel@lists.freedesktop.org])
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(config.h.in)
 AC_COPYRIGHT([Copyright 2006 Christian Hammond])
@@ -43,7 +43,7 @@ dnl ################################################################
 VERSION=$NOTIFICATION_DAEMON_VERSION
 PACKAGE=notification-daemon
 
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-bzip2])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
