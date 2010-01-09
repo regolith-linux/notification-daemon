@@ -1,4 +1,5 @@
-/*
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
+ *
  * stack.c - Notification stack groups.
  *
  * Copyright (C) 2006 Christian Hammond <chipx86@chipx86.com>
@@ -27,6 +28,8 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
+
+#define NOTIFY_STACK_SPACING 2
 
 struct _NotifyStack
 {
@@ -233,8 +236,8 @@ notify_stack_shift_notifications(NotifyStack *stack,
 			gtk_widget_size_request(GTK_WIDGET(nw2), &req);
 
 			translate_coordinates(stack->location, &workarea, &x, &y,
-								  &shiftx, &shifty, req.width, req.height,
-								  index++);
+					      &shiftx, &shifty, req.width + NOTIFY_STACK_SPACING, req.height + NOTIFY_STACK_SPACING,
+					      index++);
 			theme_move_notification(nw2, x, y);
 		}
 		else if (nw_l != NULL)
@@ -254,7 +257,7 @@ notify_stack_add_window(NotifyStack *stack,
 
 	gtk_widget_size_request(GTK_WIDGET(nw), &req);
 	notify_stack_shift_notifications(stack, nw, NULL,
-									 req.width, req.height, &x, &y);
+					 req.width + NOTIFY_STACK_SPACING, req.height + NOTIFY_STACK_SPACING, &x, &y);
 	theme_move_notification(nw, x, y);
 
 	if (new_notification)
