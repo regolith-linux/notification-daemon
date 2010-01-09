@@ -3,3 +3,4 @@ src/capplet/notification-properties.c
 src/capplet/notification-properties.desktop.in
 src/capplet/notification-properties.glade
 src/daemon/daemon.c
+src/daemon/sound.c
