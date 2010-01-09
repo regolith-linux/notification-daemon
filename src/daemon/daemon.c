@@ -845,26 +845,17 @@ url_clicked_cb(GtkWindow *nw, const char *url)
 
 	escaped_url = g_shell_quote(url);
 
-	/*
-	 * We can't actually check for GNOME_DESKTOP_SESSION_ID, because it's
-	 * not in the environment for this program :(
-	 */
-	if (/*g_getenv("GNOME_DESKTOP_SESSION_ID") != NULL &&*/
-		g_find_program_in_path("gnome-open") != NULL)
+	if (g_find_program_in_path("gvfs-open") != NULL)
 	{
-		cmd = g_strdup_printf("gnome-open %s", escaped_url);
+		cmd = g_strdup_printf("gvfs-open %s", escaped_url);
 	}
-	else if (g_find_program_in_path("mozilla-firefox") != NULL)
+	else if (g_find_program_in_path("xdg-open") != NULL)
 	{
-		cmd = g_strdup_printf("mozilla-firefox %s", escaped_url);
+		cmd = g_strdup_printf("xdg-open %s", escaped_url);
 	}
 	else if (g_find_program_in_path("firefox") != NULL)
 	{
 		cmd = g_strdup_printf("firefox %s", escaped_url);
-	}
-	else if (g_find_program_in_path("mozilla") != NULL)
-	{
-		cmd = g_strdup_printf("mozilla %s", escaped_url);
 	}
 	else
 	{
