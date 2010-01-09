@@ -21,5 +21,6 @@ void theme_add_notification_action(GtkWindow *nw, const char *label,
 								   const char *key, GCallback cb);
 void theme_clear_notification_actions(GtkWindow *nw);
 void theme_move_notification(GtkWindow *nw, int x, int y);
+gboolean theme_get_always_stack(GtkWindow *nw);
 
 #endif /* _ENGINES_H_ */

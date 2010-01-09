@@ -1280,14 +1280,14 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	}
 
 
-	if (window_xid != None)
+	if (window_xid != None && !theme_get_always_stack(nw))
 	{
 		/*
 		 * Do nothing here if we were passed an XID; we'll call
 		 * sync_notification_position later.
 		 */
 	}
-	else if (use_pos_data)
+	else if (use_pos_data && !theme_get_always_stack(nw))
 	{
 		/*
 		 * Typically, the theme engine will set its own position based on
@@ -1326,7 +1326,7 @@ notify_daemon_notify_handler(NotifyDaemon *daemon,
 	 * for changes, and reposition the window based on the source
 	 * window.  We need to do this after return_id is calculated.
 	 */
-	if (window_xid != None)
+	if (window_xid != None && !theme_get_always_stack(nw))
 	{
 		monitor_notification_source_windows(daemon, nt, window_xid);
 		sync_notification_position(daemon, nw, window_xid);

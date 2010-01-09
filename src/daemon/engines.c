@@ -30,6 +30,7 @@ typedef struct
 	void (*move_notification)(GtkWindow *nw, int x, int y);
 	void (*set_notification_timeout)(GtkWindow *nw, glong timeout);
 	void (*notification_tick)(GtkWindow *nw, glong timeout);
+	gboolean (*get_always_stack)(GtkWindow *nw);
 
 } ThemeEngine;
 
@@ -83,6 +84,7 @@ load_theme_engine(const char *name)
 	BIND_OPTIONAL_FUNC(set_notification_timeout);
 	BIND_OPTIONAL_FUNC(set_notification_hints);
 	BIND_OPTIONAL_FUNC(notification_tick);
+	BIND_OPTIONAL_FUNC(get_always_stack);
 
 	if (!engine->theme_check_init(NOTIFICATION_DAEMON_MAJOR_VERSION,
 								  NOTIFICATION_DAEMON_MINOR_VERSION,
@@ -303,4 +305,15 @@ theme_move_notification(GtkWindow *nw, int x, int y)
 {
 	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
 	engine->move_notification(nw, x, y);
+}
+
+gboolean
+theme_get_always_stack(GtkWindow *nw)
+{
+	ThemeEngine *engine = g_object_get_data(G_OBJECT(nw), "_theme_engine");
+
+	if (engine->get_always_stack != NULL)
+		return engine->get_always_stack(nw);
+	else
+		return FALSE;
 }
