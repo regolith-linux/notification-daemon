@@ -1,14 +1,14 @@
 # Swedish translation for notification-daemon.
-# Copyright (C) 2006 Free Software Foundation
+# Copyright (C) 2006-2010 Free Software Foundation
 # This file is distributed under the same license as the galago package.
-# Daniel Nylander <po@danielnylander.se>, 2006.
+# Daniel Nylander <po@danielnylander.se>, 2006, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-15 03:02-0800\n"
-"PO-Revision-Date: 2006-11-27 14:08+0100\n"
+"POT-Creation-Date: 2010-01-11 04:09+0100\n"
+"PO-Revision-Date: 2010-01-11 04:12+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -20,20 +20,78 @@ msgid "Current theme"
 msgstr "Aktuellt tema"
 
 #: ../data/notification-daemon.schemas.in.h:2
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
-"Standardposition för popup-rutor på arbetsutan för notifieringar. Tillåtna "
-"värden: \"top_left\",\"top_right\",\"bottom_left\" och \"bottom_right\""
+msgid "Default Sound"
+msgstr "Standardljud"
 
 #: ../data/notification-daemon.schemas.in.h:3
+msgid "Default popup location on the workspace for stack notifications. Allowed values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+msgstr "Standardposition för popup-rutor på arbetsutan för notifieringar. Tillåtna värden: \"top_left\",\"top_right\",\"bottom_left\" och \"bottom_right\""
+
+#: ../data/notification-daemon.schemas.in.h:4
 msgid "Popup location"
 msgstr "Popup-position"
 
-#: ../data/notification-daemon.schemas.in.h:4
+#: ../data/notification-daemon.schemas.in.h:5
+msgid "Sound Enabled"
+msgstr "Ljud aktiverat"
+
+#: ../data/notification-daemon.schemas.in.h:6
+msgid "The default sound file used unless a notification supplies the 'sound-file' or 'suppress-sound' hint. Leave empty for no default sound."
+msgstr "Standardljudfilen som används såvida inte en notifiering anger \"sound-file\" eller \"suppress-sound\". Lämna tom för inget standardljud."
+
+#: ../data/notification-daemon.schemas.in.h:7
 msgid "The theme used when displaying notifications."
 msgstr "Temat som används för visning av notifieringar."
+
+#: ../data/notification-daemon.schemas.in.h:8
+msgid "Turns on and off sound support for notifications."
+msgstr "Slår på och av ljudstöd för notifieringar."
+
+#: ../src/capplet/notification-properties.c:79
+msgid "Top Left"
+msgstr "Övre vänster"
+
+#: ../src/capplet/notification-properties.c:80
+msgid "Top Right"
+msgstr "Övre höger"
+
+#: ../src/capplet/notification-properties.c:81
+msgid "Bottom Left"
+msgstr "Nedre vänster"
+
+#: ../src/capplet/notification-properties.c:82
+msgid "Bottom Right"
+msgstr "Nedre höger"
+
+#: ../src/capplet/notification-properties.c:327
+msgid "Ubuntu theme"
+msgstr "Ubuntu-tema"
+
+#: ../src/capplet/notification-properties.c:329
+msgid "Standard theme"
+msgstr "Standardtema"
+
+#: ../src/capplet/notification-properties.c:422
+msgid "Error initializing libnotify"
+msgstr "Fel vid initiering av libnotify"
+
+#: ../src/capplet/notification-properties.c:435
+msgid "Notification Test"
+msgstr "Notifieringstest"
+
+#: ../src/capplet/notification-properties.c:436
+msgid "Just a test"
+msgstr "Bara ett test"
+
+#: ../src/capplet/notification-properties.c:443
+#, c-format
+msgid "Error while displaying notification: %s"
+msgstr "Fel vid visning av notifiering: %s"
+
+#: ../src/capplet/notification-properties.c:500
+#, c-format
+msgid "Unable to locate glade file '%s'"
+msgstr "Kunde inte hitta glade-filen \"%s\""
 
 #: ../src/capplet/notification-properties.desktop.in.h:1
 msgid "Pop-Up Notifications"
@@ -41,4 +99,38 @@ msgstr "Popup-notifieringar"
 
 #: ../src/capplet/notification-properties.desktop.in.h:2
 msgid "Set your pop-up notification preferences"
-msgstr "Ställ in dina popup-notifieringsinställningar"
+msgstr "Konfigurera dina inställningar för popupnotifieringar"
+
+#: ../src/capplet/notification-properties.glade.h:1
+msgid "      "
+msgstr "      "
+
+#: ../src/capplet/notification-properties.glade.h:2
+msgid "<b>General Options</b>"
+msgstr "<b>Allmänna alternativ</b>"
+
+#: ../src/capplet/notification-properties.glade.h:3
+msgid "Notification Settings"
+msgstr "Notifieringsinställningar"
+
+#: ../src/capplet/notification-properties.glade.h:4
+msgid "P_osition:"
+msgstr "P_osition:"
+
+#: ../src/capplet/notification-properties.glade.h:5
+msgid "_Preview"
+msgstr "_Förhandsvisning"
+
+#: ../src/capplet/notification-properties.glade.h:6
+msgid "_Theme:"
+msgstr "_Tema:"
+
+#: ../src/daemon/daemon.c:1414
+#, c-format
+msgid "%u is not a valid notification ID"
+msgstr "%u är inte ett giltigt notifierings-id"
+
+#: ../src/daemon/sound.c:36
+msgid "Notification"
+msgstr "Notifiering"
+
