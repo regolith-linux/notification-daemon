@@ -699,7 +699,7 @@ create_notification(UrlClickedCb url_clicked)
 	rcstyle = gtk_rc_style_new();
 	rcstyle->xthickness = rcstyle->ythickness = 0;
 	gtk_widget_modify_style(close_button, rcstyle);
-	gtk_rc_style_unref(rcstyle);
+	g_object_unref(rcstyle);
 
 	atkobj = gtk_widget_get_accessible(close_button);
 	atk_action_set_description(ATK_ACTION(atkobj), 0,

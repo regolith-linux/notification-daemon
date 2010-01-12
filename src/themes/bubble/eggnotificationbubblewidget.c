@@ -550,7 +550,7 @@ egg_notification_bubble_widget_set_icon_from_data (EggNotificationBubbleWidget *
                                      NULL);
 
   gtk_image_set_from_pixbuf (GTK_IMAGE (bubble_widget->icon), pixbuf);
-  gdk_pixbuf_unref (pixbuf);
+  g_object_unref (pixbuf);
 }
 
 static void
