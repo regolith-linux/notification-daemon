@@ -1,0 +1,140 @@
+# Slovenian translation for notification-daemon.
+# Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
+# This file is distributed under the same license as the notification-daemon package.
+# Andrej Žnidaršič <andrej.znidarsic@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: notification-daemon master\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-01-11 03:13+0000\n"
+"PO-Revision-Date: 2010-01-12 14:53+0100\n"
+"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
+"Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n%100==4 ? 3 : 0);\n"
+"X-Poedit-Language: Slovenian\n"
+"X-Poedit-Country: SLOVENIA\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ../data/notification-daemon.schemas.in.h:1
+msgid "Current theme"
+msgstr "Trenutna tema"
+
+#: ../data/notification-daemon.schemas.in.h:2
+msgid "Default Sound"
+msgstr "Privzeti zvok"
+
+#: ../data/notification-daemon.schemas.in.h:3
+msgid "Default popup location on the workspace for stack notifications. Allowed values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+msgstr "Privzet položaj pojavnega obvestila na delovni površini za sklad obvestil. Dovoljene vrednosti:  \"top_left\",\"top_right\",\"bottom_left\" in \"bottom_right\""
+
+#: ../data/notification-daemon.schemas.in.h:4
+msgid "Popup location"
+msgstr "Položaj pojavnega obvestila"
+
+#: ../data/notification-daemon.schemas.in.h:5
+msgid "Sound Enabled"
+msgstr "Zvok je omogočen"
+
+#: ../data/notification-daemon.schemas.in.h:6
+msgid "The default sound file used unless a notification supplies the 'sound-file' or 'suppress-sound' hint. Leave empty for no default sound."
+msgstr "Uporabljena je privzeta zvočna datoteka, razen če obvestilo zagotovi namig 'zvočna-datoteka' ali 'prepreči-zvok'. Pustite prazno za onemogočenje privzetega zvoka."
+
+#: ../data/notification-daemon.schemas.in.h:7
+msgid "The theme used when displaying notifications."
+msgstr "Tema za prikaz obvestil."
+
+#: ../data/notification-daemon.schemas.in.h:8
+msgid "Turns on and off sound support for notifications."
+msgstr "Vklopi in izklopi zvočno podporo obvestil."
+
+#: ../src/capplet/notification-properties.c:79
+msgid "Top Left"
+msgstr "Zgoraj levo"
+
+#: ../src/capplet/notification-properties.c:80
+msgid "Top Right"
+msgstr "Zgoraj desno"
+
+#: ../src/capplet/notification-properties.c:81
+msgid "Bottom Left"
+msgstr "Spodaj levo"
+
+#: ../src/capplet/notification-properties.c:82
+msgid "Bottom Right"
+msgstr "Spodaj desno"
+
+#: ../src/capplet/notification-properties.c:327
+msgid "Ubuntu theme"
+msgstr "Tema Ubuntu"
+
+#: ../src/capplet/notification-properties.c:329
+msgid "Standard theme"
+msgstr "Običajna tema"
+
+#: ../src/capplet/notification-properties.c:422
+msgid "Error initializing libnotify"
+msgstr "Napaka med zaganjanjem libnotify"
+
+#: ../src/capplet/notification-properties.c:435
+msgid "Notification Test"
+msgstr "Preskus obvestila"
+
+#: ../src/capplet/notification-properties.c:436
+msgid "Just a test"
+msgstr "Samo preskus"
+
+#: ../src/capplet/notification-properties.c:443
+#, c-format
+msgid "Error while displaying notification: %s"
+msgstr "Napaka med prikazovanjem obestila: %s"
+
+#: ../src/capplet/notification-properties.c:500
+#, c-format
+msgid "Unable to locate glade file '%s'"
+msgstr "Glade datoteke '%s' ni mogoče najti"
+
+#: ../src/capplet/notification-properties.desktop.in.h:1
+msgid "Pop-Up Notifications"
+msgstr "Pojavna obvestila"
+
+#: ../src/capplet/notification-properties.desktop.in.h:2
+msgid "Set your pop-up notification preferences"
+msgstr "Nastavitev možnosti pojavnih obvestil "
+
+#: ../src/capplet/notification-properties.glade.h:1
+msgid "      "
+msgstr "      "
+
+#: ../src/capplet/notification-properties.glade.h:2
+msgid "<b>General Options</b>"
+msgstr "<b>Splošne možnosti</b>"
+
+#: ../src/capplet/notification-properties.glade.h:3
+msgid "Notification Settings"
+msgstr "Nastavitve obvestil"
+
+#: ../src/capplet/notification-properties.glade.h:4
+msgid "P_osition:"
+msgstr "P_oložaj:"
+
+#: ../src/capplet/notification-properties.glade.h:5
+msgid "_Preview"
+msgstr "_Predogled"
+
+#: ../src/capplet/notification-properties.glade.h:6
+msgid "_Theme:"
+msgstr "_Tema:"
+
+#: ../src/daemon/daemon.c:1414
+#, c-format
+msgid "%u is not a valid notification ID"
+msgstr "%u ni veljaven ID obvestila"
+
+#: ../src/daemon/sound.c:36
+msgid "Notification"
+msgstr "Obvestilo"
+
