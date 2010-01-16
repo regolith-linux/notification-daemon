@@ -181,6 +181,11 @@ update_shape (WindowData *windata)
         GdkBitmap *mask;
         cairo_t   *cr;
 
+        if (windata->width == 0 || windata->height == 0) {
+                windata->width = MAX (windata->win->allocation.width, 1);
+                windata->height = MAX (windata->win->allocation.height, 1);
+        }
+
         if (windata->composited) {
                 gtk_widget_shape_combine_mask (windata->win, NULL, 0, 0);
                 return;
@@ -223,9 +228,9 @@ paint_window (GtkWidget     *widget,
         cairo_surface_t *surface;
         cairo_t         *cr;
 
-        if (windata->width == 0) {
-                windata->width = windata->win->allocation.width;
-                windata->height = windata->win->allocation.height;
+        if (windata->width == 0 || windata->height == 0) {
+                windata->width = MAX (windata->win->allocation.width, 1);
+                windata->height = MAX (windata->win->allocation.height, 1);
         }
 
         context = gdk_cairo_create (widget->window);
