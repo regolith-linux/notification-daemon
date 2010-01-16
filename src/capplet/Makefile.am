@@ -14,6 +14,7 @@ desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
 INCLUDES = \
 	-I$(top_srcdir) \
+	-I$(top_srcdir)/src/daemon \
 	$(NOTIFICATION_CAPPLET_CFLAGS) \
 	-DENGINES_DIR=\"$(libdir)/notification-daemon-1.0/engines\" \
 	-DNOTIFICATION_LOCALEDIR=\"$(datadir)/locale\" \

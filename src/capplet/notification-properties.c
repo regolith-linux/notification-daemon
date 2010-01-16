@@ -19,7 +19,8 @@
  * 02111-1307, USA.
  */
 
-#include <config.h>
+#include "config.h"
+
 #include <glib/gi18n.h>
 #include <glib.h>
 #include <gtk/gtk.h>
@@ -28,7 +29,7 @@
 #include <string.h>
 #include <libnotify/notify.h>
 
-#include "../daemon/stack.h"
+#include "stack.h"
 
 #define GCONF_KEY_DAEMON         "/apps/notification-daemon"
 #define GCONF_KEY_THEME          GCONF_KEY_DAEMON "/theme"
