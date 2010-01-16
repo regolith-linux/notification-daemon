@@ -69,12 +69,27 @@ AC_EXEEXT
 AM_PROG_LIBTOOL
 IT_PROG_INTLTOOL([0.35.0])
 
+REQ_GTK_VERSION=2.18.0
+
+dnl ---------------------------------------------------------------------------
+dnl Requirements for the themes
+dnl ---------------------------------------------------------------------------
+
+PKG_CHECK_MODULES(THEME,
+  gtk+-2.0 >= $REQ_GTK_VERSION
+)
+AC_SUBST(THEME_CFLAGS)
+AC_SUBST(THEME_LIBS)
+
+dnl ---------------------------------------------------------------------------
+dnl Requirements for the daemon
+dnl ---------------------------------------------------------------------------
+
 GETTEXT_PACKAGE=notification-daemon
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Gettext package])
 AM_GLIB_GNU_GETTEXT
 
-REQ_GTK_VERSION=2.18.0
 REQ_GLIB_VERSION=$REQ_GTK_VERSION
 REQ_DBUS_VERSION=0.36
 REQ_LIBCANBERRA_GTK_VERSION=0.4
@@ -90,6 +105,10 @@ pkg_modules="
 PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
+
+dnl ---------------------------------------------------------------------------
+dnl Requirements for the setup tool
+dnl ---------------------------------------------------------------------------
 
 PKG_CHECK_MODULES(NOTIFICATION_CAPPLET, glib-2.0 >= $REQ_GLIB_VERSION gtk+-2.0 >= $REQ_GTK_VERSION libglade-2.0 gconf-2.0 libnotify dbus-1 dbus-glib-1)
 AC_SUBST(NOTIFICATION_CAPPLET_CFLAGS)
@@ -203,9 +222,6 @@ fi
 
 AC_SUBST(CFLAGS)
 
-dnl ################################################################
-dnl # Output the Makefiles
-dnl ################################################################
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
@@ -216,6 +232,7 @@ src/daemon/Makefile
 src/capplet/Makefile
 src/themes/Makefile
 src/themes/bubble/Makefile
+src/themes/slider/Makefile
 src/themes/standard/Makefile
 ])
 
