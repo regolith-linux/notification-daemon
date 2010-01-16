@@ -38,20 +38,19 @@
 
 typedef struct
 {
-        GladeXML    *xml;
-        GConfClient *client;
+        GladeXML           *xml;
+        GConfClient        *client;
 
-        GtkWidget   *dialog;
-        GtkWidget   *position_combo;
-        GtkWidget   *theme_combo;
-        GtkWidget   *preview_button;
+        GtkWidget          *dialog;
+        GtkWidget          *position_combo;
+        GtkWidget          *theme_combo;
+        GtkWidget          *preview_button;
 
         NotifyNotification *preview;
 
-        guint listeners[N_LISTENERS];
-        int   n_listeners;
-        int   expected_listeners;
-
+        guint               listeners[N_LISTENERS];
+        int                 n_listeners;
+        int                 expected_listeners;
 } NotificationAppletDialog;
 
 enum
@@ -71,458 +70,477 @@ enum
 
 const struct
 {
-        const gchar *identifier;
-        const gchar *label;
-
-} popup_stack_locations[] =
-{
-        { "top_left",     N_("Top Left")     },
-        { "top_right",    N_("Top Right")    },
-        { "bottom_left",  N_("Bottom Left")  },
-        { "bottom_right", N_("Bottom Right") }
+        const gchar    *identifier;
+        const gchar    *label;
+} popup_stack_locations[] = {
+        {"top_left", N_("Top Left")},
+        {"top_right", N_("Top Right")},
+        {"bottom_left", N_("Bottom Left")},
+        {"bottom_right", N_("Bottom Right")}
 };
 
 static void
-notification_properties_location_notify(GConfClient *client,
-                                        guint cnx_id,
-                                        GConfEntry *entry,
-                                        NotificationAppletDialog *dialog)
-{
-        GtkTreeModel *model;
-        GtkTreeIter iter;
-        const char *location;
-        gboolean valid;
-
-        if (!entry->value || entry->value->type != GCONF_VALUE_STRING)
-                return;
-
-        location = gconf_value_get_string(entry->value);
-
-        model = gtk_combo_box_get_model(GTK_COMBO_BOX(dialog->position_combo));
-        valid = gtk_tree_model_get_iter_first(model, &iter);
-
-        for (valid = gtk_tree_model_get_iter_first(model, &iter);
-                 valid;
-                 valid = gtk_tree_model_iter_next(model, &iter))
-        {
-                gchar *key;
-
-                gtk_tree_model_get(model, &iter, NOTIFY_POSITION_NAME, &key, -1);
-
-                if (g_str_equal(key, location))
-                {
-                        gtk_combo_box_set_active_iter(
-                                GTK_COMBO_BOX(dialog->position_combo),
-                                &iter);
-                        g_free(key);
-                        break;
-                }
-
-                g_free(key);
-        }
-}
-
-static void
-notification_properties_location_changed(GtkComboBox *widget,
+notification_properties_location_notify (GConfClient              *client,
+                                         guint                     cnx_id,
+                                         GConfEntry               *entry,
                                          NotificationAppletDialog *dialog)
 {
-        char *location;
-        GtkTreeModel *model;
-        GtkTreeIter iter;
+        GtkTreeModel   *model;
+        GtkTreeIter     iter;
+        const char     *location;
+        gboolean        valid;
 
-        model = gtk_combo_box_get_model(GTK_COMBO_BOX(dialog->position_combo));
-
-        if (!gtk_combo_box_get_active_iter(GTK_COMBO_BOX(dialog->position_combo),
-                                                                           &iter))
-        {
+        if (!entry->value
+            || entry->value->type != GCONF_VALUE_STRING)
                 return;
-        }
 
-        gtk_tree_model_get(model, &iter, NOTIFY_POSITION_NAME, &location, -1);
+        location = gconf_value_get_string (entry->value);
 
-        gconf_client_set_string(dialog->client, GCONF_KEY_POPUP_LOCATION,
-                                                        location, NULL);
-        g_free(location);
-}
+        model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->position_combo));
+        valid = gtk_tree_model_get_iter_first (model, &iter);
 
-static void
-notification_properties_dialog_setup_positions(NotificationAppletDialog *dialog)
-{
-        NotifyStackLocation i;
-        char *location;
-        gboolean valid;
-        GtkListStore *store;
-        GtkTreeIter iter;
-
-        dialog->position_combo =
-                glade_xml_get_widget(dialog->xml, "position_combo");
-        g_return_if_fail(dialog->position_combo != NULL);
-
-        store = gtk_list_store_new(N_COLUMNS_POSITION,
-                                                           G_TYPE_STRING, G_TYPE_STRING);
-
-        for (i = NOTIFY_STACK_LOCATION_TOP_LEFT;
-                 i <= NOTIFY_STACK_LOCATION_BOTTOM_RIGHT;
-                 i++)
-        {
-                gtk_list_store_append(store, &iter);
-                gtk_list_store_set(store, &iter,
-                        NOTIFY_POSITION_LABEL, _(popup_stack_locations[i].label),
-                        NOTIFY_POSITION_NAME,  popup_stack_locations[i].identifier,
-                        -1);
-        }
-
-        gtk_combo_box_set_model(GTK_COMBO_BOX(dialog->position_combo),
-                                                        GTK_TREE_MODEL(store));
-        g_signal_connect(dialog->position_combo, "changed",
-                                         G_CALLBACK(notification_properties_location_changed),
-                                         dialog);
-
-        location = gconf_client_get_string(dialog->client,
-                                                                           GCONF_KEY_POPUP_LOCATION, NULL);
-
-        for (valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
-                 valid;
-                 valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter))
-        {
+        for (valid = gtk_tree_model_get_iter_first (model, &iter);
+             valid; valid = gtk_tree_model_iter_next (model, &iter)) {
                 gchar *key;
 
-                gtk_tree_model_get(GTK_TREE_MODEL(store), &iter,
-                                                   NOTIFY_POSITION_NAME, &key,
-                                                   -1);
+                gtk_tree_model_get (model,
+                                    &iter,
+                                    NOTIFY_POSITION_NAME, &key,
+                                    -1);
 
-                if (g_str_equal(key, location))
-                {
-                        gtk_combo_box_set_active_iter(
-                                GTK_COMBO_BOX(dialog->position_combo),
-                                &iter);
-                        g_free(key);
+                if (g_str_equal (key, location)) {
+                        gtk_combo_box_set_active_iter (GTK_COMBO_BOX (dialog->position_combo),
+                                                       &iter);
+                        g_free (key);
                         break;
                 }
 
-                g_free(key);
+                g_free (key);
         }
-
-        dialog->listeners[dialog->n_listeners] = gconf_client_notify_add(
-                dialog->client, GCONF_KEY_POPUP_LOCATION,
-                (GConfClientNotifyFunc)notification_properties_location_notify,
-                dialog, NULL, NULL);
-        dialog->n_listeners++;
-        g_free(location);
 }
 
 static void
-notification_properties_theme_notify(GConfClient *client,
-                                                                         guint cnx_id,
-                                                                         GConfEntry *entry,
-                                                                         NotificationAppletDialog *dialog)
+notification_properties_location_changed (GtkComboBox              *widget,
+                                          NotificationAppletDialog *dialog)
 {
-        GtkTreeModel *model;
-        GtkTreeIter iter;
-        const char *theme;
-        gboolean valid;
+        char           *location;
+        GtkTreeModel   *model;
+        GtkTreeIter     iter;
 
-        if (!entry->value || entry->value->type != GCONF_VALUE_STRING)
+        model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->position_combo));
+
+        if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (dialog->position_combo), &iter)) {
+                return;
+        }
+
+        gtk_tree_model_get (model,
+                            &iter,
+                            NOTIFY_POSITION_NAME, &location,
+                            -1);
+
+        gconf_client_set_string (dialog->client,
+                                 GCONF_KEY_POPUP_LOCATION,
+                                 location,
+                                 NULL);
+        g_free (location);
+}
+
+static void
+notification_properties_dialog_setup_positions (NotificationAppletDialog *dialog)
+{
+        NotifyStackLocation i;
+        char               *location;
+        gboolean            valid;
+        GtkListStore       *store;
+        GtkTreeIter         iter;
+
+        dialog->position_combo = glade_xml_get_widget (dialog->xml,
+                                                       "position_combo");
+        g_return_if_fail (dialog->position_combo != NULL);
+
+        store = gtk_list_store_new (N_COLUMNS_POSITION,
+                                    G_TYPE_STRING,
+                                    G_TYPE_STRING);
+
+        for (i = NOTIFY_STACK_LOCATION_TOP_LEFT;
+             i <= NOTIFY_STACK_LOCATION_BOTTOM_RIGHT;
+             i++) {
+                gtk_list_store_append (store, &iter);
+                gtk_list_store_set (store,
+                                    &iter,
+                                    NOTIFY_POSITION_LABEL, _(popup_stack_locations[i].label),
+                                    NOTIFY_POSITION_NAME, popup_stack_locations[i].identifier,
+                                    -1);
+        }
+
+        gtk_combo_box_set_model (GTK_COMBO_BOX (dialog->position_combo),
+                                 GTK_TREE_MODEL (store));
+        g_signal_connect (dialog->position_combo,
+                          "changed",
+                          G_CALLBACK (notification_properties_location_changed),
+                          dialog);
+
+        location = gconf_client_get_string (dialog->client,
+                                            GCONF_KEY_POPUP_LOCATION,
+                                            NULL);
+
+        for (valid = gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter);
+             valid;
+             valid = gtk_tree_model_iter_next (GTK_TREE_MODEL (store), &iter)) {
+                gchar *key;
+
+                gtk_tree_model_get (GTK_TREE_MODEL (store),
+                                    &iter,
+                                    NOTIFY_POSITION_NAME, &key,
+                                    -1);
+
+                if (g_str_equal (key, location)) {
+                        gtk_combo_box_set_active_iter (GTK_COMBO_BOX (dialog->position_combo),
+                                                       &iter);
+                        g_free (key);
+                        break;
+                }
+
+                g_free (key);
+        }
+
+        dialog->listeners[dialog->n_listeners] =
+                gconf_client_notify_add (dialog->client,
+                                         GCONF_KEY_POPUP_LOCATION,
+                                         (GConfClientNotifyFunc) notification_properties_location_notify,
+                                         dialog,
+                                         NULL,
+                                         NULL);
+        dialog->n_listeners++;
+        g_free (location);
+}
+
+static void
+notification_properties_theme_notify (GConfClient              *client,
+                                      guint                     cnx_id,
+                                      GConfEntry               *entry,
+                                      NotificationAppletDialog *dialog)
+{
+        GtkTreeModel   *model;
+        GtkTreeIter     iter;
+        const char     *theme;
+        gboolean        valid;
+
+        if (!entry->value
+            || entry->value->type != GCONF_VALUE_STRING)
                 return;
 
-        theme = gconf_value_get_string(entry->value);
+        theme = gconf_value_get_string (entry->value);
 
-        model = gtk_combo_box_get_model(GTK_COMBO_BOX(dialog->theme_combo));
+        model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->theme_combo));
 
-        for (valid = gtk_tree_model_get_iter_first(model, &iter);
-                 valid;
-                 valid = gtk_tree_model_iter_next(model, &iter))
-        {
+        for (valid = gtk_tree_model_get_iter_first (model, &iter);
+             valid;
+             valid = gtk_tree_model_iter_next (model, &iter)) {
                 gchar *theme_name;
 
-                gtk_tree_model_get(model, &iter, NOTIFY_THEME_NAME, &theme_name, -1);
+                gtk_tree_model_get (model,
+                                    &iter,
+                                    NOTIFY_THEME_NAME, &theme_name,
+                                    -1);
 
-                if (g_str_equal(theme_name, theme))
-                {
-                        gtk_combo_box_set_active_iter(GTK_COMBO_BOX(dialog->theme_combo),
-                                                                                  &iter);
-                        g_free(theme_name);
+                if (g_str_equal (theme_name, theme)) {
+                        gtk_combo_box_set_active_iter (GTK_COMBO_BOX (dialog->theme_combo),
+                                                       &iter);
+                        g_free (theme_name);
                         break;
                 }
 
-                g_free(theme_name);
+                g_free (theme_name);
         }
 }
 
 static void
-notification_properties_theme_changed(GtkComboBox *widget,
-                                                                          NotificationAppletDialog *dialog)
+notification_properties_theme_changed (GtkComboBox              *widget,
+                                       NotificationAppletDialog *dialog)
 {
-        char *theme;
-        GtkTreeModel *model;
-        GtkTreeIter iter;
+        char           *theme;
+        GtkTreeModel   *model;
+        GtkTreeIter     iter;
 
-        model = gtk_combo_box_get_model(GTK_COMBO_BOX(dialog->theme_combo));
+        model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->theme_combo));
 
-        if (!gtk_combo_box_get_active_iter(GTK_COMBO_BOX(dialog->theme_combo),
-                                                                           &iter))
-        {
+        if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (dialog->theme_combo), &iter)) {
                 return;
         }
 
-        gtk_tree_model_get(model, &iter, NOTIFY_THEME_NAME, &theme, -1);
-        gconf_client_set_string(dialog->client, GCONF_KEY_THEME, theme, NULL);
-        g_free(theme);
+        gtk_tree_model_get (model, &iter, NOTIFY_THEME_NAME, &theme, -1);
+        gconf_client_set_string (dialog->client,
+                                 GCONF_KEY_THEME,
+                                 theme,
+                                 NULL);
+        g_free (theme);
 }
 
 static gchar *
-get_theme_name(const gchar *filename)
+get_theme_name (const gchar *filename)
 {
         gchar *result;
 
         /* TODO: Remove magic numbers. Strip "lib" and ".so" */
-        result = g_strdup(filename + 3);
-        result[strlen(result) - 3] = '\0';
+        result = g_strdup (filename + 3);
+        result[strlen (result) - 3] = '\0';
         return result;
 }
 
 static void
-notification_properties_dialog_setup_themes(NotificationAppletDialog *dialog)
+notification_properties_dialog_setup_themes (NotificationAppletDialog *dialog)
 {
-        GDir *dir;
-        const gchar *filename;
-        char *theme, *theme_name, *theme_label;
-        gboolean valid;
-        GtkListStore *store;
-        GtkTreeIter iter;
+        GDir           *dir;
+        const gchar    *filename;
+        char           *theme;
+        char           *theme_name;
+        char           *theme_label;
+        gboolean        valid;
+        GtkListStore   *store;
+        GtkTreeIter     iter;
+        GtkCellRenderer *cell ;
 
-        dialog->theme_combo = glade_xml_get_widget(dialog->xml, "theme_combo");
+        dialog->theme_combo = glade_xml_get_widget (dialog->xml, "theme_combo");
         g_assert (dialog->theme_combo != NULL);
 
-        store = gtk_list_store_new(N_COLUMNS_THEME,
-                                                           G_TYPE_STRING,
-                                                           G_TYPE_STRING,
-                                                           G_TYPE_STRING);
+        store = gtk_list_store_new (N_COLUMNS_THEME,
+                                    G_TYPE_STRING,
+                                    G_TYPE_STRING,
+                                    G_TYPE_STRING);
 
-        gtk_combo_box_set_model(GTK_COMBO_BOX(dialog->theme_combo),
-                                                        GTK_TREE_MODEL(store));
-        g_signal_connect(dialog->theme_combo, "changed",
-                                         G_CALLBACK(notification_properties_theme_changed),
-                                         dialog);
+        gtk_combo_box_set_model (GTK_COMBO_BOX (dialog->theme_combo),
+                                 GTK_TREE_MODEL (store));
+        g_signal_connect (dialog->theme_combo,
+                          "changed",
+                          G_CALLBACK (notification_properties_theme_changed),
+                          dialog);
 
-        GtkCellRenderer *cell = gtk_cell_renderer_text_new();
-        gtk_cell_layout_pack_start(
-                GTK_CELL_LAYOUT(GTK_COMBO_BOX(dialog->theme_combo)),
-                cell, TRUE);
-        gtk_cell_layout_set_attributes(
-                GTK_CELL_LAYOUT(GTK_COMBO_BOX(dialog->theme_combo)),
-                cell, "text", 0, NULL);
+        cell = gtk_cell_renderer_text_new ();
+        gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (GTK_COMBO_BOX (dialog->theme_combo)),
+                                    cell,
+                                    TRUE);
+        gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (GTK_COMBO_BOX (dialog->theme_combo)),
+                                        cell,
+                                        "text", 0,
+                                        NULL);
 
-        if ((dir = g_dir_open(ENGINES_DIR, 0, NULL)))
-        {
-                while ((filename = g_dir_read_name(dir)))
-                {
-                        if ( g_str_has_prefix(filename, "lib") &&
-                             g_str_has_suffix(filename, ".so") )
-                        {
-                                theme_name = get_theme_name(filename);
+        if ((dir = g_dir_open (ENGINES_DIR, 0, NULL))) {
+                while ((filename = g_dir_read_name (dir))) {
+                        if (g_str_has_prefix (filename, "lib")
+                            && g_str_has_suffix (filename, ".so")) {
+
+                                theme_name = get_theme_name (filename);
 
                                 /* FIXME: other solution than hardcode? */
-                                if (g_str_equal(theme_name, "slider"))
-                                        theme_label = g_strdup(_("Slider"));
-                                else if (g_str_equal(theme_name, "standard"))
-                                        theme_label = g_strdup(_("Standard theme"));
+                                if (g_str_equal (theme_name, "slider"))
+                                        theme_label = g_strdup (_("Slider"));
+                                else if (g_str_equal (theme_name, "standard"))
+                                        theme_label = g_strdup (_("Standard theme"));
                                 else
-                                        theme_label = g_strdup(theme_name);
+                                        theme_label = g_strdup (theme_name);
 
-                                gtk_list_store_append(store, &iter);
-                                gtk_list_store_set(store, &iter,
-                                                                   NOTIFY_THEME_LABEL, theme_label,
-                                                                   NOTIFY_THEME_NAME, theme_name,
-                                                                   NOTIFY_THEME_FILENAME, filename,
-                                                                   -1);
-                                g_free(theme_name);
-                                g_free(theme_label);
+                                gtk_list_store_append (store, &iter);
+                                gtk_list_store_set (store,
+                                                    &iter,
+                                                    NOTIFY_THEME_LABEL, theme_label,
+                                                    NOTIFY_THEME_NAME, theme_name,
+                                                    NOTIFY_THEME_FILENAME, filename,
+                                                    -1);
+                                g_free (theme_name);
+                                g_free (theme_label);
                         }
                 }
 
-                g_dir_close(dir);
-        }
-        else
-        {
-                g_warning("Error opening themes dir");
+                g_dir_close (dir);
+        } else {
+                g_warning ("Error opening themes dir");
         }
 
 
-        theme = gconf_client_get_string(dialog->client, GCONF_KEY_THEME, NULL);
+        theme = gconf_client_get_string (dialog->client,
+                                         GCONF_KEY_THEME,
+                                         NULL);
 
-        for (valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
-                 valid;
-                 valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter))
-        {
+        for (valid = gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter);
+             valid;
+             valid = gtk_tree_model_iter_next (GTK_TREE_MODEL (store), &iter)) {
                 gchar *key;
 
-                gtk_tree_model_get(GTK_TREE_MODEL(store), &iter,
-                                                   NOTIFY_THEME_NAME, &key,
-                                                   -1);
+                gtk_tree_model_get (GTK_TREE_MODEL (store),
+                                    &iter,
+                                    NOTIFY_THEME_NAME, &key,
+                                    -1);
 
-                if (g_str_equal(key, theme))
-                {
-                        gtk_combo_box_set_active_iter(GTK_COMBO_BOX(dialog->theme_combo),
-                                                                                  &iter);
-                        g_free(key);
+                if (g_str_equal (key, theme)) {
+                        gtk_combo_box_set_active_iter (GTK_COMBO_BOX (dialog->theme_combo),
+                                                       &iter);
+                        g_free (key);
                         break;
                 }
 
-                g_free(key);
+                g_free (key);
         }
 
         dialog->listeners[dialog->n_listeners] =
-                gconf_client_notify_add(dialog->client,
-                        GCONF_KEY_THEME,
-                        (GConfClientNotifyFunc)notification_properties_theme_notify,
-                        dialog, NULL, NULL);
+                gconf_client_notify_add (dialog->client,
+                                         GCONF_KEY_THEME,
+                                         (GConfClientNotifyFunc) notification_properties_theme_notify,
+                                         dialog,
+                                         NULL,
+                                         NULL);
         dialog->n_listeners++;
-        g_free(theme);
+        g_free (theme);
 }
 
 static void
-notification_properties_dialog_help(void)
+notification_properties_dialog_help (void)
 {
-  /* Do nothing */
+        /* Do nothing */
 }
 
 static void
-show_message(NotificationAppletDialog *dialog,
-                         const gchar *message)
+show_message (NotificationAppletDialog *dialog,
+              const gchar              *message)
 {
         GtkWidget *d;
 
-        d = gtk_message_dialog_new(GTK_WINDOW(dialog->dialog),
-                                                           GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                           GTK_MESSAGE_ERROR,
-                                                           GTK_BUTTONS_CLOSE,
-                                                           "%s", message);
-        gtk_dialog_run(GTK_DIALOG(d));
-        gtk_widget_destroy(d);
+        d = gtk_message_dialog_new (GTK_WINDOW (dialog->dialog),
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_MESSAGE_ERROR,
+                                    GTK_BUTTONS_CLOSE,
+                                    "%s",
+                                    message);
+        gtk_dialog_run (GTK_DIALOG (d));
+        gtk_widget_destroy (d);
 }
 
 static void
-notification_properties_dialog_preview_closed(NotifyNotification *preview,
-                                                                                          NotificationAppletDialog *dialog)
+notification_properties_dialog_preview_closed (NotifyNotification       *preview,
+                                               NotificationAppletDialog *dialog)
 {
         if (preview == dialog->preview)
                 dialog->preview = NULL;
 
-        g_object_unref(preview);
+        g_object_unref (preview);
 }
 
 static void
-notification_properties_dialog_preview(NotificationAppletDialog *dialog)
+notification_properties_dialog_preview (NotificationAppletDialog *dialog)
 {
         GError *error;
 
-        if (!notify_is_initted() && !notify_init("n-d"))
-        {
-                show_message(dialog, _("Error initializing libnotify"));
+        if (!notify_is_initted ()
+            && !notify_init ("n-d")) {
+                show_message (dialog, _("Error initializing libnotify"));
                 return;
         }
 
         error = NULL;
 
-        if (dialog->preview)
-        {
-                notify_notification_close(dialog->preview, NULL);
-                g_object_unref(dialog->preview);
+        if (dialog->preview) {
+                notify_notification_close (dialog->preview, NULL);
+                g_object_unref (dialog->preview);
                 dialog->preview = NULL;
         }
 
-        dialog->preview = notify_notification_new(_("Notification Test"),
-                                                                                          _("Just a test"),
-                                                                                          "gnome-util",
-                                                                                          NULL);
+        dialog->preview = notify_notification_new (_("Notification Test"),
+                                                   _("Just a test"),
+                                                   "gnome-util",
+                                                   NULL);
 
-        if (!notify_notification_show(dialog->preview, &error))
-        {
-                char *message = g_strdup_printf(
-                        _("Error while displaying notification: %s"), error->message);
-                show_message(dialog, message);
-                g_error_free(error);
-                g_free(message);
+        if (!notify_notification_show (dialog->preview, &error)) {
+                char *message;
+
+                message = g_strdup_printf (_("Error while displaying notification: %s"),
+                                           error->message);
+                show_message (dialog, message);
+                g_error_free (error);
+                g_free (message);
         }
 
-        g_signal_connect(dialog->preview, "closed",
-                                         G_CALLBACK(notification_properties_dialog_preview_closed),
-                                         dialog);
+        g_signal_connect (dialog->preview,
+                          "closed",
+                          G_CALLBACK (notification_properties_dialog_preview_closed),
+                          dialog);
 }
 
 static void
-notification_properties_dialog_response(GtkWidget *widget,
-                                                                                int response,
-                                                                                NotificationAppletDialog *dialog)
+notification_properties_dialog_response (GtkWidget                *widget,
+                                         int                       response,
+                                         NotificationAppletDialog *dialog)
 {
-        switch (response)
-        {
-                case GTK_RESPONSE_HELP:
-                        notification_properties_dialog_help();
-                        break;
+        switch (response) {
+        case GTK_RESPONSE_HELP:
+                notification_properties_dialog_help ();
+                break;
 
-                case GTK_RESPONSE_ACCEPT:
-                        notification_properties_dialog_preview(dialog);
-                        break;
+        case GTK_RESPONSE_ACCEPT:
+                notification_properties_dialog_preview (dialog);
+                break;
 
-                case GTK_RESPONSE_CLOSE:
-                default:
-                        gtk_widget_destroy(widget);
-                        break;
+        case GTK_RESPONSE_CLOSE:
+        default:
+                gtk_widget_destroy (widget);
+                break;
         }
 }
 
 static void
-notification_properties_dialog_destroyed(GtkWidget *widget,
-                                                                                 NotificationAppletDialog *dialog)
+notification_properties_dialog_destroyed (GtkWidget                *widget,
+                                          NotificationAppletDialog *dialog)
 {
         dialog->dialog = NULL;
 
-        gtk_main_quit();
+        gtk_main_quit ();
 }
 
 static gboolean
-notification_properties_dialog_init(NotificationAppletDialog *dialog)
+notification_properties_dialog_init (NotificationAppletDialog *dialog)
 {
 #define NOTIFICATION_GLADE_FILE "notification-properties.glade"
         const char *glade_file;
 
-        if (g_file_test(NOTIFICATION_GLADE_FILE, G_FILE_TEST_EXISTS))
+        if (g_file_test (NOTIFICATION_GLADE_FILE, G_FILE_TEST_EXISTS))
                 glade_file = NOTIFICATION_GLADE_FILE;
         else
                 glade_file = NOTIFICATION_GLADEDIR "/" NOTIFICATION_GLADE_FILE;
 
-        dialog->xml = glade_xml_new(glade_file, "dialog", NULL);
+        dialog->xml = glade_xml_new (glade_file, "dialog", NULL);
 
-        if (!dialog->xml)
-        {
-                g_warning(_("Unable to locate glade file '%s'"), glade_file);
+        if (!dialog->xml) {
+                g_warning (_("Unable to locate glade file '%s'"), glade_file);
                 return FALSE;
         }
 
-        dialog->dialog = glade_xml_get_widget(dialog->xml, "dialog");
-        g_assert(dialog->dialog != NULL);
+        dialog->dialog = glade_xml_get_widget (dialog->xml, "dialog");
+        g_assert (dialog->dialog != NULL);
 
-        g_signal_connect(dialog->dialog, "response",
-                                         G_CALLBACK(notification_properties_dialog_response),
-                                         dialog);
-        g_signal_connect(dialog->dialog, "destroy",
-                                         G_CALLBACK(notification_properties_dialog_destroyed),
-                                         dialog);
+        g_signal_connect (dialog->dialog,
+                          "response",
+                          G_CALLBACK
+                          (notification_properties_dialog_response),
+                          dialog);
+        g_signal_connect (dialog->dialog,
+                          "destroy",
+                          G_CALLBACK
+                          (notification_properties_dialog_destroyed),
+                          dialog);
 
-        dialog->client = gconf_client_get_default();
-        gconf_client_add_dir(dialog->client, GCONF_KEY_DAEMON,
-                                                 GCONF_CLIENT_PRELOAD_ONELEVEL, NULL);
+        dialog->client = gconf_client_get_default ();
+        gconf_client_add_dir (dialog->client,
+                              GCONF_KEY_DAEMON,
+                              GCONF_CLIENT_PRELOAD_ONELEVEL,
+                              NULL);
 
         dialog->expected_listeners = N_LISTENERS;
-        dialog->n_listeners        = 0;
+        dialog->n_listeners = 0;
 
-        notification_properties_dialog_setup_themes(dialog);
-        notification_properties_dialog_setup_positions(dialog);
+        notification_properties_dialog_setup_themes (dialog);
+        notification_properties_dialog_setup_positions (dialog);
 
-        g_assert(dialog->n_listeners == dialog->expected_listeners);
-        gtk_widget_show(dialog->dialog);
+        g_assert (dialog->n_listeners == dialog->expected_listeners);
+        gtk_widget_show (dialog->dialog);
 
         dialog->preview = NULL;
 
@@ -532,68 +550,64 @@ notification_properties_dialog_init(NotificationAppletDialog *dialog)
 }
 
 static void
-notification_properties_dialog_finalize(NotificationAppletDialog *dialog)
+notification_properties_dialog_finalize (NotificationAppletDialog *dialog)
 {
-        if (dialog->dialog != NULL)
-        {
-                gtk_widget_destroy(dialog->dialog);
+        if (dialog->dialog != NULL) {
+                gtk_widget_destroy (dialog->dialog);
                 dialog->dialog = NULL;
         }
 
-        if (dialog->client != NULL)
-        {
+        if (dialog->client != NULL) {
                 int i;
-                for (i = 0; i < dialog->n_listeners; i++)
-                {
-                        if (dialog->listeners[i])
-                        {
-                                gconf_client_notify_remove(dialog->client,
-                                                                                   dialog->listeners[i]);
+
+                for (i = 0; i < dialog->n_listeners; i++) {
+                        if (dialog->listeners[i]) {
+                                gconf_client_notify_remove (dialog->client,
+                                                            dialog->listeners[i]);
                                 dialog->listeners[i] = 0;
                         }
                 }
 
                 dialog->n_listeners = 0;
-                gconf_client_remove_dir(dialog->client, GCONF_KEY_DAEMON, NULL);
-                g_object_unref(dialog->client);
+                gconf_client_remove_dir (dialog->client,
+                                         GCONF_KEY_DAEMON,
+                                         NULL);
+                g_object_unref (dialog->client);
                 dialog->client = NULL;
         }
 
-        if (dialog->xml != NULL)
-        {
-                g_object_unref(dialog->xml);
+        if (dialog->xml != NULL) {
+                g_object_unref (dialog->xml);
                 dialog->xml = NULL;
         }
 
-        if (dialog->preview)
-        {
-                notify_notification_close(dialog->preview, NULL);
+        if (dialog->preview) {
+                notify_notification_close (dialog->preview, NULL);
                 dialog->preview = NULL;
         }
 }
 
 int
-main(int argc, char **argv)
+main (int argc, char **argv)
 {
         NotificationAppletDialog dialog = { NULL, };
 
-        bindtextdomain(GETTEXT_PACKAGE, NOTIFICATION_LOCALEDIR);
-        bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-        textdomain(GETTEXT_PACKAGE);
+        bindtextdomain (GETTEXT_PACKAGE, NOTIFICATION_LOCALEDIR);
+        bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+        textdomain (GETTEXT_PACKAGE);
 
-        gtk_init(&argc, &argv);
+        gtk_init (&argc, &argv);
 
-        notify_init("notification-properties");
+        notify_init ("notification-properties");
 
-        if (!notification_properties_dialog_init(&dialog))
-        {
-                notification_properties_dialog_finalize(&dialog);
+        if (!notification_properties_dialog_init (&dialog)) {
+                notification_properties_dialog_finalize (&dialog);
                 return 1;
         }
 
-        gtk_main();
+        gtk_main ();
 
-        notification_properties_dialog_finalize(&dialog);
+        notification_properties_dialog_finalize (&dialog);
 
         return 0;
 }

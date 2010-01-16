@@ -63,16 +63,15 @@ typedef enum
         NOTIFYD_CLOSED_USER = 2,
         NOTIFYD_CLOSED_API = 3,
         NOTIFYD_CLOSED_RESERVED = 4
-
 } NotifydClosedReason;
 
-typedef struct _NotifyDaemon        NotifyDaemon;
-typedef struct _NotifyDaemonClass   NotifyDaemonClass;
+typedef struct _NotifyDaemon NotifyDaemon;
+typedef struct _NotifyDaemonClass NotifyDaemonClass;
 typedef struct _NotifyDaemonPrivate NotifyDaemonPrivate;
 
 struct _NotifyDaemon
 {
-        GObject parent;
+        GObject         parent;
 
         /*< private > */
         NotifyDaemonPrivate *priv;
@@ -80,41 +79,38 @@ struct _NotifyDaemon
 
 struct _NotifyDaemonClass
 {
-        GObjectClass parent_class;
+        GObjectClass    parent_class;
 };
 
-G_BEGIN_DECLS
+G_BEGIN_DECLS GType notify_daemon_get_type (void);
 
-GType notify_daemon_get_type(void);
+GQuark          notify_daemon_error_quark (void);
 
-GQuark notify_daemon_error_quark(void);
+gboolean        notify_daemon_notify_handler             (NotifyDaemon *daemon,
+                                                          const gchar  *app_name,
+                                                          guint         id,
+                                                          const gchar  *icon,
+                                                          const gchar  *summary,
+                                                          const gchar  *body,
+                                                          gchar       **actions,
+                                                          GHashTable   *hints,
+                                                          int           timeout,
+                                                          DBusGMethodInvocation *context);
 
-gboolean notify_daemon_notify_handler(NotifyDaemon *daemon,
-                                      const gchar *app_name,
-                                      guint id,
-                                      const gchar *icon,
-                                      const gchar *summary,
-                                      const gchar *body,
-                                      gchar **actions,
-                                      GHashTable *hints,
-                                      int timeout,
-                                      DBusGMethodInvocation *context);
+gboolean        notify_daemon_close_notification_handler (NotifyDaemon *daemon,
+                                                          guint         id,
+                                                          GError      **error);
 
-gboolean notify_daemon_close_notification_handler(NotifyDaemon *daemon,
-                                                  guint id,
-                                                  GError **error);
+gboolean        notify_daemon_get_capabilities           (NotifyDaemon *daemon,
+                                                          char       ***out_caps);
 
-gboolean notify_daemon_get_capabilities(NotifyDaemon *daemon,
-                                        char ***out_caps);
+gboolean        notify_daemon_get_server_information     (NotifyDaemon *daemon,
+                                                          char        **out_name,
+                                                          char        **out_vendor,
+                                                          char        **out_version,
+                                                          char        **out_spec_ver);
 
-gboolean notify_daemon_get_server_information(NotifyDaemon *daemon,
-                                              char **out_name,
-                                              char **out_vendor,
-                                              char **out_version,
-                                              char **out_spec_ver);
-
-GConfClient *get_gconf_client(void);
+GConfClient    *get_gconf_client (void);
 
 G_END_DECLS
-
 #endif /* NOTIFY_DAEMON_H */
