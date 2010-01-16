@@ -1,4 +1,4 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*- */
 
 #ifndef _ENGINES_H_
 #define _ENGINES_H_
@@ -15,17 +15,17 @@ void theme_set_notification_hints(GtkWindow *nw, GHashTable *hints);
 void theme_set_notification_timeout(GtkWindow *nw, glong timeout);
 void theme_notification_tick(GtkWindow *nw, glong remaining);
 void theme_set_notification_text(GtkWindow *nw,
-				 const char *summary,
-				 const char *body);
+                                 const char *summary,
+                                 const char *body);
 void theme_set_notification_icon(GtkWindow *nw, GdkPixbuf *pixbuf);
 void theme_set_notification_arrow(GtkWindow *nw,
-				  gboolean visible,
-				  int x,
-				  int y);
+                                  gboolean visible,
+                                  int x,
+                                  int y);
 void theme_add_notification_action(GtkWindow *nw,
-				   const char *label,
-				   const char *key,
-				   GCallback cb);
+                                   const char *label,
+                                   const char *key,
+                                   GCallback cb);
 void theme_clear_notification_actions(GtkWindow *nw);
 void theme_move_notification(GtkWindow *nw, int x, int y);
 gboolean theme_get_always_stack(GtkWindow *nw);

@@ -1,4 +1,4 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *
  * sound.c - Sound support portion of the destop notification spec
  *
@@ -28,12 +28,12 @@
 
 void
 sound_play_file(GtkWidget *widget,
-		const char *filename)
+                const char *filename)
 {
-	ca_gtk_play_for_widget (widget, 0,
-				CA_PROP_MEDIA_ROLE, "event",
-				CA_PROP_MEDIA_FILENAME, filename,
-				CA_PROP_EVENT_DESCRIPTION, _("Notification"),
-				NULL);
+        ca_gtk_play_for_widget (widget, 0,
+                                CA_PROP_MEDIA_ROLE, "event",
+                                CA_PROP_MEDIA_FILENAME, filename,
+                                CA_PROP_EVENT_DESCRIPTION, _("Notification"),
+                                NULL);
 }
 

@@ -1,5 +1,4 @@
-/*
- * sound.h - Sound support portion of the destop notification spec
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *
  * Copyright (C) 2007 Jim Ramsay <i.am@jimramsay.com>
  *
