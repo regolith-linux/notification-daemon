@@ -119,7 +119,7 @@ load_theme_engine (const char *name)
 }
 
 static void
-destroy_engine (ThemeEngine * engine)
+destroy_engine (ThemeEngine *engine)
 {
         g_assert (engine->ref_count == 0);
 
@@ -131,14 +131,14 @@ destroy_engine (ThemeEngine * engine)
 }
 
 static gboolean
-theme_engine_destroy (ThemeEngine * engine)
+theme_engine_destroy (ThemeEngine *engine)
 {
         destroy_engine (engine);
         return FALSE;
 }
 
 static void
-theme_engine_unref (ThemeEngine * engine)
+theme_engine_unref (ThemeEngine *engine)
 {
         engine->ref_count--;
 
@@ -212,11 +212,11 @@ get_theme_engine (void)
         return active_engine;
 }
 
-GtkWindow      *
+GtkWindow *
 theme_create_notification (UrlClickedCb url_clicked_cb)
 {
         ThemeEngine *engine;
-        GtkWindow   *nw
+        GtkWindow   *nw;
 
         engine = get_theme_engine ();
         nw = engine->create_notification (url_clicked_cb);
@@ -229,7 +229,7 @@ theme_create_notification (UrlClickedCb url_clicked_cb)
 }
 
 void
-theme_destroy_notification (GtkWindow * nw)
+theme_destroy_notification (GtkWindow *nw)
 {
         ThemeEngine *engine;
 
@@ -242,7 +242,7 @@ theme_destroy_notification (GtkWindow * nw)
 }
 
 void
-theme_show_notification (GtkWindow * nw)
+theme_show_notification (GtkWindow *nw)
 {
         ThemeEngine *engine;
 
@@ -255,7 +255,7 @@ theme_show_notification (GtkWindow * nw)
 }
 
 void
-theme_hide_notification (GtkWindow * nw)
+theme_hide_notification (GtkWindow *nw)
 {
         ThemeEngine *engine;
 
@@ -268,7 +268,8 @@ theme_hide_notification (GtkWindow * nw)
 }
 
 void
-theme_set_notification_hints (GtkWindow * nw, GHashTable * hints)
+theme_set_notification_hints (GtkWindow  *nw,
+                              GHashTable *hints)
 {
         ThemeEngine *engine;
 
@@ -279,7 +280,7 @@ theme_set_notification_hints (GtkWindow * nw, GHashTable * hints)
 }
 
 void
-theme_set_notification_timeout (GtkWindow * nw, glong timeout)
+theme_set_notification_timeout (GtkWindow *nw, glong timeout)
 {
         ThemeEngine *engine;
 
@@ -290,7 +291,8 @@ theme_set_notification_timeout (GtkWindow * nw, glong timeout)
 }
 
 void
-theme_notification_tick (GtkWindow * nw, glong remaining)
+theme_notification_tick (GtkWindow *nw,
+                         glong      remaining)
 {
         ThemeEngine *engine;
 
@@ -301,8 +303,9 @@ theme_notification_tick (GtkWindow * nw, glong remaining)
 }
 
 void
-theme_set_notification_text (GtkWindow * nw,
-                             const char *summary, const char *body)
+theme_set_notification_text (GtkWindow  *nw,
+                             const char *summary,
+                             const char *body)
 {
         ThemeEngine *engine;
         engine = g_object_get_data (G_OBJECT (nw), "_theme_engine");
@@ -310,7 +313,8 @@ theme_set_notification_text (GtkWindow * nw,
 }
 
 void
-theme_set_notification_icon (GtkWindow * nw, GdkPixbuf * pixbuf)
+theme_set_notification_icon (GtkWindow *nw,
+                             GdkPixbuf *pixbuf)
 {
         ThemeEngine *engine;
         engine = g_object_get_data (G_OBJECT (nw), "_theme_engine");
@@ -318,7 +322,10 @@ theme_set_notification_icon (GtkWindow * nw, GdkPixbuf * pixbuf)
 }
 
 void
-theme_set_notification_arrow (GtkWindow * nw, gboolean visible, int x, int y)
+theme_set_notification_arrow (GtkWindow *nw,
+                              gboolean   visible,
+                              int        x,
+                              int        y)
 {
         ThemeEngine *engine;
         engine = g_object_get_data (G_OBJECT (nw), "_theme_engine");
@@ -326,9 +333,10 @@ theme_set_notification_arrow (GtkWindow * nw, gboolean visible, int x, int y)
 }
 
 void
-theme_add_notification_action (GtkWindow * nw,
+theme_add_notification_action (GtkWindow  *nw,
                                const char *label,
-                               const char *key, GCallback cb)
+                               const char *key,
+                               GCallback   cb)
 {
         ThemeEngine *engine;
         engine = g_object_get_data (G_OBJECT (nw), "_theme_engine");
@@ -336,7 +344,7 @@ theme_add_notification_action (GtkWindow * nw,
 }
 
 void
-theme_clear_notification_actions (GtkWindow * nw)
+theme_clear_notification_actions (GtkWindow *nw)
 {
         ThemeEngine *engine;
 
@@ -345,7 +353,9 @@ theme_clear_notification_actions (GtkWindow * nw)
 }
 
 void
-theme_move_notification (GtkWindow * nw, int x, int y)
+theme_move_notification (GtkWindow *nw,
+                         int        x,
+                         int        y)
 {
         ThemeEngine *engine;
         engine = g_object_get_data (G_OBJECT (nw), "_theme_engine");
@@ -353,7 +363,7 @@ theme_move_notification (GtkWindow * nw, int x, int y)
 }
 
 gboolean
-theme_get_always_stack (GtkWindow * nw)
+theme_get_always_stack (GtkWindow *nw)
 {
         ThemeEngine *engine;
 
