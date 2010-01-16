@@ -324,8 +324,8 @@ notification_properties_dialog_setup_themes(NotificationAppletDialog *dialog)
 				theme_name = get_theme_name(filename);
 
 				/* FIXME: other solution than hardcode? */
-				if (g_str_equal(theme_name, "ubuntu"))
-					theme_label = g_strdup(_("Ubuntu theme"));
+				if (g_str_equal(theme_name, "slider"))
+					theme_label = g_strdup(_("Slider"));
 				else if (g_str_equal(theme_name, "standard"))
 					theme_label = g_strdup(_("Standard theme"));
 				else
