@@ -45,6 +45,8 @@ typedef struct
 
         int width;
         int height;
+        int last_width;
+        int last_height;
 
         guchar urgency;
         glong timeout;
@@ -181,6 +183,11 @@ update_shape (WindowData *windata)
         GdkBitmap *mask;
         cairo_t   *cr;
 
+        if (windata->width == windata->last_width
+            && windata->height == windata->last_height) {
+                return;
+        }
+
         if (windata->width == 0 || windata->height == 0) {
                 windata->width = MAX (windata->win->allocation.width, 1);
                 windata->height = MAX (windata->win->allocation.height, 1);
@@ -191,7 +198,12 @@ update_shape (WindowData *windata)
                 return;
         }
 
-        mask = (GdkBitmap *) gdk_pixmap_new (NULL, windata->width, windata->height, 1);
+        windata->last_width = windata->width;
+        windata->last_height = windata->height;
+        mask = (GdkBitmap *) gdk_pixmap_new (NULL,
+                                             windata->width,
+                                             windata->height,
+                                             1);
         if (mask == NULL) {
                 return;
         }
@@ -220,7 +232,7 @@ update_shape (WindowData *windata)
 }
 
 static gboolean
-paint_window (GtkWidget     *widget,
+paint_window (GtkWidget      *widget,
               GdkEventExpose *event,
               WindowData     *windata)
 {
@@ -374,6 +386,7 @@ on_style_set (GtkWidget  *widget,
 {
         g_signal_handlers_block_by_func (G_OBJECT(widget), on_style_set, windata);
         override_style (widget, previous_style);
+
         gtk_widget_queue_draw (widget);
 
         g_signal_handlers_unblock_by_func (G_OBJECT(widget), on_style_set, windata);
