@@ -478,7 +478,9 @@ create_notification (UrlClickedCb url_clicked)
                             FALSE, FALSE, 0);
 
         /* First row (icon, vbox, close) */
-        windata->iconbox = gtk_hbox_new (FALSE, 0);
+        windata->iconbox = gtk_alignment_new (0.5, 0, 0, 0);
+        gtk_alignment_set_padding (GTK_ALIGNMENT (windata->iconbox),
+                                   5, 0, 0, 0);
         gtk_widget_show (windata->iconbox);
         gtk_box_pack_start (GTK_BOX (windata->main_hbox),
                             windata->iconbox,
@@ -486,10 +488,7 @@ create_notification (UrlClickedCb url_clicked)
         gtk_widget_set_size_request (windata->iconbox, BODY_X_OFFSET, -1);
 
         windata->icon = gtk_image_new ();
-        gtk_box_pack_start (GTK_BOX (windata->iconbox),
-                            windata->icon,
-                            TRUE, TRUE, 0);
-        gtk_misc_set_alignment (GTK_MISC (windata->icon), 0.5, 0);
+        gtk_container_add (GTK_CONTAINER (windata->iconbox), windata->icon);
 
         vbox = gtk_vbox_new (FALSE, 6);
         gtk_widget_show (vbox);
