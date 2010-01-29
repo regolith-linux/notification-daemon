@@ -278,10 +278,6 @@ destroy_windata(WindowData *windata)
 static void
 update_content_hbox_visibility (WindowData *windata)
 {
-        /*
-         * This is all a hack, but until we have a libview-style ContentBox,
-         * it'll just have to do.
-         */
         if (GTK_WIDGET_VISIBLE (windata->icon)
             || GTK_WIDGET_VISIBLE (windata->body_label)
             || GTK_WIDGET_VISIBLE (windata->actions_box)) {
@@ -406,7 +402,6 @@ GtkWindow *
 create_notification (UrlClickedCb url_clicked)
 {
         GtkWidget   *win;
-        GtkWidget   *drawbox;
         GtkWidget   *main_vbox;
         GtkWidget   *vbox;
         GtkWidget   *close_button;
@@ -636,9 +631,13 @@ set_notification_text (GtkWindow  *nw,
                        const char *summary,
                        const char *body)
 {
-        char *str, *quoted;
+        char          *str;
+        char          *quoted;
         GtkRequisition req;
-        WindowData *windata = g_object_get_data (G_OBJECT (nw), "windata");
+        WindowData    *windata;
+        int            summary_width;
+
+        windata = g_object_get_data (G_OBJECT (nw), "windata");
 
         g_assert (windata != NULL);
 
@@ -659,21 +658,20 @@ set_notification_text (GtkWindow  *nw,
 
         update_content_hbox_visibility (windata);
 
+        gtk_widget_size_request (windata->close_button, &req);
+        /* -1: main_vbox border width
+           -10: vbox border width
+           -6: spacing for hbox */
+        summary_width = WIDTH - (1*2) - (10*2) - BODY_X_OFFSET - req.width - (6*2);
+
         if (body != NULL && *body != '\0') {
-                gtk_widget_size_request (windata->iconbox, &req);
                 gtk_widget_set_size_request (windata->body_label,
-                                             /* -1: border width for
-                                                -6: spacing for hbox */
-                                             WIDTH - (1*2) - (10*2) - req.width - 6,
+                                             summary_width,
                                              -1);
         }
 
-        gtk_widget_size_request (windata->close_button, &req);
         gtk_widget_set_size_request (windata->summary_label,
-                                     /* -1: main_vbox border width
-                                        -10: vbox border width
-                                        -6: spacing for hbox */
-                                     WIDTH - (1*2) - (10*2) - BODY_X_OFFSET - req.width - (6*2),
+                                     summary_width,
                                      -1);
 }
 
