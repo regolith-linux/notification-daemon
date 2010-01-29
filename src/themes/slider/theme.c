@@ -26,8 +26,6 @@
 typedef void (*ActionInvokedCb) (GtkWindow *nw, const char *key);
 typedef void (*UrlClickedCb)    (GtkWindow *nw, const char *url);
 
-#define MAX_ICON_SIZE 48
-
 typedef struct
 {
         GtkWidget *win;
@@ -67,12 +65,14 @@ enum {
 #define DEFAULT_X0    0
 #define DEFAULT_Y0    0
 #define DEFAULT_RADIUS 16
-#define IMAGE_SIZE    32
+#define IMAGE_SIZE    48
 #define PIE_RADIUS    12
 #define PIE_WIDTH     (2 * PIE_RADIUS)
 #define PIE_HEIGHT    (2 * PIE_RADIUS)
 #define BODY_X_OFFSET (IMAGE_SIZE + 8)
 #define BACKGROUND_ALPHA    0.90
+
+#define MAX_ICON_SIZE IMAGE_SIZE
 
 #if GTK_CHECK_VERSION(2, 10, 0)
 # define USE_COMPOSITE
