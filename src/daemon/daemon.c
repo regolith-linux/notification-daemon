@@ -1348,6 +1348,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         } else if (*icon != '\0') {
                 pixbuf = _notify_daemon_pixbuf_from_path (icon);
         } else if ((data = (GValue *) g_hash_table_lookup (hints, "icon_data"))) {
+                g_warning("\"icon_data\" hint is deprecated, please use \"image_data\" instead");
                 pixbuf = _notify_daemon_pixbuf_from_data_hint (data);
         }
 
