@@ -26,6 +26,8 @@
 typedef void (*ActionInvokedCb) (GtkWindow *nw, const char *key);
 typedef void (*UrlClickedCb)    (GtkWindow *nw, const char *url);
 
+#define MAX_ICON_SIZE 48
+
 typedef struct
 {
         GtkWidget *win;
@@ -675,25 +677,80 @@ set_notification_text (GtkWindow  *nw,
                                      -1);
 }
 
+static GdkPixbuf *
+scale_pixbuf (GdkPixbuf *pixbuf,
+              int        max_width,
+              int        max_height,
+              gboolean   no_stretch_hint)
+{
+        int        pw;
+        int        ph;
+        float      scale_factor_x = 1.0;
+        float      scale_factor_y = 1.0;
+        float      scale_factor = 1.0;
+
+        pw = gdk_pixbuf_get_width (pixbuf);
+        ph = gdk_pixbuf_get_height (pixbuf);
+
+        /* Determine which dimension requires the smallest scale. */
+        scale_factor_x = (float) max_width / (float) pw;
+        scale_factor_y = (float) max_height / (float) ph;
+
+        if (scale_factor_x > scale_factor_y) {
+                scale_factor = scale_factor_y;
+        } else {
+                scale_factor = scale_factor_x;
+        }
+
+        /* always scale down, allow to disable scaling up */
+        if (scale_factor < 1.0 || !no_stretch_hint) {
+                int scale_x;
+                int scale_y;
+
+                scale_x = (int) (pw * scale_factor);
+                scale_y = (int) (ph * scale_factor);
+                return gdk_pixbuf_scale_simple (pixbuf,
+                                                scale_x,
+                                                scale_y,
+                                                GDK_INTERP_BILINEAR);
+        } else {
+                return g_object_ref (pixbuf);
+        }
+}
+
 void
 set_notification_icon (GtkWindow *nw,
                        GdkPixbuf *pixbuf)
 {
-        WindowData *windata = g_object_get_data (G_OBJECT (nw), "windata");
+        WindowData *windata;
+        GdkPixbuf  *scaled;
+
+        windata = g_object_get_data (G_OBJECT (nw), "windata");
 
         g_assert (windata != NULL);
 
-        gtk_image_set_from_pixbuf (GTK_IMAGE (windata->icon), pixbuf);
-
+        scaled = NULL;
         if (pixbuf != NULL) {
-                int pixbuf_width = gdk_pixbuf_get_width (pixbuf);
+                scaled = scale_pixbuf (pixbuf,
+                                       MAX_ICON_SIZE,
+                                       MAX_ICON_SIZE,
+                                       TRUE);
+        }
+
+        gtk_image_set_from_pixbuf (GTK_IMAGE (windata->icon), scaled);
+
+        if (scaled != NULL) {
+                int pixbuf_width = gdk_pixbuf_get_width (scaled);
 
                 gtk_widget_show (windata->icon);
                 gtk_widget_set_size_request (windata->iconbox,
                                              MAX (BODY_X_OFFSET, pixbuf_width), -1);
+                g_object_unref (scaled);
         } else {
                 gtk_widget_hide (windata->icon);
-                gtk_widget_set_size_request (windata->iconbox, BODY_X_OFFSET, -1);
+                gtk_widget_set_size_request (windata->iconbox,
+                                             BODY_X_OFFSET,
+                                             -1);
         }
 
         update_content_hbox_visibility (windata);
