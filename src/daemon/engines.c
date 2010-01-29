@@ -176,7 +176,7 @@ get_theme_engine (void)
                 GConfClient    *client;
                 char           *enginename;
 
-                client = get_gconf_client;
+                client = get_gconf_client ();
                 enginename = gconf_client_get_string (client,
                                                       GCONF_KEY_THEME,
                                                       NULL);

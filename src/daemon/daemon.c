@@ -1473,7 +1473,7 @@ notify_daemon_get_server_information (NotifyDaemon *daemon,
         return TRUE;
 }
 
-GConfClient    *
+GConfClient *
 get_gconf_client (void)
 {
         return gconf_client;
