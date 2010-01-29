@@ -685,10 +685,8 @@ _store_notification (NotifyDaemon *daemon,
         return nt;
 }
 
-static gboolean
-_notify_daemon_process_icon_data (NotifyDaemon *daemon,
-                                  GtkWindow    *nw,
-                                  GValue       *icon_data)
+static GdkPixbuf *
+_notify_daemon_pixbuf_from_data_hint (GValue *icon_data)
 {
         const guchar   *data = NULL;
         gboolean        has_alpha;
@@ -716,9 +714,9 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
                                               G_TYPE_INVALID);
 
         if (!G_VALUE_HOLDS (icon_data, struct_type)) {
-                g_warning ("_notify_daemon_process_icon_data expected a "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected a "
                            "GValue of type GValueArray");
-                return FALSE;
+                return NULL;
         }
 #endif /* D-BUS >= 0.61 */
 
@@ -726,107 +724,107 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
         value = g_value_array_get_nth (image_struct, 0);
 
         if (value == NULL) {
-                g_warning ("_notify_daemon_process_icon_data expected position "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected position "
                            "0 of the GValueArray to exist");
-                return FALSE;
+                return NULL;
         }
 
         if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 0 of the GValueArray to be of type int");
-                return FALSE;
+                return NULL;
         }
 
         width = g_value_get_int (value);
         value = g_value_array_get_nth (image_struct, 1);
 
         if (value == NULL) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 1 of the GValueArray to exist");
-                return FALSE;
+                return NULL;
         }
 
         if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 1 of the GValueArray to be of type int");
-                return FALSE;
+                return NULL;
         }
 
         height = g_value_get_int (value);
         value = g_value_array_get_nth (image_struct, 2);
 
         if (value == NULL) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 2 of the GValueArray to exist");
-                return FALSE;
+                return NULL;
         }
 
         if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 2 of the GValueArray to be of type int");
-                return FALSE;
+                return NULL;
         }
 
         rowstride = g_value_get_int (value);
         value = g_value_array_get_nth (image_struct, 3);
 
         if (value == NULL) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 3 of the GValueArray to exist");
-                return FALSE;
+                return NULL;
         }
 
         if (!G_VALUE_HOLDS (value, G_TYPE_BOOLEAN)) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 3 of the GValueArray to be of type gboolean");
-                return FALSE;
+                return NULL;
         }
 
         has_alpha = g_value_get_boolean (value);
         value = g_value_array_get_nth (image_struct, 4);
 
         if (value == NULL) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 4 of the GValueArray to exist");
-                return FALSE;
+                return NULL;
         }
 
         if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 4 of the GValueArray to be of type int");
-                return FALSE;
+                return NULL;
         }
 
         bits_per_sample = g_value_get_int (value);
         value = g_value_array_get_nth (image_struct, 5);
 
         if (value == NULL) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 5 of the GValueArray to exist");
-                return FALSE;
+                return NULL;
         }
 
         if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 5 of the GValueArray to be of type int");
-                return FALSE;
+                return NULL;
         }
 
         n_channels = g_value_get_int (value);
         value = g_value_array_get_nth (image_struct, 6);
 
         if (value == NULL) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 6 of the GValueArray to exist");
-                return FALSE;
+                return NULL;
         }
 
         if (!G_VALUE_HOLDS (value,
                             dbus_g_type_get_collection ("GArray",
                                                         G_TYPE_UCHAR))) {
-                g_warning ("_notify_daemon_process_icon_data expected "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
                            "position 6 of the GValueArray to be of type GArray");
-                return FALSE;
+                return NULL;
         }
 
         tmp_array = (GArray *) g_value_get_boxed (value);
@@ -834,11 +832,11 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
                 * ((n_channels * bits_per_sample + 7) / 8);
 
         if (expected_len != tmp_array->len) {
-                g_warning ("_notify_daemon_process_icon_data expected image "
+                g_warning ("_notify_daemon_pixbuf_from_data_hint expected image "
                            "data to be of length %" G_GSIZE_FORMAT
                            " but got a " "length of %u", expected_len,
                            tmp_array->len);
-                return FALSE;
+                return NULL;
         }
 
         data = (guchar *) g_memdup (tmp_array->data, tmp_array->len);
@@ -851,10 +849,58 @@ _notify_daemon_process_icon_data (NotifyDaemon *daemon,
                                            rowstride,
                                            (GdkPixbufDestroyNotify) g_free,
                                            NULL);
-        theme_set_notification_icon (nw, pixbuf);
-        g_object_unref (G_OBJECT (pixbuf));
 
-        return TRUE;
+        return pixbuf;
+}
+
+static GdkPixbuf *
+_notify_daemon_pixbuf_from_path (const char *path)
+{
+        GdkPixbuf *pixbuf = NULL;
+
+        if (!strncmp (path, "file://", 7) || *path == '/') {
+                if (!strncmp (path, "file://", 7)) {
+                        path += 7;
+                }
+
+                /* Load file */
+                pixbuf = gdk_pixbuf_new_from_file (path, NULL);
+        } else {
+                /* Load icon theme icon */
+                GtkIconTheme *theme;
+                GtkIconInfo  *icon_info;
+
+                theme = gtk_icon_theme_get_default ();
+                icon_info = gtk_icon_theme_lookup_icon (theme,
+                                                        path,
+                                                        IMAGE_SIZE,
+                                                        GTK_ICON_LOOKUP_USE_BUILTIN);
+
+                if (icon_info != NULL) {
+                        gint icon_size;
+
+                        icon_size = MIN (IMAGE_SIZE,
+                                         gtk_icon_info_get_base_size (icon_info));
+
+                        if (icon_size == 0)
+                                icon_size = IMAGE_SIZE;
+
+                        pixbuf = gtk_icon_theme_load_icon (theme,
+                                                           path,
+                                                           icon_size,
+                                                           GTK_ICON_LOOKUP_USE_BUILTIN,
+                                                           NULL);
+
+                        gtk_icon_info_free (icon_info);
+                }
+
+                if (pixbuf == NULL) {
+                        /* Well... maybe this is a file afterall. */
+                        pixbuf = gdk_pixbuf_new_from_file (path, NULL);
+                }
+        }
+
+        return pixbuf;
 }
 
 static void
@@ -1177,6 +1223,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         gchar          *sound_file = NULL;
         gboolean        sound_enabled;
         gint            i;
+        GdkPixbuf      *pixbuf;
 
         if (id > 0) {
                 nt = (NotifyTimeout *) g_hash_table_lookup (priv->notification_hash,
@@ -1287,60 +1334,27 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
                 }
         }
 
-        /* check for icon_data if icon == "" */
-        if (*icon == '\0') {
-                data = (GValue *) g_hash_table_lookup (hints, "icon_data");
-
-                if (data)
-                        _notify_daemon_process_icon_data (daemon, nw, data);
-        } else {
-                GdkPixbuf *pixbuf = NULL;
-
-                if (!strncmp (icon, "file://", 7) || *icon == '/') {
-                        if (!strncmp (icon, "file://", 7))
-                                icon += 7;
-
-                        /* Load file */
-                        pixbuf = gdk_pixbuf_new_from_file (icon, NULL);
+        pixbuf = NULL;
+        if ((data = (GValue *) g_hash_table_lookup (hints, "image_data"))) {
+                pixbuf = _notify_daemon_pixbuf_from_data_hint (data);
+        } else if ((data = (GValue *) g_hash_table_lookup (hints, "image_path"))) {
+                if (G_VALUE_HOLDS_STRING (data)) {
+                        const char *path = g_value_get_string (data);
+                        pixbuf = _notify_daemon_pixbuf_from_path (path);
                 } else {
-                        /* Load icon theme icon */
-                        GtkIconTheme   *theme;
-                        GtkIconInfo    *icon_info;
-
-                        theme = gtk_icon_theme_get_default ();
-                        icon_info = gtk_icon_theme_lookup_icon (theme,
-                                                                icon,
-                                                                IMAGE_SIZE,
-                                                                GTK_ICON_LOOKUP_USE_BUILTIN);
-
-                        if (icon_info != NULL) {
-                                gint icon_size = MIN (IMAGE_SIZE,
-                                                      gtk_icon_info_get_base_size (icon_info));
-
-                                if (icon_size == 0)
-                                        icon_size = IMAGE_SIZE;
-
-                                pixbuf = gtk_icon_theme_load_icon (theme,
-                                                                   icon,
-                                                                   icon_size,
-                                                                   GTK_ICON_LOOKUP_USE_BUILTIN,
-                                                                   NULL);
-
-                                gtk_icon_info_free (icon_info);
-                        }
-
-                        if (pixbuf == NULL) {
-                                /* Well... maybe this is a file afterall. */
-                                pixbuf = gdk_pixbuf_new_from_file (icon, NULL);
-                        }
+                        g_warning ("notify_daemon_notify_handler expected "
+                                   "image_path hint to be of type string");
                 }
-
-                if (pixbuf != NULL) {
-                        theme_set_notification_icon (nw, pixbuf);
-                        g_object_unref (G_OBJECT (pixbuf));
-                }
+        } else if (*icon != '\0') {
+                pixbuf = _notify_daemon_pixbuf_from_path (icon);
+        } else if ((data = (GValue *) g_hash_table_lookup (hints, "icon_data"))) {
+                pixbuf = _notify_daemon_pixbuf_from_data_hint (data);
         }
 
+        if (pixbuf != NULL) {
+                theme_set_notification_icon (nw, pixbuf);
+                g_object_unref (G_OBJECT (pixbuf));
+        }
 
         if (window_xid != None && !theme_get_always_stack (nw)) {
                 /*
@@ -1468,7 +1482,7 @@ notify_daemon_get_server_information (NotifyDaemon *daemon,
         *out_name = g_strdup ("Notification Daemon");
         *out_vendor = g_strdup ("GNOME");
         *out_version = g_strdup (VERSION);
-        *out_spec_ver = g_strdup ("1.0");
+        *out_spec_ver = g_strdup ("1.1");
 
         return TRUE;
 }
