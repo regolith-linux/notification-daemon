@@ -184,7 +184,7 @@ get_theme_engine (void)
                 if (theme_prop_notify_id == 0) {
                         theme_prop_notify_id =
                                 gconf_client_notify_add (client,
-                                                         "/apps/notification-daemon/theme",
+                                                         GCONF_KEY_THEME,
                                                          theme_changed_cb,
                                                          NULL,
                                                          NULL,

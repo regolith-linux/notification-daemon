@@ -896,7 +896,7 @@ popup_location_changed_cb (GConfClient *client,
                 stack_location = get_stack_location_from_string (slocation);
         } else {
                 gconf_client_set_string (get_gconf_client (),
-                                         "/apps/notification-daemon/popup_location",
+                                         GCONF_KEY_POPUP_LOCATION,
                                          popup_stack_locations
                                          [POPUP_STACK_DEFAULT_INDEX].
                                          identifier,
