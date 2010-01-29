@@ -30,6 +30,7 @@
 #include <gdk/gdkx.h>
 
 #define NOTIFY_STACK_SPACING 2
+#define WORKAREA_PADDING 6
 
 struct _NotifyStack
 {
@@ -41,13 +42,15 @@ struct _NotifyStack
 };
 
 static gboolean
-get_work_area (GtkWidget * nw, GdkRectangle * rect)
+get_work_area (GtkWidget    *nw,
+               GdkRectangle *rect)
 {
         Atom            workarea;
         Atom            type;
         Window          win;
         int             format;
-        gulong          num, leftovers;
+        gulong          num;
+        gulong          leftovers;
         gulong          max_len = 4 * 32;
         guchar         *ret_workarea;
         long           *workareas;
@@ -61,10 +64,14 @@ get_work_area (GtkWidget * nw, GdkRectangle * rect)
         disp_screen = GDK_SCREEN_XNUMBER (screen);
 
         /* Defaults in case of error */
-        rect->x = 0;
-        rect->y = 0;
-        rect->width = gdk_screen_get_width (screen);
-        rect->height = gdk_screen_get_height (screen);
+        rect->x = WORKAREA_PADDING;
+        rect->y = WORKAREA_PADDING;
+        rect->width = gdk_screen_get_width (screen) - WORKAREA_PADDING * 2;
+        rect->height = gdk_screen_get_height (screen) - WORKAREA_PADDING * 2;
+        if (rect->width < 0)
+                rect->width = 0;
+        if (rect->height < 0)
+                rect->height = 0;
 
         if (workarea == None)
                 return FALSE;
@@ -92,10 +99,14 @@ get_work_area (GtkWidget * nw, GdkRectangle * rect)
         }
 
         workareas = (long *) ret_workarea;
-        rect->x = workareas[disp_screen * 4];
-        rect->y = workareas[disp_screen * 4 + 1];
-        rect->width = workareas[disp_screen * 4 + 2];
-        rect->height = workareas[disp_screen * 4 + 3];
+        rect->x = workareas[disp_screen * 4] + WORKAREA_PADDING;
+        rect->y = workareas[disp_screen * 4 + 1] + WORKAREA_PADDING;
+        rect->width = workareas[disp_screen * 4 + 2] - WORKAREA_PADDING * 2;
+        rect->height = workareas[disp_screen * 4 + 3] - WORKAREA_PADDING * 2;
+        if (rect->width < 0)
+                rect->width = 0;
+        if (rect->height < 0)
+                rect->height = 0;
 
         XFree (ret_workarea);
 
@@ -235,12 +246,18 @@ notify_stack_shift_notifications (NotifyStack *stack,
         gint            index = 1;
 
         get_work_area (GTK_WIDGET (nw), &workarea);
-        gdk_screen_get_monitor_geometry (stack->screen, stack->monitor,
+        gdk_screen_get_monitor_geometry (stack->screen,
+                                         stack->monitor,
                                          &monitor);
         gdk_rectangle_intersect (&monitor, &workarea, &workarea);
 
-        get_origin_coordinates (stack->location, &workarea, &x, &y,
-                                &shiftx, &shifty, init_width, init_height);
+        get_origin_coordinates (stack->location,
+                                &workarea,
+                                &x, &y,
+                                &shiftx,
+                                &shifty,
+                                init_width,
+                                init_height);
 
         if (nw_x != NULL)
                 *nw_x = x;
@@ -261,7 +278,7 @@ notify_stack_shift_notifications (NotifyStack *stack,
                                                &y,
                                                &shiftx,
                                                &shifty,
-                                               req.width + NOTIFY_STACK_SPACING,
+                                               req.width,
                                                req.height + NOTIFY_STACK_SPACING,
                                                index++);
                         theme_move_notification (nw2, x, y);
@@ -283,7 +300,7 @@ notify_stack_add_window (NotifyStack *stack,
         notify_stack_shift_notifications (stack,
                                           nw,
                                           NULL,
-                                          req.width + NOTIFY_STACK_SPACING,
+                                          req.width,
                                           req.height + NOTIFY_STACK_SPACING,
                                           &x,
                                           &y);
