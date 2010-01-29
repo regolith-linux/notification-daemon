@@ -461,24 +461,13 @@ create_notification (UrlClickedCb url_clicked)
                           G_CALLBACK (on_configure_event),
                           windata);
 
-        /*
-         * For some reason, there are occasionally graphics glitches when
-         * repainting the window. Despite filling the window with a background
-         * color, parts of the other windows on the screen or the shadows around
-         * notifications will appear on the notification. Somehow, adding this
-         * eventbox makes that problem just go away. Whatever works for now.
-         */
-        drawbox = gtk_event_box_new ();
-        gtk_widget_show (drawbox);
-        gtk_container_add (GTK_CONTAINER (win), drawbox);
-
         main_vbox = gtk_vbox_new (FALSE, 0);
         g_signal_connect (G_OBJECT (main_vbox),
                           "style-set",
                           G_CALLBACK (on_style_set),
                           windata);
         gtk_widget_show (main_vbox);
-        gtk_container_add (GTK_CONTAINER (drawbox), main_vbox);
+        gtk_container_add (GTK_CONTAINER (win), main_vbox);
         gtk_container_set_border_width (GTK_CONTAINER (main_vbox), 12);
         g_signal_connect (G_OBJECT (main_vbox),
                           "expose-event",
