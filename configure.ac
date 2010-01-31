@@ -231,7 +231,6 @@ src/Makefile
 src/daemon/Makefile
 src/capplet/Makefile
 src/themes/Makefile
-src/themes/bubble/Makefile
 src/themes/slider/Makefile
 src/themes/standard/Makefile
 ])
