@@ -110,7 +110,7 @@ dnl ---------------------------------------------------------------------------
 dnl Requirements for the setup tool
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(NOTIFICATION_CAPPLET, glib-2.0 >= $REQ_GLIB_VERSION gtk+-2.0 >= $REQ_GTK_VERSION libglade-2.0 gconf-2.0 libnotify dbus-1 dbus-glib-1)
+PKG_CHECK_MODULES(NOTIFICATION_CAPPLET, glib-2.0 >= $REQ_GLIB_VERSION gtk+-2.0 >= $REQ_GTK_VERSION gconf-2.0 libnotify dbus-1 dbus-glib-1)
 AC_SUBST(NOTIFICATION_CAPPLET_CFLAGS)
 AC_SUBST(NOTIFICATION_CAPPLET_LIBS)
 

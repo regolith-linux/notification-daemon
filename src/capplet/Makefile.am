@@ -5,8 +5,8 @@ bin_PROGRAMS = notification-properties
 notification_properties_LDADD   = $(NOTIFICATION_CAPPLET_LIBS)
 notification_properties_SOURCES = notification-properties.c
 
-gladedir = $(datadir)/notification-daemon
-glade_DATA = notification-properties.glade
+uidir = $(datadir)/notification-daemon
+ui_DATA = notification-properties.ui
 
 desktopdir = $(datadir)/applications
 desktop_in_files = notification-properties.desktop.in
@@ -18,9 +18,9 @@ INCLUDES = \
 	$(NOTIFICATION_CAPPLET_CFLAGS) \
 	-DENGINES_DIR=\"$(libdir)/notification-daemon-1.0/engines\" \
 	-DNOTIFICATION_LOCALEDIR=\"$(datadir)/locale\" \
-	-DNOTIFICATION_GLADEDIR=\"$(datadir)/notification-daemon\"
+	-DNOTIFICATION_UIDIR=\"$(datadir)/notification-daemon\"
 
 CLEANFILES = $(desktop_DATA)
-EXTRA_DIST = $(glade_DATA) $(pixmap_DATA) $(desktop_in_files)
+EXTRA_DIST = $(ui_DATA) $(pixmap_DATA) $(desktop_in_files)
 
 -include $(top_srcdir)/git.mk

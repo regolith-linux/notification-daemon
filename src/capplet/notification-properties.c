@@ -23,7 +23,6 @@
 #include <glib/gi18n.h>
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <glade/glade.h>
 #include <gconf/gconf-client.h>
 #include <string.h>
 #include <libnotify/notify.h>
@@ -36,9 +35,11 @@
 
 #define N_LISTENERS 2
 
+#define NOTIFICATION_UI_FILE "notification-properties.ui"
+#define WID(s) GTK_WIDGET (gtk_builder_get_object (builder, s))
+
 typedef struct
 {
-        GladeXML           *xml;
         GConfClient        *client;
 
         GtkWidget          *dialog;
@@ -66,17 +67,6 @@ enum
         NOTIFY_THEME_NAME,
         NOTIFY_THEME_FILENAME,
         N_COLUMNS_THEME
-};
-
-const struct
-{
-        const gchar    *identifier;
-        const gchar    *label;
-} popup_stack_locations[] = {
-        {"top_left", N_("Top Left")},
-        {"top_right", N_("Top Right")},
-        {"bottom_left", N_("Bottom Left")},
-        {"bottom_right", N_("Bottom Right")}
 };
 
 static void
@@ -148,33 +138,12 @@ notification_properties_location_changed (GtkComboBox              *widget,
 static void
 notification_properties_dialog_setup_positions (NotificationAppletDialog *dialog)
 {
-        NotifyStackLocation i;
         char               *location;
         gboolean            valid;
-        GtkListStore       *store;
+        GtkTreeModel       *model;
         GtkTreeIter         iter;
 
-        dialog->position_combo = glade_xml_get_widget (dialog->xml,
-                                                       "position_combo");
-        g_return_if_fail (dialog->position_combo != NULL);
-
-        store = gtk_list_store_new (N_COLUMNS_POSITION,
-                                    G_TYPE_STRING,
-                                    G_TYPE_STRING);
-
-        for (i = NOTIFY_STACK_LOCATION_TOP_LEFT;
-             i <= NOTIFY_STACK_LOCATION_BOTTOM_RIGHT;
-             i++) {
-                gtk_list_store_append (store, &iter);
-                gtk_list_store_set (store,
-                                    &iter,
-                                    NOTIFY_POSITION_LABEL, _(popup_stack_locations[i].label),
-                                    NOTIFY_POSITION_NAME, popup_stack_locations[i].identifier,
-                                    -1);
-        }
-
-        gtk_combo_box_set_model (GTK_COMBO_BOX (dialog->position_combo),
-                                 GTK_TREE_MODEL (store));
+        model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->position_combo));
         g_signal_connect (dialog->position_combo,
                           "changed",
                           G_CALLBACK (notification_properties_location_changed),
@@ -184,12 +153,12 @@ notification_properties_dialog_setup_positions (NotificationAppletDialog *dialog
                                             GCONF_KEY_POPUP_LOCATION,
                                             NULL);
 
-        for (valid = gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter);
+        for (valid = gtk_tree_model_get_iter_first (model, &iter);
              valid;
-             valid = gtk_tree_model_iter_next (GTK_TREE_MODEL (store), &iter)) {
+             valid = gtk_tree_model_iter_next (model, &iter)) {
                 gchar *key;
 
-                gtk_tree_model_get (GTK_TREE_MODEL (store),
+                gtk_tree_model_get (model,
                                     &iter,
                                     NOTIFY_POSITION_NAME, &key,
                                     -1);
@@ -299,10 +268,6 @@ notification_properties_dialog_setup_themes (NotificationAppletDialog *dialog)
         gboolean        valid;
         GtkListStore   *store;
         GtkTreeIter     iter;
-        GtkCellRenderer *cell ;
-
-        dialog->theme_combo = glade_xml_get_widget (dialog->xml, "theme_combo");
-        g_assert (dialog->theme_combo != NULL);
 
         store = gtk_list_store_new (N_COLUMNS_THEME,
                                     G_TYPE_STRING,
@@ -315,15 +280,6 @@ notification_properties_dialog_setup_themes (NotificationAppletDialog *dialog)
                           "changed",
                           G_CALLBACK (notification_properties_theme_changed),
                           dialog);
-
-        cell = gtk_cell_renderer_text_new ();
-        gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (GTK_COMBO_BOX (dialog->theme_combo)),
-                                    cell,
-                                    TRUE);
-        gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (GTK_COMBO_BOX (dialog->theme_combo)),
-                                        cell,
-                                        "text", 0,
-                                        NULL);
 
         if ((dir = g_dir_open (ENGINES_DIR, 0, NULL))) {
                 while ((filename = g_dir_read_name (dir))) {
@@ -498,23 +454,37 @@ notification_properties_dialog_destroyed (GtkWidget                *widget,
 static gboolean
 notification_properties_dialog_init (NotificationAppletDialog *dialog)
 {
-#define NOTIFICATION_GLADE_FILE "notification-properties.glade"
-        const char *glade_file;
+        GtkBuilder *builder;
+        GError     *error;
+        const char *ui_file;
 
-        if (g_file_test (NOTIFICATION_GLADE_FILE, G_FILE_TEST_EXISTS))
-                glade_file = NOTIFICATION_GLADE_FILE;
-        else
-                glade_file = NOTIFICATION_GLADEDIR "/" NOTIFICATION_GLADE_FILE;
+        if (g_file_test (NOTIFICATION_UI_FILE, G_FILE_TEST_EXISTS)) {
+                ui_file = NOTIFICATION_UI_FILE;
+        } else {
+                ui_file = NOTIFICATION_UIDIR "/" NOTIFICATION_UI_FILE;
+        }
 
-        dialog->xml = glade_xml_new (glade_file, "dialog", NULL);
+        builder = gtk_builder_new ();
 
-        if (!dialog->xml) {
-                g_warning (_("Unable to locate glade file '%s'"), glade_file);
+        error = NULL;
+        gtk_builder_add_from_file (builder, ui_file, &error);
+        if (error != NULL) {
+                g_warning (_("Could not load user interface file: %s"),
+                           error->message);
+                g_error_free (error);
                 return FALSE;
         }
 
-        dialog->dialog = glade_xml_get_widget (dialog->xml, "dialog");
+        dialog->dialog = WID ("dialog");
         g_assert (dialog->dialog != NULL);
+
+        dialog->position_combo = WID ("position_combo");
+        g_assert (dialog->position_combo != NULL);
+
+        dialog->theme_combo = WID ("theme_combo");
+        g_assert (dialog->theme_combo != NULL);
+
+        g_object_unref (builder);
 
         g_signal_connect (dialog->dialog,
                           "response",
@@ -545,8 +515,6 @@ notification_properties_dialog_init (NotificationAppletDialog *dialog)
         dialog->preview = NULL;
 
         return TRUE;
-
-#undef NOTIFICATION_GLADE_FILE
 }
 
 static void
@@ -574,11 +542,6 @@ notification_properties_dialog_finalize (NotificationAppletDialog *dialog)
                                          NULL);
                 g_object_unref (dialog->client);
                 dialog->client = NULL;
-        }
-
-        if (dialog->xml != NULL) {
-                g_object_unref (dialog->xml);
-                dialog->xml = NULL;
         }
 
         if (dialog->preview) {
