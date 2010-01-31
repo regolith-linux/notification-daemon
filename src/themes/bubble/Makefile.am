@@ -13,3 +13,5 @@ libbubble_la_LDFLAGS = -module -avoid-version
 
 INCLUDES = \
 	$(NOTIFICATION_DAEMON_CFLAGS)
+
+-include $(top_srcdir)/git.mk

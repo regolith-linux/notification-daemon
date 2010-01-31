@@ -7,3 +7,5 @@ libstandard_la_LDFLAGS = -module -avoid-version
 libstandard_la_LIBADD  = $(NOTIFICATION_DAEMON_LIBS)
 
 INCLUDES = $(NOTIFICATION_DAEMON_CFLAGS)
+
+-include $(top_srcdir)/git.mk

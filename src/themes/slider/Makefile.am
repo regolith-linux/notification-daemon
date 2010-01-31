@@ -11,3 +11,5 @@ libslider_la_LDFLAGS = -module -avoid-version
 libslider_la_LIBADD =	\
 	$(THEME_LIBS)	\
 	$(NULL)
+
+-include $(top_srcdir)/git.mk

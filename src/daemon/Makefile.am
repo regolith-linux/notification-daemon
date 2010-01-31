@@ -26,3 +26,5 @@ INCLUDES = \
 EXTRA_DIST = notificationdaemon.xml
 DISTCLEANFILES = \
 	notificationdaemon-dbus-glue.h
+
+-include $(top_srcdir)/git.mk

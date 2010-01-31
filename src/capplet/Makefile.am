@@ -22,3 +22,5 @@ INCLUDES = \
 
 CLEANFILES = $(desktop_DATA)
 EXTRA_DIST = $(glade_DATA) $(pixmap_DATA) $(desktop_in_files)
+
+-include $(top_srcdir)/git.mk
