@@ -237,13 +237,18 @@ src/themes/standard/Makefile
 
 AC_OUTPUT
 
-echo
-echo $PACKAGE v$VERSION
-echo
-echo prefix............... : $prefix
-echo dbus-1 system.d dir.. : $DBUS_SYS_DIR
-echo dbus-1 services dir.. : $DBUS_SERVICES_DIR
-echo
-echo "Now type make to compile"
-echo "Then su to root and type: make install"
-echo
+echo "
+                    $PACKAGE $VERSION
+                    ========================
+
+	prefix:                   ${prefix}
+	exec_prefix:              ${exec_prefix}
+        bindir:                   ${bindir}
+        datadir:                  ${datadir}
+	source code location:	  ${srcdir}
+	cflags:		          ${CFLAGS}
+
+        dbus-1 system.d           $DBUS_SYS_DIR
+        dbus-1 services           $DBUS_SERVICES_DIR
+
+"
