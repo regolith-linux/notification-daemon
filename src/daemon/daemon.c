@@ -50,6 +50,8 @@
 
 #define IMAGE_SIZE 48
 #define IDLE_SECONDS 30
+#define NOTIFICATION_BUS_NAME      "org.freedesktop.Notifications"
+#define NOTIFICATION_BUS_PATH      "/org/freedesktop/Notifications"
 
 #define NW_GET_NOTIFY_ID(nw) \
         (GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(nw), "_notify_id")))
@@ -304,8 +306,8 @@ create_signal (GtkWindow  *nw,
 
         g_assert (dest != NULL);
 
-        message = dbus_message_new_signal ("/org/freedesktop/Notifications",
-                                           "org.freedesktop.Notifications",
+        message = dbus_message_new_signal (NOTIFICATION_BUS_PATH,
+                                           NOTIFICATION_BUS_NAME,
                                            signal_name);
 
         dbus_message_set_destination (message, dest);
@@ -1501,6 +1503,7 @@ main (int argc, char **argv)
         DBusGConnection *connection;
         DBusGProxy      *bus_proxy;
         GError          *error;
+        gboolean         res;
         guint            request_name_result;
 
         g_log_set_always_fatal (G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
@@ -1535,18 +1538,25 @@ main (int argc, char **argv)
                                                "/org/freedesktop/DBus",
                                                "org.freedesktop.DBus");
 
-        if (!dbus_g_proxy_call (bus_proxy,
-                                "RequestName",
-                                &error,
-                                G_TYPE_STRING,
-                                "org.freedesktop.Notifications",
-                                G_TYPE_UINT,
-                                0,
-                                G_TYPE_INVALID,
-                                G_TYPE_UINT,
-                                &request_name_result,
-                                G_TYPE_INVALID)) {
-                g_error ("Could not aquire name: %s", error->message);
+        res = dbus_g_proxy_call (bus_proxy,
+                                 "RequestName",
+                                 &error,
+                                 G_TYPE_STRING, NOTIFICATION_BUS_NAME,
+                                 G_TYPE_UINT, 0,
+                                 G_TYPE_INVALID,
+                                 G_TYPE_UINT, &request_name_result,
+                                 G_TYPE_INVALID);
+        if (! res
+            || request_name_result != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER) {
+                if (error != NULL) {
+                        g_warning ("Failed to acquire name %s: %s",
+                                   NOTIFICATION_BUS_NAME,
+                                   error->message);
+                        g_error_free (error);
+                } else {
+                        g_warning ("Failed to acquire name %s", NOTIFICATION_BUS_NAME);
+                }
+                goto out;
         }
 
         daemon = g_object_new (NOTIFY_TYPE_DAEMON, NULL);
@@ -1566,7 +1576,7 @@ main (int argc, char **argv)
                                              G_OBJECT (daemon));
 
         gtk_main ();
-
+ out:
         g_object_unref (G_OBJECT (gconf_client));
 
         return 0;
