@@ -234,9 +234,8 @@ update_shape (WindowData *windata)
 }
 
 static void
-paint_window (GtkWidget      *widget,
-              GdkEventExpose *event,
-              WindowData     *windata)
+paint_window (GtkWidget  *widget,
+              WindowData *windata)
 {
         cairo_t         *context;
         cairo_surface_t *surface;
@@ -268,17 +267,21 @@ paint_window (GtkWidget      *widget,
 }
 
 static gboolean
+on_window_map (GtkWidget  *widget,
+               GdkEvent   *event,
+               WindowData *windata)
+{
+
+        return FALSE;
+}
+
+static gboolean
 on_window_expose (GtkWidget      *widget,
                   GdkEventExpose *event,
                   WindowData     *windata)
 {
-        GtkWidget *child;
+        paint_window (widget, windata);
 
-        paint_window (widget, event, windata);
-
-        child = gtk_bin_get_child (GTK_BIN (widget));
-        if (child != NULL)
-                gtk_container_propagate_expose (GTK_CONTAINER (widget), child, event);
         return FALSE;
 }
 
@@ -301,16 +304,23 @@ update_content_hbox_visibility (WindowData *windata)
 }
 
 static gboolean
-on_configure_event (GtkWidget         *nw,
+on_configure_event (GtkWidget         *widget,
                     GdkEventConfigure *event,
                     WindowData        *windata)
 {
         windata->width = event->width;
         windata->height = event->height;
 
-        gtk_widget_queue_draw (nw);
+        gtk_widget_queue_draw (widget);
 
         return FALSE;
+}
+
+static void
+on_window_realize (GtkWidget  *widget,
+                   WindowData *windata)
+{
+
 }
 
 static void
@@ -410,24 +420,6 @@ on_composited_changed (GtkWidget  *window,
         update_shape (windata);
 }
 
-
-static gboolean
-on_win_map (GtkWidget  *widget,
-            GdkEvent   *event,
-            WindowData *windata)
-{
-
-        return FALSE;
-}
-
-static void
-on_win_size_allocate (GtkWidget     *widget,
-                      GtkAllocation *allocation,
-                      WindowData    *windata)
-{
-
-}
-
 GtkWindow *
 create_notification (UrlClickedCb url_clicked)
 {
@@ -450,21 +442,23 @@ create_notification (UrlClickedCb url_clicked)
         windata->url_clicked = url_clicked;
 
         win = gtk_window_new (GTK_WINDOW_POPUP);
+        gtk_window_set_resizable (GTK_WINDOW (win), FALSE);
+        gtk_widget_set_app_paintable (win, TRUE);
         g_signal_connect (G_OBJECT (win),
                           "style-set",
                           G_CALLBACK (on_style_set),
                           windata);
         g_signal_connect (G_OBJECT (win),
                           "map-event",
-                          G_CALLBACK (on_win_map),
-                          windata);
-        g_signal_connect (G_OBJECT (win),
-                          "size-allocate",
-                          G_CALLBACK (on_win_size_allocate),
+                          G_CALLBACK (on_window_map),
                           windata);
         g_signal_connect (G_OBJECT (win),
                           "expose-event",
                           G_CALLBACK (on_window_expose),
+                          windata);
+        g_signal_connect (G_OBJECT (win),
+                          "realize",
+                          G_CALLBACK (on_window_realize),
                           windata);
 
         windata->win = win;
@@ -489,7 +483,6 @@ create_notification (UrlClickedCb url_clicked)
         gtk_window_set_type_hint (GTK_WINDOW (win),
                                   GDK_WINDOW_TYPE_HINT_NOTIFICATION);
         gtk_widget_add_events (win, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-        gtk_widget_realize (win);
 
         g_object_set_data_full (G_OBJECT (win),
                                 "windata", windata,
@@ -518,15 +511,16 @@ create_notification (UrlClickedCb url_clicked)
 
         /* First row (icon, vbox, close) */
         windata->iconbox = gtk_alignment_new (0.5, 0, 0, 0);
+        gtk_widget_show (windata->iconbox);
         gtk_alignment_set_padding (GTK_ALIGNMENT (windata->iconbox),
                                    5, 0, 0, 0);
-        gtk_widget_show (windata->iconbox);
         gtk_box_pack_start (GTK_BOX (windata->main_hbox),
                             windata->iconbox,
                             FALSE, FALSE, 0);
         gtk_widget_set_size_request (windata->iconbox, BODY_X_OFFSET, -1);
 
         windata->icon = gtk_image_new ();
+        gtk_widget_show (windata->icon);
         gtk_container_add (GTK_CONTAINER (windata->iconbox), windata->icon);
 
         vbox = gtk_vbox_new (FALSE, 6);
@@ -544,8 +538,8 @@ create_notification (UrlClickedCb url_clicked)
                           "style-set",
                           G_CALLBACK (on_style_set),
                           windata);
-        windata->close_button = close_button;
         gtk_widget_show (close_button);
+        windata->close_button = close_button;
         gtk_container_add (GTK_CONTAINER (alignment), close_button);
         gtk_button_set_relief (GTK_BUTTON (close_button), GTK_RELIEF_NONE);
         gtk_container_set_border_width (GTK_CONTAINER (close_button), 0);
@@ -584,6 +578,7 @@ create_notification (UrlClickedCb url_clicked)
         atk_object_set_description (atkobj, "Notification summary text.");
 
         windata->content_hbox = gtk_hbox_new (FALSE, 6);
+        gtk_widget_show (windata->content_hbox);
         gtk_box_pack_start (GTK_BOX (vbox), windata->content_hbox, FALSE, FALSE, 0);
 
 
@@ -596,6 +591,7 @@ create_notification (UrlClickedCb url_clicked)
                           "style-set",
                           G_CALLBACK (on_style_set),
                           windata);
+        gtk_widget_show (windata->body_label);
         gtk_box_pack_start (GTK_BOX (vbox), windata->body_label, TRUE, TRUE, 0);
         gtk_misc_set_alignment (GTK_MISC (windata->body_label), 0, 0);
         gtk_label_set_line_wrap (GTK_LABEL (windata->body_label), TRUE);
@@ -612,6 +608,7 @@ create_notification (UrlClickedCb url_clicked)
         gtk_box_pack_start (GTK_BOX (vbox), alignment, FALSE, TRUE, 0);
 
         windata->actions_box = gtk_hbox_new (FALSE, 6);
+        gtk_widget_show (windata->actions_box);
         gtk_container_add (GTK_CONTAINER (alignment), windata->actions_box);
 
         return GTK_WINDOW (win);
@@ -974,15 +971,15 @@ clear_notification_actions (GtkWindow *nw)
 }
 
 void
-move_notification (GtkWidget *nw,
+move_notification (GtkWidget *widget,
                    int        x,
                    int        y)
 {
-        WindowData *windata = g_object_get_data (G_OBJECT (nw), "windata");
+        WindowData *windata = g_object_get_data (G_OBJECT (widget), "windata");
 
         g_assert (windata != NULL);
 
-        gtk_window_move (GTK_WINDOW (nw), x, y);
+        gtk_window_move (GTK_WINDOW (windata->win), x, y);
 }
 
 void
