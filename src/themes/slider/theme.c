@@ -233,7 +233,7 @@ update_shape (WindowData *windata)
         g_object_unref (mask);
 }
 
-static gboolean
+static void
 paint_window (GtkWidget      *widget,
               GdkEventExpose *event,
               WindowData     *windata)
@@ -265,12 +265,25 @@ paint_window (GtkWidget      *widget,
         cairo_destroy (context);
 
         update_shape (windata);
+}
 
+static gboolean
+on_window_expose (GtkWidget      *widget,
+                  GdkEventExpose *event,
+                  WindowData     *windata)
+{
+        GtkWidget *child;
+
+        paint_window (widget, event, windata);
+
+        child = gtk_bin_get_child (GTK_BIN (widget));
+        if (child != NULL)
+                gtk_container_propagate_expose (GTK_CONTAINER (widget), child, event);
         return FALSE;
 }
 
 static void
-destroy_windata(WindowData *windata)
+destroy_windata (WindowData *windata)
 {
         g_free (windata);
 }
@@ -344,7 +357,6 @@ override_style (GtkWidget *widget,
         GdkColor     bg;
 
         style = gtk_style_copy (widget->style);
-
         if (previous_style == NULL
             || (previous_style != NULL
                 && (previous_style->bg[GTK_STATE_NORMAL].red != style->bg[GTK_STATE_NORMAL].red
@@ -398,6 +410,24 @@ on_composited_changed (GtkWidget  *window,
         update_shape (windata);
 }
 
+
+static gboolean
+on_win_map (GtkWidget  *widget,
+            GdkEvent   *event,
+            WindowData *windata)
+{
+
+        return FALSE;
+}
+
+static void
+on_win_size_allocate (GtkWidget     *widget,
+                      GtkAllocation *allocation,
+                      WindowData    *windata)
+{
+
+}
+
 GtkWindow *
 create_notification (UrlClickedCb url_clicked)
 {
@@ -424,6 +454,19 @@ create_notification (UrlClickedCb url_clicked)
                           "style-set",
                           G_CALLBACK (on_style_set),
                           windata);
+        g_signal_connect (G_OBJECT (win),
+                          "map-event",
+                          G_CALLBACK (on_win_map),
+                          windata);
+        g_signal_connect (G_OBJECT (win),
+                          "size-allocate",
+                          G_CALLBACK (on_win_size_allocate),
+                          windata);
+        g_signal_connect (G_OBJECT (win),
+                          "expose-event",
+                          G_CALLBACK (on_window_expose),
+                          windata);
+
         windata->win = win;
 
         windata->composited = FALSE;
@@ -466,10 +509,6 @@ create_notification (UrlClickedCb url_clicked)
         gtk_widget_show (main_vbox);
         gtk_container_add (GTK_CONTAINER (win), main_vbox);
         gtk_container_set_border_width (GTK_CONTAINER (main_vbox), 12);
-        g_signal_connect (G_OBJECT (main_vbox),
-                          "expose-event",
-                          G_CALLBACK (paint_window),
-                          windata);
 
         windata->main_hbox = gtk_hbox_new (FALSE, 0);
         gtk_widget_show (windata->main_hbox);
