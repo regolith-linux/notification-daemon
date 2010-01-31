@@ -64,14 +64,10 @@ get_work_area (GtkWidget    *nw,
         disp_screen = GDK_SCREEN_XNUMBER (screen);
 
         /* Defaults in case of error */
-        rect->x = WORKAREA_PADDING;
-        rect->y = WORKAREA_PADDING;
-        rect->width = gdk_screen_get_width (screen) - WORKAREA_PADDING * 2;
-        rect->height = gdk_screen_get_height (screen) - WORKAREA_PADDING * 2;
-        if (rect->width < 0)
-                rect->width = 0;
-        if (rect->height < 0)
-                rect->height = 0;
+        rect->x = 0;
+        rect->y = 0;
+        rect->width = gdk_screen_get_width (screen);
+        rect->height = gdk_screen_get_height (screen);
 
         if (workarea == None)
                 return FALSE;
@@ -99,14 +95,10 @@ get_work_area (GtkWidget    *nw,
         }
 
         workareas = (long *) ret_workarea;
-        rect->x = workareas[disp_screen * 4] + WORKAREA_PADDING;
-        rect->y = workareas[disp_screen * 4 + 1] + WORKAREA_PADDING;
-        rect->width = workareas[disp_screen * 4 + 2] - WORKAREA_PADDING * 2;
-        rect->height = workareas[disp_screen * 4 + 3] - WORKAREA_PADDING * 2;
-        if (rect->width < 0)
-                rect->width = 0;
-        if (rect->height < 0)
-                rect->height = 0;
+        rect->x = workareas[disp_screen * 4];
+        rect->y = workareas[disp_screen * 4 + 1];
+        rect->width = workareas[disp_screen * 4 + 2];
+        rect->height = workareas[disp_screen * 4 + 3];
 
         XFree (ret_workarea);
 
@@ -190,7 +182,7 @@ translate_coordinates (NotifyStackLocation stack_location,
         }
 }
 
-NotifyStack    *
+NotifyStack *
 notify_stack_new (NotifyDaemon       *daemon,
                   GdkScreen          *screen,
                   guint               monitor,
@@ -229,6 +221,20 @@ notify_stack_set_location (NotifyStack        *stack,
 }
 
 static void
+add_padding_to_rect (GdkRectangle *rect)
+{
+        rect->x += WORKAREA_PADDING;
+        rect->y += WORKAREA_PADDING;
+        rect->width -= WORKAREA_PADDING * 2;
+        rect->height -= WORKAREA_PADDING * 2;
+
+        if (rect->width < 0)
+                rect->width = 0;
+        if (rect->height < 0)
+                rect->height = 0;
+}
+
+static void
 notify_stack_shift_notifications (NotifyStack *stack,
                                   GtkWindow   *nw,
                                   GSList     **nw_l,
@@ -250,6 +256,8 @@ notify_stack_shift_notifications (NotifyStack *stack,
                                          stack->monitor,
                                          &monitor);
         gdk_rectangle_intersect (&monitor, &workarea, &workarea);
+
+        add_padding_to_rect (&workarea);
 
         get_origin_coordinates (stack->location,
                                 &workarea,
