@@ -82,9 +82,7 @@ enum
 #define BACKGROUND_OPACITY    0.92
 #define BOTTOM_GRADIENT_HEIGHT 30
 
-#if GTK_CHECK_VERSION(2, 10, 0)
-# define USE_COMPOSITE
-#endif
+#define USE_COMPOSITE
 
 static void
 fill_background (GtkWidget *widget,

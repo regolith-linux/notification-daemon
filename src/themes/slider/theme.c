@@ -74,9 +74,7 @@ enum {
 
 #define MAX_ICON_SIZE IMAGE_SIZE
 
-#if GTK_CHECK_VERSION(2, 10, 0)
-# define USE_COMPOSITE
-#endif
+#define USE_COMPOSITE
 
 static void
 draw_round_rect (cairo_t* cr,
