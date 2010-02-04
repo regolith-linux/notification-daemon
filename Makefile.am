@@ -1,5 +1,8 @@
 SUBDIRS = data po src
 
+# Point to our macro directory and pick up user flags from the environment
+ACLOCAL_AMFLAGS  = -I macros ${ACLOCAL_FLAGS}
+
 EXTRA_DIST = \
 	AUTHORS NEWS INSTALL COPYING README \
 	ChangeLog \

@@ -1499,7 +1499,7 @@ notify_daemon_get_server_information (NotifyDaemon *daemon,
 {
         *out_name = g_strdup ("Notification Daemon");
         *out_vendor = g_strdup ("GNOME");
-        *out_version = g_strdup (VERSION);
+        *out_version = g_strdup (PACKAGE_VERSION);
         *out_spec_ver = g_strdup ("1.1");
 
         return TRUE;

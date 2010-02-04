@@ -3,11 +3,14 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT([notification-daemon], [0.4.2], [galago-devel@lists.freedesktop.org])
-AC_PREREQ(2.50)
-AC_CONFIG_SRCDIR(config.h.in)
-AC_COPYRIGHT([Copyright 2006 Christian Hammond])
+AC_INIT([notification-daemon],[0.4.2],[https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon],[notification-daemon])
+AC_PREREQ(2.63)
 
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_SRCDIR([config.h.in])
+AC_CONFIG_MACRO_DIR([macros])
+
+AC_COPYRIGHT([Copyright 2006 Christian Hammond])
 
 dnl ################################################################
 dnl # Version information
@@ -40,41 +43,45 @@ AC_DEFINE_UNQUOTED(NOTIFICATION_DAEMON_VERSION, "$NOTIFICATION_DAEMON_VERSION",
 dnl ################################################################
 dnl # Initialize automake
 dnl ################################################################
-VERSION=$NOTIFICATION_DAEMON_VERSION
-PACKAGE=notification-daemon
-
-AM_INIT_AUTOMAKE([1.9 no-dist-gzip dist-bzip2])
-
+AM_INIT_AUTOMAKE([1.10 no-dist-gzip dist-bzip2])
+AM_MAINTAINER_MODE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-
-dnl ################################################################
-dnl # Specify a header configuration file
-dnl ################################################################
-AM_CONFIG_HEADER(config.h)
 
 dnl ################################################################
 dnl # Check for some standard stuff.
 dnl ################################################################
+# Checks for programs
 AC_PROG_CC
-#AC_ARG_PROGRAM
 AC_PROG_CPP
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
-AC_C_CONST
+# Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
-AC_EXEEXT
 
-AM_PROG_LIBTOOL
-IT_PROG_INTLTOOL([0.35.0])
+dnl ---------------------------------------------------------------------------
+dnl Initialize Libtool
+dnl ---------------------------------------------------------------------------
+LT_PREREQ([2.2.6])
+LT_INIT
 
-REQ_GTK_VERSION=2.18.0
+
+dnl ---------------------------------------------------------------------------
+dnl i18n stuff
+dnl ---------------------------------------------------------------------------
+IT_PROG_INTLTOOL([0.40.0])
+
+AC_SUBST([GETTEXT_PACKAGE], [notification-daemon])
+AM_GNU_GETTEXT_VERSION([0.11])
+AM_GLIB_GNU_GETTEXT
+AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [Define to the gettext package name.])
+
 
 dnl ---------------------------------------------------------------------------
 dnl Requirements for the themes
 dnl ---------------------------------------------------------------------------
-
+REQ_GTK_VERSION=2.18.0
 PKG_CHECK_MODULES(THEME,
   gtk+-2.0 >= $REQ_GTK_VERSION
 )
@@ -84,12 +91,6 @@ AC_SUBST(THEME_LIBS)
 dnl ---------------------------------------------------------------------------
 dnl Requirements for the daemon
 dnl ---------------------------------------------------------------------------
-
-GETTEXT_PACKAGE=notification-daemon
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Gettext package])
-AM_GLIB_GNU_GETTEXT
-
 REQ_GLIB_VERSION=$REQ_GTK_VERSION
 REQ_DBUS_VERSION=0.36
 REQ_LIBCANBERRA_GTK_VERSION=0.4
@@ -110,7 +111,6 @@ AC_SUBST(NOTIFICATION_DAEMON_LIBS)
 dnl ---------------------------------------------------------------------------
 dnl Requirements for the setup tool
 dnl ---------------------------------------------------------------------------
-
 PKG_CHECK_MODULES(NOTIFICATION_CAPPLET, glib-2.0 >= $REQ_GLIB_VERSION gtk+-2.0 >= $REQ_GTK_VERSION gconf-2.0 libnotify dbus-1 dbus-glib-1)
 AC_SUBST(NOTIFICATION_CAPPLET_CFLAGS)
 AC_SUBST(NOTIFICATION_CAPPLET_LIBS)
@@ -122,7 +122,7 @@ gdk_modules="
 PKG_CHECK_MODULES(GDK, $gdk_modules, have_gdk=yes,
 [
 	have_gdk=no
-	AC_WARN("Some test apps will not be built")
+	AC_MSG_WARN("Some test apps will not be built")
 ])
 
 AM_CONDITIONAL(HAVE_GDK, test "x$have_gdk" = "xyes")
@@ -179,8 +179,12 @@ AC_SUBST(DBUS_SERVICES_DIR)
 AC_DEFINE_UNQUOTED(DBUS_SYSTEMD_DIR, "$DBUS_SYS_DIR", [Where system.d dir for DBUS is])
 AC_DEFINE_UNQUOTED(DBUS_SERVICES_DIR, "$DBUS_SERVICES_DIR", [Where services dir for DBUS is])
 
-
-# Turn on the additional warnings last
+dnl ---------------------------------------------------------------------------
+dnl Turn on the additional warnings last
+dnl ---------------------------------------------------------------------------
+GNOME_COMPILE_WARNINGS([maximum])
+GNOME_CXX_WARNINGS([yes])
+GNOME_MAINTAINER_MODE_DEFINES
 
 AC_ARG_ENABLE(more-warnings,
               AS_HELP_STRING([--enable-more-warnings],
@@ -195,22 +199,20 @@ AC_ARG_ENABLE(more-warnings,
 AC_MSG_CHECKING(for more warnings)
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
         AC_MSG_RESULT(yes)
-        CFLAGS="\
-        -Wall \
-        -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
-        -Wnested-externs -Wpointer-arith \
+        WARNINGCFLAGS="\
+        -Wchar-subscripts -Wmissing-declarations \
         -Wcast-align -Wsign-compare -Wp,-D_FORTIFY_SOURCE=2 \
-        $CFLAGS"
+        $WARNINGCFLAGS"
 
-        for option in -Wno-strict-aliasing -Wno-sign-compare; do
-                SAVE_CFLAGS="$CFLAGS"
-                CFLAGS="$CFLAGS $option"
+        for option in -Wno-strict-aliasing; do
+                SAVE_CFLAGS="$WARNINGCFLAGS"
+                WARNINGCFLAGS="$WARNINGCFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])
                 AC_TRY_COMPILE([], [],
                         has_option=yes,
                         has_option=no,)
                 if test $has_option = no; then
-                        CFLAGS="$SAVE_CFLAGS"
+                        WARNINGCFLAGS="$SAVE_CFLAGS"
                 fi
                 AC_MSG_RESULT($has_option)
                 unset has_option
@@ -221,7 +223,11 @@ else
         AC_MSG_RESULT(no)
 fi
 
-AC_SUBST(CFLAGS)
+AM_CFLAGS="$AM_CFLAGS $WARN_CFLAGS $WARNINGCFLAGS"
+AM_CXXFLAGS="$AM_CXXFLAGS $WARN_CXXFLAGS"
+
+AC_SUBST([AM_CFLAGS])
+AC_SUBST([AM_CXXFLAGS])
 
 AC_CONFIG_FILES([
 Makefile
@@ -239,15 +245,15 @@ src/themes/standard/Makefile
 AC_OUTPUT
 
 echo "
-                    $PACKAGE $VERSION
-                    ========================
+                    $PACKAGE_NAME $PACKAGE_VERSION
+                    =========================
 
 	prefix:                   ${prefix}
 	exec_prefix:              ${exec_prefix}
         bindir:                   ${bindir}
         datadir:                  ${datadir}
 	source code location:	  ${srcdir}
-	cflags:		          ${CFLAGS}
+	cflags:		          ${AM_CFLAGS}
 
         dbus-1 system.d           $DBUS_SYS_DIR
         dbus-1 services           $DBUS_SERVICES_DIR
