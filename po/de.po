@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-16 20:45+0000\n"
-"PO-Revision-Date: 2010-01-17 18:44+0100\n"
+"POT-Creation-Date: 2010-01-31 21:54+0000\n"
+"PO-Revision-Date: 2010-02-04 13:50+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -57,51 +57,35 @@ msgstr "Das Thema um Benachrichtigungen anzuzeigen."
 msgid "Turns on and off sound support for notifications."
 msgstr "Schaltet Klänge für Benachrichtigungen ein oder aus."
 
-#: ../src/capplet/notification-properties.c:76
-msgid "Top Left"
-msgstr "Links oben"
-
-#: ../src/capplet/notification-properties.c:77
-msgid "Top Right"
-msgstr "Rechts oben"
-
-#: ../src/capplet/notification-properties.c:78
-msgid "Bottom Left"
-msgstr "Links unten"
-
-#: ../src/capplet/notification-properties.c:79
-msgid "Bottom Right"
-msgstr "Rechts unten"
-
-#: ../src/capplet/notification-properties.c:337
+#: ../src/capplet/notification-properties.c:293
 msgid "Slider"
 msgstr "Schieber"
 
-#: ../src/capplet/notification-properties.c:339
+#: ../src/capplet/notification-properties.c:295
 msgid "Standard theme"
 msgstr "Standardthema"
 
-#: ../src/capplet/notification-properties.c:435
+#: ../src/capplet/notification-properties.c:391
 msgid "Error initializing libnotify"
 msgstr "Fehler beim Initialisieren von libnotify"
 
-#: ../src/capplet/notification-properties.c:447
+#: ../src/capplet/notification-properties.c:403
 msgid "Notification Test"
 msgstr "Test für Benachrichtigungen"
 
-#: ../src/capplet/notification-properties.c:448
+#: ../src/capplet/notification-properties.c:404
 msgid "Just a test"
 msgstr "Nur ein Test"
 
-#: ../src/capplet/notification-properties.c:455
+#: ../src/capplet/notification-properties.c:411
 #, c-format
 msgid "Error while displaying notification: %s"
 msgstr "Fehler bei der Anzeige der Benachrichtigung: %s"
 
-#: ../src/capplet/notification-properties.c:512
+#: ../src/capplet/notification-properties.c:472
 #, c-format
-msgid "Unable to locate glade file '%s'"
-msgstr "Ort der Glade-Datei »%s« konnte nicht ermittelt werden"
+msgid "Could not load user interface file: %s"
+msgstr "Benutzerschnittstellendatei konnte nicht geladen werden: %s"
 
 #: ../src/capplet/notification-properties.desktop.in.h:1
 msgid "Pop-Up Notifications"
@@ -111,31 +95,7 @@ msgstr "Popup-Benachrichtigungen"
 msgid "Set your pop-up notification preferences"
 msgstr "Legen Sie Ihre Popup-Benachrichtigungseinstellungen fest"
 
-#: ../src/capplet/notification-properties.glade.h:1
-msgid "      "
-msgstr "      "
-
-#: ../src/capplet/notification-properties.glade.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>Allgemeine Optionen</b>"
-
-#: ../src/capplet/notification-properties.glade.h:3
-msgid "Notification Settings"
-msgstr "Einstellungen für Benachrichtigungen"
-
-#: ../src/capplet/notification-properties.glade.h:4
-msgid "P_osition:"
-msgstr "P_osition:"
-
-#: ../src/capplet/notification-properties.glade.h:5
-msgid "_Preview"
-msgstr "_Vorschau"
-
-#: ../src/capplet/notification-properties.glade.h:6
-msgid "_Theme:"
-msgstr "_Thema:"
-
-#: ../src/daemon/daemon.c:1419
+#: ../src/daemon/daemon.c:1453
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u ist keine gültige Kennung für eine Benachrichtigung"
@@ -143,3 +103,36 @@ msgstr "%u ist keine gültige Kennung für eine Benachrichtigung"
 #: ../src/daemon/sound.c:36
 msgid "Notification"
 msgstr "Benachrichtigung"
+
+#~ msgid "Top Left"
+#~ msgstr "Links oben"
+
+#~ msgid "Top Right"
+#~ msgstr "Rechts oben"
+
+#~ msgid "Bottom Left"
+#~ msgstr "Links unten"
+
+#~ msgid "Bottom Right"
+#~ msgstr "Rechts unten"
+
+#~ msgid "Unable to locate glade file '%s'"
+#~ msgstr "Ort der Glade-Datei »%s« konnte nicht ermittelt werden"
+
+#~ msgid "      "
+#~ msgstr "      "
+
+#~ msgid "<b>General Options</b>"
+#~ msgstr "<b>Allgemeine Optionen</b>"
+
+#~ msgid "Notification Settings"
+#~ msgstr "Einstellungen für Benachrichtigungen"
+
+#~ msgid "P_osition:"
+#~ msgstr "P_osition:"
+
+#~ msgid "_Preview"
+#~ msgstr "_Vorschau"
+
+#~ msgid "_Theme:"
+#~ msgstr "_Thema:"
