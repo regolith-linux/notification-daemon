@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-12 21:42+0100\n"
-"PO-Revision-Date: 2010-01-12 21:40+0100\n"
+"POT-Creation-Date: 2010-02-05 01:41+0100\n"
+"PO-Revision-Date: 2010-02-05 01:41+0100\n"
 "Last-Translator: Petr Kovar <pknbe@volny.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -58,51 +58,35 @@ msgstr "Motiv používaný k zobrazování oznámení."
 msgid "Turns on and off sound support for notifications."
 msgstr "Zapne a vypne zvukovou podporu u oznámení."
 
-#: ../src/capplet/notification-properties.c:79
-msgid "Top Left"
-msgstr "Vlevo nahoře"
+#: ../src/capplet/notification-properties.c:293
+msgid "Slider"
+msgstr "Táhlo"
 
-#: ../src/capplet/notification-properties.c:80
-msgid "Top Right"
-msgstr "Vpravo nahoře"
-
-#: ../src/capplet/notification-properties.c:81
-msgid "Bottom Left"
-msgstr "Vlevo dole"
-
-#: ../src/capplet/notification-properties.c:82
-msgid "Bottom Right"
-msgstr "Vpravo dole"
-
-#: ../src/capplet/notification-properties.c:327
-msgid "Ubuntu theme"
-msgstr "Motiv Ubuntu"
-
-#: ../src/capplet/notification-properties.c:329
+#: ../src/capplet/notification-properties.c:295
 msgid "Standard theme"
 msgstr "Standardní motiv"
 
-#: ../src/capplet/notification-properties.c:422
+#: ../src/capplet/notification-properties.c:391
 msgid "Error initializing libnotify"
 msgstr "Chyba během spouštění libnotify"
 
-#: ../src/capplet/notification-properties.c:435
+#: ../src/capplet/notification-properties.c:403
 msgid "Notification Test"
 msgstr "Text oznámení"
 
-#: ../src/capplet/notification-properties.c:436
+#: ../src/capplet/notification-properties.c:404
 msgid "Just a test"
 msgstr "Toliko test"
 
-#: ../src/capplet/notification-properties.c:443
+#: ../src/capplet/notification-properties.c:411
 #, c-format
 msgid "Error while displaying notification: %s"
 msgstr "Chyba při zobrazování oznámení: %s"
 
-#: ../src/capplet/notification-properties.c:500
+#: ../src/capplet/notification-properties.c:472
 #, c-format
-msgid "Unable to locate glade file '%s'"
-msgstr "Nelze nalézt soubor glade \"%s\""
+msgid "Could not load user interface file: %s"
+msgstr "Nelze načíst soubor rozložení uživatelského rozhraní: %s"
 
 #: ../src/capplet/notification-properties.desktop.in.h:1
 msgid "Pop-Up Notifications"
@@ -112,31 +96,7 @@ msgstr "Automaticky otevíraná oznámení"
 msgid "Set your pop-up notification preferences"
 msgstr "Nastaví předvolby automaticky otevíraných oznámení"
 
-#: ../src/capplet/notification-properties.glade.h:1
-msgid "      "
-msgstr "      "
-
-#: ../src/capplet/notification-properties.glade.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>Obecné možnosti</b>"
-
-#: ../src/capplet/notification-properties.glade.h:3
-msgid "Notification Settings"
-msgstr "Nastavení oznámení"
-
-#: ../src/capplet/notification-properties.glade.h:4
-msgid "P_osition:"
-msgstr "_Umístění:"
-
-#: ../src/capplet/notification-properties.glade.h:5
-msgid "_Preview"
-msgstr "Ná_hled"
-
-#: ../src/capplet/notification-properties.glade.h:6
-msgid "_Theme:"
-msgstr "_Motiv:"
-
-#: ../src/daemon/daemon.c:1414
+#: ../src/daemon/daemon.c:1453
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u není platným ID oznámení"
@@ -144,3 +104,39 @@ msgstr "%u není platným ID oznámení"
 #: ../src/daemon/sound.c:36
 msgid "Notification"
 msgstr "Oznámení"
+
+#~ msgid "Top Left"
+#~ msgstr "Vlevo nahoře"
+
+#~ msgid "Top Right"
+#~ msgstr "Vpravo nahoře"
+
+#~ msgid "Bottom Left"
+#~ msgstr "Vlevo dole"
+
+#~ msgid "Bottom Right"
+#~ msgstr "Vpravo dole"
+
+#~ msgid "Ubuntu theme"
+#~ msgstr "Motiv Ubuntu"
+
+#~ msgid "Unable to locate glade file '%s'"
+#~ msgstr "Nelze nalézt soubor glade \"%s\""
+
+#~ msgid "      "
+#~ msgstr "      "
+
+#~ msgid "<b>General Options</b>"
+#~ msgstr "<b>Obecné možnosti</b>"
+
+#~ msgid "Notification Settings"
+#~ msgstr "Nastavení oznámení"
+
+#~ msgid "P_osition:"
+#~ msgstr "_Umístění:"
+
+#~ msgid "_Preview"
+#~ msgstr "Ná_hled"
+
+#~ msgid "_Theme:"
+#~ msgstr "_Motiv:"
