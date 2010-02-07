@@ -38,7 +38,7 @@ struct _NotifyStack
         GdkScreen          *screen;
         guint               monitor;
         NotifyStackLocation location;
-        GSList             *windows;
+        GList              *windows;
 };
 
 static gboolean
@@ -151,8 +151,7 @@ translate_coordinates (NotifyStackLocation stack_location,
                        gint               *shiftx,
                        gint               *shifty,
                        gint                width,
-                       gint                height,
-                       gint                index)
+                       gint                height)
 {
         switch (stack_location) {
         case NOTIFY_STACK_LOCATION_TOP_LEFT:
@@ -209,7 +208,7 @@ notify_stack_destroy (NotifyStack *stack)
 {
         g_assert (stack != NULL);
 
-        g_slist_free (stack->windows);
+        g_list_free (stack->windows);
         g_free (stack);
 }
 
@@ -237,7 +236,7 @@ add_padding_to_rect (GdkRectangle *rect)
 static void
 notify_stack_shift_notifications (NotifyStack *stack,
                                   GtkWindow   *nw,
-                                  GSList     **nw_l,
+                                  GList      **nw_l,
                                   gint         init_width,
                                   gint         init_height,
                                   gint        *nw_x,
@@ -245,11 +244,13 @@ notify_stack_shift_notifications (NotifyStack *stack,
 {
         GdkRectangle    workarea;
         GdkRectangle    monitor;
-        GSList         *l;
+        GdkRectangle   *positions;
+        GList          *l;
         gint            x, y;
         gint            shiftx = 0;
         gint            shifty = 0;
-        gint            index = 1;
+        int             i;
+        int             n_wins;
 
         get_work_area (GTK_WIDGET (nw), &workarea);
         gdk_screen_get_monitor_geometry (stack->screen,
@@ -258,6 +259,9 @@ notify_stack_shift_notifications (NotifyStack *stack,
         gdk_rectangle_intersect (&monitor, &workarea, &workarea);
 
         add_padding_to_rect (&workarea);
+
+        n_wins = g_list_length (stack->windows);
+        positions = g_new0 (GdkRectangle, n_wins);
 
         get_origin_coordinates (stack->location,
                                 &workarea,
@@ -273,7 +277,7 @@ notify_stack_shift_notifications (NotifyStack *stack,
         if (nw_y != NULL)
                 *nw_y = y;
 
-        for (l = stack->windows; l != NULL; l = l->next) {
+        for (i = 0, l = stack->windows; l != NULL; i++, l = l->next) {
                 GtkWindow      *nw2 = GTK_WINDOW (l->data);
                 GtkRequisition  req;
 
@@ -287,13 +291,27 @@ notify_stack_shift_notifications (NotifyStack *stack,
                                                &shiftx,
                                                &shifty,
                                                req.width,
-                                               req.height + NOTIFY_STACK_SPACING,
-                                               index++);
-                        theme_move_notification (nw2, x, y);
+                                               req.height + NOTIFY_STACK_SPACING);
+                        positions[i].x = x;
+                        positions[i].y = y;
                 } else if (nw_l != NULL) {
                         *nw_l = l;
+                        positions[i].x = -1;
+                        positions[i].y = -1;
                 }
         }
+
+        /* move bubbles at the bottom of the stack first
+           to avoid overlapping */
+        for (i = n_wins - 1, l = g_list_last (stack->windows); l != NULL; i--, l = l->prev) {
+                GtkWindow *nw2 = GTK_WINDOW (l->data);
+
+                if (nw2 != nw) {
+                        theme_move_notification (nw2, positions[i].x, positions[i].y);
+                }
+        }
+
+        g_free (positions);
 }
 
 void
@@ -319,7 +337,7 @@ notify_stack_add_window (NotifyStack *stack,
                                           "destroy",
                                           G_CALLBACK (notify_stack_remove_window),
                                           stack);
-                stack->windows = g_slist_prepend (stack->windows, nw);
+                stack->windows = g_list_prepend (stack->windows, nw);
         }
 }
 
@@ -327,7 +345,7 @@ void
 notify_stack_remove_window (NotifyStack *stack,
                             GtkWindow   *nw)
 {
-        GSList         *remove_l = NULL;
+        GList *remove_l = NULL;
 
         notify_stack_shift_notifications (stack,
                                           nw,
@@ -338,7 +356,7 @@ notify_stack_remove_window (NotifyStack *stack,
                                           NULL);
 
         if (remove_l != NULL)
-                stack->windows = g_slist_delete_link (stack->windows, remove_l);
+                stack->windows = g_list_delete_link (stack->windows, remove_l);
 
         if (GTK_WIDGET_REALIZED (GTK_WIDGET (nw)))
                 gtk_widget_unrealize (GTK_WIDGET (nw));
