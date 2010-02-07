@@ -48,6 +48,8 @@
 #include "sound.h"
 #include "notificationdaemon-dbus-glue.h"
 
+#define MAX_NOTIFICATIONS 20
+
 #define IMAGE_SIZE 48
 #define IDLE_SECONDS 30
 #define NOTIFICATION_BUS_NAME      "org.freedesktop.Notifications"
@@ -1227,6 +1229,18 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         gint            i;
         GdkPixbuf      *pixbuf;
 
+        if (g_hash_table_size (priv->notification_hash) > MAX_NOTIFICATIONS) {
+                GError *error;
+
+                error = g_error_new (notify_daemon_error_quark (),
+                                     1,
+                                     _("Exceeded maximum number of notifications"));
+                dbus_g_method_return_error (context, error);
+                g_error_free (error);
+
+                return TRUE;
+        }
+
         if (id > 0) {
                 nt = (NotifyTimeout *) g_hash_table_lookup (priv->notification_hash,
                                                             &id);
@@ -1397,8 +1411,9 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         if (id == 0) {
                 nt = _store_notification (daemon, nw, timeout);
                 return_id = nt->id;
-        } else
+        } else {
                 return_id = id;
+        }
 
         /*
          * If we have a source Window XID, start monitoring the tree
