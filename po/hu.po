@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-22 01:11+0100\n"
-"PO-Revision-Date: 2010-01-22 01:12+0100\n"
+"POT-Creation-Date: 2010-02-11 23:35+0100\n"
+"PO-Revision-Date: 2010-02-11 23:36+0100\n"
 "Last-Translator: Gabor Kelemen <kelemeng at gnome dot hu>\n"
 "Language-Team: Hungarian <gnome at fsf dot hu>\n"
 "MIME-Version: 1.0\n"
@@ -61,51 +61,35 @@ msgstr "Az értesítések megjelenítéséhez használt téma."
 msgid "Turns on and off sound support for notifications."
 msgstr "Be- illetve kikapcsolja az értesítések hangját."
 
-#: ../src/capplet/notification-properties.c:76
-msgid "Top Left"
-msgstr "Bal oldalon, felül"
-
-#: ../src/capplet/notification-properties.c:77
-msgid "Top Right"
-msgstr "Jobb oldalon, felül"
-
-#: ../src/capplet/notification-properties.c:78
-msgid "Bottom Left"
-msgstr "Bal oldalon, alul"
-
-#: ../src/capplet/notification-properties.c:79
-msgid "Bottom Right"
-msgstr "Jobb oldalon, alul"
-
-#: ../src/capplet/notification-properties.c:337
+#: ../src/capplet/notification-properties.c:293
 msgid "Slider"
 msgstr "Csúszka"
 
-#: ../src/capplet/notification-properties.c:339
+#: ../src/capplet/notification-properties.c:295
 msgid "Standard theme"
 msgstr "Alapértelmezett téma"
 
-#: ../src/capplet/notification-properties.c:435
+#: ../src/capplet/notification-properties.c:391
 msgid "Error initializing libnotify"
 msgstr "Hiba a libnotify előkészítése közben"
 
-#: ../src/capplet/notification-properties.c:447
+#: ../src/capplet/notification-properties.c:403
 msgid "Notification Test"
 msgstr "Értesítésteszt"
 
-#: ../src/capplet/notification-properties.c:448
+#: ../src/capplet/notification-properties.c:404
 msgid "Just a test"
 msgstr "Csak egy próba"
 
-#: ../src/capplet/notification-properties.c:455
+#: ../src/capplet/notification-properties.c:411
 #, c-format
 msgid "Error while displaying notification: %s"
 msgstr "Hiba az értesítés megjelenítésekor: %s"
 
-#: ../src/capplet/notification-properties.c:512
+#: ../src/capplet/notification-properties.c:472
 #, c-format
-msgid "Unable to locate glade file '%s'"
-msgstr "Nem található a(z) „%s” Glade fájl"
+msgid "Could not load user interface file: %s"
+msgstr "A felhasználóifelület-fájl nem tölthető be: %s"
 
 #: ../src/capplet/notification-properties.desktop.in.h:1
 msgid "Pop-Up Notifications"
@@ -115,31 +99,12 @@ msgstr "Felugró értesítések"
 msgid "Set your pop-up notification preferences"
 msgstr "Felugró értesítések beállításai"
 
-#: ../src/capplet/notification-properties.glade.h:1
-msgid "      "
-msgstr "      "
+#: ../src/daemon/daemon.c:1237
+#, c-format
+msgid "Exceeded maximum number of notifications"
+msgstr "Az értesítések maximális száma túllépve"
 
-#: ../src/capplet/notification-properties.glade.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>Általános beállítások</b>"
-
-#: ../src/capplet/notification-properties.glade.h:3
-msgid "Notification Settings"
-msgstr "Értesítések beállításai"
-
-#: ../src/capplet/notification-properties.glade.h:4
-msgid "P_osition:"
-msgstr "P_ozíció:"
-
-#: ../src/capplet/notification-properties.glade.h:5
-msgid "_Preview"
-msgstr "_Előnézet"
-
-#: ../src/capplet/notification-properties.glade.h:6
-msgid "_Theme:"
-msgstr "_Téma:"
-
-#: ../src/daemon/daemon.c:1436
+#: ../src/daemon/daemon.c:1468
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "A(z) %u nem érvényes értesítésazonosító"
