@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-17 17:46+0000\n"
-"PO-Revision-Date: 2010-01-18 14:12+0100\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon&component=general\n"
+"POT-Creation-Date: 2010-02-11 22:36+0000\n"
+"PO-Revision-Date: 2010-02-12 13:43+0100\n"
 "Last-Translator: Andrej Žnidaršič <andrej.znidarsic@gmail.com>\n"
 "Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -51,51 +51,35 @@ msgstr "Tema za prikaz obvestil."
 msgid "Turns on and off sound support for notifications."
 msgstr "Vklopi in izklopi zvočno podporo obvestil."
 
-#: ../src/capplet/notification-properties.c:76
-msgid "Top Left"
-msgstr "Zgoraj levo"
-
-#: ../src/capplet/notification-properties.c:77
-msgid "Top Right"
-msgstr "Zgoraj desno"
-
-#: ../src/capplet/notification-properties.c:78
-msgid "Bottom Left"
-msgstr "Spodaj levo"
-
-#: ../src/capplet/notification-properties.c:79
-msgid "Bottom Right"
-msgstr "Spodaj desno"
-
-#: ../src/capplet/notification-properties.c:337
+#: ../src/capplet/notification-properties.c:293
 msgid "Slider"
 msgstr "Drsnik"
 
-#: ../src/capplet/notification-properties.c:339
+#: ../src/capplet/notification-properties.c:295
 msgid "Standard theme"
 msgstr "Običajna tema"
 
-#: ../src/capplet/notification-properties.c:435
+#: ../src/capplet/notification-properties.c:391
 msgid "Error initializing libnotify"
 msgstr "Napaka med zaganjanjem libnotify"
 
-#: ../src/capplet/notification-properties.c:447
+#: ../src/capplet/notification-properties.c:403
 msgid "Notification Test"
 msgstr "Preskus obvestila"
 
-#: ../src/capplet/notification-properties.c:448
+#: ../src/capplet/notification-properties.c:404
 msgid "Just a test"
 msgstr "Samo preskus"
 
-#: ../src/capplet/notification-properties.c:455
+#: ../src/capplet/notification-properties.c:411
 #, c-format
 msgid "Error while displaying notification: %s"
 msgstr "Napaka med prikazovanjem obestila: %s"
 
-#: ../src/capplet/notification-properties.c:512
+#: ../src/capplet/notification-properties.c:472
 #, c-format
-msgid "Unable to locate glade file '%s'"
-msgstr "Glade datoteke '%s' ni mogoče najti"
+msgid "Could not load user interface file: %s"
+msgstr "Ni mogoče naložiti datoteke uporabniškega vmesnika: %s"
 
 #: ../src/capplet/notification-properties.desktop.in.h:1
 msgid "Pop-Up Notifications"
@@ -105,31 +89,12 @@ msgstr "Pojavna obvestila"
 msgid "Set your pop-up notification preferences"
 msgstr "Nastavitev možnosti pojavnih obvestil "
 
-#: ../src/capplet/notification-properties.glade.h:1
-msgid "      "
-msgstr "      "
+#: ../src/daemon/daemon.c:1237
+#, c-format
+msgid "Exceeded maximum number of notifications"
+msgstr "Največje število obvestil je preseženo"
 
-#: ../src/capplet/notification-properties.glade.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>Splošne možnosti</b>"
-
-#: ../src/capplet/notification-properties.glade.h:3
-msgid "Notification Settings"
-msgstr "Nastavitve obvestil"
-
-#: ../src/capplet/notification-properties.glade.h:4
-msgid "P_osition:"
-msgstr "P_oložaj:"
-
-#: ../src/capplet/notification-properties.glade.h:5
-msgid "_Preview"
-msgstr "_Predogled"
-
-#: ../src/capplet/notification-properties.glade.h:6
-msgid "_Theme:"
-msgstr "_Tema:"
-
-#: ../src/daemon/daemon.c:1436
+#: ../src/daemon/daemon.c:1468
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u ni veljaven ID obvestila"
@@ -138,6 +103,28 @@ msgstr "%u ni veljaven ID obvestila"
 msgid "Notification"
 msgstr "Obvestilo"
 
+#~ msgid "Top Left"
+#~ msgstr "Zgoraj levo"
+#~ msgid "Top Right"
+#~ msgstr "Zgoraj desno"
+#~ msgid "Bottom Left"
+#~ msgstr "Spodaj levo"
+#~ msgid "Bottom Right"
+#~ msgstr "Spodaj desno"
+#~ msgid "Unable to locate glade file '%s'"
+#~ msgstr "Glade datoteke '%s' ni mogoče najti"
+#~ msgid "      "
+#~ msgstr "      "
+#~ msgid "<b>General Options</b>"
+#~ msgstr "<b>Splošne možnosti</b>"
+#~ msgid "Notification Settings"
+#~ msgstr "Nastavitve obvestil"
+#~ msgid "P_osition:"
+#~ msgstr "P_oložaj:"
+#~ msgid "_Preview"
+#~ msgstr "_Predogled"
+#~ msgid "_Theme:"
+#~ msgstr "_Tema:"
 #~ msgid "Ubuntu theme"
 #~ msgstr "Tema Ubuntu"
 
