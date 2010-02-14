@@ -101,6 +101,7 @@ pkg_modules="
         libcanberra-gtk >= $REQ_LIBCANBERRA_GTK_VERSION, \
 	gconf-2.0, \
 	libwnck-1.0 \
+        x11 \
 "
 PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
