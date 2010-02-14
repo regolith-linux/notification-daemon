@@ -7,9 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-31 21:54+0000\n"
-"PO-Revision-Date: 2010-02-04 13:50+0100\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&component=general\n"
+"POT-Creation-Date: 2010-02-07 05:36+0000\n"
+"PO-Revision-Date: 2010-02-14 12:04+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -95,7 +96,12 @@ msgstr "Popup-Benachrichtigungen"
 msgid "Set your pop-up notification preferences"
 msgstr "Legen Sie Ihre Popup-Benachrichtigungseinstellungen fest"
 
-#: ../src/daemon/daemon.c:1453
+#: ../src/daemon/daemon.c:1237
+#, c-format
+msgid "Exceeded maximum number of notifications"
+msgstr "Maximale Anzahl an Benachrichtigungen wurde überschritten"
+
+#: ../src/daemon/daemon.c:1468
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u ist keine gültige Kennung für eine Benachrichtigung"
