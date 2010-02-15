@@ -6,9 +6,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon.po.master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-31 21:54+0000\n"
-"PO-Revision-Date: 2010-02-01 19:16+0100\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&component=general\n"
+"POT-Creation-Date: 2010-02-07 05:36+0000\n"
+"PO-Revision-Date: 2010-02-15 11:30+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -97,7 +98,12 @@ msgstr "Notificaciones emergentes"
 msgid "Set your pop-up notification preferences"
 msgstr "Configurar las preferencias de sus notificaciones emergentes"
 
-#: ../src/daemon/daemon.c:1453
+#: ../src/daemon/daemon.c:1237
+#, c-format
+msgid "Exceeded maximum number of notifications"
+msgstr "Se excedió el número máximo de notificaciones"
+
+#: ../src/daemon/daemon.c:1468
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u no es un ID de notificación válido"
