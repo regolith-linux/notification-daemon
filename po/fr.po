@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-10 18:37+0000\n"
-"PO-Revision-Date: 2010-01-10 21:08+0100\n"
+"POT-Creation-Date: 2010-03-02 22:42+0100\n"
+"PO-Revision-Date: 2010-03-02 22:43+0100\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -31,9 +31,9 @@ msgid ""
 "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
 msgstr ""
 "Emplacement par défaut des bulles de notification sur l'espace de travail "
-"pour l'empilement des notifications. Les valeurs possibles sont : « top_left » "
-"(en haut à gauche), « top_right » (en haut à droite), « bottom_left » (en bas à "
-"gauche) et  « bottom_right » (en bas à droite)."
+"pour l'empilement des notifications. Les valeurs possibles sont : "
+"« top_left » (en haut à gauche), « top_right » (en haut à droite), "
+"« bottom_left » (en bas à gauche) et  « bottom_right » (en bas à droite)."
 
 #: ../data/notification-daemon.schemas.in.h:4
 msgid "Popup location"
@@ -48,9 +48,9 @@ msgid ""
 "The default sound file used unless a notification supplies the 'sound-file' "
 "or 'suppress-sound' hint. Leave empty for no default sound."
 msgstr ""
-"Le fichier son utilisé par défaut, pour autant que la notification ne fournisse "
-"pas l'indication « sound-file » ou « suppress-sound ». Laisser vide pour aucun "
-"son par défaut."
+"Le fichier son utilisé par défaut, pour autant que la notification ne "
+"fournisse pas l'indication « sound-file » ou « suppress-sound ». Laisser vide "
+"pour aucun son par défaut."
 
 #: ../data/notification-daemon.schemas.in.h:7
 msgid "The theme used when displaying notifications."
@@ -60,51 +60,35 @@ msgstr "Le thème utilisé pour l'affichage des notifications."
 msgid "Turns on and off sound support for notifications."
 msgstr "Active ou désactive la prise en charge du son pour les notifications."
 
-#: ../src/capplet/notification-properties.c:79
-msgid "Top Left"
-msgstr "En haut à gauche"
+#: ../src/capplet/notification-properties.c:293
+msgid "Slider"
+msgstr "Curseur"
 
-#: ../src/capplet/notification-properties.c:80
-msgid "Top Right"
-msgstr "En haut à droite"
-
-#: ../src/capplet/notification-properties.c:81
-msgid "Bottom Left"
-msgstr "En bas à gauche"
-
-#: ../src/capplet/notification-properties.c:82
-msgid "Bottom Right"
-msgstr "En bas à droite"
-
-#: ../src/capplet/notification-properties.c:327
-msgid "Ubuntu theme"
-msgstr "Thème Ubuntu"
-
-#: ../src/capplet/notification-properties.c:329
+#: ../src/capplet/notification-properties.c:295
 msgid "Standard theme"
 msgstr "Thème standard"
 
-#: ../src/capplet/notification-properties.c:422
+#: ../src/capplet/notification-properties.c:391
 msgid "Error initializing libnotify"
 msgstr "Erreur d'initialisation de libnotify"
 
-#: ../src/capplet/notification-properties.c:435
+#: ../src/capplet/notification-properties.c:403
 msgid "Notification Test"
 msgstr "Test de notification"
 
-#: ../src/capplet/notification-properties.c:436
+#: ../src/capplet/notification-properties.c:404
 msgid "Just a test"
 msgstr "Un simple test"
 
-#: ../src/capplet/notification-properties.c:443
+#: ../src/capplet/notification-properties.c:411
 #, c-format
 msgid "Error while displaying notification: %s"
 msgstr "Erreur lors de l'affichage d'une notification : %s"
 
-#: ../src/capplet/notification-properties.c:500
+#: ../src/capplet/notification-properties.c:472
 #, c-format
-msgid "Unable to locate glade file '%s'"
-msgstr "Impossible de trouver le fichier Glade « %s »"
+msgid "Could not load user interface file: %s"
+msgstr "Impossible de charger le fichier d'interface utilisateur : %s"
 
 #: ../src/capplet/notification-properties.desktop.in.h:1
 msgid "Pop-Up Notifications"
@@ -114,31 +98,12 @@ msgstr "Bulles de notification"
 msgid "Set your pop-up notification preferences"
 msgstr "Configurer les préférences des bulles de notification"
 
-#: ../src/capplet/notification-properties.glade.h:1
-msgid "      "
-msgstr "      "
+#: ../src/daemon/daemon.c:1237
+#, c-format
+msgid "Exceeded maximum number of notifications"
+msgstr "Nombre maximum de notifications atteint"
 
-#: ../src/capplet/notification-properties.glade.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>Options générales</b>"
-
-#: ../src/capplet/notification-properties.glade.h:3
-msgid "Notification Settings"
-msgstr "Paramètres de notification"
-
-#: ../src/capplet/notification-properties.glade.h:4
-msgid "P_osition:"
-msgstr "_Position :"
-
-#: ../src/capplet/notification-properties.glade.h:5
-msgid "_Preview"
-msgstr "_Aperçu"
-
-#: ../src/capplet/notification-properties.glade.h:6
-msgid "_Theme:"
-msgstr "_Thème :"
-
-#: ../src/daemon/daemon.c:1414
+#: ../src/daemon/daemon.c:1468
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u n'est pas un ID de notification valable"
@@ -146,3 +111,27 @@ msgstr "%u n'est pas un ID de notification valable"
 #: ../src/daemon/sound.c:36
 msgid "Notification"
 msgstr "Notification"
+
+#~ msgid "Top Left"
+#~ msgstr "En haut à gauche"
+
+#~ msgid "Top Right"
+#~ msgstr "En haut à droite"
+
+#~ msgid "Bottom Left"
+#~ msgstr "En bas à gauche"
+
+#~ msgid "Bottom Right"
+#~ msgstr "En bas à droite"
+
+#~ msgid "Notification Settings"
+#~ msgstr "Paramètres de notification"
+
+#~ msgid "P_osition:"
+#~ msgstr "_Position :"
+
+#~ msgid "_Preview"
+#~ msgstr "_Aperçu"
+
+#~ msgid "_Theme:"
+#~ msgstr "_Thème :"
