@@ -154,6 +154,8 @@ draw_stripe (GtkWidget  *widget,
 
         style = gtk_widget_get_style (widget);
         stripe_x = windata->main_hbox->allocation.x + 1;
+        if (gtk_widget_get_direction (widget) == GTK_TEXT_DIR_RTL)
+                stripe_x = windata->width - STRIPE_WIDTH - stripe_x;
         stripe_y = windata->main_hbox->allocation.y + 1;
         stripe_height = windata->main_hbox->allocation.height - 2;
 
