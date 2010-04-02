@@ -242,19 +242,19 @@
     <data>
       <row>
         <col id="0" translatable="yes">Top Left</col>
-        <col id="1" translatable="yes">top_left</col>
+        <col id="1">top_left</col>
       </row>
       <row>
         <col id="0" translatable="yes">Top Right</col>
-        <col id="1" translatable="yes">top_right</col>
+        <col id="1">top_right</col>
       </row>
       <row>
         <col id="0" translatable="yes">Bottom Left</col>
-        <col id="1" translatable="yes">bottom_left</col>
+        <col id="1">bottom_left</col>
       </row>
       <row>
         <col id="0" translatable="yes">Bottom Right</col>
-        <col id="1" translatable="yes">bottom_right</col>
+        <col id="1">bottom_right</col>
       </row>
     </data>
   </object>
