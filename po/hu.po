@@ -2,14 +2,13 @@
 # Copyright (c) (c) 2006 Canonical Ltd, and Rosetta Contributors 2006
 # This file is distributed under the same license as the notification-daemon package.
 #
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
 # Gabor Kelemen <kelemeng at gnome dot hu>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: notification-daemon\n"
+"Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-11 23:35+0100\n"
-"PO-Revision-Date: 2010-02-11 23:36+0100\n"
+"POT-Creation-Date: 2010-04-12 10:18+0200\n"
+"PO-Revision-Date: 2010-04-12 10:19+0200\n"
 "Last-Translator: Gabor Kelemen <kelemeng at gnome dot hu>\n"
 "Language-Team: Hungarian <gnome at fsf dot hu>\n"
 "MIME-Version: 1.0\n"
@@ -98,6 +97,46 @@ msgstr "Felugró értesítések"
 #: ../src/capplet/notification-properties.desktop.in.h:2
 msgid "Set your pop-up notification preferences"
 msgstr "Felugró értesítések beállításai"
+
+#: ../src/capplet/notification-properties.ui.h:1
+msgid "      "
+msgstr "      "
+
+#: ../src/capplet/notification-properties.ui.h:2
+msgid "<b>General Options</b>"
+msgstr "<b>Általános beállítások</b>"
+
+#: ../src/capplet/notification-properties.ui.h:3
+msgid "Bottom Left"
+msgstr "Bal oldalon, alul"
+
+#: ../src/capplet/notification-properties.ui.h:4
+msgid "Bottom Right"
+msgstr "Jobb oldalon, alul"
+
+#: ../src/capplet/notification-properties.ui.h:5
+msgid "Notification Settings"
+msgstr "Értesítések beállításai"
+
+#: ../src/capplet/notification-properties.ui.h:6
+msgid "P_osition:"
+msgstr "P_ozíció:"
+
+#: ../src/capplet/notification-properties.ui.h:7
+msgid "Top Left"
+msgstr "Bal oldalon, felül"
+
+#: ../src/capplet/notification-properties.ui.h:8
+msgid "Top Right"
+msgstr "Jobb oldalon, felül"
+
+#: ../src/capplet/notification-properties.ui.h:9
+msgid "_Preview"
+msgstr "_Előnézet"
+
+#: ../src/capplet/notification-properties.ui.h:10
+msgid "_Theme:"
+msgstr "_Téma:"
 
 #: ../src/daemon/daemon.c:1237
 #, c-format
