@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-02 02:01+0300\n"
-"PO-Revision-Date: 2010-04-02 02:01+0300\n"
+"POT-Creation-Date: 2010-04-19 02:00+0300\n"
+"PO-Revision-Date: 2010-04-15 22:48+0300\n"
 "Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
 "Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
 "MIME-Version: 1.0\n"
@@ -94,6 +94,46 @@ msgstr "Iššokantys pranešimai"
 #: ../src/capplet/notification-properties.desktop.in.h:2
 msgid "Set your pop-up notification preferences"
 msgstr "Keiskite iššokančių pranešimų nustatymus"
+
+#: ../src/capplet/notification-properties.ui.h:1
+msgid "      "
+msgstr "      "
+
+#: ../src/capplet/notification-properties.ui.h:2
+msgid "<b>General Options</b>"
+msgstr "<b>Bendrosios parinktys</b>"
+
+#: ../src/capplet/notification-properties.ui.h:3
+msgid "Bottom Left"
+msgstr "Apačioje kairėje"
+
+#: ../src/capplet/notification-properties.ui.h:4
+msgid "Bottom Right"
+msgstr "Apačioje dešinėje"
+
+#: ../src/capplet/notification-properties.ui.h:5
+msgid "Notification Settings"
+msgstr "Pranešimo nustatymai"
+
+#: ../src/capplet/notification-properties.ui.h:6
+msgid "P_osition:"
+msgstr "P_adėtis:"
+
+#: ../src/capplet/notification-properties.ui.h:7
+msgid "Top Left"
+msgstr "Viršuje kairėje"
+
+#: ../src/capplet/notification-properties.ui.h:8
+msgid "Top Right"
+msgstr "Viršuje dešinėje"
+
+#: ../src/capplet/notification-properties.ui.h:9
+msgid "_Preview"
+msgstr "_Peržiūra"
+
+#: ../src/capplet/notification-properties.ui.h:10
+msgid "_Theme:"
+msgstr "_Tema:"
 
 #: ../src/daemon/daemon.c:1237
 #, c-format
