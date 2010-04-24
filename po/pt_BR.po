@@ -2,15 +2,15 @@
 # Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
 # This file is distributed under the same license as the notification-daemon package.
 # Henrique P. Machado <hpmachado@gnome.org>, 2010.
+# André Gondim <andregondim@ubuntu.com>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-04-02 22:59+0000\n"
-"PO-Revision-Date: 2010-03-07 17:25-0300\n"
-"Last-Translator: Henrique P. Machado <hpmachado@gnome.org>\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-04-23 22:40-0300\n"
+"PO-Revision-Date: 2010-04-23 21:11-0300\n"
+"Last-Translator: Vladimir Melo <vmelo@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +35,7 @@ msgstr ""
 
 #: ../data/notification-daemon.schemas.in.h:4
 msgid "Popup location"
-msgstr "Local da pop-up"
+msgstr "Localização da pop-up"
 
 #: ../data/notification-daemon.schemas.in.h:5
 msgid "Sound Enabled"
@@ -60,7 +60,7 @@ msgstr "Liga ou desliga o suporte a som para notificações."
 
 #: ../src/capplet/notification-properties.c:293
 msgid "Slider"
-msgstr "Deslizador"
+msgstr "Controle deslizante"
 
 #: ../src/capplet/notification-properties.c:295
 msgid "Standard theme"
@@ -98,45 +98,43 @@ msgstr "Defina as preferências de suas notificações pop-up"
 
 #: ../src/capplet/notification-properties.ui.h:1
 msgid "      "
-msgstr ""
+msgstr "       "
 
 #: ../src/capplet/notification-properties.ui.h:2
 msgid "<b>General Options</b>"
-msgstr ""
+msgstr "<b>Opções gerais</b>"
 
 #: ../src/capplet/notification-properties.ui.h:3
 msgid "Bottom Left"
-msgstr ""
+msgstr "Inferior esquerda"
 
 #: ../src/capplet/notification-properties.ui.h:4
 msgid "Bottom Right"
-msgstr ""
+msgstr "Inferior direita"
 
 #: ../src/capplet/notification-properties.ui.h:5
-#, fuzzy
-#| msgid "Notification Test"
 msgid "Notification Settings"
 msgstr "Teste de notificação"
 
 #: ../src/capplet/notification-properties.ui.h:6
 msgid "P_osition:"
-msgstr ""
+msgstr "P_osição:"
 
 #: ../src/capplet/notification-properties.ui.h:7
 msgid "Top Left"
-msgstr ""
+msgstr "Superior esquerdo"
 
 #: ../src/capplet/notification-properties.ui.h:8
 msgid "Top Right"
-msgstr ""
+msgstr "Superior direito"
 
 #: ../src/capplet/notification-properties.ui.h:9
 msgid "_Preview"
-msgstr ""
+msgstr "_Visualizar"
 
 #: ../src/capplet/notification-properties.ui.h:10
 msgid "_Theme:"
-msgstr ""
+msgstr "_Tema:"
 
 #: ../src/daemon/daemon.c:1237
 #, c-format
