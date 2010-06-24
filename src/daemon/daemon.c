@@ -84,11 +84,11 @@ typedef struct
         NotifyDaemon   *daemon;
         GTimeVal        expiration;
         GTimeVal        paused_diff;
-        gboolean        has_timeout;
-        gboolean        paused;
         guint           id;
         GtkWindow      *nw;
         Window          src_window_xid;
+        guint           has_timeout : 1;
+        guint           paused : 1;
 } NotifyTimeout;
 
 typedef struct
