@@ -278,6 +278,7 @@ on_screen_monitors_changed (GdkScreen    *screen,
                         }
                         g_list_free (windows);
                         notify_stack_destroy (stack);
+                        nscreen->stacks[i] = NULL;
                 }
 
                 /* remove the extra stacks */
@@ -336,7 +337,6 @@ create_screens (NotifyDaemon *daemon)
                 create_stacks_for_screen (daemon, gdk_display_get_screen (display, i));
         }
 }
-
 
 static void
 on_popup_location_changed (GConfClient  *client,
@@ -425,6 +425,31 @@ notify_daemon_init (NotifyDaemon *daemon)
 }
 
 static void
+destroy_screens (NotifyDaemon *daemon)
+{
+        GdkDisplay  *display;
+        int          i;
+        int          j;
+
+        display = gdk_display_get_default ();
+
+        for (i = 0; i < daemon->priv->n_screens; i++) {
+                g_signal_handlers_disconnect_by_func (gdk_display_get_screen (display, i),
+                                                      G_CALLBACK (on_screen_monitors_changed),
+                                                      daemon);
+                for (j = 0; i < daemon->priv->screens[i]->n_stacks; j++) {
+                        notify_stack_destroy (daemon->priv->screens[i]->stacks[j]);
+                        daemon->priv->screens[i]->stacks[j] = NULL;
+                }
+
+                g_free (daemon->priv->screens[i]->stacks);
+        }
+
+        g_free (daemon->priv->screens);
+        daemon->priv->screens = NULL;
+}
+
+static void
 notify_daemon_finalize (GObject *object)
 {
         NotifyDaemon *daemon;
@@ -445,6 +470,9 @@ notify_daemon_finalize (GObject *object)
         g_hash_table_destroy (daemon->priv->monitored_window_hash);
         g_hash_table_destroy (daemon->priv->idle_reposition_notify_ids);
         g_hash_table_destroy (daemon->priv->notification_hash);
+
+        destroy_screens (daemon);
+
         g_free (daemon->priv);
 
         G_OBJECT_CLASS (notify_daemon_parent_class)->finalize (object);
