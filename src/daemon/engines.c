@@ -176,7 +176,7 @@ get_theme_engine (void)
                 GConfClient    *client;
                 char           *enginename;
 
-                client = get_gconf_client ();
+                client = gconf_client_get_default ();
                 enginename = gconf_client_get_string (client,
                                                       GCONF_KEY_THEME,
                                                       NULL);
@@ -190,6 +190,8 @@ get_theme_engine (void)
                                                          NULL,
                                                          NULL);
                 }
+
+                g_object_unref (client);
 
                 if (enginename == NULL) {
                         active_engine = load_theme_engine ("standard");

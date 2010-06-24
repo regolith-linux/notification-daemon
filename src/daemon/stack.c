@@ -41,6 +41,12 @@ struct _NotifyStack
         GList              *windows;
 };
 
+GList *
+notify_stack_get_windows (NotifyStack *stack)
+{
+        return stack->windows;
+}
+
 static gboolean
 get_work_area (GtkWidget    *nw,
                GdkRectangle *rect)

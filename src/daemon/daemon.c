@@ -91,6 +91,12 @@ typedef struct
         Window          src_window_xid;
 } NotifyTimeout;
 
+typedef struct
+{
+        NotifyStack   **stacks;
+        int             n_stacks;
+} NotifyScreen;
+
 struct _NotifyDaemonPrivate
 {
         guint           next_id;
@@ -100,11 +106,12 @@ struct _NotifyDaemonPrivate
         GHashTable     *monitored_window_hash;
         GHashTable     *notification_hash;
         gboolean        url_clicked_lock;
-        NotifyStack   **stacks;
-        gint            stacks_size;
+
+        NotifyStackLocation stack_location;
+        NotifyScreen      **screens;
+        int                 n_screens;
 };
 
-static GConfClient    *gconf_client = NULL;
 static DBusConnection *dbus_conn = NULL;
 
 #define CHECK_DBUS_VERSION(major, minor) \
@@ -173,42 +180,6 @@ _notify_timeout_destroy (NotifyTimeout *nt)
         g_free (nt);
 }
 
-static void
-reallocate_stacks (NotifyDaemon *daemon)
-{
-        GdkDisplay         *display;
-        GdkScreen          *screen;
-        gint                old_stacks_size;
-        GConfClient        *client;
-        NotifyStackLocation location;
-        gchar              *slocation;
-        gint                i;
-
-        client = get_gconf_client ();
-        display = gdk_display_get_default ();
-        screen = gdk_display_get_default_screen (display);
-
-        if (daemon->priv->stacks_size < gdk_screen_get_n_monitors (screen)) {
-                slocation = gconf_client_get_string (client,
-                                                     GCONF_KEY_POPUP_LOCATION,
-                                                     NULL);
-                location = get_stack_location_from_string (slocation);
-                g_free (slocation);
-
-                old_stacks_size = daemon->priv->stacks_size;
-                daemon->priv->stacks_size = gdk_screen_get_n_monitors (screen);
-                daemon->priv->stacks = g_renew (NotifyStack *,
-                                                daemon->priv->stacks,
-                                                daemon->priv->stacks_size);
-                for (i = old_stacks_size; i < daemon->priv->stacks_size; i++) {
-                        daemon->priv->stacks[i] = notify_stack_new (daemon,
-                                                                    screen,
-                                                                    i,
-                                                                    location);
-                }
-        }
-}
-
 static gboolean
 do_exit (gpointer user_data)
 {
@@ -235,8 +206,186 @@ remove_exit_timeout (NotifyDaemon *daemon)
 }
 
 static void
+create_stack_for_monitor (NotifyDaemon *daemon,
+                          GdkScreen    *screen,
+                          int           monitor_num)
+{
+        NotifyScreen *nscreen;
+        int           screen_num;
+
+
+        screen_num = gdk_screen_get_number (screen);
+        nscreen = daemon->priv->screens[screen_num];
+
+        nscreen->stacks[monitor_num] = notify_stack_new (daemon,
+                                                         screen,
+                                                         monitor_num,
+                                                         daemon->priv->stack_location);
+}
+
+static void
+on_screen_monitors_changed (GdkScreen    *screen,
+                            NotifyDaemon *daemon)
+{
+        NotifyScreen *nscreen;
+        int           screen_num;
+        int           n_monitors;
+        int           i;
+
+        screen_num = gdk_screen_get_number (screen);
+        nscreen = daemon->priv->screens[screen_num];
+
+        n_monitors = gdk_screen_get_n_monitors (screen);
+
+        g_debug ("Monitors changed for screen %d: num=%d",
+                 screen_num,
+                 n_monitors);
+
+        if (n_monitors == nscreen->n_stacks) {
+                return;
+        } else if (n_monitors > nscreen->n_stacks) {
+                /* grow */
+                nscreen->stacks = g_renew (NotifyStack *,
+                                           nscreen->stacks,
+                                           n_monitors);
+
+                /* add more stacks */
+                for (i = nscreen->n_stacks; i < n_monitors; i++) {
+                        create_stack_for_monitor (daemon, screen, i);
+                }
+
+                nscreen->n_stacks = n_monitors;
+        } else {
+                NotifyStack *last_stack;
+
+                last_stack = nscreen->stacks[n_monitors - 1];
+
+                /* transfer items before removing stacks */
+                for (i = n_monitors; i < nscreen->n_stacks; i++) {
+                        NotifyStack *stack;
+                        GList       *windows;
+                        GList       *l;
+
+                        stack = nscreen->stacks[i];
+                        windows = g_list_copy (notify_stack_get_windows (stack));
+                        for (l = windows; l != NULL; l = l->next) {
+                                g_debug ("Transferring window %p from %d to %d",
+                                         l->data,
+                                         i,
+                                         n_monitors - 1);
+
+                                /* skip removing the window from the
+                                   old stack since it will try to
+                                   unrealize the window.  And the
+                                   stack is going away anyhow. */
+                                notify_stack_add_window (last_stack, l->data, TRUE);
+                        }
+                        g_list_free (windows);
+                        notify_stack_destroy (stack);
+                }
+
+                /* remove the extra stacks */
+                nscreen->stacks = g_renew (NotifyStack *,
+                                           nscreen->stacks,
+                                           n_monitors);
+                nscreen->n_stacks = n_monitors;
+        }
+}
+
+static void
+create_stacks_for_screen (NotifyDaemon *daemon,
+                          GdkScreen    *screen)
+{
+        NotifyScreen *nscreen;
+        int           screen_num;
+        int           i;
+
+        screen_num = gdk_screen_get_number (screen);
+        nscreen = daemon->priv->screens[screen_num];
+
+        nscreen->n_stacks = gdk_screen_get_n_monitors (screen);
+
+        nscreen->stacks = g_renew (NotifyStack *,
+                                   nscreen->stacks,
+                                   nscreen->n_stacks);
+
+        g_debug ("Creating %d stacks for screen %d",
+                 nscreen->n_stacks,
+                 screen_num);
+
+        for (i = 0; i < nscreen->n_stacks; i++) {
+                create_stack_for_monitor (daemon, screen, i);
+        }
+}
+
+static void
+create_screens (NotifyDaemon *daemon)
+{
+        GdkDisplay  *display;
+        int          i;
+
+        g_assert (daemon->priv->screens == NULL);
+
+        display = gdk_display_get_default ();
+        daemon->priv->n_screens = gdk_display_get_n_screens (display);
+
+        daemon->priv->screens = g_new0 (NotifyScreen *, daemon->priv->n_screens);
+
+        for (i = 0; i < daemon->priv->n_screens; i++) {
+                g_signal_connect (gdk_display_get_screen (display, i),
+                                  "monitors-changed",
+                                  G_CALLBACK (on_screen_monitors_changed),
+                                  daemon);
+                daemon->priv->screens[i] = g_new0 (NotifyScreen, 1);
+                create_stacks_for_screen (daemon, gdk_display_get_screen (display, i));
+        }
+}
+
+
+static void
+on_popup_location_changed (GConfClient  *client,
+                           guint         cnxn_id,
+                           GConfEntry   *entry,
+                           NotifyDaemon *daemon)
+{
+        NotifyStackLocation stack_location;
+        const char         *slocation;
+        GConfValue         *value;
+        int                 i;
+
+        value = gconf_entry_get_value (entry);
+        slocation = (value != NULL ? gconf_value_get_string (value) : NULL);
+
+        if (slocation != NULL && *slocation != '\0') {
+                stack_location = get_stack_location_from_string (slocation);
+        } else {
+                gconf_client_set_string (client,
+                                         GCONF_KEY_POPUP_LOCATION,
+                                         popup_stack_locations
+                                         [POPUP_STACK_DEFAULT_INDEX].
+                                         identifier,
+                                         NULL);
+
+                stack_location = NOTIFY_STACK_LOCATION_DEFAULT;
+        }
+
+        daemon->priv->stack_location = stack_location;
+        for (i = 0; i < daemon->priv->n_screens; i++) {
+                int j;
+                for (j = 0; j < daemon->priv->n_screens; j++) {
+                        NotifyStack *stack;
+                        stack = daemon->priv->screens[i]->stacks[j];
+                        notify_stack_set_location (stack, stack_location);
+                }
+        }
+}
+
+static void
 notify_daemon_init (NotifyDaemon *daemon)
 {
+        GConfClient *client;
+        char        *location;
+
         daemon->priv = G_TYPE_INSTANCE_GET_PRIVATE (daemon,
                                                     NOTIFY_TYPE_DAEMON,
                                                     NotifyDaemonPrivate);
@@ -246,10 +395,30 @@ notify_daemon_init (NotifyDaemon *daemon)
 
         add_exit_timeout (daemon);
 
-        daemon->priv->stacks_size = 0;
-        daemon->priv->stacks = NULL;
+        client = gconf_client_get_default ();
+        gconf_client_add_dir (client,
+                              GCONF_KEY_DAEMON,
+                              GCONF_CLIENT_PRELOAD_NONE,
+                              NULL);
 
-        reallocate_stacks (daemon);
+        location = gconf_client_get_string (client,
+                                            GCONF_KEY_POPUP_LOCATION,
+                                            NULL);
+        daemon->priv->stack_location = get_stack_location_from_string (location);
+        g_free (location);
+
+        gconf_client_notify_add (client,
+                                 GCONF_KEY_POPUP_LOCATION,
+                                 (GConfClientNotifyFunc) on_popup_location_changed,
+                                 daemon,
+                                 NULL,
+                                 NULL);
+        g_object_unref (client);
+
+        daemon->priv->n_screens = 0;
+        daemon->priv->screens = NULL;
+
+        create_screens (daemon);
 
         daemon->priv->idle_reposition_notify_ids = g_hash_table_new (NULL, NULL);
         daemon->priv->monitored_window_hash = g_hash_table_new (NULL, NULL);
@@ -925,42 +1094,6 @@ window_clicked_cb (GtkWindow      *nw,
 }
 
 static void
-popup_location_changed_cb (GConfClient *client,
-                           guint        cnxn_id,
-                           GConfEntry  *entry,
-                           gpointer     user_data)
-{
-        NotifyDaemon   *daemon = (NotifyDaemon *) user_data;
-        NotifyStackLocation stack_location;
-        const char     *slocation;
-        GConfValue     *value;
-        gint            i;
-
-        if (daemon == NULL)
-                return;
-
-        value = gconf_entry_get_value (entry);
-        slocation = (value != NULL ? gconf_value_get_string (value) : NULL);
-
-        if (slocation != NULL && *slocation != '\0') {
-                stack_location = get_stack_location_from_string (slocation);
-        } else {
-                gconf_client_set_string (get_gconf_client (),
-                                         GCONF_KEY_POPUP_LOCATION,
-                                         popup_stack_locations
-                                         [POPUP_STACK_DEFAULT_INDEX].
-                                         identifier,
-                                         NULL);
-
-                stack_location = NOTIFY_STACK_LOCATION_DEFAULT;
-        }
-
-        for (i = 0; i < daemon->priv->stacks_size; i++)
-                notify_stack_set_location (daemon->priv->stacks[i],
-                                           stack_location);
-}
-
-static void
 url_clicked_cb (GtkWindow *nw, const char *url)
 {
         NotifyDaemon   *daemon = NW_GET_DAEMON (nw);
@@ -1228,6 +1361,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         gboolean        sound_enabled;
         gint            i;
         GdkPixbuf      *pixbuf;
+        GConfClient    *gconf_client;
 
         if (g_hash_table_size (priv->notification_hash) > MAX_NOTIFICATIONS) {
                 GError *error;
@@ -1299,9 +1433,12 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         }
 
         /* Deal with sound hints */
+        gconf_client = gconf_client_get_default ();
         sound_enabled = gconf_client_get_bool (gconf_client,
                                                GCONF_KEY_SOUND_ENABLED,
                                                NULL);
+        g_object_unref (gconf_client);
+
         data = (GValue *) g_hash_table_lookup (hints, "suppress-sound");
 
         if (data != NULL) {
@@ -1387,7 +1524,8 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
                 theme_set_notification_arrow (nw, TRUE, x, y);
                 theme_move_notification (nw, x, y);
         } else {
-                gint            monitor;
+                int             monitor_num;
+                int             screen_num;
                 GdkScreen      *screen;
                 gint            x, y;
 
@@ -1398,12 +1536,16 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
                                          &x,
                                          &y,
                                          NULL);
-                monitor = gdk_screen_get_monitor_at_point (screen, x, y);
-                if (monitor >= priv->stacks_size) {
-                        reallocate_stacks (daemon);
+                screen_num = gdk_screen_get_number (screen);
+                monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
+
+                if (monitor_num >= priv->screens[screen_num]->n_stacks) {
+                        /* screw it - dump it on the last one we'll get
+                         a monitors-changed signal soon enough*/
+                        monitor_num = priv->screens[screen_num]->n_stacks - 1;
                 }
 
-                notify_stack_add_window (priv->stacks[monitor],
+                notify_stack_add_window (priv->screens[screen_num]->stacks[monitor_num],
                                          nw,
                                          new_notification);
         }
@@ -1505,12 +1647,6 @@ notify_daemon_get_server_information (NotifyDaemon *daemon,
         return TRUE;
 }
 
-GConfClient *
-get_gconf_client (void)
-{
-        return gconf_client;
-}
-
 int
 main (int argc, char **argv)
 {
@@ -1524,18 +1660,9 @@ main (int argc, char **argv)
         g_log_set_always_fatal (G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
 
         gtk_init (&argc, &argv);
-        gconf_init (argc, argv, NULL);
-
-        gconf_client = gconf_client_get_default ();
-        gconf_client_add_dir (gconf_client,
-                              GCONF_KEY_DAEMON,
-                              GCONF_CLIENT_PRELOAD_NONE,
-                              NULL);
 
         error = NULL;
-
         connection = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
-
         if (connection == NULL) {
                 g_printerr ("Failed to open connection to bus: %s\n",
                             error->message);
@@ -1576,23 +1703,13 @@ main (int argc, char **argv)
 
         daemon = g_object_new (NOTIFY_TYPE_DAEMON, NULL);
 
-        gconf_client_notify_add (gconf_client,
-                                 GCONF_KEY_POPUP_LOCATION,
-                                 popup_location_changed_cb,
-                                 daemon,
-                                 NULL,
-                                 NULL);
-
-        /* Emit signal to verify/set current key */
-        gconf_client_notify (gconf_client, GCONF_KEY_POPUP_LOCATION);
-
         dbus_g_connection_register_g_object (connection,
                                              "/org/freedesktop/Notifications",
                                              G_OBJECT (daemon));
 
         gtk_main ();
+
  out:
-        g_object_unref (G_OBJECT (gconf_client));
 
         return 0;
 }
