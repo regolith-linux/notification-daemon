@@ -109,6 +109,8 @@ struct _NotifyDaemonPrivate
         GHashTable     *notification_hash;
         gboolean        url_clicked_lock;
 
+        guint           gconf_cnxn;
+
         NotifyStackLocation stack_location;
         NotifyScreen      **screens;
         int                 n_screens;
@@ -401,12 +403,12 @@ notify_daemon_init (NotifyDaemon *daemon)
         daemon->priv->stack_location = get_stack_location_from_string (location);
         g_free (location);
 
-        gconf_client_notify_add (client,
-                                 GCONF_KEY_POPUP_LOCATION,
-                                 (GConfClientNotifyFunc) on_popup_location_changed,
-                                 daemon,
-                                 NULL,
-                                 NULL);
+        daemon->priv->gconf_cnxn = gconf_client_notify_add (client,
+                                                            GCONF_KEY_POPUP_LOCATION,
+                                                            (GConfClientNotifyFunc) on_popup_location_changed,
+                                                            daemon,
+                                                            NULL,
+                                                            NULL);
         g_object_unref (client);
 
         daemon->priv->n_screens = 0;
@@ -426,8 +428,13 @@ static void
 notify_daemon_finalize (GObject *object)
 {
         NotifyDaemon *daemon;
+        GConfClient  *client;
 
         daemon = NOTIFY_DAEMON (object);
+
+        client = gconf_client_get_default ();
+        gconf_client_notify_remove (client, daemon->priv->gconf_cnxn);
+        g_object_unref (client);
 
         if (g_hash_table_size (daemon->priv->monitored_window_hash) > 0) {
                 gdk_window_remove_filter (NULL, (GdkFilterFunc) _notify_x11_filter, daemon);
