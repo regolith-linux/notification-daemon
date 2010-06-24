@@ -17,12 +17,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
+
 #ifndef _SOUND_H
 #define _SOUND_H
 
 #include <gtk/gtk.h>
 
-void sound_play_file(GtkWidget *widget,
-                     const char *filename);
+void sound_play_file (GtkWidget *widget,
+                      const char *filename);
 
 #endif /* _SOUND_H */

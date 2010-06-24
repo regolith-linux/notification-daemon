@@ -2,6 +2,7 @@
  *
  * Copyright (C) 2006 Christian Hammond <chipx86@chipx86.com>
  * Copyright (C) 2005 John (J5) Palmieri <johnp@redhat.com>
+ * Copyright (C) 2010 Red Hat, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
+
 #include "config.h"
 
 #include <stdlib.h>
@@ -804,9 +806,9 @@ _calculate_timeout (NotifyDaemon  *daemon,
                     NotifyTimeout *nt,
                     int            timeout)
 {
-        if (timeout == 0)
+        if (timeout == 0) {
                 nt->has_timeout = FALSE;
-        else {
+        } else {
                 glong usec;
 
                 nt->has_timeout = TRUE;
@@ -1110,7 +1112,8 @@ window_clicked_cb (GtkWindow      *nw,
 }
 
 static void
-url_clicked_cb (GtkWindow *nw, const char *url)
+url_clicked_cb (GtkWindow  *nw,
+                const char *url)
 {
         NotifyDaemon   *daemon = NW_GET_DAEMON (nw);
         char           *escaped_url;
@@ -1174,8 +1177,9 @@ screensaver_active (GtkWidget *nw)
                            error->message);
                 g_error_free (error);
         }
+
         g_object_unref (gs_proxy);
-      out:
+ out:
 
         return active;
 }
@@ -1260,8 +1264,9 @@ monitor_notification_source_windows (NotifyDaemon  *daemon,
 
         /* Start monitoring events if necessary.  We don't want to
            filter events unless we absolutely have to. */
-        if (g_hash_table_size (daemon->priv->monitored_window_hash) == 0)
+        if (g_hash_table_size (daemon->priv->monitored_window_hash) == 0) {
                 gdk_window_add_filter (NULL, _notify_x11_filter, daemon);
+        }
 
         /* Store the window in the timeout */
         g_assert (nt != NULL);

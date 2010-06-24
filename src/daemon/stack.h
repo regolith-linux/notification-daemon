@@ -1,8 +1,7 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *
- * stack.h - Notification stack groups.
- *
  * Copyright (C) 2006 Christian Hammond <chipx86@chipx86.com>
+ * Copyright (C) 2010 Red Hat, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +18,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
+
 #ifndef _NOTIFY_STACK_H_
 #define _NOTIFY_STACK_H_
 
 #include <gtk/gtk.h>
+
 #include "daemon.h"
 
 typedef enum

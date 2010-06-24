@@ -1,7 +1,5 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *
- * sound.c - Sound support portion of the destop notification spec
- *
  * Copyright (C) 2007 Jim Ramsay <i.am@jimramsay.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.
  */
+
 #include "config.h"
 
 #include "sound.h"
@@ -27,8 +26,8 @@
 #include <canberra-gtk.h>
 
 void
-sound_play_file(GtkWidget *widget,
-                const char *filename)
+sound_play_file (GtkWidget *widget,
+                 const char *filename)
 {
         ca_gtk_play_for_widget (widget, 0,
                                 CA_PROP_MEDIA_ROLE, "event",
