@@ -112,6 +112,12 @@ struct _NotifyDaemonPrivate
         int                 n_screens;
 };
 
+typedef struct
+{
+        guint           id;
+        NotifyDaemon   *daemon;
+} _NotifyPendingClose;
+
 static DBusConnection *dbus_conn = NULL;
 
 #define CHECK_DBUS_VERSION(major, minor) \
@@ -547,6 +553,16 @@ _close_notification (NotifyDaemon       *daemon,
                 if (g_hash_table_size (daemon->priv->notification_hash) == 0)
                         add_exit_timeout (daemon);
         }
+}
+
+static gboolean
+_close_notification_not_shown (_NotifyPendingClose *data)
+{
+        _close_notification (data->daemon, data->id, TRUE, NOTIFYD_CLOSED_RESERVED);
+        g_object_unref (data->daemon);
+        g_free (data);
+
+        return FALSE;
 }
 
 static void
@@ -1572,6 +1588,15 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
                 theme_show_notification (nw);
                 if (sound_file != NULL)
                         sound_play_file (GTK_WIDGET (nw), sound_file);
+        } else {
+                _NotifyPendingClose *data;
+
+                /* The notification was not shown, so queue up a close
+                 * for it */
+                data = g_new0 (_NotifyPendingClose, 1);
+                data->id = id;
+                data->daemon = g_object_ref (daemon);
+                g_idle_add ((GSourceFunc) _close_notification_not_shown, data);
         }
 
         g_free (sound_file);
