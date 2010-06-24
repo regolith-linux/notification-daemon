@@ -90,7 +90,7 @@ dnl ---------------------------------------------------------------------------
 dnl Requirements for the daemon
 dnl ---------------------------------------------------------------------------
 REQ_GLIB_VERSION=$REQ_GTK_VERSION
-REQ_DBUS_VERSION=0.36
+REQ_DBUS_VERSION=0.78
 REQ_LIBCANBERRA_GTK_VERSION=0.4
 pkg_modules="
 	gtk+-2.0 >= $REQ_GTK_VERSION, \

@@ -122,22 +122,6 @@ typedef struct
 
 static DBusConnection *dbus_conn = NULL;
 
-#define CHECK_DBUS_VERSION(major, minor) \
-        (DBUS_MAJOR_VER > (major) || \
-         (DBUS_MAJOR_VER == (major) && DBUS_MINOR_VER >= (minor)))
-
-#if !CHECK_DBUS_VERSION(0, 60)
-
-/* This is a hack that will go away in time. For now, it's fairly safe. */
-struct _DBusGMethodInvocation
-{
-        DBusGConnection       *connection;
-        DBusGMessage          *message;
-        const DBusGObjectInfo *object;
-        const DBusGMethodInfo *method;
-};
-#endif /* D-BUS < 0.60 */
-
 static void                 notify_daemon_finalize        (GObject *object);
 static void                _notification_destroyed_cb     (GtkWindow *nw,
                                                            NotifyDaemon *daemon);
@@ -891,7 +875,6 @@ _notify_daemon_pixbuf_from_data_hint (GValue *icon_data)
         GValueArray    *image_struct;
         GValue         *value;
         GArray         *tmp_array;
-#if CHECK_DBUS_VERSION(0, 61)
         GType           struct_type;
 
         struct_type = dbus_g_type_get_struct ("GValueArray",
@@ -909,7 +892,6 @@ _notify_daemon_pixbuf_from_data_hint (GValue *icon_data)
                            "GValue of type GValueArray");
                 return NULL;
         }
-#endif /* D-BUS >= 0.61 */
 
         image_struct = (GValueArray *) g_value_get_boxed (icon_data);
         value = g_value_array_get_nth (image_struct, 0);
@@ -1606,11 +1588,7 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
 
         g_free (sound_file);
 
-#if CHECK_DBUS_VERSION(0, 60)
         sender = dbus_g_method_get_sender (context);
-#else
-        sender = g_strdup (dbus_message_get_sender (dbus_g_message_get_message (context->message)));
-#endif
 
         g_object_set_data (G_OBJECT (nw),
                            "_notify_id",
