@@ -1709,6 +1709,7 @@ main (int argc, char **argv)
 
         gtk_main ();
 
+        g_object_unref (daemon);
  out:
 
         return 0;
