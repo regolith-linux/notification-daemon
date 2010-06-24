@@ -1620,14 +1620,19 @@ gboolean
 notify_daemon_get_capabilities (NotifyDaemon *daemon,
                                 char       ***caps)
 {
-        *caps = g_new0 (char *, 6);
+        GPtrArray *a;
+        char **_caps;
 
-        (*caps)[0] = g_strdup ("actions");
-        (*caps)[1] = g_strdup ("body");
-        (*caps)[2] = g_strdup ("body-hyperlinks");
-        (*caps)[3] = g_strdup ("body-markup");
-        (*caps)[4] = g_strdup ("icon-static");
-        (*caps)[5] = NULL;
+        a = g_ptr_array_new ();
+        g_ptr_array_add (a, g_strdup ("actions"));
+        g_ptr_array_add (a, g_strdup ("body"));
+        g_ptr_array_add (a, g_strdup ("body-hyperlinks"));
+        g_ptr_array_add (a, g_strdup ("body-markup"));
+        g_ptr_array_add (a, g_strdup ("icon-static"));
+        g_ptr_array_add (a, NULL);
+        _caps = (char **) g_ptr_array_free (a, FALSE);
+
+        *caps = _caps;
 
         return TRUE;
 }
