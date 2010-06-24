@@ -39,6 +39,7 @@ struct _NotifyStack
         guint               monitor;
         NotifyStackLocation location;
         GList              *windows;
+        guint               update_id;
 };
 
 GList *
@@ -48,7 +49,7 @@ notify_stack_get_windows (NotifyStack *stack)
 }
 
 static gboolean
-get_work_area (GtkWidget    *nw,
+get_work_area (NotifyStack  *stack,
                GdkRectangle *rect)
 {
         Atom            workarea;
@@ -61,19 +62,17 @@ get_work_area (GtkWidget    *nw,
         guchar         *ret_workarea;
         long           *workareas;
         int             result;
-        GdkScreen      *screen;
         int             disp_screen;
 
         workarea = XInternAtom (GDK_DISPLAY (), "_NET_WORKAREA", True);
-        gtk_widget_realize (nw);
-        screen = gdk_drawable_get_screen (GDK_DRAWABLE (nw->window));
-        disp_screen = GDK_SCREEN_XNUMBER (screen);
+
+        disp_screen = GDK_SCREEN_XNUMBER (stack->screen);
 
         /* Defaults in case of error */
         rect->x = 0;
         rect->y = 0;
-        rect->width = gdk_screen_get_width (screen);
-        rect->height = gdk_screen_get_height (screen);
+        rect->width = gdk_screen_get_width (stack->screen);
+        rect->height = gdk_screen_get_height (stack->screen);
 
         if (workarea == None)
                 return FALSE;
@@ -214,6 +213,10 @@ notify_stack_destroy (NotifyStack *stack)
 {
         g_assert (stack != NULL);
 
+        if (stack->update_id != 0) {
+                g_source_remove (stack->update_id);
+        }
+
         g_list_free (stack->windows);
         g_free (stack);
 }
@@ -258,7 +261,7 @@ notify_stack_shift_notifications (NotifyStack *stack,
         int             i;
         int             n_wins;
 
-        get_work_area (GTK_WIDGET (nw), &workarea);
+        get_work_area (stack, &workarea);
         gdk_screen_get_monitor_geometry (stack->screen,
                                          stack->monitor,
                                          &monitor);
@@ -287,7 +290,7 @@ notify_stack_shift_notifications (NotifyStack *stack,
                 GtkWindow      *nw2 = GTK_WINDOW (l->data);
                 GtkRequisition  req;
 
-                if (nw2 != nw) {
+                if (nw == NULL || nw2 != nw) {
                         gtk_widget_size_request (GTK_WIDGET (nw2), &req);
 
                         translate_coordinates (stack->location,
@@ -312,12 +315,43 @@ notify_stack_shift_notifications (NotifyStack *stack,
         for (i = n_wins - 1, l = g_list_last (stack->windows); l != NULL; i--, l = l->prev) {
                 GtkWindow *nw2 = GTK_WINDOW (l->data);
 
-                if (nw2 != nw) {
+                if (nw == NULL || nw2 != nw) {
                         theme_move_notification (nw2, positions[i].x, positions[i].y);
                 }
         }
 
         g_free (positions);
+}
+
+static void
+update_position (NotifyStack *stack)
+{
+        notify_stack_shift_notifications (stack,
+                                          NULL, /* window */
+                                          NULL, /* list pointer */
+                                          0, /* init width */
+                                          0, /* init height */
+                                          NULL, /* out window x */
+                                          NULL); /* out window y */
+}
+
+static gboolean
+update_position_idle (NotifyStack *stack)
+{
+        update_position (stack);
+
+        stack->update_id = 0;
+        return FALSE;
+}
+
+void
+notify_stack_queue_update_position (NotifyStack *stack)
+{
+        if (stack->update_id != 0) {
+                return;
+        }
+
+        stack->update_id = g_idle_add ((GSourceFunc) update_position_idle, stack);
 }
 
 void

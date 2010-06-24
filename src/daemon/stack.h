@@ -52,5 +52,6 @@ void            notify_stack_add_window    (NotifyStack        *stack,
 void            notify_stack_remove_window (NotifyStack        *stack,
                                             GtkWindow          *nw);
 GList *         notify_stack_get_windows   (NotifyStack        *stack);
+void            notify_stack_queue_update_position (NotifyStack        *stack);
 
 #endif /* _NOTIFY_STACK_H_ */

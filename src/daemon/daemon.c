@@ -97,6 +97,7 @@ typedef struct
 {
         NotifyStack   **stacks;
         int             n_stacks;
+        Atom            workarea_atom;
 } NotifyScreen;
 
 struct _NotifyDaemonPrivate
@@ -233,13 +234,7 @@ on_screen_monitors_changed (GdkScreen    *screen,
 
         n_monitors = gdk_screen_get_n_monitors (screen);
 
-        g_debug ("Monitors changed for screen %d: num=%d",
-                 screen_num,
-                 n_monitors);
-
-        if (n_monitors == nscreen->n_stacks) {
-                return;
-        } else if (n_monitors > nscreen->n_stacks) {
+        if (n_monitors > nscreen->n_stacks) {
                 /* grow */
                 nscreen->stacks = g_renew (NotifyStack *,
                                            nscreen->stacks,
@@ -251,7 +246,7 @@ on_screen_monitors_changed (GdkScreen    *screen,
                 }
 
                 nscreen->n_stacks = n_monitors;
-        } else {
+        } else if (n_monitors < nscreen->n_stacks) {
                 NotifyStack *last_stack;
 
                 last_stack = nscreen->stacks[n_monitors - 1];
@@ -265,11 +260,6 @@ on_screen_monitors_changed (GdkScreen    *screen,
                         stack = nscreen->stacks[i];
                         windows = g_list_copy (notify_stack_get_windows (stack));
                         for (l = windows; l != NULL; l = l->next) {
-                                g_debug ("Transferring window %p from %d to %d",
-                                         l->data,
-                                         i,
-                                         n_monitors - 1);
-
                                 /* skip removing the window from the
                                    old stack since it will try to
                                    unrealize the window.  And the
@@ -306,13 +296,30 @@ create_stacks_for_screen (NotifyDaemon *daemon,
                                    nscreen->stacks,
                                    nscreen->n_stacks);
 
-        g_debug ("Creating %d stacks for screen %d",
-                 nscreen->n_stacks,
-                 screen_num);
-
         for (i = 0; i < nscreen->n_stacks; i++) {
                 create_stack_for_monitor (daemon, screen, i);
         }
+}
+
+static GdkFilterReturn
+screen_xevent_filter (GdkXEvent    *xevent,
+                      GdkEvent     *event,
+                      NotifyScreen *nscreen)
+{
+        XEvent *xev;
+
+        xev = (XEvent *) xevent;
+
+        if (xev->type == PropertyNotify &&
+            xev->xproperty.atom == nscreen->workarea_atom) {
+                int i;
+
+                for (i = 0; i < nscreen->n_stacks; i++) {
+                        notify_stack_queue_update_position (nscreen->stacks[i]);
+                }
+        }
+
+        return GDK_FILTER_CONTINUE;
 }
 
 static void
@@ -329,11 +336,22 @@ create_screens (NotifyDaemon *daemon)
         daemon->priv->screens = g_new0 (NotifyScreen *, daemon->priv->n_screens);
 
         for (i = 0; i < daemon->priv->n_screens; i++) {
-                g_signal_connect (gdk_display_get_screen (display, i),
+                GdkScreen *screen;
+                GdkWindow *gdkwindow;
+
+                screen = gdk_display_get_screen (display, i);
+                g_signal_connect (screen,
                                   "monitors-changed",
                                   G_CALLBACK (on_screen_monitors_changed),
                                   daemon);
+
                 daemon->priv->screens[i] = g_new0 (NotifyScreen, 1);
+
+                daemon->priv->screens[i]->workarea_atom = XInternAtom (GDK_DISPLAY (), "_NET_WORKAREA", True);
+                gdkwindow = gdk_screen_get_root_window (screen);
+                gdk_window_add_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, daemon->priv->screens[i]);
+                gdk_window_set_events (gdkwindow, gdk_window_get_events (gdkwindow) | GDK_PROPERTY_CHANGE_MASK);
+
                 create_stacks_for_screen (daemon, gdk_display_get_screen (display, i));
         }
 }
@@ -434,9 +452,16 @@ destroy_screens (NotifyDaemon *daemon)
         display = gdk_display_get_default ();
 
         for (i = 0; i < daemon->priv->n_screens; i++) {
-                g_signal_handlers_disconnect_by_func (gdk_display_get_screen (display, i),
+                GdkScreen *screen;
+                GdkWindow *gdkwindow;
+
+                screen = gdk_display_get_screen (display, i);
+                g_signal_handlers_disconnect_by_func (screen,
                                                       G_CALLBACK (on_screen_monitors_changed),
                                                       daemon);
+
+                gdkwindow = gdk_screen_get_root_window (screen);
+                gdk_window_remove_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, daemon->priv->screens[i]);
                 for (j = 0; i < daemon->priv->screens[i]->n_stacks; j++) {
                         notify_stack_destroy (daemon->priv->screens[i]->stacks[j]);
                         daemon->priv->screens[i]->stacks[j] = NULL;
