@@ -848,7 +848,6 @@ _check_expiration (NotifyDaemon *daemon)
 
         if (!has_more_timeouts) {
                 daemon->priv->timeout_source = 0;
-                add_exit_timeout (daemon);
         }
 
         return has_more_timeouts;
