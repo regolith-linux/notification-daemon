@@ -1,3 +1,52 @@
+
+NEW in 0.5.0:
+==============
+- Add a new default theme
+- Properly handle monitor changes
+- Add multi-screen support
+- Exit when not in use
+- Exit when unable to acquire bus name
+- Support version 1.1 of the notification spec
+- Various memory leak fixes
+- Better RTL locale support
+- Don't monitor all X events unless necessary
+- Update the list of ways to start a browser (Matthias Clasen)
+- Fix the screensaver lock detection (Matthias Clasen)
+- Use top right location by default (Matthias Clasen)
+- Use canberra instead of gstreamer for event sounds
+- Limit the total number of notifications that can be displayed at once
+- Conversion from glade to gtkbuilder
+- Fixed #608077, doesn't report its sound capability when built with sound support (Bastien Nocera)
+- Fixed #608082, Arabic text is misplaced in bubbles (RTL) (William Jon McCann)
+- Fixed #608858, Modernize autotools configuration (Javier Jardón)
+- Fixed #612032, Various i18n problems (William Jon McCann)
+- Fixed #622021, Closed signal is not emitted when the screensaver si active (Bastien Nocera)
+- Fixed #622552, doesn't support multiple screens or monitor configuration changes (William Jon McCann)
+- Fixed #622556, Save some RAM in NotifyTimeout (Bastien Nocera)
+
+Translations:
+- Updated cs: Petr Kovar
+- Updated da: Joe Hansen
+- Updated de: Mario Blättermann
+- Updated el: Kostas Papadimas
+- Updated es: Jorge González
+- Updated et: Priit Laes
+- Updated fr: Claude Paroz
+- Updated gl: Fran Diéguez
+- Updated hu: Gabor Kelemen <kelemeng at gnome dot hu>
+- Updated it: Luca Ferretti
+- Updated ja: Christian Hammond
+- Updated lt: Gintautas Miliauskas, Aurimas Černius
+- Updated nb: Kjartan Maraas
+- Updated pa: A S Alam
+- Updated pl: Piotr Drąg
+- Updated pt_BR: André Gondim, Vladimir Melo, Henrique P. Machado
+- Updated ru: Leonid Kanter, Yuri Myasoedov, Christian Hammond
+- Updated sl: Matej Urbančič
+- Updated sv: Daniel Nylander
+- Updated zh_CN: Ray Wang, 微尘, Aron Xu
+
+
 version 0.4.0 (20-November-2008):
 	* Bumped up the required minimum version of GTK+ to 2.10.0.
 	* Bump the notification spec version we're compliant with to 1.0.
