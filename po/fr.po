@@ -7,8 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-02 22:42+0100\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&component=general\n"
+"POT-Creation-Date: 2010-04-02 22:59+0000\n"
 "PO-Revision-Date: 2010-03-02 22:43+0100\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
@@ -33,7 +34,7 @@ msgstr ""
 "Emplacement par défaut des bulles de notification sur l'espace de travail "
 "pour l'empilement des notifications. Les valeurs possibles sont : "
 "« top_left » (en haut à gauche), « top_right » (en haut à droite), "
-"« bottom_left » (en bas à gauche) et  « bottom_right » (en bas à droite)."
+"« bottom_left » (en bas à gauche) et « bottom_right » (en bas à droite)."
 
 #: ../data/notification-daemon.schemas.in.h:4
 msgid "Popup location"
@@ -98,6 +99,46 @@ msgstr "Bulles de notification"
 msgid "Set your pop-up notification preferences"
 msgstr "Configurer les préférences des bulles de notification"
 
+#: ../src/capplet/notification-properties.ui.h:1
+msgid "      "
+msgstr "      "
+
+#: ../src/capplet/notification-properties.ui.h:2
+msgid "<b>General Options</b>"
+msgstr "<b>Options générales</b>"
+
+#: ../src/capplet/notification-properties.ui.h:3
+msgid "Bottom Left"
+msgstr "En bas à gauche"
+
+#: ../src/capplet/notification-properties.ui.h:4
+msgid "Bottom Right"
+msgstr "En bas à droite"
+
+#: ../src/capplet/notification-properties.ui.h:5
+msgid "Notification Settings"
+msgstr "Paramètres de notification"
+
+#: ../src/capplet/notification-properties.ui.h:6
+msgid "P_osition:"
+msgstr "_Position :"
+
+#: ../src/capplet/notification-properties.ui.h:7
+msgid "Top Left"
+msgstr "En haut à gauche"
+
+#: ../src/capplet/notification-properties.ui.h:8
+msgid "Top Right"
+msgstr "En haut à droite"
+
+#: ../src/capplet/notification-properties.ui.h:9
+msgid "_Preview"
+msgstr "_Aperçu"
+
+#: ../src/capplet/notification-properties.ui.h:10
+msgid "_Theme:"
+msgstr "_Thème :"
+
 #: ../src/daemon/daemon.c:1237
 #, c-format
 msgid "Exceeded maximum number of notifications"
@@ -111,27 +152,3 @@ msgstr "%u n'est pas un ID de notification valable"
 #: ../src/daemon/sound.c:36
 msgid "Notification"
 msgstr "Notification"
-
-#~ msgid "Top Left"
-#~ msgstr "En haut à gauche"
-
-#~ msgid "Top Right"
-#~ msgstr "En haut à droite"
-
-#~ msgid "Bottom Left"
-#~ msgstr "En bas à gauche"
-
-#~ msgid "Bottom Right"
-#~ msgstr "En bas à droite"
-
-#~ msgid "Notification Settings"
-#~ msgstr "Paramètres de notification"
-
-#~ msgid "P_osition:"
-#~ msgstr "_Position :"
-
-#~ msgid "_Preview"
-#~ msgstr "_Aperçu"
-
-#~ msgid "_Theme:"
-#~ msgstr "_Thème :"
