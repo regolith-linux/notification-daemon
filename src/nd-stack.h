@@ -69,6 +69,7 @@ void            nd_stack_add_bubble            (NdStack        *stack,
                                                 gboolean        new_notification);
 void            nd_stack_remove_bubble         (NdStack        *stack,
                                                 NdBubble       *bubble);
+void            nd_stack_remove_all            (NdStack        *stack);
 GList *         nd_stack_get_bubbles           (NdStack        *stack);
 void            nd_stack_queue_update_position (NdStack        *stack);
 

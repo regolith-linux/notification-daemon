@@ -267,6 +267,8 @@ popdown_dock (NdQueue *queue)
 
         /* hide again */
         gtk_widget_hide (queue->priv->dock);
+
+        queue_update (queue);
 }
 
 /* This is called when the grab is broken for
@@ -322,10 +324,29 @@ on_dock_key_release (GtkWidget   *widget,
 }
 
 static void
+clear_stacks (NdQueue *queue)
+{
+        int i;
+        int j;
+
+        for (i = 0; i < queue->priv->n_screens; i++) {
+                NotifyScreen *nscreen;
+                nscreen = queue->priv->screens[i];
+                for (j = 0; j < nscreen->n_stacks; j++) {
+                       NdStack *stack;
+                       stack = nscreen->stacks[j];
+                       nd_stack_remove_all (stack);
+                }
+        }
+}
+
+static void
 _nd_queue_remove_all (NdQueue *queue)
 {
         GHashTableIter iter;
         gpointer       key, value;
+
+        clear_stacks (queue);
 
         g_queue_clear (queue->priv->queue);
         g_hash_table_iter_init (&iter, queue->priv->notifications);
@@ -416,6 +437,39 @@ nd_queue_init (NdQueue *queue)
 }
 
 static void
+destroy_screens (NdQueue *queue)
+{
+        GdkDisplay  *display;
+        int          i;
+        int          j;
+
+        display = gdk_display_get_default ();
+
+        for (i = 0; i < queue->priv->n_screens; i++) {
+                GdkScreen *screen;
+                GdkWindow *gdkwindow;
+
+                screen = gdk_display_get_screen (display, i);
+                g_signal_handlers_disconnect_by_func (screen,
+                                                      G_CALLBACK (on_screen_monitors_changed),
+                                                      queue);
+
+                gdkwindow = gdk_screen_get_root_window (screen);
+                gdk_window_remove_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, queue->priv->screens[i]);
+                for (j = 0; i < queue->priv->screens[i]->n_stacks; j++) {
+                        g_object_unref (queue->priv->screens[i]->stacks[j]);
+                        queue->priv->screens[i]->stacks[j] = NULL;
+                }
+
+                g_free (queue->priv->screens[i]->stacks);
+        }
+
+        g_free (queue->priv->screens);
+        queue->priv->screens = NULL;
+}
+
+
+static void
 nd_queue_finalize (GObject *object)
 {
         NdQueue *queue;
@@ -429,6 +483,8 @@ nd_queue_finalize (GObject *object)
 
         g_hash_table_destroy (queue->priv->notifications);
         g_queue_free (queue->priv->queue);
+
+        destroy_screens (queue);
 
         G_OBJECT_CLASS (nd_queue_parent_class)->finalize (object);
 }
@@ -497,6 +553,12 @@ maybe_show_notification (NdQueue *queue)
         GList          *list;
 
         /* FIXME: show one at a time if not busy or away */
+
+        /* don't show bubbles when dock is showing */
+        if (gtk_widget_get_visible (queue->priv->dock)) {
+                g_debug ("Dock is showing");
+                return;
+        }
 
         stack = get_stack_with_pointer (queue);
         list = nd_stack_get_bubbles (stack);
@@ -1011,6 +1073,11 @@ static void
 on_status_icon_activate (GtkStatusIcon *status_icon,
                          NdQueue       *queue)
 {
+        /* clear the bubble queue since the user will be looking at a
+           full list now */
+        clear_stacks (queue);
+        g_queue_clear (queue->priv->queue);
+
         popup_dock (queue, GDK_CURRENT_TIME);
 }
 

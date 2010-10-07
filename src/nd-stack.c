@@ -404,7 +404,7 @@ nd_stack_add_bubble (NdStack  *stack,
                                       req.height + NOTIFY_STACK_SPACING,
                                       &x,
                                       &y);
-        gtk_widget_show (bubble);
+        gtk_widget_show (GTK_WIDGET (bubble));
         gtk_window_move (GTK_WINDOW (bubble), x, y);
 
         if (new_notification) {
@@ -435,4 +435,14 @@ nd_stack_remove_bubble (NdStack  *stack,
 
         if (gtk_widget_get_realized (GTK_WIDGET (bubble)))
                 gtk_widget_unrealize (GTK_WIDGET (bubble));
+}
+
+void
+nd_stack_remove_all (NdStack  *stack)
+{
+        GList *bubbles;
+
+        bubbles = g_list_copy (stack->priv->bubbles);
+        g_list_foreach (bubbles, (GFunc)gtk_widget_destroy, NULL);
+        g_list_free (bubbles);
 }
