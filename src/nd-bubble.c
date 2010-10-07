@@ -175,9 +175,20 @@ override_style (GtkWidget *widget,
 static void
 nd_bubble_composited_changed (GtkWidget *widget)
 {
-        NdBubble *bubble = ND_BUBBLE (widget);
+        NdBubble  *bubble = ND_BUBBLE (widget);
+        GdkScreen *screen;
+        GdkVisual *visual;
 
         bubble->priv->composited = gdk_screen_is_composited (gtk_widget_get_screen (widget));
+
+        screen = gtk_window_get_screen (GTK_WINDOW (bubble));
+        visual = gdk_screen_get_rgba_visual (screen);
+        if (visual == NULL) {
+                visual = gdk_screen_get_system_visual (screen);
+         }
+
+        gtk_widget_set_visual (GTK_WIDGET (bubble), visual);
+
         gtk_widget_queue_draw (widget);
 }
 
@@ -301,8 +312,12 @@ paint_bubble (NdBubble *bubble,
         cairo_stroke (cr2);
 
         cairo_destroy (cr2);
+
+        cairo_save (cr);
+        cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
         cairo_set_source_surface (cr, surface, 0, 0);
         cairo_paint (cr);
+        cairo_restore (cr);
 
         if (bubble->priv->width == bubble->priv->last_width
             && bubble->priv->height == bubble->priv->last_height) {
