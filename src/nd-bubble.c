@@ -137,9 +137,6 @@ override_style (GtkWidget *widget,
         GdkColor     fg;
         GdkColor     bg;
 
-        /* FIXME! causes a segfault */
-        return;
-
         gtk_widget_ensure_style (widget);
         old_style = gtk_widget_get_style (widget);
         style = gtk_style_copy (old_style);
@@ -173,16 +170,6 @@ override_style (GtkWidget *widget,
         }
 
         g_object_unref (style);
-}
-
-static void
-nd_bubble_style_set (GtkWidget *widget,
-                     GtkStyle  *previous_style)
-{
-        override_style (widget, previous_style);
-        gtk_widget_queue_draw (widget);
-
-        GTK_WIDGET_CLASS (nd_bubble_parent_class)->style_set (widget, previous_style);
 }
 
 static void
@@ -433,7 +420,6 @@ nd_bubble_class_init (NdBubbleClass *klass)
 
         object_class->finalize = nd_bubble_finalize;
 
-        widget_class->style_set = nd_bubble_style_set;
         widget_class->draw = nd_bubble_draw;
         widget_class->configure_event = nd_bubble_configure_event;
         widget_class->composited_changed = nd_bubble_composited_changed;
@@ -513,6 +499,11 @@ nd_bubble_init (NdBubble *bubble)
         GdkVisual   *visual;
 
         bubble->priv = ND_BUBBLE_GET_PRIVATE (bubble);
+
+        g_signal_connect (G_OBJECT (bubble),
+                          "style-set",
+                          G_CALLBACK (on_style_set),
+                          bubble);
 
         gtk_widget_add_events (GTK_WIDGET (bubble), GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
         atk_object_set_role (gtk_widget_get_accessible (GTK_WIDGET (bubble)), ATK_ROLE_ALERT);
