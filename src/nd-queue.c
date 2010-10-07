@@ -74,6 +74,9 @@ static void     nd_queue_class_init  (NdQueueClass *klass);
 static void     nd_queue_init        (NdQueue      *queue);
 static void     nd_queue_finalize    (GObject         *object);
 static void     queue_update         (NdQueue *queue);
+static void     on_notification_close (NdNotification *notification,
+                                       int             reason,
+                                       NdQueue        *queue);
 
 static gpointer queue_object = NULL;
 
@@ -319,6 +322,32 @@ on_dock_key_release (GtkWidget   *widget,
 }
 
 static void
+_nd_queue_remove_all (NdQueue *queue)
+{
+        GHashTableIter iter;
+        gpointer       key, value;
+
+        g_queue_clear (queue->priv->queue);
+        g_hash_table_iter_init (&iter, queue->priv->notifications);
+        while (g_hash_table_iter_next (&iter, &key, &value)) {
+                NdNotification *n = ND_NOTIFICATION (value);
+
+                g_signal_handlers_disconnect_by_func (n, G_CALLBACK (on_notification_close), queue);
+                nd_notification_close (n, ND_NOTIFICATION_CLOSED_USER);
+                g_hash_table_iter_remove (&iter);
+        }
+        popdown_dock (queue);
+        queue_update (queue);
+}
+
+static void
+on_clear_all_clicked (GtkButton *button,
+                      NdQueue   *queue)
+{
+        _nd_queue_remove_all (queue);
+}
+
+static void
 create_dock (NdQueue *queue)
 {
         GtkWidget *frame;
@@ -369,6 +398,7 @@ create_dock (NdQueue *queue)
         gtk_box_pack_start (GTK_BOX (box), queue->priv->dock_scrolled_window, TRUE, TRUE, 0);
 
         button = gtk_button_new_with_label (_("Clear all notifications"));
+        g_signal_connect (button, "clicked", G_CALLBACK (on_clear_all_clicked), queue);
         gtk_box_pack_end (GTK_BOX (box), button, FALSE, FALSE, 0);
 }
 
@@ -1040,18 +1070,51 @@ queue_update (NdQueue *queue)
         queue->priv->update_id = g_idle_add ((GSourceFunc)update_idle, queue);
 }
 
-void
-nd_queue_remove (NdQueue *queue,
-                 guint    id)
+static void
+_nd_queue_remove (NdQueue        *queue,
+                  NdNotification *notification)
 {
-        g_return_if_fail (ND_IS_QUEUE (queue));
+        guint id;
+
+        id = nd_notification_get_id (notification);
         g_debug ("Removing id %u", id);
-        g_queue_remove (queue->priv->queue, GUINT_TO_POINTER (id));
+
+        /* FIXME: withdraw currently showing bubbles */
+
+        g_signal_handlers_disconnect_by_func (notification, G_CALLBACK (on_notification_close), queue);
+
+        if (queue->priv->queue != NULL) {
+                g_queue_remove (queue->priv->queue, GUINT_TO_POINTER (id));
+        }
         g_hash_table_remove (queue->priv->notifications, GUINT_TO_POINTER (id));
+
         /* FIXME: should probably only emit this when it really removes something */
         g_signal_emit (queue, signals[CHANGED], 0);
 
         queue_update (queue);
+}
+
+static void
+on_notification_close (NdNotification *notification,
+                       int             reason,
+                       NdQueue        *queue)
+{
+        g_debug ("Notification closed - removing from queue");
+        _nd_queue_remove (queue, notification);
+}
+
+void
+nd_queue_remove_for_id (NdQueue *queue,
+                        guint    id)
+{
+        NdNotification *notification;
+
+        g_return_if_fail (ND_IS_QUEUE (queue));
+
+        notification = g_hash_table_lookup (queue->priv->notifications, GUINT_TO_POINTER (id));
+        if (notification != NULL) {
+                _nd_queue_remove (queue, notification);
+        }
 }
 
 void
@@ -1066,6 +1129,8 @@ nd_queue_add (NdQueue        *queue,
         g_debug ("Adding id %u", id);
         g_hash_table_insert (queue->priv->notifications, GUINT_TO_POINTER (id), g_object_ref (notification));
         g_queue_push_head (queue->priv->queue, GUINT_TO_POINTER (id));
+
+        g_signal_connect (notification, "closed", G_CALLBACK (on_notification_close), queue);
 
         /* FIXME: should probably only emit this when it really adds something */
         g_signal_emit (queue, signals[CHANGED], 0);

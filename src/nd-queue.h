@@ -60,7 +60,7 @@ NdNotification *    nd_queue_lookup                         (NdQueue        *que
 
 void                nd_queue_add                            (NdQueue        *queue,
                                                              NdNotification *notification);
-void                nd_queue_remove                         (NdQueue        *queue,
+void                nd_queue_remove_for_id                  (NdQueue        *queue,
                                                              guint           id);
 
 G_END_DECLS

@@ -193,9 +193,6 @@ on_notification_close (NdNotification *notification,
                                   DBUS_TYPE_INVALID);
         dbus_connection_send (dbus_conn, message, NULL);
         dbus_message_unref (message);
-
-        nd_queue_remove (daemon->priv->queue,
-                         nd_notification_get_id (notification));
 }
 
 static void
