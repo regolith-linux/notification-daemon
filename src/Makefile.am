@@ -1,3 +1,3 @@
-SUBDIRS = daemon themes capplet
+SUBDIRS = daemon themes
 
 -include $(top_srcdir)/git.mk
