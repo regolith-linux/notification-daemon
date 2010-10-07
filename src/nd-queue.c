@@ -271,6 +271,22 @@ popdown_dock (NdQueue *queue)
         queue_update (queue);
 }
 
+static void
+release_grab (GtkWidget      *widget,
+              GdkEventButton *event)
+{
+        GdkDisplay *display;
+
+        /* ungrab focus */
+        display = gtk_widget_get_display (widget);
+        gdk_display_keyboard_ungrab (display, event->time);
+        gdk_display_pointer_ungrab (display, event->time);
+        gtk_grab_remove (widget);
+
+        /* hide again */
+        gtk_widget_hide (widget);
+}
+
 /* This is called when the grab is broken for
  * either the dock, or the scale itself */
 static void
@@ -368,6 +384,19 @@ on_clear_all_clicked (GtkButton *button,
         _nd_queue_remove_all (queue);
 }
 
+static gboolean
+on_dock_button_press (GtkWidget      *widget,
+                      GdkEventButton *event,
+                      NdQueue        *queue)
+{
+        if (event->type == GDK_BUTTON_PRESS) {
+                release_grab (widget, event);
+                return TRUE;
+        }
+
+        return FALSE;
+}
+
 static void
 create_dock (NdQueue *queue)
 {
@@ -389,11 +418,11 @@ create_dock (NdQueue *queue)
                           "key-release-event",
                           G_CALLBACK (on_dock_key_release),
                           queue);
-#if 0
         g_signal_connect (queue->priv->dock,
                           "button-press-event",
                           G_CALLBACK (on_dock_button_press),
                           queue);
+#if 0
         g_signal_connect (queue->priv->dock,
                           "scroll-event",
                           G_CALLBACK (on_dock_scroll_event),
