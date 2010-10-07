@@ -22,18 +22,11 @@
 #ifndef NOTIFY_DAEMON_H
 #define NOTIFY_DAEMON_H
 
-#include <gconf/gconf-client.h>
 #include <glib.h>
 #include <glib-object.h>
 
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-lowlevel.h>
-
-#define GCONF_KEY_DAEMON         "/apps/notification-daemon"
-#define GCONF_KEY_THEME          GCONF_KEY_DAEMON "/theme"
-#define GCONF_KEY_POPUP_LOCATION GCONF_KEY_DAEMON "/popup_location"
-#define GCONF_KEY_SOUND_ENABLED  GCONF_KEY_DAEMON "/sound_enabled"
-#define GCONF_KEY_DEFAULT_SOUND  GCONF_KEY_DAEMON "/default_sound"
 
 #define NOTIFY_TYPE_DAEMON (notify_daemon_get_type())
 #define NOTIFY_DAEMON(obj) \
@@ -55,14 +48,6 @@ enum
         URGENCY_NORMAL,
         URGENCY_CRITICAL
 };
-
-typedef enum
-{
-        NOTIFYD_CLOSED_EXPIRED = 1,
-        NOTIFYD_CLOSED_USER = 2,
-        NOTIFYD_CLOSED_API = 3,
-        NOTIFYD_CLOSED_RESERVED = 4
-} NotifydClosedReason;
 
 typedef struct _NotifyDaemon NotifyDaemon;
 typedef struct _NotifyDaemonClass NotifyDaemonClass;
@@ -108,8 +93,6 @@ gboolean        notify_daemon_get_server_information     (NotifyDaemon *daemon,
                                                           char        **out_vendor,
                                                           char        **out_version,
                                                           char        **out_spec_ver);
-
-GConfClient    *get_gconf_client (void);
 
 G_END_DECLS
 #endif /* NOTIFY_DAEMON_H */

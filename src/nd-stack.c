@@ -1,12 +1,11 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *
- * Copyright (C) 2006 Christian Hammond <chipx86@chipx86.com>
  * Copyright (C) 2010 Red Hat, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,13 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
  */
 
 #include "config.h"
-#include "engines.h"
-#include "stack.h"
+
+#include <string.h>
+#include <strings.h>
+#include <glib.h>
 
 #include <X11/Xproto.h>
 #include <X11/Xlib.h>
@@ -29,27 +30,36 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 
+#include "nd-stack.h"
+
+#define ND_STACK_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), ND_TYPE_STACK, NdStackPrivate))
+
 #define NOTIFY_STACK_SPACING 2
 #define WORKAREA_PADDING 6
 
-struct _NotifyStack
+struct NdStackPrivate
 {
-        NotifyDaemon       *daemon;
-        GdkScreen          *screen;
-        guint               monitor;
-        NotifyStackLocation location;
-        GList              *windows;
-        guint               update_id;
+        GdkScreen      *screen;
+        guint           monitor;
+        NdStackLocation location;
+        GList          *bubbles;
+        guint           update_id;
 };
 
+static void     nd_stack_class_init  (NdStackClass *klass);
+static void     nd_stack_init        (NdStack      *stack);
+static void     nd_stack_finalize    (GObject       *object);
+
+G_DEFINE_TYPE (NdStack, nd_stack, G_TYPE_OBJECT)
+
 GList *
-notify_stack_get_windows (NotifyStack *stack)
+nd_stack_get_bubbles (NdStack *stack)
 {
-        return stack->windows;
+        return stack->priv->bubbles;
 }
 
 static gboolean
-get_work_area (NotifyStack  *stack,
+get_work_area (NdStack      *stack,
                GdkRectangle *rect)
 {
         Atom            workarea;
@@ -63,22 +73,24 @@ get_work_area (NotifyStack  *stack,
         long           *workareas;
         int             result;
         int             disp_screen;
+        Display        *display;
 
-        workarea = XInternAtom (GDK_DISPLAY (), "_NET_WORKAREA", True);
+        display = GDK_DISPLAY_XDISPLAY (gdk_screen_get_display (stack->priv->screen));
+        workarea = XInternAtom (display, "_NET_WORKAREA", True);
 
-        disp_screen = GDK_SCREEN_XNUMBER (stack->screen);
+        disp_screen = GDK_SCREEN_XNUMBER (stack->priv->screen);
 
         /* Defaults in case of error */
         rect->x = 0;
         rect->y = 0;
-        rect->width = gdk_screen_get_width (stack->screen);
-        rect->height = gdk_screen_get_height (stack->screen);
+        rect->width = gdk_screen_get_width (stack->priv->screen);
+        rect->height = gdk_screen_get_height (stack->priv->screen);
 
         if (workarea == None)
                 return FALSE;
 
-        win = XRootWindow (GDK_DISPLAY (), disp_screen);
-        result = XGetWindowProperty (GDK_DISPLAY (),
+        win = XRootWindow (display, disp_screen);
+        result = XGetWindowProperty (display,
                                      win,
                                      workarea,
                                      0,
@@ -111,7 +123,7 @@ get_work_area (NotifyStack  *stack,
 }
 
 static void
-get_origin_coordinates (NotifyStackLocation stack_location,
+get_origin_coordinates (NdStackLocation stack_location,
                         GdkRectangle       *workarea,
                         gint               *x,
                         gint               *y,
@@ -121,24 +133,24 @@ get_origin_coordinates (NotifyStackLocation stack_location,
                         gint                height)
 {
         switch (stack_location) {
-        case NOTIFY_STACK_LOCATION_TOP_LEFT:
+        case ND_STACK_LOCATION_TOP_LEFT:
                 *x = workarea->x;
                 *y = workarea->y;
                 *shifty = height;
                 break;
 
-        case NOTIFY_STACK_LOCATION_TOP_RIGHT:
+        case ND_STACK_LOCATION_TOP_RIGHT:
                 *x = workarea->x + workarea->width - width;
                 *y = workarea->y;
                 *shifty = height;
                 break;
 
-        case NOTIFY_STACK_LOCATION_BOTTOM_LEFT:
+        case ND_STACK_LOCATION_BOTTOM_LEFT:
                 *x = workarea->x;
                 *y = workarea->y + workarea->height - height;
                 break;
 
-        case NOTIFY_STACK_LOCATION_BOTTOM_RIGHT:
+        case ND_STACK_LOCATION_BOTTOM_RIGHT:
                 *x = workarea->x + workarea->width - width;
                 *y = workarea->y + workarea->height - height;
                 break;
@@ -149,7 +161,7 @@ get_origin_coordinates (NotifyStackLocation stack_location,
 }
 
 static void
-translate_coordinates (NotifyStackLocation stack_location,
+translate_coordinates (NdStackLocation stack_location,
                        GdkRectangle       *workarea,
                        gint               *x,
                        gint               *y,
@@ -159,24 +171,24 @@ translate_coordinates (NotifyStackLocation stack_location,
                        gint                height)
 {
         switch (stack_location) {
-        case NOTIFY_STACK_LOCATION_TOP_LEFT:
+        case ND_STACK_LOCATION_TOP_LEFT:
                 *x = workarea->x;
                 *y += *shifty;
                 *shifty = height;
                 break;
 
-        case NOTIFY_STACK_LOCATION_TOP_RIGHT:
+        case ND_STACK_LOCATION_TOP_RIGHT:
                 *x = workarea->x + workarea->width - width;
                 *y += *shifty;
                 *shifty = height;
                 break;
 
-        case NOTIFY_STACK_LOCATION_BOTTOM_LEFT:
+        case ND_STACK_LOCATION_BOTTOM_LEFT:
                 *x = workarea->x;
                 *y -= height;
                 break;
 
-        case NOTIFY_STACK_LOCATION_BOTTOM_RIGHT:
+        case ND_STACK_LOCATION_BOTTOM_RIGHT:
                 *x = workarea->x + workarea->width - width;
                 *y -= height;
                 break;
@@ -186,47 +198,69 @@ translate_coordinates (NotifyStackLocation stack_location,
         }
 }
 
-NotifyStack *
-notify_stack_new (NotifyDaemon       *daemon,
-                  GdkScreen          *screen,
-                  guint               monitor,
-                  NotifyStackLocation location)
+static void
+nd_stack_class_init (NdStackClass *klass)
 {
-        NotifyStack    *stack;
+        GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
-        g_assert (daemon != NULL);
+        object_class->finalize = nd_stack_finalize;
+
+        g_type_class_add_private (klass, sizeof (NdStackPrivate));
+}
+
+static void
+nd_stack_init (NdStack *stack)
+{
+        stack->priv = ND_STACK_GET_PRIVATE (stack);
+        stack->priv->location = ND_STACK_LOCATION_DEFAULT;
+}
+
+static void
+nd_stack_finalize (GObject *object)
+{
+        NdStack *stack;
+
+        g_return_if_fail (object != NULL);
+        g_return_if_fail (ND_IS_STACK (object));
+
+        stack = ND_STACK (object);
+
+        g_return_if_fail (stack->priv != NULL);
+
+        if (stack->priv->update_id != 0) {
+                g_source_remove (stack->priv->update_id);
+        }
+
+        g_list_free (stack->priv->bubbles);
+
+        G_OBJECT_CLASS (nd_stack_parent_class)->finalize (object);
+}
+
+void
+nd_stack_set_location (NdStack        *stack,
+                       NdStackLocation location)
+{
+        g_return_if_fail (ND_IS_STACK (stack));
+
+        stack->priv->location = location;
+}
+
+NdStack *
+nd_stack_new (GdkScreen *screen,
+              guint      monitor)
+{
+        NdStack *stack;
+
         g_assert (screen != NULL && GDK_IS_SCREEN (screen));
         g_assert (monitor < (guint)gdk_screen_get_n_monitors (screen));
-        g_assert (location != NOTIFY_STACK_LOCATION_UNKNOWN);
 
-        stack = g_new0 (NotifyStack, 1);
-        stack->daemon = daemon;
-        stack->screen = screen;
-        stack->monitor = monitor;
-        stack->location = location;
+        stack = g_object_new (ND_TYPE_STACK, NULL);
+        stack->priv->screen = screen;
+        stack->priv->monitor = monitor;
 
         return stack;
 }
 
-void
-notify_stack_destroy (NotifyStack *stack)
-{
-        g_assert (stack != NULL);
-
-        if (stack->update_id != 0) {
-                g_source_remove (stack->update_id);
-        }
-
-        g_list_free (stack->windows);
-        g_free (stack);
-}
-
-void
-notify_stack_set_location (NotifyStack        *stack,
-                           NotifyStackLocation location)
-{
-        stack->location = location;
-}
 
 static void
 add_padding_to_rect (GdkRectangle *rect)
@@ -243,13 +277,13 @@ add_padding_to_rect (GdkRectangle *rect)
 }
 
 static void
-notify_stack_shift_notifications (NotifyStack *stack,
-                                  GtkWindow   *nw,
-                                  GList      **nw_l,
-                                  gint         init_width,
-                                  gint         init_height,
-                                  gint        *nw_x,
-                                  gint        *nw_y)
+nd_stack_shift_notifications (NdStack     *stack,
+                              NdBubble    *bubble,
+                              GList      **nw_l,
+                              gint         init_width,
+                              gint         init_height,
+                              gint        *nw_x,
+                              gint        *nw_y)
 {
         GdkRectangle    workarea;
         GdkRectangle    monitor;
@@ -262,17 +296,17 @@ notify_stack_shift_notifications (NotifyStack *stack,
         int             n_wins;
 
         get_work_area (stack, &workarea);
-        gdk_screen_get_monitor_geometry (stack->screen,
-                                         stack->monitor,
+        gdk_screen_get_monitor_geometry (stack->priv->screen,
+                                         stack->priv->monitor,
                                          &monitor);
         gdk_rectangle_intersect (&monitor, &workarea, &workarea);
 
         add_padding_to_rect (&workarea);
 
-        n_wins = g_list_length (stack->windows);
+        n_wins = g_list_length (stack->priv->bubbles);
         positions = g_new0 (GdkRectangle, n_wins);
 
-        get_origin_coordinates (stack->location,
+        get_origin_coordinates (stack->priv->location,
                                 &workarea,
                                 &x, &y,
                                 &shiftx,
@@ -286,14 +320,14 @@ notify_stack_shift_notifications (NotifyStack *stack,
         if (nw_y != NULL)
                 *nw_y = y;
 
-        for (i = 0, l = stack->windows; l != NULL; i++, l = l->next) {
-                GtkWindow      *nw2 = GTK_WINDOW (l->data);
+        for (i = 0, l = stack->priv->bubbles; l != NULL; i++, l = l->next) {
+                NdBubble       *nw2 = ND_BUBBLE (l->data);
                 GtkRequisition  req;
 
-                if (nw == NULL || nw2 != nw) {
+                if (bubble == NULL || nw2 != bubble) {
                         gtk_widget_size_request (GTK_WIDGET (nw2), &req);
 
-                        translate_coordinates (stack->location,
+                        translate_coordinates (stack->priv->location,
                                                &workarea,
                                                &x,
                                                &y,
@@ -312,11 +346,11 @@ notify_stack_shift_notifications (NotifyStack *stack,
 
         /* move bubbles at the bottom of the stack first
            to avoid overlapping */
-        for (i = n_wins - 1, l = g_list_last (stack->windows); l != NULL; i--, l = l->prev) {
-                GtkWindow *nw2 = GTK_WINDOW (l->data);
+        for (i = n_wins - 1, l = g_list_last (stack->priv->bubbles); l != NULL; i--, l = l->prev) {
+                NdBubble *nw2 = ND_BUBBLE (l->data);
 
-                if (nw == NULL || nw2 != nw) {
-                        theme_move_notification (nw2, positions[i].x, positions[i].y);
+                if (bubble == NULL || nw2 != bubble) {
+                        gtk_window_move (GTK_WINDOW (nw2), positions[i].x, positions[i].y);
                 }
         }
 
@@ -324,80 +358,81 @@ notify_stack_shift_notifications (NotifyStack *stack,
 }
 
 static void
-update_position (NotifyStack *stack)
+update_position (NdStack *stack)
 {
-        notify_stack_shift_notifications (stack,
-                                          NULL, /* window */
-                                          NULL, /* list pointer */
-                                          0, /* init width */
-                                          0, /* init height */
-                                          NULL, /* out window x */
-                                          NULL); /* out window y */
+        nd_stack_shift_notifications (stack,
+                                      NULL, /* window */
+                                      NULL, /* list pointer */
+                                      0, /* init width */
+                                      0, /* init height */
+                                      NULL, /* out window x */
+                                      NULL); /* out window y */
 }
 
 static gboolean
-update_position_idle (NotifyStack *stack)
+update_position_idle (NdStack *stack)
 {
         update_position (stack);
 
-        stack->update_id = 0;
+        stack->priv->update_id = 0;
         return FALSE;
 }
 
 void
-notify_stack_queue_update_position (NotifyStack *stack)
+nd_stack_queue_update_position (NdStack *stack)
 {
-        if (stack->update_id != 0) {
+        if (stack->priv->update_id != 0) {
                 return;
         }
 
-        stack->update_id = g_idle_add ((GSourceFunc) update_position_idle, stack);
+        stack->priv->update_id = g_idle_add ((GSourceFunc) update_position_idle, stack);
 }
 
 void
-notify_stack_add_window (NotifyStack *stack,
-                         GtkWindow   *nw,
-                         gboolean     new_notification)
+nd_stack_add_bubble (NdStack  *stack,
+                     NdBubble *bubble,
+                     gboolean  new_notification)
 {
         GtkRequisition  req;
-        gint            x, y;
+        int             x, y;
 
-        gtk_widget_size_request (GTK_WIDGET (nw), &req);
-        notify_stack_shift_notifications (stack,
-                                          nw,
-                                          NULL,
-                                          req.width,
-                                          req.height + NOTIFY_STACK_SPACING,
-                                          &x,
-                                          &y);
-        theme_move_notification (nw, x, y);
+        gtk_widget_size_request (GTK_WIDGET (bubble), &req);
+        nd_stack_shift_notifications (stack,
+                                      bubble,
+                                      NULL,
+                                      req.width,
+                                      req.height + NOTIFY_STACK_SPACING,
+                                      &x,
+                                      &y);
+        gtk_widget_show (bubble);
+        gtk_window_move (GTK_WINDOW (bubble), x, y);
 
         if (new_notification) {
-                g_signal_connect_swapped (G_OBJECT (nw),
+                g_signal_connect_swapped (G_OBJECT (bubble),
                                           "destroy",
-                                          G_CALLBACK (notify_stack_remove_window),
+                                          G_CALLBACK (nd_stack_remove_bubble),
                                           stack);
-                stack->windows = g_list_prepend (stack->windows, nw);
+                stack->priv->bubbles = g_list_prepend (stack->priv->bubbles, bubble);
         }
 }
 
 void
-notify_stack_remove_window (NotifyStack *stack,
-                            GtkWindow   *nw)
+nd_stack_remove_bubble (NdStack  *stack,
+                        NdBubble *bubble)
 {
         GList *remove_l = NULL;
 
-        notify_stack_shift_notifications (stack,
-                                          nw,
-                                          &remove_l,
-                                          0,
-                                          0,
-                                          NULL,
-                                          NULL);
+        nd_stack_shift_notifications (stack,
+                                      bubble,
+                                      &remove_l,
+                                      0,
+                                      0,
+                                      NULL,
+                                      NULL);
 
         if (remove_l != NULL)
-                stack->windows = g_list_delete_link (stack->windows, remove_l);
+                stack->priv->bubbles = g_list_delete_link (stack->priv->bubbles, remove_l);
 
-        if (GTK_WIDGET_REALIZED (GTK_WIDGET (nw)))
-                gtk_widget_unrealize (GTK_WIDGET (nw));
+        if (gtk_widget_get_realized (GTK_WIDGET (bubble)))
+                gtk_widget_unrealize (GTK_WIDGET (bubble));
 }

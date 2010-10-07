@@ -79,45 +79,21 @@ AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [Define to the gettext package n
 dnl ---------------------------------------------------------------------------
 dnl Requirements for the daemon
 dnl ---------------------------------------------------------------------------
-REQ_GTK_VERSION=2.18.0
-REQ_GLIB_VERSION=$REQ_GTK_VERSION
+REQ_GTK_VERSION=2.91.0
+REQ_GLIB_VERSION=2.27.0
 REQ_DBUS_VERSION=0.78
 REQ_LIBCANBERRA_GTK_VERSION=0.4
 pkg_modules="
-	gtk+-2.0 >= $REQ_GTK_VERSION, \
+	gtk+-3.0 >= $REQ_GTK_VERSION, \
 	glib-2.0 >= $REQ_GLIB_VERSION, \
 	dbus-1 >= $REQ_DBUS_VERSION, \
 	dbus-glib-1 >= $REQ_DBUS_VERSION, \
-        libcanberra-gtk >= $REQ_LIBCANBERRA_GTK_VERSION, \
-	gconf-2.0, \
-	libwnck-1.0 \
+        libcanberra-gtk3 >= $REQ_LIBCANBERRA_GTK_VERSION, \
         x11 \
 "
 PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
-
-gdk_modules="
-	gdk-2.0 >= $REQ_GTK_VERSION, \
-	gdk-pixbuf-2.0 >= $REQ_GTK_VERSION \
-"
-PKG_CHECK_MODULES(GDK, $gdk_modules, have_gdk=yes,
-[
-	have_gdk=no
-	AC_MSG_WARN("Some test apps will not be built")
-])
-
-AM_CONDITIONAL(HAVE_GDK, test "x$have_gdk" = "xyes")
-
-AC_SUBST(GDK_CFLAGS)
-AC_SUBST(GDK_LIBS)
-
-AM_GCONF_SOURCE_2
-AC_PATH_PROG(GCONFTOOL, gconftool-2, no)
-
-if test "x$GCONFTOOL" = "xno"; then
-	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with Gconf])
-fi
 
 dnl
 dnl Check the D-BUS version.
@@ -217,7 +193,6 @@ data/Makefile
 data/org.freedesktop.Notifications.service
 po/Makefile.in
 src/Makefile
-src/daemon/Makefile
 ])
 
 AC_OUTPUT
