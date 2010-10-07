@@ -389,12 +389,20 @@ on_dock_button_press (GtkWidget      *widget,
                       GdkEventButton *event,
                       NdQueue        *queue)
 {
-        if (event->type == GDK_BUTTON_PRESS) {
-                release_grab (widget, event);
-                return TRUE;
+        GtkWidget *event_widget;
+
+        if (event->type != GDK_BUTTON_PRESS) {
+                return FALSE;
         }
 
-        return FALSE;
+        event_widget = gtk_get_event_widget ((GdkEvent *)event);
+        if (event_widget == widget) {
+                release_grab (widget, event);
+        } else {
+                return FALSE;
+        }
+
+        return TRUE;
 }
 
 static void
@@ -967,6 +975,11 @@ update_dock (NdQueue *queue)
         child = gtk_vbox_new (FALSE, 6);
         gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (queue->priv->dock_scrolled_window),
                                                child);
+        gtk_container_set_focus_hadjustment (GTK_CONTAINER (child),
+                                             gtk_scrolled_window_get_hadjustment (GTK_SCROLLED_WINDOW (queue->priv->dock_scrolled_window)));
+        gtk_container_set_focus_vadjustment (GTK_CONTAINER (child),
+                                             gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (queue->priv->dock_scrolled_window)));
+
         list = g_hash_table_get_values (queue->priv->notifications);
         list = g_list_sort (list, (GCompareFunc)collate_notifications);
 
