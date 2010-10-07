@@ -77,18 +77,9 @@ AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [Define to the gettext package n
 
 
 dnl ---------------------------------------------------------------------------
-dnl Requirements for the themes
-dnl ---------------------------------------------------------------------------
-REQ_GTK_VERSION=2.18.0
-PKG_CHECK_MODULES(THEME,
-  gtk+-2.0 >= $REQ_GTK_VERSION
-)
-AC_SUBST(THEME_CFLAGS)
-AC_SUBST(THEME_LIBS)
-
-dnl ---------------------------------------------------------------------------
 dnl Requirements for the daemon
 dnl ---------------------------------------------------------------------------
+REQ_GTK_VERSION=2.18.0
 REQ_GLIB_VERSION=$REQ_GTK_VERSION
 REQ_DBUS_VERSION=0.78
 REQ_LIBCANBERRA_GTK_VERSION=0.4
@@ -227,9 +218,6 @@ data/org.freedesktop.Notifications.service
 po/Makefile.in
 src/Makefile
 src/daemon/Makefile
-src/themes/Makefile
-src/themes/slider/Makefile
-src/themes/standard/Makefile
 ])
 
 AC_OUTPUT
