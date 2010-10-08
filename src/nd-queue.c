@@ -411,8 +411,6 @@ on_dock_button_press (GtkWidget      *widget,
         if (event_widget == widget) {
                 release_grab (widget, event);
                 return TRUE;
-        } else {
-                gtk_widget_event (event_widget, (GdkEvent *)event);
         }
 
         return FALSE;
