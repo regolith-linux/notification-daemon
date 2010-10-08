@@ -411,6 +411,8 @@ on_dock_button_press (GtkWidget      *widget,
         if (event_widget == widget) {
                 release_grab (widget, event);
                 return TRUE;
+        } else {
+                gtk_widget_event (event_widget, (GdkEvent *)event);
         }
 
         return FALSE;
@@ -771,6 +773,7 @@ static GtkWidget *
 create_notification_box (NdQueue        *queue,
                          NdNotification *n)
 {
+        GtkWidget     *event_box;
         GtkWidget     *box;
         GtkWidget     *iconbox;
         GtkWidget     *icon;
@@ -795,8 +798,14 @@ create_notification_box (NdQueue        *queue,
         char         **actions;
         int            i;
 
+        event_box = gtk_event_box_new ();
+        gtk_event_box_set_visible_window (GTK_EVENT_BOX (event_box),
+                                          FALSE);
+        g_signal_connect (event_box, "button-release-event", G_CALLBACK (on_button_release), n);
+
         box = gtk_hbox_new (FALSE, 6);
-        gtk_widget_add_events (box, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+        gtk_container_add (GTK_CONTAINER (event_box), box);
+        gtk_widget_show (box);
 
         /* First row (icon, vbox, close) */
         iconbox = gtk_alignment_new (0.5, 0, 0, 0);
@@ -861,8 +870,8 @@ create_notification_box (NdQueue        *queue,
         gtk_widget_show (content_hbox);
         gtk_box_pack_start (GTK_BOX (vbox), content_hbox, FALSE, FALSE, 0);
 
-
         vbox = gtk_vbox_new (FALSE, 6);
+
         gtk_widget_show (vbox);
         gtk_box_pack_start (GTK_BOX (content_hbox), vbox, TRUE, TRUE, 0);
 
@@ -957,15 +966,13 @@ create_notification_box (NdQueue        *queue,
                 }
         }
 
-        g_signal_connect (box, "button-release-event", G_CALLBACK (on_button_release), n);
-
         if (have_icon || have_body || have_actions) {
                 gtk_widget_show (content_hbox);
         } else {
                 gtk_widget_hide (content_hbox);
         }
 
-        return box;
+        return event_box;
 }
 
 static void
