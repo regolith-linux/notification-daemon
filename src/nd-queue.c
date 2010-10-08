@@ -365,6 +365,9 @@ _nd_queue_remove_all (NdQueue *queue)
 {
         GHashTableIter iter;
         gpointer       key, value;
+        gboolean       changed;
+
+        changed = FALSE;
 
         clear_stacks (queue);
 
@@ -376,9 +379,14 @@ _nd_queue_remove_all (NdQueue *queue)
                 g_signal_handlers_disconnect_by_func (n, G_CALLBACK (on_notification_close), queue);
                 nd_notification_close (n, ND_NOTIFICATION_CLOSED_USER);
                 g_hash_table_iter_remove (&iter);
+                changed = TRUE;
         }
         popdown_dock (queue);
         queue_update (queue);
+
+        if (changed) {
+                g_signal_emit (queue, signals[CHANGED], 0);
+        }
 }
 
 static void
