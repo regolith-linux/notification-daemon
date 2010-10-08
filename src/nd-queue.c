@@ -293,7 +293,9 @@ static void
 grab_notify (NdQueue   *queue,
              gboolean   was_grabbed)
 {
-        if (was_grabbed != FALSE) {
+        GtkWidget *current;
+
+        if (was_grabbed) {
                 return;
         }
 
@@ -301,7 +303,9 @@ grab_notify (NdQueue   *queue,
                 return;
         }
 
-        if (gtk_widget_is_ancestor (gtk_grab_get_current (), queue->priv->dock)) {
+        current = gtk_grab_get_current ();
+        if (current == queue->priv->dock
+            || gtk_widget_is_ancestor (current, queue->priv->dock)) {
                 return;
         }
 
@@ -394,15 +398,14 @@ on_dock_button_press (GtkWidget      *widget,
         if (event->type != GDK_BUTTON_PRESS) {
                 return FALSE;
         }
-
         event_widget = gtk_get_event_widget ((GdkEvent *)event);
+        g_debug ("Button press: %p dock=%p", event_widget, widget);
         if (event_widget == widget) {
                 release_grab (widget, event);
-        } else {
-                return FALSE;
+                return TRUE;
         }
 
-        return TRUE;
+        return FALSE;
 }
 
 static void
@@ -413,6 +416,9 @@ create_dock (NdQueue *queue)
         GtkWidget *button;
 
         queue->priv->dock = gtk_window_new (GTK_WINDOW_POPUP);
+        gtk_widget_add_events (queue->priv->dock,
+                               GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+
         gtk_widget_set_name (queue->priv->dock, "notification-popup-window");
         g_signal_connect (queue->priv->dock,
                           "grab-notify",
@@ -1083,7 +1089,6 @@ popup_dock (NdQueue *queue,
         gtk_window_resize (GTK_WINDOW (queue->priv->dock), 1, 1);
 
         gtk_widget_show_all (queue->priv->dock);
-
 
         /* grab focus */
         gtk_grab_add (queue->priv->dock);
