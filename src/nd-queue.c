@@ -1125,12 +1125,12 @@ on_status_icon_visible_notify (GtkStatusIcon *icon,
 static gboolean
 update_idle (NdQueue *queue)
 {
-        if (gtk_widget_get_visible (queue->priv->dock)) {
-                update_dock (queue);
-        }
-
         /* Show the status icon when their are stored notifications */
         if (g_hash_table_size (queue->priv->notifications) > 0) {
+                if (gtk_widget_get_visible (queue->priv->dock)) {
+                        update_dock (queue);
+                }
+
                 if (queue->priv->status_icon == NULL) {
                         queue->priv->status_icon = gtk_status_icon_new_from_icon_name ("mail-message-new");
                         gtk_status_icon_set_title (GTK_STATUS_ICON (queue->priv->status_icon),
@@ -1148,6 +1148,10 @@ update_idle (NdQueue *queue)
 
                 maybe_show_notification (queue);
         } else {
+                if (gtk_widget_get_visible (queue->priv->dock)) {
+                        popdown_dock (queue);
+                }
+
                 if (queue->priv->status_icon != NULL) {
                         g_object_unref (queue->priv->status_icon);
                         queue->priv->status_icon = NULL;
