@@ -651,39 +651,6 @@ collate_notifications (NdNotification *a,
         }
 }
 
-static gboolean
-on_activate_link (GtkLabel *label,
-                  char     *uri,
-                  NdQueue  *queue)
-{
-        char *escaped_uri;
-        char *cmd = NULL;
-
-        /* Somewhat of a hack.. */
-        //bubble->priv->url_clicked_lock = TRUE;
-
-        escaped_uri = g_shell_quote (uri);
-
-        if (g_find_program_in_path ("gvfs-open") != NULL) {
-                cmd = g_strdup_printf ("gvfs-open %s", escaped_uri);
-        } else if (g_find_program_in_path ("xdg-open") != NULL) {
-                cmd = g_strdup_printf ("xdg-open %s", escaped_uri);
-        } else if (g_find_program_in_path ("firefox") != NULL) {
-                cmd = g_strdup_printf ("firefox %s", escaped_uri);
-        } else {
-                g_warning ("Unable to find a browser.");
-        }
-
-        g_free (escaped_uri);
-
-        if (cmd != NULL) {
-                g_spawn_command_line_async (cmd, NULL);
-                g_free (cmd);
-        }
-
-        return TRUE;
-}
-
 static void
 on_close_button_clicked (GtkButton      *button,
                          NdNotification *notification)
@@ -878,10 +845,6 @@ create_notification_box (NdQueue        *queue,
         gtk_box_pack_start (GTK_BOX (vbox), body_label, TRUE, TRUE, 0);
         gtk_misc_set_alignment (GTK_MISC (body_label), 0, 0);
         gtk_label_set_line_wrap (GTK_LABEL (body_label), TRUE);
-        g_signal_connect (body_label,
-                          "activate-link",
-                          G_CALLBACK (on_activate_link),
-                          queue);
 
         atkobj = gtk_widget_get_accessible (body_label);
         atk_object_set_description (atkobj, "Notification body text.");
