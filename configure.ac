@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT([notification-daemon],[0.5.1],[https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon],[notification-daemon])
+AC_INIT([notification-daemon],[0.6.0],[https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon],[notification-daemon])
 AC_PREREQ(2.63)
 
 AC_CONFIG_HEADERS([config.h])
@@ -14,8 +14,8 @@ dnl ################################################################
 dnl # Version information
 dnl ################################################################
 NOTIFICATION_DAEMON_MAJOR_VERSION=0
-NOTIFICATION_DAEMON_MINOR_VERSION=5
-NOTIFICATION_DAEMON_MICRO_VERSION=1
+NOTIFICATION_DAEMON_MINOR_VERSION=6
+NOTIFICATION_DAEMON_MICRO_VERSION=0
 NOTIFICATION_DAEMON_DEVEL_VERSION=0
 
 NOTIFICATION_DAEMON_VERSION=$NOTIFICATION_DAEMON_MAJOR_VERSION.$NOTIFICATION_DAEMON_MINOR_VERSION.$NOTIFICATION_DAEMON_MICRO_VERSION
