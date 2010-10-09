@@ -1016,20 +1016,23 @@ update_dock (NdQueue *queue)
                 gtk_box_pack_start (GTK_BOX (child), sep, FALSE, FALSE, 0);
         }
         gtk_widget_show (child);
-        gtk_widget_get_preferred_height (child,
-                                         &min_height,
-                                         &height);
 
-        gtk_status_icon_get_geometry (GTK_STATUS_ICON (queue->priv->status_icon),
-                                      &screen,
-                                      &area,
-                                      NULL);
-        monitor_num = gdk_screen_get_monitor_at_point (screen, area.x, area.y);
-        gdk_screen_get_monitor_geometry (screen, monitor_num, &area);
-        height = MIN (height, (area.height / 2));
-        gtk_widget_set_size_request (queue->priv->dock_scrolled_window,
-                                     WIDTH,
-                                     height);
+        if (queue->priv->status_icon != NULL
+            && gtk_status_icon_get_visible (GTK_STATUS_ICON (queue->priv->status_icon))) {
+                gtk_widget_get_preferred_height (child,
+                                                 &min_height,
+                                                 &height);
+                gtk_status_icon_get_geometry (GTK_STATUS_ICON (queue->priv->status_icon),
+                                              &screen,
+                                              &area,
+                                              NULL);
+                monitor_num = gdk_screen_get_monitor_at_point (screen, area.x, area.y);
+                gdk_screen_get_monitor_geometry (screen, monitor_num, &area);
+                height = MIN (height, (area.height / 2));
+                gtk_widget_set_size_request (queue->priv->dock_scrolled_window,
+                                             WIDTH,
+                                             height);
+        }
 
         g_list_free (list);
 }
@@ -1159,6 +1162,10 @@ on_status_icon_visible_notify (GtkStatusIcon *icon,
 static gboolean
 update_idle (NdQueue *queue)
 {
+        if (gtk_widget_get_visible (queue->priv->dock)) {
+                update_dock (queue);
+        }
+
         /* Show the status icon when their are stored notifications */
         if (g_hash_table_size (queue->priv->notifications) > 0) {
                 if (queue->priv->status_icon == NULL) {
