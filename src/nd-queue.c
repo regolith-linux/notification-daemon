@@ -1096,8 +1096,7 @@ popup_dock (NdQueue *queue,
 }
 
 static void
-on_status_icon_activate (GtkStatusIcon *status_icon,
-                         NdQueue       *queue)
+show_dock (NdQueue *queue)
 {
         /* clear the bubble queue since the user will be looking at a
            full list now */
@@ -1105,6 +1104,22 @@ on_status_icon_activate (GtkStatusIcon *status_icon,
         g_queue_clear (queue->priv->queue);
 
         popup_dock (queue, GDK_CURRENT_TIME);
+}
+
+static void
+on_status_icon_popup_menu (GtkStatusIcon *status_icon,
+                           guint          button,
+                           guint          activate_time,
+                           NdQueue       *queue)
+{
+        show_dock (queue);
+}
+
+static void
+on_status_icon_activate (GtkStatusIcon *status_icon,
+                         NdQueue       *queue)
+{
+        show_dock (queue);
 }
 
 static void
@@ -1138,6 +1153,10 @@ update_idle (NdQueue *queue)
                         g_signal_connect (queue->priv->status_icon,
                                           "activate",
                                           G_CALLBACK (on_status_icon_activate),
+                                          queue);
+                        g_signal_connect (queue->priv->status_icon,
+                                          "popup-menu",
+                                          G_CALLBACK (on_status_icon_popup_menu),
                                           queue);
                         g_signal_connect (queue->priv->status_icon,
                                           "notify::visible",
