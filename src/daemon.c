@@ -322,6 +322,7 @@ notify_daemon_get_capabilities (NotifyDaemon *daemon,
         g_ptr_array_add (a, g_strdup ("body-markup"));
         g_ptr_array_add (a, g_strdup ("icon-static"));
         g_ptr_array_add (a, g_strdup ("sound"));
+        g_ptr_array_add (a, g_strdup ("persistence"));
         g_ptr_array_add (a, NULL);
         _caps = (char **) g_ptr_array_free (a, FALSE);
 
