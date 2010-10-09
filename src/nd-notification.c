@@ -488,16 +488,20 @@ static GdkPixbuf *
 _notify_daemon_pixbuf_from_path (const char *path,
                                  int         size)
 {
+        GFile *file;
         GdkPixbuf *pixbuf = NULL;
 
-        if (!strncmp (path, "file://", 7) || *path == '/') {
-                if (!strncmp (path, "file://", 7)) {
-                        path += 7;
-                }
+        file = g_file_new_for_commandline_arg (path);
+        if (g_file_is_native (file)) {
+                char *realpath;
 
-                /* Load file */
-                pixbuf = gdk_pixbuf_new_from_file_at_size (path, size, size, NULL);
-        } else {
+                realpath = g_file_get_path (file);
+                pixbuf = gdk_pixbuf_new_from_file_at_size (realpath, size, size, NULL);
+                g_free (realpath);
+        }
+        g_object_unref (file);
+
+        if (pixbuf == NULL) {
                 /* Load icon theme icon */
                 GtkIconTheme *theme;
                 GtkIconInfo  *icon_info;
@@ -524,11 +528,6 @@ _notify_daemon_pixbuf_from_path (const char *path,
                                                            NULL);
 
                         gtk_icon_info_free (icon_info);
-                }
-
-                if (pixbuf == NULL) {
-                        /* Well... maybe this is a file afterall. */
-                        pixbuf = gdk_pixbuf_new_from_file_at_size (path, size, size, NULL);
                 }
         }
 
