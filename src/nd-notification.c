@@ -112,6 +112,13 @@ nd_notification_class_init (NdNotificationClass *class)
                               G_TYPE_NONE, 1, G_TYPE_STRING);
 }
 
+ static void
+_g_value_free (GValue *value)
+{
+        g_value_unset (value);
+        g_free (value);
+}
+
 static void
 nd_notification_init (NdNotification *notification)
 {
@@ -122,7 +129,10 @@ nd_notification_init (NdNotification *notification)
         notification->summary = NULL;
         notification->body = NULL;
         notification->actions = NULL;
-        notification->hints = g_hash_table_new (g_str_hash, g_str_equal);
+        notification->hints = g_hash_table_new_full (g_str_hash,
+                                                     g_str_equal,
+                                                     g_free,
+                                                     (GDestroyNotify) _g_value_free);
 }
 
 static void
@@ -181,7 +191,13 @@ nd_notification_update (NdNotification *notification,
 
         g_hash_table_iter_init (&iter, hints);
         while (g_hash_table_iter_next (&iter, &key, &value)) {
-                g_hash_table_insert (notification->hints, key, value);
+                GValue *value_copy;
+
+                value_copy = g_new0 (GValue, 1);
+                g_value_init (value_copy, G_VALUE_TYPE (value));
+                g_value_copy (value, value_copy);
+
+                g_hash_table_insert (notification->hints, g_strdup (key), value_copy);
         }
 
         g_signal_emit (notification, signals[CHANGED], 0);
