@@ -1,6 +1,5 @@
 data/notification-daemon.schemas.in
-src/capplet/notification-properties.c
-src/capplet/notification-properties.desktop.in
-[type: gettext/glade]src/capplet/notification-properties.ui
-src/daemon/daemon.c
-src/daemon/sound.c
+src/daemon.c
+src/nd-queue.c
+src/sound.c
+
