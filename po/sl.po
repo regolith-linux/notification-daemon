@@ -1,4 +1,4 @@
-# Slovenian translation for notification-daemon.
+# Slovenian translations for notification-daemon.
 # Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
 # This file is distributed under the same license as the notification-daemon package.
 #
@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-02-11 22:36+0000\n"
-"PO-Revision-Date: 2010-04-24 08:10+0100\n"
+"POT-Creation-Date: 2010-10-16 19:14+0000\n"
+"PO-Revision-Date: 2010-10-16 21:42+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
+"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -42,7 +43,7 @@ msgstr "Zvok je omogočen"
 
 #: ../data/notification-daemon.schemas.in.h:6
 msgid "The default sound file used unless a notification supplies the 'sound-file' or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr "Uporabljena je privzeta zvočna datoteka, razen če obvestilo zagotovi namig 'zvočna-datoteka' ali 'prepreči-zvok'. Pustite prazno za onemogočenje privzetega zvoka."
+msgstr "Uporabljena je privzeta zvočna datoteka, razen kadar obvestilo zajema tudi 'zvočno-datoteko' ali pa možnost 'prepreči-zvok'. Pustite prazno za onemogočenje privzetega zvoka."
 
 #: ../data/notification-daemon.schemas.in.h:7
 msgid "The theme used when displaying notifications."
@@ -52,90 +53,68 @@ msgstr "Tema za prikaz obvestil."
 msgid "Turns on and off sound support for notifications."
 msgstr "Vklopi in izklopi zvočno podporo obvestil."
 
-#: ../src/capplet/notification-properties.c:293
-msgid "Slider"
-msgstr "Drsnik"
-
-#: ../src/capplet/notification-properties.c:295
-msgid "Standard theme"
-msgstr "Običajna tema"
-
-#: ../src/capplet/notification-properties.c:391
-msgid "Error initializing libnotify"
-msgstr "Napaka med zaganjanjem libnotify"
-
-#: ../src/capplet/notification-properties.c:403
-msgid "Notification Test"
-msgstr "Preizkus obvestila"
-
-#: ../src/capplet/notification-properties.c:404
-msgid "Just a test"
-msgstr "Samo preizkus"
-
-#: ../src/capplet/notification-properties.c:411
-#, c-format
-msgid "Error while displaying notification: %s"
-msgstr "Napaka med prikazovanjem obvestila: %s"
-
-#: ../src/capplet/notification-properties.c:472
-#, c-format
-msgid "Could not load user interface file: %s"
-msgstr "Ni mogoče naložiti datoteke uporabniškega vmesnika: %s"
-
-#: ../src/capplet/notification-properties.desktop.in.h:1
-msgid "Pop-Up Notifications"
-msgstr "Pojavna obvestila"
-
-#: ../src/capplet/notification-properties.desktop.in.h:2
-msgid "Set your pop-up notification preferences"
-msgstr "Nastavitev možnosti pojavnih obvestil "
-
-#: ../src/daemon/daemon.c:1237
+#: ../src/daemon.c:239
 #, c-format
 msgid "Exceeded maximum number of notifications"
 msgstr "Največje število obvestil je preseženo"
 
-#: ../src/daemon/daemon.c:1468
+#: ../src/daemon.c:296
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u ni veljaven ID obvestila"
 
-#: ../src/daemon/sound.c:36
+#: ../src/nd-queue.c:472
+msgid "Clear all notifications"
+msgstr "Počisti vsa opravila"
+
+#: ../src/nd-queue.c:1152
+msgid "Notifications"
+msgstr "Obvestila"
+
+#: ../src/sound.c:35
 msgid "Notification"
 msgstr "Obvestilo"
 
+#~ msgid "Slider"
+#~ msgstr "Drsnik"
+#~ msgid "Standard theme"
+#~ msgstr "Običajna tema"
+#~ msgid "Error initializing libnotify"
+#~ msgstr "Napaka med zaganjanjem libnotify"
+#~ msgid "Notification Test"
+#~ msgstr "Preizkus obvestila"
+#~ msgid "Just a test"
+#~ msgstr "Samo preizkus"
+#~ msgid "Error while displaying notification: %s"
+#~ msgstr "Napaka med prikazovanjem obvestila: %s"
+#~ msgid "Could not load user interface file: %s"
+#~ msgstr "Ni mogoče naložiti datoteke uporabniškega vmesnika: %s"
+#~ msgid "Pop-Up Notifications"
+#~ msgstr "Pojavna obvestila"
+#~ msgid "Set your pop-up notification preferences"
+#~ msgstr "Nastavitev možnosti pojavnih obvestil "
 #~ msgid "Top Left"
 #~ msgstr "Zgoraj levo"
-
 #~ msgid "Top Right"
 #~ msgstr "Zgoraj desno"
-
 #~ msgid "Bottom Left"
 #~ msgstr "Spodaj levo"
-
 #~ msgid "Bottom Right"
 #~ msgstr "Spodaj desno"
-
 #~ msgid "Unable to locate glade file '%s'"
 #~ msgstr "Glade datoteke '%s' ni mogoče najti"
-
 #~ msgid "      "
 #~ msgstr "      "
-
 #~ msgid "<b>General Options</b>"
 #~ msgstr "<b>Splošne možnosti</b>"
-
 #~ msgid "Notification Settings"
 #~ msgstr "Nastavitve obvestil"
-
 #~ msgid "P_osition:"
 #~ msgstr "P_oložaj:"
-
 #~ msgid "_Preview"
 #~ msgstr "_Predogled"
-
 #~ msgid "_Theme:"
 #~ msgstr "_Tema:"
-
 #~ msgid "Ubuntu theme"
 #~ msgstr "Tema Ubuntu"
+
