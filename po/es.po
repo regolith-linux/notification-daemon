@@ -3,13 +3,14 @@
 # Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
 # This file is distributed under the same license as the notification-daemon package.
 # Jorge González <jorgegonz@svn.gnome.org>, 2010.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon.po.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-02-07 05:36+0000\n"
-"PO-Revision-Date: 2010-02-15 11:30+0100\n"
+"POT-Creation-Date: 2010-10-16 19:14+0000\n"
+"PO-Revision-Date: 2010-10-18 10:13+0200\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -49,8 +50,8 @@ msgid ""
 "or 'suppress-sound' hint. Leave empty for no default sound."
 msgstr ""
 "El archivo de sonido predeterminado que usar a no ser que la notificación "
-"proporcione las opciones «sound-file» o «suppress-sound». Déjelo vacío para no "
-"tener sonido predeterminado."
+"proporcione las opciones «sound-file» o «suppress-sound». Déjelo vacío para "
+"no tener sonido predeterminado."
 
 #: ../data/notification-daemon.schemas.in.h:7
 msgid "The theme used when displaying notifications."
@@ -60,57 +61,56 @@ msgstr "El tema usado al mostrar las notificaciones."
 msgid "Turns on and off sound support for notifications."
 msgstr "Activar y desactivar el soporte de sonido para las notificaciones."
 
-#: ../src/capplet/notification-properties.c:293
-msgid "Slider"
-msgstr "Deslizador"
-
-#: ../src/capplet/notification-properties.c:295
-msgid "Standard theme"
-msgstr "Tema estándar"
-
-#: ../src/capplet/notification-properties.c:391
-msgid "Error initializing libnotify"
-msgstr "Error al iniciar libnotify"
-
-#: ../src/capplet/notification-properties.c:403
-msgid "Notification Test"
-msgstr "Prueba de notificación"
-
-#: ../src/capplet/notification-properties.c:404
-msgid "Just a test"
-msgstr "Simplemente una prueba"
-
-#: ../src/capplet/notification-properties.c:411
-#, c-format
-msgid "Error while displaying notification: %s"
-msgstr "Error al mostrar la notificación: %s"
-
-#: ../src/capplet/notification-properties.c:472
-#, c-format
-msgid "Could not load user interface file: %s"
-msgstr "No se pudo cargar el archivo de interfaz de usuario: %s"
-
-#: ../src/capplet/notification-properties.desktop.in.h:1
-msgid "Pop-Up Notifications"
-msgstr "Notificaciones emergentes"
-
-#: ../src/capplet/notification-properties.desktop.in.h:2
-msgid "Set your pop-up notification preferences"
-msgstr "Configurar las preferencias de sus notificaciones emergentes"
-
-#: ../src/daemon/daemon.c:1237
+#: ../src/daemon.c:239
 #, c-format
 msgid "Exceeded maximum number of notifications"
 msgstr "Se excedió el número máximo de notificaciones"
 
-#: ../src/daemon/daemon.c:1468
+#: ../src/daemon.c:296
 #, c-format
 msgid "%u is not a valid notification ID"
 msgstr "%u no es un ID de notificación válido"
 
-#: ../src/daemon/sound.c:36
+#: ../src/nd-queue.c:472
+#| msgid "Notification"
+msgid "Clear all notifications"
+msgstr "Limpiar todas las notificaciones"
+
+#: ../src/nd-queue.c:1152
+#| msgid "Notification"
+msgid "Notifications"
+msgstr "Notificaciones"
+
+#: ../src/sound.c:35
 msgid "Notification"
 msgstr "Notificación"
+
+#~ msgid "Slider"
+#~ msgstr "Deslizador"
+
+#~ msgid "Standard theme"
+#~ msgstr "Tema estándar"
+
+#~ msgid "Error initializing libnotify"
+#~ msgstr "Error al iniciar libnotify"
+
+#~ msgid "Notification Test"
+#~ msgstr "Prueba de notificación"
+
+#~ msgid "Just a test"
+#~ msgstr "Simplemente una prueba"
+
+#~ msgid "Error while displaying notification: %s"
+#~ msgstr "Error al mostrar la notificación: %s"
+
+#~ msgid "Could not load user interface file: %s"
+#~ msgstr "No se pudo cargar el archivo de interfaz de usuario: %s"
+
+#~ msgid "Pop-Up Notifications"
+#~ msgstr "Notificaciones emergentes"
+
+#~ msgid "Set your pop-up notification preferences"
+#~ msgstr "Configurar las preferencias de sus notificaciones emergentes"
 
 #~ msgid "Top Left"
 #~ msgstr "Arriba a la izquierda"
