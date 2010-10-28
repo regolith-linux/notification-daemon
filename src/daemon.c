@@ -27,10 +27,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <dbus/dbus.h>
-#include <dbus/dbus-glib.h>
 #include <glib/gi18n.h>
 #include <glib.h>
+#include <gio/gio.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
@@ -44,7 +43,6 @@
 #include "daemon.h"
 #include "nd-notification.h"
 #include "nd-queue.h"
-#include "notificationdaemon-dbus-glue.h"
 
 #define MAX_NOTIFICATIONS 20
 
@@ -57,11 +55,10 @@
 
 struct _NotifyDaemonPrivate
 {
-        guint           exit_timeout_source;
-        NdQueue        *queue;
+        GDBusConnection *connection;
+        guint            exit_timeout_source;
+        NdQueue         *queue;
 };
-
-static DBusConnection *dbus_conn = NULL;
 
 static void notify_daemon_finalize (GObject *object);
 
@@ -143,56 +140,18 @@ notify_daemon_finalize (GObject *object)
         G_OBJECT_CLASS (notify_daemon_parent_class)->finalize (object);
 }
 
-static DBusMessage *
-create_signal_for_notification (NdNotification *notification,
-                                const char     *signal_name)
-{
-        guint           id;
-        const char     *dest;
-        DBusMessage    *message;
-
-        id = nd_notification_get_id (notification);
-        dest = nd_notification_get_sender (notification);
-        g_assert (dest != NULL);
-
-        message = dbus_message_new_signal (NOTIFICATION_BUS_PATH,
-                                           NOTIFICATION_BUS_NAME,
-                                           signal_name);
-
-        dbus_message_set_destination (message, dest);
-        dbus_message_append_args (message,
-                                  DBUS_TYPE_UINT32,
-                                  &id,
-                                  DBUS_TYPE_INVALID);
-
-        return message;
-}
-
-GQuark
-notify_daemon_error_quark (void)
-{
-        static GQuark   q = 0;
-
-        if (q == 0)
-                q = g_quark_from_static_string ("notification-daemon-error-quark");
-
-        return q;
-}
-
 static void
 on_notification_close (NdNotification *notification,
                        int             reason,
                        NotifyDaemon   *daemon)
 {
-        DBusMessage *message;
-
-        message = create_signal_for_notification (notification, "NotificationClosed");
-        dbus_message_append_args (message,
-                                  DBUS_TYPE_UINT32,
-                                  &reason,
-                                  DBUS_TYPE_INVALID);
-        dbus_connection_send (dbus_conn, message, NULL);
-        dbus_message_unref (message);
+        g_dbus_connection_emit_signal (daemon->priv->connection,
+                                       nd_notification_get_sender (notification),
+                                       "/org/freedesktop/Notifications",
+                                       "org.freedesktop.Notifications",
+                                       "NotificationClosed",
+                                       g_variant_new ("(uu)", nd_notification_get_id (notification), reason),
+                                       NULL);
 }
 
 static void
@@ -200,51 +159,87 @@ on_notification_action_invoked (NdNotification *notification,
                                 const char     *action,
                                 NotifyDaemon   *daemon)
 {
-        guint           id;
-        DBusMessage    *message;
-
-        id = nd_notification_get_id (notification);
-        message = create_signal_for_notification (notification, "ActionInvoked");
-        dbus_message_append_args (message,
-                                  DBUS_TYPE_STRING,
-                                  &action,
-                                  DBUS_TYPE_INVALID);
-
-        dbus_connection_send (dbus_conn, message, NULL);
-        dbus_message_unref (message);
+        g_dbus_connection_emit_signal (daemon->priv->connection,
+                                       nd_notification_get_sender (notification),
+                                       "/org/freedesktop/Notifications",
+                                       "org.freedesktop.Notifications",
+                                       "ActionInvoked",
+                                       g_variant_new ("(us)", nd_notification_get_id (notification), action),
+                                       NULL);
 
         nd_notification_close (notification, ND_NOTIFICATION_CLOSED_USER);
 }
 
-gboolean
-notify_daemon_notify_handler (NotifyDaemon *daemon,
-                              const char   *app_name,
-                              guint         id,
-                              const char   *icon,
-                              const char   *summary,
-                              const char   *body,
-                              char        **actions,
-                              GHashTable   *hints,
-                              int           timeout,
-                              DBusGMethodInvocation *context)
+/* ---------------------------------------------------------------------------------------------- */
+
+static GDBusNodeInfo *introspection_data = NULL;
+
+/* Introspection data for the service we are exporting */
+static const char introspection_xml[] =
+        "<node>"
+        "  <interface name='org.freedesktop.Notifications'>"
+        "    <method name='Notify'>"
+        "      <arg type='s' name='app_name' direction='in' />"
+        "      <arg type='u' name='id' direction='in' />"
+        "      <arg type='s' name='icon' direction='in' />"
+        "      <arg type='s' name='summary' direction='in' />"
+        "      <arg type='s' name='body' direction='in' />"
+        "      <arg type='as' name='actions' direction='in' />"
+        "      <arg type='a{sv}' name='hints' direction='in' />"
+        "      <arg type='i' name='timeout' direction='in' />"
+        "      <arg type='u' name='return_id' direction='out' />"
+        "    </method>"
+        "    <method name='CloseNotification'>"
+        "      <arg type='u' name='id' direction='in' />"
+        "    </method>"
+        "    <method name='GetCapabilities'>"
+        "      <arg type='as' name='return_caps' direction='out'/>"
+        "    </method>"
+        "    <method name='GetServerInformation'>"
+        "      <arg type='s' name='return_name' direction='out'/>"
+        "      <arg type='s' name='return_vendor' direction='out'/>"
+        "      <arg type='s' name='return_version' direction='out'/>"
+        "      <arg type='s' name='return_spec_version' direction='out'/>"
+        "    </method>"
+        "  </interface>"
+        "</node>";
+
+static void
+handle_notify (NotifyDaemon          *daemon,
+               const char            *sender,
+               GVariant              *parameters,
+               GDBusMethodInvocation *invocation)
 {
-        NotifyDaemonPrivate *priv = daemon->priv;
-        NdNotification      *notification;
+        NdNotification *notification;
+        const char     *app_name;
+        guint           id;
+        const char     *icon_name;
+        const char     *summary;
+        const char     *body;
+        const char    **actions;
+        GVariantIter   *hints_iter;
+        int             timeout;
 
-        if (nd_queue_length (priv->queue) > MAX_NOTIFICATIONS) {
-                GError *error;
-
-                error = g_error_new (notify_daemon_error_quark (),
-                                     1,
-                                     _("Exceeded maximum number of notifications"));
-                dbus_g_method_return_error (context, error);
-                g_error_free (error);
-
-                return TRUE;
+        if (nd_queue_length (daemon->priv->queue) > MAX_NOTIFICATIONS) {
+                g_dbus_method_invocation_return_dbus_error (invocation,
+                                                            "org.freedesktop.Notifications.MaxNotificationsExceeded",
+                                                            _("Exceeded maximum number of notifications"));
+                return;
         }
 
+        g_variant_get (parameters,
+                       "(&su&s&s&s^a&sa{sv}i)",
+                       &app_name,
+                       &id,
+                       &icon_name,
+                       &summary,
+                       &body,
+                       &actions,
+                       &hints_iter,
+                       &timeout);
+
         if (id > 0) {
-                notification = nd_queue_lookup (priv->queue, id);
+                notification = nd_queue_lookup (daemon->priv->queue, id);
                 if (notification == NULL) {
                         id = 0;
                 } else {
@@ -253,163 +248,189 @@ notify_daemon_notify_handler (NotifyDaemon *daemon,
         }
 
         if (id == 0) {
-                char *sender;
-
-                sender = dbus_g_method_get_sender (context);
-
                 notification = nd_notification_new (sender);
-
-                g_free (sender);
         }
 
         nd_notification_update (notification,
                                 app_name,
-                                icon,
+                                icon_name,
                                 summary,
                                 body,
-                                (const char **)actions,
-                                hints,
+                                actions,
+                                hints_iter,
                                 timeout);
         g_signal_connect (notification, "closed", G_CALLBACK (on_notification_close), daemon);
         g_signal_connect (notification, "action-invoked", G_CALLBACK (on_notification_action_invoked), daemon);
 
         if (id == 0) {
-                nd_queue_add (priv->queue, notification);
+                nd_queue_add (daemon->priv->queue, notification);
         }
 
-        dbus_g_method_return (context, nd_notification_get_id (notification));
+        g_dbus_method_invocation_return_value (invocation,
+                                               g_variant_new ("(u)", nd_notification_get_id (notification)));
 
         g_object_unref (notification);
-
-        return TRUE;
 }
 
-gboolean
-notify_daemon_close_notification_handler (NotifyDaemon *daemon,
-                                          guint         id,
-                                          GError      **error)
+static void
+handle_close_notification (NotifyDaemon          *daemon,
+                           const char            *sender,
+                           GVariant              *parameters,
+                           GDBusMethodInvocation *invocation)
 {
+        NdNotification *notification;
+        guint           id;
+
+        g_variant_get (parameters, "(u)", &id);
+
         if (id == 0) {
-                g_set_error (error,
-                             notify_daemon_error_quark (),
-                             100,
-                             _("%u is not a valid notification ID"),
-                             id);
-                return FALSE;
-        } else {
-                NdNotification *notification;
+                g_dbus_method_invocation_return_dbus_error (invocation,
+                                                            "org.freedesktop.Notifications.InvalidId",
+                                                            _("Invalid notification identifier"));
+                return;
+        }
 
-                notification = nd_queue_lookup (daemon->priv->queue, id);
-                if (notification != NULL) {
-                        nd_notification_close (notification, ND_NOTIFICATION_CLOSED_API);
-                }
+        notification = nd_queue_lookup (daemon->priv->queue, id);
+        if (notification != NULL) {
+                nd_notification_close (notification, ND_NOTIFICATION_CLOSED_API);
+        }
 
-                return TRUE;
+        g_dbus_method_invocation_return_value (invocation, NULL);
+}
+
+static void
+handle_get_capabilities (NotifyDaemon          *daemon,
+                         const char            *sender,
+                         GVariant              *parameters,
+                         GDBusMethodInvocation *invocation)
+{
+        GVariantBuilder *builder;
+
+        builder = g_variant_builder_new (G_VARIANT_TYPE ("as"));
+        g_variant_builder_add (builder, "s", "actions");
+        g_variant_builder_add (builder, "s", "body");
+        g_variant_builder_add (builder, "s", "body-hyperlinks");
+        g_variant_builder_add (builder, "s", "body-markup");
+        g_variant_builder_add (builder, "s", "icon-static");
+        g_variant_builder_add (builder, "s", "sound");
+        g_variant_builder_add (builder, "s", "persistence");
+
+        g_dbus_method_invocation_return_value (invocation,
+                                               g_variant_new ("(as)", builder));
+        g_variant_builder_unref (builder);
+}
+
+static void
+handle_get_server_information (NotifyDaemon          *daemon,
+                               const char            *sender,
+                               GVariant              *parameters,
+                               GDBusMethodInvocation *invocation)
+{
+        g_dbus_method_invocation_return_value (invocation,
+                                               g_variant_new ("(ssss)",
+                                                              "Notification Daemon",
+                                                              "GNOME",
+                                                              PACKAGE_VERSION,
+                                                              "1.1"));
+}
+
+static void
+handle_method_call (GDBusConnection       *connection,
+                    const char            *sender,
+                    const char            *object_path,
+                    const char            *interface_name,
+                    const char            *method_name,
+                    GVariant              *parameters,
+                    GDBusMethodInvocation *invocation,
+                    gpointer               user_data)
+{
+        NotifyDaemon *daemon = user_data;
+
+        if (g_strcmp0 (method_name, "Notify") == 0) {
+                handle_notify (daemon, sender, parameters, invocation);
+        } else if (g_strcmp0 (method_name, "CloseNotification") == 0) {
+                handle_close_notification (daemon, sender, parameters, invocation);
+        } else if (g_strcmp0 (method_name, "GetCapabilities") == 0) {
+                handle_get_capabilities (daemon, sender, parameters, invocation);
+        } else if (g_strcmp0 (method_name, "GetServerInformation") == 0) {
+                handle_get_server_information (daemon, sender, parameters, invocation);
         }
 }
 
-gboolean
-notify_daemon_get_capabilities (NotifyDaemon *daemon,
-                                char       ***caps)
+/* for now */
+static const GDBusInterfaceVTable interface_vtable =
 {
-        GPtrArray *a;
-        char     **_caps;
+        handle_method_call,
+        NULL, /* get property */
+        NULL  /* set property */
+};
 
-        a = g_ptr_array_new ();
-        g_ptr_array_add (a, g_strdup ("actions"));
-        g_ptr_array_add (a, g_strdup ("body"));
-        g_ptr_array_add (a, g_strdup ("body-hyperlinks"));
-        g_ptr_array_add (a, g_strdup ("body-markup"));
-        g_ptr_array_add (a, g_strdup ("icon-static"));
-        g_ptr_array_add (a, g_strdup ("sound"));
-        g_ptr_array_add (a, g_strdup ("persistence"));
-        g_ptr_array_add (a, NULL);
-        _caps = (char **) g_ptr_array_free (a, FALSE);
+static void
+on_bus_acquired (GDBusConnection *connection,
+                 const char      *name,
+                 gpointer         user_data)
+{
+        NotifyDaemon *daemon = user_data;
+        guint         registration_id;
 
-        *caps = _caps;
-
-        return TRUE;
+        registration_id = g_dbus_connection_register_object (connection,
+                                                             "/org/freedesktop/Notifications",
+                                                             introspection_data->interfaces[0],
+                                                             &interface_vtable,
+                                                             daemon,
+                                                             NULL,  /* user_data_free_func */
+                                                             NULL); /* GError** */
+        g_assert (registration_id > 0);
 }
 
-gboolean
-notify_daemon_get_server_information (NotifyDaemon *daemon,
-                                      char        **out_name,
-                                      char        **out_vendor,
-                                      char        **out_version,
-                                      char        **out_spec_ver)
+static void
+on_name_acquired (GDBusConnection *connection,
+                  const char      *name,
+                  gpointer         user_data)
 {
-        *out_name = g_strdup ("Notification Daemon");
-        *out_vendor = g_strdup ("GNOME");
-        *out_version = g_strdup (PACKAGE_VERSION);
-        *out_spec_ver = g_strdup ("1.1");
-
-        return TRUE;
+        NotifyDaemon *daemon = user_data;
+        daemon->priv->connection = connection;
 }
+
+static void
+on_name_lost (GDBusConnection *connection,
+              const char      *name,
+              gpointer         user_data)
+{
+        exit (1);
+}
+
 
 int
 main (int argc, char **argv)
 {
-        NotifyDaemon    *daemon;
-        DBusGConnection *connection;
-        DBusGProxy      *bus_proxy;
-        GError          *error;
-        gboolean         res;
-        guint            request_name_result;
+        NotifyDaemon *daemon;
+        guint         owner_id;
 
         g_log_set_always_fatal (G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
 
         gtk_init (&argc, &argv);
 
-        error = NULL;
-        connection = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
-        if (connection == NULL) {
-                g_printerr ("Failed to open connection to bus: %s\n",
-                            error->message);
-                g_error_free (error);
-                exit (1);
-        }
-
-        dbus_conn = dbus_g_connection_get_connection (connection);
-
-        dbus_g_object_type_install_info (NOTIFY_TYPE_DAEMON,
-                                         &dbus_glib_notification_daemon_object_info);
-
-        bus_proxy = dbus_g_proxy_new_for_name (connection,
-                                               "org.freedesktop.DBus",
-                                               "/org/freedesktop/DBus",
-                                               "org.freedesktop.DBus");
-
-        res = dbus_g_proxy_call (bus_proxy,
-                                 "RequestName",
-                                 &error,
-                                 G_TYPE_STRING, NOTIFICATION_BUS_NAME,
-                                 G_TYPE_UINT, 0,
-                                 G_TYPE_INVALID,
-                                 G_TYPE_UINT, &request_name_result,
-                                 G_TYPE_INVALID);
-        if (! res
-            || request_name_result != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER) {
-                if (error != NULL) {
-                        g_warning ("Failed to acquire name %s: %s",
-                                   NOTIFICATION_BUS_NAME,
-                                   error->message);
-                        g_error_free (error);
-                } else {
-                        g_warning ("Failed to acquire name %s", NOTIFICATION_BUS_NAME);
-                }
-                goto out;
-        }
+        introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
+        g_assert (introspection_data != NULL);
 
         daemon = g_object_new (NOTIFY_TYPE_DAEMON, NULL);
 
-        dbus_g_connection_register_g_object (connection,
-                                             "/org/freedesktop/Notifications",
-                                             G_OBJECT (daemon));
+        owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
+                                   "org.freedesktop.Notifications",
+                                   G_BUS_NAME_OWNER_FLAGS_NONE,
+                                   on_bus_acquired,
+                                   on_name_acquired,
+                                   on_name_lost,
+                                   daemon,
+                                   NULL);
 
         gtk_main ();
 
+        g_bus_unown_name (owner_id);
+        g_dbus_node_info_unref (introspection_data);
+
         g_object_unref (daemon);
- out:
 
         return 0;
 }

@@ -81,36 +81,17 @@ dnl Requirements for the daemon
 dnl ---------------------------------------------------------------------------
 REQ_GTK_VERSION=2.91.0
 REQ_GLIB_VERSION=2.27.0
-REQ_DBUS_VERSION=0.78
 REQ_LIBCANBERRA_GTK_VERSION=0.4
 pkg_modules="
 	gtk+-3.0 >= $REQ_GTK_VERSION, \
 	glib-2.0 >= $REQ_GLIB_VERSION, \
-	dbus-1 >= $REQ_DBUS_VERSION, \
-	dbus-glib-1 >= $REQ_DBUS_VERSION, \
+        gio-2.0 >= $REQ_GLIB_VERSION, \
         libcanberra-gtk3 >= $REQ_LIBCANBERRA_GTK_VERSION, \
         x11 \
 "
 PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
-
-dnl
-dnl Check the D-BUS version.
-dnl
-
-AC_MSG_CHECKING([dbus version])
-DBUS_VERSION=`$PKG_CONFIG --modversion dbus-1`
-DBUS_MAJOR_VER=`echo $DBUS_VERSION | cut -d. -f 1`
-DBUS_MINOR_VER=`echo $DBUS_VERSION | cut -d. -f 2`
-DBUS_MICRO_VER=`echo $DBUS_VERSION | cut -d. -f 3`
-
-AC_MSG_RESULT($DBUS_VERSION)
-AC_DEFINE_UNQUOTED(DBUS_MAJOR_VER, $DBUS_MAJOR_VER, [D-BUS major version.])
-AC_DEFINE_UNQUOTED(DBUS_MINOR_VER, $DBUS_MINOR_VER, [D-BUS minor version.])
-AC_DEFINE_UNQUOTED(DBUS_MICRO_VER, $DBUS_MICRO_VER, [D-BUS micro version.])
-
-AC_DEFINE_UNQUOTED(DBUS_API_SUBJECT_TO_CHANGE, ,DBUS API is subject to change)
 
 AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
 AS_AC_EXPAND(LIBDIR, $libdir)

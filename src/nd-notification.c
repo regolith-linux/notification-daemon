@@ -22,7 +22,6 @@
 #include <string.h>
 #include <strings.h>
 #include <gtk/gtk.h>
-#include <dbus/dbus-glib.h>
 
 #include "nd-notification.h"
 
@@ -112,13 +111,6 @@ nd_notification_class_init (NdNotificationClass *class)
                               G_TYPE_NONE, 1, G_TYPE_STRING);
 }
 
- static void
-_g_value_free (GValue *value)
-{
-        g_value_unset (value);
-        g_free (value);
-}
-
 static void
 nd_notification_init (NdNotification *notification)
 {
@@ -132,7 +124,7 @@ nd_notification_init (NdNotification *notification)
         notification->hints = g_hash_table_new_full (g_str_hash,
                                                      g_str_equal,
                                                      g_free,
-                                                     (GDestroyNotify) _g_value_free);
+                                                     (GDestroyNotify) g_variant_unref);
 }
 
 static void
@@ -164,11 +156,10 @@ nd_notification_update (NdNotification *notification,
                         const char     *summary,
                         const char     *body,
                         const char    **actions,
-                        GHashTable     *hints,
+                        GVariantIter   *hints_iter,
                         int             timeout)
 {
-        GHashTableIter iter;
-        gpointer       key, value;
+        GVariant *item;
 
         g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
 
@@ -189,15 +180,18 @@ nd_notification_update (NdNotification *notification,
 
         g_hash_table_remove_all (notification->hints);
 
-        g_hash_table_iter_init (&iter, hints);
-        while (g_hash_table_iter_next (&iter, &key, &value)) {
-                GValue *value_copy;
+        while ((item = g_variant_iter_next_value (hints_iter))) {
+                const char *key;
+                GVariant   *value;
 
-                value_copy = g_new0 (GValue, 1);
-                g_value_init (value_copy, G_VALUE_TYPE (value));
-                g_value_copy (value, value_copy);
+                g_variant_get (item,
+                               "{sv}",
+                               &key,
+                               &value);
 
-                g_hash_table_insert (notification->hints, g_strdup (key), value_copy);
+                g_hash_table_insert (notification->hints,
+                                     g_strdup (key),
+                                     value); /* steals value */
         }
 
         g_signal_emit (notification, signals[CHANGED], 0);
@@ -328,159 +322,44 @@ scale_pixbuf (GdkPixbuf *pixbuf,
 }
 
 static GdkPixbuf *
-_notify_daemon_pixbuf_from_data_hint (GValue *icon_data,
-                                      int     size)
+_notify_daemon_pixbuf_from_data_hint (GVariant *icon_data,
+                                      int       size)
 {
-        const guchar   *data = NULL;
         gboolean        has_alpha;
         int             bits_per_sample;
         int             width;
         int             height;
         int             rowstride;
         int             n_channels;
+        GVariant       *data_variant;
         gsize           expected_len;
+        guchar         *data;
         GdkPixbuf      *pixbuf;
-        GValueArray    *image_struct;
-        GValue         *value;
-        GArray         *tmp_array;
-        GType           struct_type;
 
-        struct_type = dbus_g_type_get_struct ("GValueArray",
-                                              G_TYPE_INT,
-                                              G_TYPE_INT,
-                                              G_TYPE_INT,
-                                              G_TYPE_BOOLEAN,
-                                              G_TYPE_INT,
-                                              G_TYPE_INT,
-                                              dbus_g_type_get_collection ("GArray", G_TYPE_UCHAR),
-                                              G_TYPE_INVALID);
+        g_variant_get (icon_data,
+                       "(iiibii@ay)",
+                       &width,
+                       &height,
+                       &rowstride,
+                       &has_alpha,
+                       &bits_per_sample,
+                       &n_channels,
+                       &data_variant);
 
-        if (!G_VALUE_HOLDS (icon_data, struct_type)) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected a "
-                           "GValue of type GValueArray");
-                return NULL;
-        }
-
-        image_struct = (GValueArray *) g_value_get_boxed (icon_data);
-        value = g_value_array_get_nth (image_struct, 0);
-
-        if (value == NULL) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected position "
-                           "0 of the GValueArray to exist");
-                return NULL;
-        }
-
-        if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 0 of the GValueArray to be of type int");
-                return NULL;
-        }
-
-        width = g_value_get_int (value);
-        value = g_value_array_get_nth (image_struct, 1);
-
-        if (value == NULL) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 1 of the GValueArray to exist");
-                return NULL;
-        }
-
-        if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 1 of the GValueArray to be of type int");
-                return NULL;
-        }
-
-        height = g_value_get_int (value);
-        value = g_value_array_get_nth (image_struct, 2);
-
-        if (value == NULL) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 2 of the GValueArray to exist");
-                return NULL;
-        }
-
-        if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 2 of the GValueArray to be of type int");
-                return NULL;
-        }
-
-        rowstride = g_value_get_int (value);
-        value = g_value_array_get_nth (image_struct, 3);
-
-        if (value == NULL) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 3 of the GValueArray to exist");
-                return NULL;
-        }
-
-        if (!G_VALUE_HOLDS (value, G_TYPE_BOOLEAN)) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 3 of the GValueArray to be of type gboolean");
-                return NULL;
-        }
-
-        has_alpha = g_value_get_boolean (value);
-        value = g_value_array_get_nth (image_struct, 4);
-
-        if (value == NULL) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 4 of the GValueArray to exist");
-                return NULL;
-        }
-
-        if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 4 of the GValueArray to be of type int");
-                return NULL;
-        }
-
-        bits_per_sample = g_value_get_int (value);
-        value = g_value_array_get_nth (image_struct, 5);
-
-        if (value == NULL) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 5 of the GValueArray to exist");
-                return NULL;
-        }
-
-        if (!G_VALUE_HOLDS (value, G_TYPE_INT)) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 5 of the GValueArray to be of type int");
-                return NULL;
-        }
-
-        n_channels = g_value_get_int (value);
-        value = g_value_array_get_nth (image_struct, 6);
-
-        if (value == NULL) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 6 of the GValueArray to exist");
-                return NULL;
-        }
-
-        if (!G_VALUE_HOLDS (value,
-                            dbus_g_type_get_collection ("GArray",
-                                                        G_TYPE_UCHAR))) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected "
-                           "position 6 of the GValueArray to be of type GArray");
-                return NULL;
-        }
-
-        tmp_array = (GArray *) g_value_get_boxed (value);
         expected_len = (height - 1) * rowstride + width
                 * ((n_channels * bits_per_sample + 7) / 8);
 
-        if (expected_len != tmp_array->len) {
-                g_warning ("_notify_daemon_pixbuf_from_data_hint expected image "
-                           "data to be of length %" G_GSIZE_FORMAT
-                           " but got a " "length of %u", expected_len,
-                           tmp_array->len);
+        if (expected_len != g_variant_get_size (data_variant)) {
+                g_warning ("Expected image data to be of length %" G_GSIZE_FORMAT
+                           " but got a " "length of %u",
+                           expected_len,
+                           g_variant_get_size (data_variant));
                 return NULL;
         }
 
-        data = (guchar *) g_memdup (tmp_array->data, tmp_array->len);
+        data = (guchar *) g_memdup (g_variant_get_data (data_variant),
+                                    g_variant_get_size (data_variant));
+
         pixbuf = gdk_pixbuf_new_from_data (data,
                                            GDK_COLORSPACE_RGB,
                                            has_alpha,
@@ -554,24 +433,24 @@ GdkPixbuf *
 nd_notification_load_image (NdNotification *notification,
                             int             size)
 {
-        GValue    *data;
+        GVariant  *data;
         GdkPixbuf *pixbuf;
 
         pixbuf = NULL;
 
-        if ((data = (GValue *) g_hash_table_lookup (notification->hints, "image_data"))) {
+        if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "image_data"))) {
                 pixbuf = _notify_daemon_pixbuf_from_data_hint (data, size);
-        } else if ((data = (GValue *) g_hash_table_lookup (notification->hints, "image_path"))) {
-                if (G_VALUE_HOLDS_STRING (data)) {
-                        const char *path = g_value_get_string (data);
+        } else if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "image_path"))) {
+                if (g_variant_is_of_type (data, G_VARIANT_TYPE ("(s)"))) {
+                        const char *path;
+                        path = g_variant_get_string (data, NULL);
                         pixbuf = _notify_daemon_pixbuf_from_path (path, size);
                 } else {
-                        g_warning ("notify_daemon_notify_handler expected "
-                                   "image_path hint to be of type string");
+                        g_warning ("Expected image_path hint to be of type string");
                 }
         } else if (*notification->icon != '\0') {
                 pixbuf = _notify_daemon_pixbuf_from_path (notification->icon, size);
-        } else if ((data = (GValue *) g_hash_table_lookup (notification->hints, "icon_data"))) {
+        } else if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "icon_data"))) {
                 g_warning("\"icon_data\" hint is deprecated, please use \"image_data\" instead");
                 pixbuf = _notify_daemon_pixbuf_from_data_hint (data, size);
         }

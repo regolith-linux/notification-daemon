@@ -53,7 +53,7 @@ gboolean              nd_notification_update              (NdNotification *notif
                                                            const char     *summary,
                                                            const char     *body,
                                                            const char    **actions,
-                                                           GHashTable     *hints,
+                                                           GVariantIter   *hints_iter,
                                                            int             timeout);
 
 gboolean              nd_notification_get_is_closed       (NdNotification *notification);
