@@ -240,6 +240,23 @@ nd_notification_get_is_transient (NdNotification *notification)
         return ret;
 }
 
+gboolean
+nd_notification_get_is_resident (NdNotification *notification)
+{
+        gboolean  ret;
+        GVariant *value;
+
+        ret = FALSE;
+        g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
+
+        value = g_hash_table_lookup (notification->hints, "resident");
+        if (value != NULL) {
+                ret = g_variant_get_boolean (value);
+        }
+
+        return ret;
+}
+
 guint32
 nd_notification_get_id (NdNotification *notification)
 {

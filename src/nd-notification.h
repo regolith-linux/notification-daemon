@@ -72,6 +72,7 @@ GHashTable *          nd_notification_get_hints           (NdNotification *notif
 
 GdkPixbuf *           nd_notification_load_image          (NdNotification *notification,
                                                            int             size);
+gboolean              nd_notification_get_is_resident     (NdNotification *notification);
 gboolean              nd_notification_get_is_transient    (NdNotification *notification);
 
 void                  nd_notification_close               (NdNotification *notification,

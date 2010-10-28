@@ -167,7 +167,10 @@ on_notification_action_invoked (NdNotification *notification,
                                        g_variant_new ("(us)", nd_notification_get_id (notification), action),
                                        NULL);
 
-        nd_notification_close (notification, ND_NOTIFICATION_CLOSED_USER);
+        /* resident notifications don't close when actions are invoked */
+        if (! nd_notification_get_is_resident (notification)) {
+                nd_notification_close (notification, ND_NOTIFICATION_CLOSED_USER);
+        }
 }
 
 /* ---------------------------------------------------------------------------------------------- */
