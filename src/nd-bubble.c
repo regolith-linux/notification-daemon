@@ -79,6 +79,14 @@ static void     on_notification_changed (NdNotification *notification,
 
 G_DEFINE_TYPE (NdBubble, nd_bubble, GTK_TYPE_WINDOW)
 
+NdNotification *
+nd_bubble_get_notification (NdBubble *bubble)
+{
+        g_return_val_if_fail (ND_IS_BUBBLE (bubble), NULL);
+
+        return bubble->priv->notification;
+}
+
 static gboolean
 nd_bubble_configure_event (GtkWidget         *widget,
                            GdkEventConfigure *event)

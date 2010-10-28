@@ -590,7 +590,15 @@ static void
 on_bubble_destroyed (NdBubble *bubble,
                      NdQueue  *queue)
 {
+        NdNotification *notification;
+
         g_debug ("Bubble destroyed");
+        notification = nd_bubble_get_notification (bubble);
+        if (nd_notification_get_is_transient (notification)) {
+                g_debug ("Bubble is transient");
+                nd_notification_close (notification, ND_NOTIFICATION_CLOSED_EXPIRED);
+        }
+
         queue_update (queue);
 }
 

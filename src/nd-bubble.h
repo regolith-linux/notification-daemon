@@ -53,6 +53,7 @@ GType               nd_bubble_get_type                      (void);
 
 NdBubble *          nd_bubble_new_for_notification          (NdNotification *notification);
 
+NdNotification *    nd_bubble_get_notification              (NdBubble       *bubble);
 
 G_END_DECLS
 
