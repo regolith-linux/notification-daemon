@@ -334,7 +334,7 @@ handle_get_server_information (NotifyDaemon          *daemon,
                                                               "Notification Daemon",
                                                               "GNOME",
                                                               PACKAGE_VERSION,
-                                                              "1.1"));
+                                                              "1.2"));
 }
 
 static void
