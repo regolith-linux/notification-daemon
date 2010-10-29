@@ -138,6 +138,7 @@ create_notification_action (NdNotificationBox *box,
                 GtkWidget *image;
 
                 image = gtk_image_new_from_pixbuf (pixbuf);
+                g_object_unref (pixbuf);
                 atk_object_set_name (gtk_widget_get_accessible (GTK_WIDGET (button)),
                                      text);
                 gtk_widget_show (image);

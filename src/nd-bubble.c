@@ -881,6 +881,7 @@ add_notification_action (NdBubble       *bubble,
                 GtkWidget *image;
 
                 image = gtk_image_new_from_pixbuf (pixbuf);
+                g_object_unref (pixbuf);
                 g_signal_connect (G_OBJECT (image),
                                   "style-set",
                                   G_CALLBACK (on_style_set),
