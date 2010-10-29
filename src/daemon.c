@@ -252,6 +252,8 @@ handle_notify (NotifyDaemon          *daemon,
 
         if (id == 0) {
                 notification = nd_notification_new (sender);
+                g_signal_connect (notification, "closed", G_CALLBACK (on_notification_close), daemon);
+                g_signal_connect (notification, "action-invoked", G_CALLBACK (on_notification_action_invoked), daemon);
         }
 
         nd_notification_update (notification,
@@ -262,8 +264,6 @@ handle_notify (NotifyDaemon          *daemon,
                                 actions,
                                 hints_iter,
                                 timeout);
-        g_signal_connect (notification, "closed", G_CALLBACK (on_notification_close), daemon);
-        g_signal_connect (notification, "action-invoked", G_CALLBACK (on_notification_action_invoked), daemon);
 
         if (id == 0) {
                 nd_queue_add (daemon->priv->queue, notification);
