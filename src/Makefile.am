@@ -3,6 +3,8 @@ libexec_PROGRAMS = notification-daemon
 notification_daemon_SOURCES = \
 	nd-notification.c \
 	nd-notification.h \
+	nd-notification-box.c \
+	nd-notification-box.h \
 	nd-bubble.c \
 	nd-bubble.h \
 	nd-stack.c \

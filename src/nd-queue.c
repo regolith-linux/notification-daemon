@@ -32,12 +32,11 @@
 #include "nd-queue.h"
 
 #include "nd-notification.h"
+#include "nd-notification-box.h"
 #include "nd-stack.h"
 
 #define ND_QUEUE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), ND_TYPE_QUEUE, NdQueuePrivate))
 
-#define IMAGE_SIZE    48
-#define BODY_X_OFFSET (IMAGE_SIZE + 8)
 #define WIDTH         400
 
 typedef struct
@@ -70,13 +69,13 @@ enum {
 
 static guint signals [LAST_SIGNAL] = { 0, };
 
-static void     nd_queue_class_init  (NdQueueClass *klass);
-static void     nd_queue_init        (NdQueue      *queue);
-static void     nd_queue_finalize    (GObject         *object);
-static void     queue_update         (NdQueue *queue);
-static void     on_notification_close (NdNotification *notification,
-                                       int             reason,
-                                       NdQueue        *queue);
+static void     nd_queue_class_init     (NdQueueClass   *klass);
+static void     nd_queue_init           (NdQueue        *queue);
+static void     nd_queue_finalize       (GObject        *object);
+static void     queue_update            (NdQueue        *queue);
+static void     on_notification_close   (NdNotification *notification,
+                                         int             reason,
+                                         NdQueue        *queue);
 
 static gpointer queue_object = NULL;
 
@@ -660,291 +659,6 @@ collate_notifications (NdNotification *a,
 }
 
 static void
-on_close_button_clicked (GtkButton      *button,
-                         NdNotification *notification)
-{
-        nd_notification_close (notification, ND_NOTIFICATION_CLOSED_USER);
-}
-
-static void
-on_action_clicked (GtkButton      *button,
-                   GdkEventButton *event,
-                   NdNotification *notification)
-{
-        const char *key = g_object_get_data (G_OBJECT (button), "_action_key");
-
-        nd_notification_action_invoked (notification,
-                                        key);
-}
-
-static GtkWidget *
-create_notification_action (NdQueue        *queue,
-                            NdNotification *notification,
-                            const char     *text,
-                            const char     *key)
-{
-        GtkWidget *label;
-        GtkWidget *button;
-        GtkWidget *hbox;
-        GdkPixbuf *pixbuf;
-        char      *buf;
-
-        button = gtk_button_new ();
-        gtk_widget_show (button);
-        gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
-        gtk_container_set_border_width (GTK_CONTAINER (button), 0);
-
-        hbox = gtk_hbox_new (FALSE, 6);
-        gtk_widget_show (hbox);
-        gtk_container_add (GTK_CONTAINER (button), hbox);
-
-        /* Try to be smart and find a suitable icon. */
-        buf = g_strdup_printf ("stock_%s", key);
-        pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_for_screen (gtk_widget_get_screen (GTK_WIDGET (queue->priv->dock))),
-                                           buf,
-                                           16,
-                                           GTK_ICON_LOOKUP_USE_BUILTIN,
-                                           NULL);
-        g_free (buf);
-
-        if (pixbuf != NULL) {
-                GtkWidget *image = gtk_image_new_from_pixbuf (pixbuf);
-                gtk_widget_show (image);
-                gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
-                gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0.5);
-        }
-
-        label = gtk_label_new (NULL);
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-        gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-        buf = g_strdup_printf ("<small>%s</small>", text);
-        gtk_label_set_markup (GTK_LABEL (label), buf);
-        g_free (buf);
-
-        g_object_set_data_full (G_OBJECT (button),
-                                "_action_key", g_strdup (key), g_free);
-        g_signal_connect (G_OBJECT (button),
-                          "button-release-event",
-                          G_CALLBACK (on_action_clicked),
-                          notification);
-        return button;
-}
-
-static gboolean
-on_button_release (GtkWidget      *widget,
-                   GdkEventButton *event,
-                   NdNotification *notification)
-{
-        g_debug ("CLICK");
-        nd_notification_action_invoked (notification, "default");
-
-        return FALSE;
-}
-
-static GtkWidget *
-create_notification_box (NdQueue        *queue,
-                         NdNotification *n)
-{
-        GtkWidget     *event_box;
-        GtkWidget     *box;
-        GtkWidget     *iconbox;
-        GtkWidget     *icon;
-        GtkWidget     *image;
-        GtkWidget     *content_hbox;
-        GtkWidget     *actions_box;
-        GtkWidget     *vbox;
-        GtkWidget     *summary_label;
-        GtkWidget     *body_label;
-        GtkWidget     *alignment;
-        GtkWidget     *close_button;
-        AtkObject     *atkobj;
-        GtkRcStyle    *rcstyle;
-        char          *str;
-        char          *quoted;
-        GtkRequisition req;
-        int            summary_width;
-        gboolean       have_icon;
-        gboolean       have_body;
-        gboolean       have_actions;
-        GdkPixbuf     *pixbuf;
-        char         **actions;
-        int            i;
-
-        event_box = gtk_event_box_new ();
-        gtk_event_box_set_visible_window (GTK_EVENT_BOX (event_box),
-                                          FALSE);
-        g_signal_connect (event_box, "button-release-event", G_CALLBACK (on_button_release), n);
-
-        box = gtk_hbox_new (FALSE, 6);
-        gtk_container_add (GTK_CONTAINER (event_box), box);
-        gtk_widget_show (box);
-
-        /* First row (icon, vbox, close) */
-        iconbox = gtk_alignment_new (0.5, 0, 0, 0);
-        gtk_widget_show (iconbox);
-        gtk_alignment_set_padding (GTK_ALIGNMENT (iconbox),
-                                   5, 0, 0, 0);
-        gtk_box_pack_start (GTK_BOX (box),
-                            iconbox,
-                            FALSE, FALSE, 0);
-        gtk_widget_set_size_request (iconbox, BODY_X_OFFSET, -1);
-
-        icon = gtk_image_new ();
-        gtk_widget_show (icon);
-        gtk_container_add (GTK_CONTAINER (iconbox), icon);
-
-        vbox = gtk_vbox_new (FALSE, 6);
-        gtk_widget_show (vbox);
-        gtk_box_pack_start (GTK_BOX (box), vbox, TRUE, TRUE, 0);
-        gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
-
-        /* Add the close button */
-        alignment = gtk_alignment_new (0.5, 0, 0, 0);
-        gtk_widget_show (alignment);
-        gtk_box_pack_start (GTK_BOX (box), alignment, FALSE, FALSE, 0);
-
-        close_button = gtk_button_new ();
-        gtk_widget_show (close_button);
-        gtk_container_add (GTK_CONTAINER (alignment), close_button);
-        gtk_button_set_relief (GTK_BUTTON (close_button), GTK_RELIEF_NONE);
-        gtk_container_set_border_width (GTK_CONTAINER (close_button), 0);
-        g_signal_connect (G_OBJECT (close_button),
-                          "clicked",
-                          G_CALLBACK (on_close_button_clicked),
-                          n);
-
-        rcstyle = gtk_rc_style_new ();
-        rcstyle->xthickness = rcstyle->ythickness = 0;
-        gtk_widget_modify_style (close_button, rcstyle);
-        g_object_unref (rcstyle);
-
-        atkobj = gtk_widget_get_accessible (close_button);
-        atk_action_set_description (ATK_ACTION (atkobj), 0,
-                                    "Closes the notification.");
-        atk_object_set_name (atkobj, "");
-        atk_object_set_description (atkobj, "Closes the notification.");
-
-        image = gtk_image_new_from_stock (GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
-        gtk_widget_show (image);
-        gtk_container_add (GTK_CONTAINER (close_button), image);
-
-        /* center vbox */
-        summary_label = gtk_label_new (NULL);
-        gtk_widget_show (summary_label);
-        gtk_box_pack_start (GTK_BOX (vbox), summary_label, TRUE, TRUE, 0);
-        gtk_misc_set_alignment (GTK_MISC (summary_label), 0, 0);
-        gtk_label_set_line_wrap (GTK_LABEL (summary_label), TRUE);
-
-        atkobj = gtk_widget_get_accessible (summary_label);
-        atk_object_set_description (atkobj, "Notification summary text.");
-
-        content_hbox = gtk_hbox_new (FALSE, 6);
-        gtk_widget_show (content_hbox);
-        gtk_box_pack_start (GTK_BOX (vbox), content_hbox, FALSE, FALSE, 0);
-
-        vbox = gtk_vbox_new (FALSE, 6);
-
-        gtk_widget_show (vbox);
-        gtk_box_pack_start (GTK_BOX (content_hbox), vbox, TRUE, TRUE, 0);
-
-        body_label = gtk_label_new (NULL);
-        gtk_widget_show (body_label);
-        gtk_box_pack_start (GTK_BOX (vbox), body_label, TRUE, TRUE, 0);
-        gtk_misc_set_alignment (GTK_MISC (body_label), 0, 0);
-        gtk_label_set_line_wrap (GTK_LABEL (body_label), TRUE);
-
-        atkobj = gtk_widget_get_accessible (body_label);
-        atk_object_set_description (atkobj, "Notification body text.");
-
-        alignment = gtk_alignment_new (1, 0.5, 0, 0);
-        gtk_widget_show (alignment);
-        gtk_box_pack_start (GTK_BOX (vbox), alignment, FALSE, TRUE, 0);
-
-        actions_box = gtk_hbox_new (FALSE, 6);
-        gtk_widget_show (actions_box);
-        gtk_container_add (GTK_CONTAINER (alignment), actions_box);
-
-        /* Add content */
-
-        have_icon = FALSE;
-        have_body = FALSE;
-        have_actions = FALSE;
-
-        /* image */
-        pixbuf = nd_notification_load_image (n, IMAGE_SIZE);
-        if (pixbuf != NULL) {
-                gtk_image_set_from_pixbuf (GTK_IMAGE (icon), pixbuf);
-
-                g_object_unref (G_OBJECT (pixbuf));
-                have_icon = TRUE;
-        }
-
-        /* summary */
-        quoted = g_markup_escape_text (nd_notification_get_summary (n), -1);
-        str = g_strdup_printf ("<b><big>%s</big></b>", quoted);
-        g_free (quoted);
-
-        gtk_label_set_markup (GTK_LABEL (summary_label), str);
-        g_free (str);
-
-        gtk_widget_size_request (close_button, &req);
-        /* -1: main_vbox border width
-           -10: vbox border width
-           -6: spacing for hbox */
-        summary_width = WIDTH - (1*2) - (10*2) - BODY_X_OFFSET - req.width - (6*2);
-
-        gtk_widget_set_size_request (summary_label,
-                                     summary_width,
-                                     -1);
-
-        /* body */
-        gtk_label_set_markup (GTK_LABEL (body_label), nd_notification_get_body (n));
-
-        if (str != NULL && *str != '\0') {
-                gtk_widget_set_size_request (body_label,
-                                             summary_width,
-                                             -1);
-                have_body = TRUE;
-        }
-
-        /* actions */
-        actions = nd_notification_get_actions (n);
-        for (i = 0; actions[i] != NULL; i += 2) {
-                char *l = actions[i + 1];
-
-                if (l == NULL) {
-                        g_warning ("Label not found for action %s. "
-                                   "The protocol specifies that a label must "
-                                   "follow an action in the actions array",
-                                   actions[i]);
-
-                        break;
-                }
-
-                if (strcasecmp (actions[i], "default") != 0) {
-                        GtkWidget *button;
-
-                        button = create_notification_action (queue,
-                                                             n,
-                                                             l,
-                                                             actions[i]);
-                        gtk_box_pack_start (GTK_BOX (actions_box), button, FALSE, FALSE, 0);
-
-                        have_actions = TRUE;
-                }
-        }
-
-        if (have_icon || have_body || have_actions) {
-                gtk_widget_show (content_hbox);
-        } else {
-                gtk_widget_hide (content_hbox);
-        }
-
-        return event_box;
-}
-
-static void
 update_dock (NdQueue *queue)
 {
         GtkWidget   *child;
@@ -974,13 +688,13 @@ update_dock (NdQueue *queue)
         list = g_list_sort (list, (GCompareFunc)collate_notifications);
 
         for (l = list; l != NULL; l = l->next) {
-                NdNotification *n = l->data;
-                GtkWidget      *hbox;
-                GtkWidget      *sep;
+                NdNotification    *n = l->data;
+                NdNotificationBox *box;
+                GtkWidget         *sep;
 
-                hbox = create_notification_box (queue, n);
-                gtk_widget_show (hbox);
-                gtk_box_pack_start (GTK_BOX (child), hbox, FALSE, FALSE, 0);
+                box = nd_notification_box_new_for_notification (n);
+                gtk_widget_show (GTK_WIDGET (box));
+                gtk_box_pack_start (GTK_BOX (child), GTK_WIDGET (box), FALSE, FALSE, 0);
 
                 sep = gtk_hseparator_new ();
                 gtk_widget_show (sep);
