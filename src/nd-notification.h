@@ -74,6 +74,7 @@ GdkPixbuf *           nd_notification_load_image          (NdNotification *notif
                                                            int             size);
 gboolean              nd_notification_get_is_resident     (NdNotification *notification);
 gboolean              nd_notification_get_is_transient    (NdNotification *notification);
+gboolean              nd_notification_get_action_icons    (NdNotification *notification);
 
 void                  nd_notification_close               (NdNotification *notification,
                                                            NdNotificationClosedReason reason);

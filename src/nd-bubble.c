@@ -835,7 +835,6 @@ add_notification_action (NdBubble       *bubble,
                          const char     *text,
                          const char     *key)
 {
-        GtkWidget *label;
         GtkWidget *button;
         GtkWidget *hbox;
         GdkPixbuf *pixbuf;
@@ -868,37 +867,44 @@ add_notification_action (NdBubble       *bubble,
         gtk_widget_show (hbox);
         gtk_container_add (GTK_CONTAINER (button), hbox);
 
-        /* Try to be smart and find a suitable icon. */
-        buf = g_strdup_printf ("stock_%s", key);
-        pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_for_screen (gtk_widget_get_screen (GTK_WIDGET (bubble))),
-                                           buf,
-                                           16,
-                                           GTK_ICON_LOOKUP_USE_BUILTIN,
-                                           NULL);
-        g_free(buf);
+        pixbuf = NULL;
+        /* try to load an icon if requested */
+        if (nd_notification_get_action_icons (bubble->priv->notification)) {
+                pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_for_screen (gtk_widget_get_screen (GTK_WIDGET (bubble))),
+                                                   key,
+                                                   20,
+                                                   GTK_ICON_LOOKUP_USE_BUILTIN,
+                                                   NULL);
+        }
 
         if (pixbuf != NULL) {
-                GtkWidget *image = gtk_image_new_from_pixbuf (pixbuf);
+                GtkWidget *image;
+
+                image = gtk_image_new_from_pixbuf (pixbuf);
                 g_signal_connect (G_OBJECT (image),
                                   "style-set",
                                   G_CALLBACK (on_style_set),
                                   bubble);
+                atk_object_set_name (gtk_widget_get_accessible (GTK_WIDGET (button)),
+                                     text);
                 gtk_widget_show (image);
                 gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
                 gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0.5);
-        }
+        } else {
+                GtkWidget *label;
 
-        label = gtk_label_new (NULL);
-        g_signal_connect (G_OBJECT (label),
-                          "style-set",
-                          G_CALLBACK (on_style_set),
-                          bubble);
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-        gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-        buf = g_strdup_printf ("<small>%s</small>", text);
-        gtk_label_set_markup (GTK_LABEL (label), buf);
-        g_free (buf);
+                label = gtk_label_new (NULL);
+                g_signal_connect (G_OBJECT (label),
+                                  "style-set",
+                                  G_CALLBACK (on_style_set),
+                                  bubble);
+                gtk_widget_show (label);
+                gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+                gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+                buf = g_strdup_printf ("<small>%s</small>", text);
+                gtk_label_set_markup (GTK_LABEL (label), buf);
+                g_free (buf);
+        }
 
         g_object_set_data_full (G_OBJECT (button),
                                 "_action_key", g_strdup (key), g_free);

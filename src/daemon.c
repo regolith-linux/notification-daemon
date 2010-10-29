@@ -317,6 +317,7 @@ handle_get_capabilities (NotifyDaemon          *daemon,
         g_variant_builder_add (builder, "s", "icon-static");
         g_variant_builder_add (builder, "s", "sound");
         g_variant_builder_add (builder, "s", "persistence");
+        g_variant_builder_add (builder, "s", "action-icons");
 
         g_dbus_method_invocation_return_value (invocation,
                                                g_variant_new ("(as)", builder));
