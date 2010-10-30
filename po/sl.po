@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-10-16 19:14+0000\n"
-"PO-Revision-Date: 2010-10-16 21:42+0100\n"
-"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
+"POT-Creation-Date: 2010-10-29 23:04+0000\n"
+"PO-Revision-Date: 2010-10-30 08:14+0100\n"
+"Last-Translator: Andrej Žnidaršič <andrej.znidarsic@gmail.com>\n"
 "Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -53,21 +53,19 @@ msgstr "Tema za prikaz obvestil."
 msgid "Turns on and off sound support for notifications."
 msgstr "Vklopi in izklopi zvočno podporo obvestil."
 
-#: ../src/daemon.c:239
-#, c-format
+#: ../src/daemon.c:229
 msgid "Exceeded maximum number of notifications"
 msgstr "Največje število obvestil je preseženo"
 
-#: ../src/daemon.c:296
-#, c-format
-msgid "%u is not a valid notification ID"
-msgstr "%u ni veljaven ID obvestila"
+#: ../src/daemon.c:292
+msgid "Invalid notification identifier"
+msgstr "Določilo obvestilnika je neveljavo "
 
-#: ../src/nd-queue.c:472
+#: ../src/nd-queue.c:471
 msgid "Clear all notifications"
 msgstr "Počisti vsa opravila"
 
-#: ../src/nd-queue.c:1152
+#: ../src/nd-queue.c:874
 msgid "Notifications"
 msgstr "Obvestila"
 
