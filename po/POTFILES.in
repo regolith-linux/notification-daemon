@@ -1,4 +1,3 @@
-data/notification-daemon.schemas.in
 src/daemon.c
 src/nd-queue.c
 src/sound.c
