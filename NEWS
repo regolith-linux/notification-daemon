@@ -1,3 +1,11 @@
+NEW in 0.6.0:
+==============
+- Drop setup capplet
+- Drop themes
+- Add a 'dock' for bubbles
+- Add 'persistence' and 'action-icons' capabilities
+- Support transient and resident notifications
+- Port to GDBus
 
 NEW in 0.5.0:
 ==============
