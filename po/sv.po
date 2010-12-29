@@ -1,104 +1,84 @@
 # Swedish translation for notification-daemon.
 # Copyright (C) 2006-2010 Free Software Foundation
-# This file is distributed under the same license as the galago package.
+# This file is distributed under the same license as the notification-daemon package.
 # Daniel Nylander <po@danielnylander.se>, 2006, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-02 19:06+0100\n"
-"PO-Revision-Date: 2010-03-02 19:08+0100\n"
+"POT-Creation-Date: 2010-12-29 15:04+0100\n"
+"PO-Revision-Date: 2010-12-29 18:47+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Aktuellt tema"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Standardljud"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid "Default popup location on the workspace for stack notifications. Allowed values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr "Standardposition för popup-rutor på arbetsutan för notifieringar. Tillåtna värden: \"top_left\",\"top_right\",\"bottom_left\" och \"bottom_right\""
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Popup-position"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Ljud aktiverat"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid "The default sound file used unless a notification supplies the 'sound-file' or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr "Standardljudfilen som används såvida inte en notifiering anger \"sound-file\" eller \"suppress-sound\". Lämna tom för inget standardljud."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "Temat som används för visning av notifieringar."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Slår på och av ljudstöd för notifieringar."
-
-#: ../src/capplet/notification-properties.c:293
-msgid "Slider"
-msgstr "Draglist"
-
-#: ../src/capplet/notification-properties.c:295
-msgid "Standard theme"
-msgstr "Standardtema"
-
-#: ../src/capplet/notification-properties.c:391
-msgid "Error initializing libnotify"
-msgstr "Fel vid initiering av libnotify"
-
-#: ../src/capplet/notification-properties.c:403
-msgid "Notification Test"
-msgstr "Notifieringstest"
-
-#: ../src/capplet/notification-properties.c:404
-msgid "Just a test"
-msgstr "Bara ett test"
-
-#: ../src/capplet/notification-properties.c:411
-#, c-format
-msgid "Error while displaying notification: %s"
-msgstr "Fel vid visning av notifiering: %s"
-
-#: ../src/capplet/notification-properties.c:472
-#, c-format
-msgid "Could not load user interface file: %s"
-msgstr "Kunde inte läsa in användargränssnittsfil: %s"
-
-#: ../src/capplet/notification-properties.desktop.in.h:1
-msgid "Pop-Up Notifications"
-msgstr "Popup-notifieringar"
-
-#: ../src/capplet/notification-properties.desktop.in.h:2
-msgid "Set your pop-up notification preferences"
-msgstr "Konfigurera dina inställningar för popupnotifieringar"
-
-#: ../src/daemon/daemon.c:1237
-#, c-format
+#: ../src/daemon.c:229
 msgid "Exceeded maximum number of notifications"
 msgstr "Översteg maximalt antal notifieringar"
 
-#: ../src/daemon/daemon.c:1468
-#, c-format
-msgid "%u is not a valid notification ID"
-msgstr "%u är inte ett giltigt notifierings-id"
+#: ../src/daemon.c:292
+msgid "Invalid notification identifier"
+msgstr "Ogiltig notifieringsidentifierare"
 
-#: ../src/daemon/sound.c:36
+#: ../src/nd-queue.c:471
+msgid "Clear all notifications"
+msgstr "Töm alla notifieringar"
+
+#: ../src/nd-queue.c:874
+msgid "Notifications"
+msgstr "Notifieringar"
+
+#: ../src/sound.c:35
 msgid "Notification"
 msgstr "Notifiering"
 
+#~ msgid "Current theme"
+#~ msgstr "Aktuellt tema"
+#~ msgid "Default Sound"
+#~ msgstr "Standardljud"
+#~ msgid ""
+#~ "Default popup location on the workspace for stack notifications. Allowed "
+#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+#~ msgstr ""
+#~ "Standardposition för popup-rutor på arbetsutan för notifieringar. "
+#~ "Tillåtna värden: \"top_left\",\"top_right\",\"bottom_left\" och "
+#~ "\"bottom_right\""
+#~ msgid "Popup location"
+#~ msgstr "Popup-position"
+#~ msgid "Sound Enabled"
+#~ msgstr "Ljud aktiverat"
+#~ msgid ""
+#~ "The default sound file used unless a notification supplies the 'sound-"
+#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ msgstr ""
+#~ "Standardljudfilen som används såvida inte en notifiering anger \"sound-"
+#~ "file\" eller \"suppress-sound\". Lämna tom för inget standardljud."
+#~ msgid "The theme used when displaying notifications."
+#~ msgstr "Temat som används för visning av notifieringar."
+#~ msgid "Turns on and off sound support for notifications."
+#~ msgstr "Slår på och av ljudstöd för notifieringar."
+#~ msgid "Slider"
+#~ msgstr "Draglist"
+#~ msgid "Standard theme"
+#~ msgstr "Standardtema"
+#~ msgid "Error initializing libnotify"
+#~ msgstr "Fel vid initiering av libnotify"
+#~ msgid "Notification Test"
+#~ msgstr "Notifieringstest"
+#~ msgid "Just a test"
+#~ msgstr "Bara ett test"
+#~ msgid "Error while displaying notification: %s"
+#~ msgstr "Fel vid visning av notifiering: %s"
+#~ msgid "Could not load user interface file: %s"
+#~ msgstr "Kunde inte läsa in användargränssnittsfil: %s"
+#~ msgid "Pop-Up Notifications"
+#~ msgstr "Popup-notifieringar"
+#~ msgid "Set your pop-up notification preferences"
+#~ msgstr "Konfigurera dina inställningar för popupnotifieringar"
 #~ msgid "Top Left"
 #~ msgstr "Övre vänster"
 #~ msgid "Top Right"
