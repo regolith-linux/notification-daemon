@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-04-25 08:37+0000\n"
-"PO-Revision-Date: 2010-05-12 11:14+0800\n"
+"POT-Creation-Date: 2011-01-03 22:17+0000\n"
+"PO-Revision-Date: 2010-12-30 16:46+0800\n"
 "Last-Translator: 微尘 <squeeze@189.cn>\n"
 "Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -56,94 +56,79 @@ msgstr "显示通知时使用的主题。"
 msgid "Turns on and off sound support for notifications."
 msgstr "为通知打开和关闭声音支持"
 
-#: ../src/capplet/notification-properties.c:293
-msgid "Slider"
-msgstr "滑块"
-
-#: ../src/capplet/notification-properties.c:295
-msgid "Standard theme"
-msgstr "标准主题"
-
-#: ../src/capplet/notification-properties.c:391
-msgid "Error initializing libnotify"
-msgstr "初始化 libnotify 出错"
-
-#: ../src/capplet/notification-properties.c:403
-msgid "Notification Test"
-msgstr "通知测试"
-
-#: ../src/capplet/notification-properties.c:404
-msgid "Just a test"
-msgstr "仅仅一个测试"
-
-#: ../src/capplet/notification-properties.c:411
-#, c-format
-msgid "Error while displaying notification: %s"
-msgstr "显示通知时出错：%s"
-
-#: ../src/capplet/notification-properties.c:472
-#, c-format
-msgid "Could not load user interface file: %s"
-msgstr "无法加载用户界面文件：%s"
-
-#: ../src/capplet/notification-properties.desktop.in.h:1
-msgid "Pop-Up Notifications"
-msgstr "弹出通知"
-
-#: ../src/capplet/notification-properties.desktop.in.h:2
-msgid "Set your pop-up notification preferences"
-msgstr "设置您的弹出通知首选项"
-
-#: ../src/capplet/notification-properties.ui.h:1
-msgid "      "
-msgstr "      "
-
-#: ../src/capplet/notification-properties.ui.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>常规选项</b>"
-
-#: ../src/capplet/notification-properties.ui.h:3
-msgid "Bottom Left"
-msgstr "左下角"
-
-#: ../src/capplet/notification-properties.ui.h:4
-msgid "Bottom Right"
-msgstr "右下角"
-
-#: ../src/capplet/notification-properties.ui.h:5
-msgid "Notification Settings"
-msgstr "通知设定"
-
-#: ../src/capplet/notification-properties.ui.h:6
-msgid "P_osition:"
-msgstr "位置(_O)："
-
-#: ../src/capplet/notification-properties.ui.h:7
-msgid "Top Left"
-msgstr "左上角"
-
-#: ../src/capplet/notification-properties.ui.h:8
-msgid "Top Right"
-msgstr "右上角"
-
-#: ../src/capplet/notification-properties.ui.h:9
-msgid "_Preview"
-msgstr "预览(_P)"
-
-#: ../src/capplet/notification-properties.ui.h:10
-msgid "_Theme:"
-msgstr "主题(_T)："
-
-#: ../src/daemon/daemon.c:1237
-#, c-format
+#: ../src/daemon.c:229
 msgid "Exceeded maximum number of notifications"
 msgstr "超过了通知的最大数目"
 
-#: ../src/daemon/daemon.c:1468
-#, c-format
-msgid "%u is not a valid notification ID"
-msgstr "%u 不是有效的通知 ID"
+#: ../src/daemon.c:292
+msgid "Invalid notification identifier"
+msgstr "无效的通知标示符"
 
-#: ../src/daemon/sound.c:36
+#: ../src/nd-queue.c:471
+msgid "Clear all notifications"
+msgstr "清除所有通知"
+
+#: ../src/nd-queue.c:874
+msgid "Notifications"
+msgstr "通知"
+
+#: ../src/sound.c:35
 msgid "Notification"
 msgstr "通知"
+
+#~ msgid "Slider"
+#~ msgstr "滑块"
+
+#~ msgid "Standard theme"
+#~ msgstr "标准主题"
+
+#~ msgid "Error initializing libnotify"
+#~ msgstr "初始化 libnotify 出错"
+
+#~ msgid "Notification Test"
+#~ msgstr "通知测试"
+
+#~ msgid "Just a test"
+#~ msgstr "仅仅一个测试"
+
+#~ msgid "Error while displaying notification: %s"
+#~ msgstr "显示通知时出错：%s"
+
+#~ msgid "Could not load user interface file: %s"
+#~ msgstr "无法加载用户界面文件：%s"
+
+#~ msgid "Pop-Up Notifications"
+#~ msgstr "弹出通知"
+
+#~ msgid "Set your pop-up notification preferences"
+#~ msgstr "设置您的弹出通知首选项"
+
+#~ msgid "      "
+#~ msgstr "      "
+
+#~ msgid "<b>General Options</b>"
+#~ msgstr "<b>常规选项</b>"
+
+#~ msgid "Bottom Left"
+#~ msgstr "左下角"
+
+#~ msgid "Bottom Right"
+#~ msgstr "右下角"
+
+#~ msgid "Notification Settings"
+#~ msgstr "通知设定"
+
+#~ msgid "P_osition:"
+#~ msgstr "位置(_O)："
+
+#~ msgid "Top Left"
+#~ msgstr "左上角"
+
+#~ msgid "Top Right"
+#~ msgstr "右上角"
+
+#~ msgid "_Preview"
+#~ msgstr "预览(_P)"
+
+#~ msgid "_Theme:"
+#~ msgstr "主题(_T)："
