@@ -489,9 +489,11 @@ nd_notification_load_image (NdNotification *notification,
 
         pixbuf = NULL;
 
-        if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "image_data"))) {
+        if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "image-data"))
+            || (data = (GVariant *) g_hash_table_lookup (notification->hints, "image_data"))) {
                 pixbuf = _notify_daemon_pixbuf_from_data_hint (data, size);
-        } else if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "image_path"))) {
+        } else if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "image-path"))
+                   || (data = (GVariant *) g_hash_table_lookup (notification->hints, "image_path"))) {
                 if (g_variant_is_of_type (data, G_VARIANT_TYPE ("(s)"))) {
                         const char *path;
                         path = g_variant_get_string (data, NULL);
