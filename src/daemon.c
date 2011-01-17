@@ -50,6 +50,8 @@
 #define NOTIFICATION_BUS_NAME      "org.freedesktop.Notifications"
 #define NOTIFICATION_BUS_PATH      "/org/freedesktop/Notifications"
 
+#define NOTIFICATION_SPEC_VERSION  "1.2"
+
 #define NW_GET_DAEMON(nw) \
         (g_object_get_data(G_OBJECT(nw), "_notify_daemon"))
 
@@ -335,7 +337,7 @@ handle_get_server_information (NotifyDaemon          *daemon,
                                                               "Notification Daemon",
                                                               "GNOME",
                                                               PACKAGE_VERSION,
-                                                              "1.2"));
+                                                              NOTIFICATION_SPEC_VERSION));
 }
 
 static void
