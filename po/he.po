@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-29 08:00+0200\n"
-"PO-Revision-Date: 2010-09-29 08:38+0200\n"
+"POT-Creation-Date: 2011-01-18 13:26+0200\n"
+"PO-Revision-Date: 2011-01-18 13:27+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew\n"
 "MIME-Version: 1.0\n"
@@ -59,94 +59,79 @@ msgstr "The theme used when displaying notifications."
 msgid "Turns on and off sound support for notifications."
 msgstr "Turns on and off sound support for notifications."
 
-#: ../src/capplet/notification-properties.c:293
-msgid "Slider"
-msgstr "פס גלילה"
-
-#: ../src/capplet/notification-properties.c:295
-msgid "Standard theme"
-msgstr "ערכת הנושא כבררת המחדל"
-
-#: ../src/capplet/notification-properties.c:391
-msgid "Error initializing libnotify"
-msgstr "שגיאה בהפעלת libnotify"
-
-#: ../src/capplet/notification-properties.c:403
-msgid "Notification Test"
-msgstr "בדיקת ההתרעות"
-
-#: ../src/capplet/notification-properties.c:404
-msgid "Just a test"
-msgstr "סתם בדיקה"
-
-#: ../src/capplet/notification-properties.c:411
-#, c-format
-msgid "Error while displaying notification: %s"
-msgstr "אירעה שגיאה בעת הצגת התרעה: %s"
-
-#: ../src/capplet/notification-properties.c:472
-#, c-format
-msgid "Could not load user interface file: %s"
-msgstr "לא ניתן לטעון את מנשק המשתמש:%s"
-
-#: ../src/capplet/notification-properties.desktop.in.h:1
-msgid "Pop-Up Notifications"
-msgstr "התרעות קופצות"
-
-#: ../src/capplet/notification-properties.desktop.in.h:2
-msgid "Set your pop-up notification preferences"
-msgstr "הגדרת העדפות ההתרעות הקופצות שלך"
-
-#: ../src/capplet/notification-properties.ui.h:1
-msgid "      "
-msgstr "      "
-
-#: ../src/capplet/notification-properties.ui.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>אפשרויות כלליות</b>"
-
-#: ../src/capplet/notification-properties.ui.h:3
-msgid "Bottom Left"
-msgstr "למטה משמאל"
-
-#: ../src/capplet/notification-properties.ui.h:4
-msgid "Bottom Right"
-msgstr "למטה מימין"
-
-#: ../src/capplet/notification-properties.ui.h:5
-msgid "Notification Settings"
-msgstr "הגדרות התרעה"
-
-#: ../src/capplet/notification-properties.ui.h:6
-msgid "P_osition:"
-msgstr "מי_קום:"
-
-#: ../src/capplet/notification-properties.ui.h:7
-msgid "Top Left"
-msgstr "משמאל למעלה"
-
-#: ../src/capplet/notification-properties.ui.h:8
-msgid "Top Right"
-msgstr "מימין למעלה"
-
-#: ../src/capplet/notification-properties.ui.h:9
-msgid "_Preview"
-msgstr "_תצוגה מקדימה"
-
-#: ../src/capplet/notification-properties.ui.h:10
-msgid "_Theme:"
-msgstr "ע_רכת נושא:"
-
-#: ../src/daemon/daemon.c:1448
-#, c-format
+#: ../src/daemon.c:231
 msgid "Exceeded maximum number of notifications"
 msgstr "מספר ההתרעות המרבי נחרג"
 
-#: ../src/daemon/daemon.c:1692
-#, c-format
-msgid "%u is not a valid notification ID"
-msgstr "%u אינו מזהה התרעה תקני"
+#: ../src/daemon.c:294
+msgid "Invalid notification identifier"
+msgstr "מזהה ההתרעה אינו תקני"
 
-#: ../src/daemon/sound.c:35
+#: ../src/nd-queue.c:471
+msgid "Clear all notifications"
+msgstr "ניקוי כל ההתרעות"
+
+#: ../src/nd-queue.c:874
+msgid "Notifications"
+msgstr "התרעות"
+
+#: ../src/sound.c:35
 msgid "Notification"
 msgstr "התרעה"
+
+#~ msgid "Slider"
+#~ msgstr "פס גלילה"
+
+#~ msgid "Standard theme"
+#~ msgstr "ערכת הנושא כבררת המחדל"
+
+#~ msgid "Error initializing libnotify"
+#~ msgstr "שגיאה בהפעלת libnotify"
+
+#~ msgid "Notification Test"
+#~ msgstr "בדיקת ההתרעות"
+
+#~ msgid "Just a test"
+#~ msgstr "סתם בדיקה"
+
+#~ msgid "Error while displaying notification: %s"
+#~ msgstr "אירעה שגיאה בעת הצגת התרעה: %s"
+
+#~ msgid "Could not load user interface file: %s"
+#~ msgstr "לא ניתן לטעון את מנשק המשתמש:%s"
+
+#~ msgid "Pop-Up Notifications"
+#~ msgstr "התרעות קופצות"
+
+#~ msgid "Set your pop-up notification preferences"
+#~ msgstr "הגדרת העדפות ההתרעות הקופצות שלך"
+
+#~ msgid "      "
+#~ msgstr "      "
+
+#~ msgid "<b>General Options</b>"
+#~ msgstr "<b>אפשרויות כלליות</b>"
+
+#~ msgid "Bottom Left"
+#~ msgstr "למטה משמאל"
+
+#~ msgid "Bottom Right"
+#~ msgstr "למטה מימין"
+
+#~ msgid "Notification Settings"
+#~ msgstr "הגדרות התרעה"
+
+#~ msgid "P_osition:"
+#~ msgstr "מי_קום:"
+
+#~ msgid "Top Left"
+#~ msgstr "משמאל למעלה"
+
+#~ msgid "Top Right"
+#~ msgstr "מימין למעלה"
+
+#~ msgid "_Preview"
+#~ msgstr "_תצוגה מקדימה"
+
+#~ msgid "_Theme:"
+#~ msgstr "ע_רכת נושא:"
