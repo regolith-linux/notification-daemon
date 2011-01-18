@@ -1,15 +1,15 @@
 # Italian translation for notification-daemon package.
-# Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 # This file is distributed under the same license as the notification-daemon package.
-# Luca Ferretti <elle.uca@libero.it>, 2007, 2008, 2009
+# Luca Ferretti <elle.uca@libero.it>, 2007, 2008, 2009, 2010, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-08 13:48+0100\n"
-"PO-Revision-Date: 2010-01-08 13:50+0100\n"
-"Last-Translator: Luca Ferretti <elle.uca@libero.it>\n"
+"POT-Creation-Date: 2011-01-18 01:17+0100\n"
+"PO-Revision-Date: 2011-01-18 01:19+0100\n"
+"Last-Translator: Luca Ferretti <lferrett@gnome.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -57,85 +57,22 @@ msgstr "Il tema usato nel mostrare le notifiche."
 msgid "Turns on and off sound support for notifications."
 msgstr "Attiva e disattiva il supporto audio alle notifiche."
 
-#: ../src/capplet/notification-properties.c:79
-msgid "Top Left"
-msgstr "Alto - sinistra"
+#: ../src/daemon.c:231
+msgid "Exceeded maximum number of notifications"
+msgstr "Superato il numero massimo di notifiche"
 
-#: ../src/capplet/notification-properties.c:80
-msgid "Top Right"
-msgstr "Alto - destra"
+#: ../src/daemon.c:294
+msgid "Invalid notification identifier"
+msgstr "Identificatore notifica non valido"
 
-#: ../src/capplet/notification-properties.c:81
-msgid "Bottom Left"
-msgstr "Basso - sinistra"
+#: ../src/nd-queue.c:471
+msgid "Clear all notifications"
+msgstr "Cancella tutte notifiche"
 
-#: ../src/capplet/notification-properties.c:82
-msgid "Bottom Right"
-msgstr "Basso - destra"
+#: ../src/nd-queue.c:874
+msgid "Notifications"
+msgstr "Notifiche"
 
-#: ../src/capplet/notification-properties.c:327
-msgid "Ubuntu theme"
-msgstr "Tema di Ubuntu"
-
-#: ../src/capplet/notification-properties.c:329
-msgid "Standard theme"
-msgstr "Tema predefinito"
-
-#: ../src/capplet/notification-properties.c:422
-msgid "Error initializing libnotify"
-msgstr "Errore nell'inizializzare libnotify"
-
-#: ../src/capplet/notification-properties.c:435
-msgid "Notification Test"
-msgstr "Controllo notifica"
-
-#: ../src/capplet/notification-properties.c:436
-msgid "Just a test"
-msgstr "Solo un controllo"
-
-#: ../src/capplet/notification-properties.c:443
-#, c-format
-msgid "Error while displaying notification: %s"
-msgstr "Errore durante la visualizzazione della notifica: %s"
-
-#: ../src/capplet/notification-properties.c:500
-#, c-format
-msgid "Unable to locate glade file '%s'"
-msgstr "Impossibile localizzare il file glade «%s»"
-
-#: ../src/capplet/notification-properties.desktop.in.h:1
-msgid "Pop-Up Notifications"
-msgstr "Notifiche a comparsa"
-
-#: ../src/capplet/notification-properties.desktop.in.h:2
-msgid "Set your pop-up notification preferences"
-msgstr "Imposta le preferenze delle notifiche a comparsa (o popup)"
-
-#: ../src/capplet/notification-properties.glade.h:1
-msgid "      "
-msgstr "      "
-
-#: ../src/capplet/notification-properties.glade.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>Opzioni generali</b>"
-
-#: ../src/capplet/notification-properties.glade.h:3
-msgid "Notification Settings"
-msgstr "Impostazioni di notifiche"
-
-#: ../src/capplet/notification-properties.glade.h:4
-msgid "P_osition:"
-msgstr "P_osizione:"
-
-#: ../src/capplet/notification-properties.glade.h:5
-msgid "_Preview"
-msgstr "Ante_prima"
-
-#: ../src/capplet/notification-properties.glade.h:6
-msgid "_Theme:"
-msgstr "_Tema:"
-
-#: ../src/daemon/daemon.c:1372
-#, c-format
-msgid "%u is not a valid notification ID"
-msgstr "%u non è un ID di notifica valido"
+#: ../src/sound.c:35
+msgid "Notification"
+msgstr "Notifica"
