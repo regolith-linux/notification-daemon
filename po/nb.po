@@ -1,14 +1,14 @@
 # Norwegian bokmål translation of notification-daemon.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Kjartan Maraas <kmaraas@gnome.org>, 2010.
+# Kjartan Maraas <kmaraas@gnome.org>, 2010-2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-16 21:05+0200\n"
-"PO-Revision-Date: 2010-10-16 21:07+0200\n"
+"POT-Creation-Date: 2011-01-20 19:13+0100\n"
+"PO-Revision-Date: 2011-01-20 19:15+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norsk bokmal <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
@@ -28,11 +28,11 @@ msgstr "Forvalgt lyd"
 msgid ""
 "Default popup location on the workspace for stack notifications. Allowed "
 "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
+msgstr "Forvalgt plassering av oppsprettmeny på arbeidsområdet for varsling. Tillatte verdier: «top_left», «top_right», «bottom_left» og «bottom_right»"
 
 #: ../data/notification-daemon.schemas.in.h:4
 msgid "Popup location"
-msgstr ""
+msgstr "Plassering av oppsprettmeny"
 
 #: ../data/notification-daemon.schemas.in.h:5
 msgid "Sound Enabled"
@@ -42,7 +42,7 @@ msgstr "Lyd aktivert"
 msgid ""
 "The default sound file used unless a notification supplies the 'sound-file' "
 "or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr ""
+msgstr "Forvalgt lydfil som brukes med mindre varselet angir hintene «sound-file» eller «supress-sound». La den være tom hvis du ikke vil sette forvalgt lyd."
 
 #: ../data/notification-daemon.schemas.in.h:7
 msgid "The theme used when displaying notifications."
@@ -52,21 +52,19 @@ msgstr "Tema som brukes ved visning av varslinger."
 msgid "Turns on and off sound support for notifications."
 msgstr "Slår av og på støtte for lyd ved varsling."
 
-#: ../src/daemon.c:239
-#, c-format
+#: ../src/daemon.c:231
 msgid "Exceeded maximum number of notifications"
 msgstr "Oversteget maksimalt antall varslinger"
 
-#: ../src/daemon.c:296
-#, c-format
-msgid "%u is not a valid notification ID"
-msgstr "%u er ikke en gyldig varsel-ID"
+#: ../src/daemon.c:294
+msgid "Invalid notification identifier"
+msgstr "Uyldig identifikator for varsel"
 
-#: ../src/nd-queue.c:472
+#: ../src/nd-queue.c:471
 msgid "Clear all notifications"
 msgstr "Tøm alle varsler"
 
-#: ../src/nd-queue.c:1152
+#: ../src/nd-queue.c:874
 msgid "Notifications"
 msgstr "Varsler"
 
