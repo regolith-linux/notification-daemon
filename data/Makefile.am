@@ -1,7 +1,9 @@
-servicedir   = $(DBUS_SERVICES_DIR)
-service_DATA = org.freedesktop.Notifications.service
+@INTLTOOL_DESKTOP_RULE@
+desktopdir= $(datadir)/applications
+desktop_in_files = notification-daemon.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
 EXTRA_DIST = \
-	$(service_DATA)
+	$(desktop_in_files)
 
 -include $(top_srcdir)/git.mk
