@@ -58,7 +58,6 @@
 struct _NotifyDaemonPrivate
 {
         GDBusConnection *connection;
-        guint            exit_timeout_source;
         NdQueue         *queue;
 };
 
@@ -76,44 +75,6 @@ notify_daemon_class_init (NotifyDaemonClass *daemon_class)
         g_type_class_add_private (daemon_class, sizeof (NotifyDaemonPrivate));
 }
 
-static gboolean
-do_exit (gpointer user_data)
-{
-        g_debug ("Exiting due to inactivity");
-        exit (1);
-        return FALSE;
-}
-
-static void
-add_exit_timeout (NotifyDaemon *daemon)
-{
-        if (daemon->priv->exit_timeout_source > 0)
-                return;
-
-        daemon->priv->exit_timeout_source = g_timeout_add_seconds (IDLE_SECONDS, do_exit, NULL);
-}
-
-static void
-remove_exit_timeout (NotifyDaemon *daemon)
-{
-        if (daemon->priv->exit_timeout_source == 0)
-                return;
-
-        g_source_remove (daemon->priv->exit_timeout_source);
-        daemon->priv->exit_timeout_source = 0;
-}
-
-static void
-on_queue_changed (NdQueue      *queue,
-                 NotifyDaemon *daemon)
-{
-        if (nd_queue_length (queue) > 0) {
-                remove_exit_timeout (daemon);
-        } else {
-                add_exit_timeout (daemon);
-        }
-}
-
 static void
 notify_daemon_init (NotifyDaemon *daemon)
 {
@@ -122,8 +83,6 @@ notify_daemon_init (NotifyDaemon *daemon)
                                                     NotifyDaemonPrivate);
 
         daemon->priv->queue = nd_queue_new ();
-        add_exit_timeout (daemon);
-        g_signal_connect (daemon->priv->queue, "changed", G_CALLBACK (on_queue_changed), daemon);
 }
 
 static void
@@ -132,8 +91,6 @@ notify_daemon_finalize (GObject *object)
         NotifyDaemon *daemon;
 
         daemon = NOTIFY_DAEMON (object);
-
-        remove_exit_timeout (daemon);
 
         g_object_unref (daemon->priv->queue);
 
