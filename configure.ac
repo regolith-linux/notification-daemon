@@ -171,7 +171,7 @@ AC_SUBST([AM_CXXFLAGS])
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
-data/org.freedesktop.Notifications.service
+data/notification-daemon.desktop.in
 po/Makefile.in
 src/Makefile
 ])

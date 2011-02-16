@@ -1,4 +1,4 @@
-bin_PROGRAMS = notification-daemon
+libexec_PROGRAMS = notification-daemon
 
 notification_daemon_SOURCES = \
 	nd-notification.c \
