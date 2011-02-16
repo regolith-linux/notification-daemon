@@ -7,61 +7,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-18 01:17+0100\n"
-"PO-Revision-Date: 2011-01-18 01:19+0100\n"
+"POT-Creation-Date: 2011-02-16 20:13+0100\n"
+"PO-Revision-Date: 2011-02-16 20:14+0100\n"
 "Last-Translator: Luca Ferretti <lferrett@gnome.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Tema attuale"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Suono predefinito"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
-"Posizione predefinita di comparsa sull'area di lavoro per impilare le "
-"notifiche. Valori ammessi: \"top_left\", \"top_right\", \"bottom_left\" e "
-"\"bottom_right\""
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Posizione popup"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Suono abilitato"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr ""
-"Il file audio predefinito usato, a meno che una notifica non fornisca l'hint "
-"'sound-file' o 'suppress-sound'. Lasciare in bianco per non usare alcun "
-"suono predefinito."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "Il tema usato nel mostrare le notifiche."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Attiva e disattiva il supporto audio alle notifiche."
-
-#: ../src/daemon.c:231
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Superato il numero massimo di notifiche"
 
-#: ../src/daemon.c:294
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Identificatore notifica non valido"
 
@@ -76,3 +35,45 @@ msgstr "Notifiche"
 #: ../src/sound.c:35
 msgid "Notification"
 msgstr "Notifica"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Mostre le notifiche"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Demone notifiche"
+
+#~ msgid "Current theme"
+#~ msgstr "Tema attuale"
+
+#~ msgid "Default Sound"
+#~ msgstr "Suono predefinito"
+
+#~ msgid ""
+#~ "Default popup location on the workspace for stack notifications. Allowed "
+#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+#~ msgstr ""
+#~ "Posizione predefinita di comparsa sull'area di lavoro per impilare le "
+#~ "notifiche. Valori ammessi: \"top_left\", \"top_right\", \"bottom_left\" e "
+#~ "\"bottom_right\""
+
+#~ msgid "Popup location"
+#~ msgstr "Posizione popup"
+
+#~ msgid "Sound Enabled"
+#~ msgstr "Suono abilitato"
+
+#~ msgid ""
+#~ "The default sound file used unless a notification supplies the 'sound-"
+#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ msgstr ""
+#~ "Il file audio predefinito usato, a meno che una notifica non fornisca "
+#~ "l'hint 'sound-file' o 'suppress-sound'. Lasciare in bianco per non usare "
+#~ "alcun suono predefinito."
+
+#~ msgid "The theme used when displaying notifications."
+#~ msgstr "Il tema usato nel mostrare le notifiche."
+
+#~ msgid "Turns on and off sound support for notifications."
+#~ msgstr "Attiva e disattiva il supporto audio alle notifiche."
