@@ -402,7 +402,7 @@ _notify_daemon_pixbuf_from_data_hint (GVariant *icon_data,
 
         if (expected_len != g_variant_get_size (data_variant)) {
                 g_warning ("Expected image data to be of length %" G_GSIZE_FORMAT
-                           " but got a " "length of %u",
+                           " but got a " "length of %" G_GSIZE_FORMAT,
                            expected_len,
                            g_variant_get_size (data_variant));
                 return NULL;
