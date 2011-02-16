@@ -1,3 +1,9 @@
+NEW in 0.7.1:
+==============
+- Don't use DBus activation
+- Don't exit on idle
+- Install a desktop file for notification-daemon
+
 NEW in 0.7.0:
 ==============
 - Support image-data and image-path hints
