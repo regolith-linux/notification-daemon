@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-11 22:29+0100\n"
-"PO-Revision-Date: 2011-02-11 22:31+0100\n"
+"POT-Creation-Date: 2011-02-17 00:16+0100\n"
+"PO-Revision-Date: 2011-02-17 00:16+0100\n"
 "Last-Translator: Wouter Bolsterlee <wbolster@gnome.org>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "Language: nl\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/daemon.c:231
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Maximum aantal notificaties overschreden"
 
-#: ../src/daemon.c:294
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Ongeldig notificatie-id"
 
@@ -35,4 +35,12 @@ msgstr "Notificaties"
 
 #: ../src/sound.c:35
 msgid "Notification"
-msgstr "Notficatie"
+msgstr "Notificatie"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Notificaties tonen"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Notificatie-service"
