@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-16 09:35+0200\n"
-"PO-Revision-Date: 2011-02-16 09:38+0300\n"
+"POT-Creation-Date: 2011-02-17 11:40+0200\n"
+"PO-Revision-Date: 2011-02-17 11:41+0300\n"
 "Last-Translator: Korostil Daniel <ted.korostiled@gmail.com>\n"
 "Language-Team: translation@linux.org.ua\n"
 "Language: uk\n"
@@ -18,11 +18,11 @@ msgstr ""
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Virtaal 0.6.1\n"
 
-#: ../src/daemon.c:231
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Перевищено максимальну кількість сповіщень"
 
-#: ../src/daemon.c:294
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Неправильний ідентифікатор сповіщення"
 
@@ -37,3 +37,11 @@ msgstr "Сповіщення"
 #: ../src/sound.c:35
 msgid "Notification"
 msgstr "Сповіщення"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "показати сповіщення"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Служба сповіщення"
