@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 19:13+0100\n"
-"PO-Revision-Date: 2011-01-20 19:15+0100\n"
+"POT-Creation-Date: 2011-02-17 15:08+0100\n"
+"PO-Revision-Date: 2011-02-17 15:08+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norsk bokmal <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
@@ -16,47 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Aktivt tema"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Forvalgt lyd"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr "Forvalgt plassering av oppsprettmeny på arbeidsområdet for varsling. Tillatte verdier: «top_left», «top_right», «bottom_left» og «bottom_right»"
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Plassering av oppsprettmeny"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Lyd aktivert"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr "Forvalgt lydfil som brukes med mindre varselet angir hintene «sound-file» eller «supress-sound». La den være tom hvis du ikke vil sette forvalgt lyd."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "Tema som brukes ved visning av varslinger."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Slår av og på støtte for lyd ved varsling."
-
-#: ../src/daemon.c:231
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Oversteget maksimalt antall varslinger"
 
-#: ../src/daemon.c:294
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Uyldig identifikator for varsel"
 
@@ -71,3 +35,11 @@ msgstr "Varsler"
 #: ../src/sound.c:35
 msgid "Notification"
 msgstr "Varsling"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Vis varsler"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Varslingstjeneste"
