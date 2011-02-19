@@ -2,15 +2,15 @@
 # Spanish translation for notification-daemon.
 # Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
 # This file is distributed under the same license as the notification-daemon package.
-# Jorge González <jorgegonz@svn.gnome.org>, 2010.
+# Jorge González <jorgegonz@svn.gnome.org>, 2010, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon.po.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-10-28 23:01+0000\n"
-"PO-Revision-Date: 2010-10-29 09:59+0200\n"
+"POT-Creation-Date: 2011-02-16 16:53+0000\n"
+"PO-Revision-Date: 2011-02-19 12:39+0100\n"
 "Last-Translator: Jorge González <jorgegonz@svn.gnome.org>\n"
 "Language-Team: Español <gnome-es-list@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,68 +19,69 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Tema actual"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Sonido predeterminado"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
-"Ubicación predeterminada de la ventana emergente en el área de trabajo para "
-"la pila de notificaciones. Los valores permitidos son: «top_left», "
-"«top_right», «bottom_left» y «bottom_right»"
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Ubicación de la ventana emergente"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Sonido activado"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr ""
-"El archivo de sonido predeterminado que usar a no ser que la notificación "
-"proporcione las opciones «sound-file» o «suppress-sound». Déjelo vacío para "
-"no tener sonido predeterminado."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "El tema usado al mostrar las notificaciones."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Activar y desactivar el soporte de sonido para las notificaciones."
-
-#: ../src/daemon.c:226
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Se excedió el número máximo de notificaciones"
 
-#: ../src/daemon.c:289
-#| msgid "%u is not a valid notification ID"
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Identificador de notificación no válido"
 
-#: ../src/nd-queue.c:472
+#: ../src/nd-queue.c:471
 msgid "Clear all notifications"
 msgstr "Limpiar todas las notificaciones"
 
-#: ../src/nd-queue.c:1152
+#: ../src/nd-queue.c:874
 msgid "Notifications"
 msgstr "Notificaciones"
 
 #: ../src/sound.c:35
 msgid "Notification"
 msgstr "Notificación"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+#| msgid "Clear all notifications"
+msgid "Display notifications"
+msgstr "Mostrar notificaciones"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+#| msgid "Notification Test"
+msgid "Notification Daemon"
+msgstr "Demonio de notificación"
+
+#~ msgid "Current theme"
+#~ msgstr "Tema actual"
+
+#~ msgid "Default Sound"
+#~ msgstr "Sonido predeterminado"
+
+#~ msgid ""
+#~ "Default popup location on the workspace for stack notifications. Allowed "
+#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+#~ msgstr ""
+#~ "Ubicación predeterminada de la ventana emergente en el área de trabajo "
+#~ "para la pila de notificaciones. Los valores permitidos son: «top_left», "
+#~ "«top_right», «bottom_left» y «bottom_right»"
+
+#~ msgid "Popup location"
+#~ msgstr "Ubicación de la ventana emergente"
+
+#~ msgid "Sound Enabled"
+#~ msgstr "Sonido activado"
+
+#~ msgid ""
+#~ "The default sound file used unless a notification supplies the 'sound-"
+#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ msgstr ""
+#~ "El archivo de sonido predeterminado que usar a no ser que la notificación "
+#~ "proporcione las opciones «sound-file» o «suppress-sound». Déjelo vacío "
+#~ "para no tener sonido predeterminado."
+
+#~ msgid "The theme used when displaying notifications."
+#~ msgstr "El tema usado al mostrar las notificaciones."
+
+#~ msgid "Turns on and off sound support for notifications."
+#~ msgstr "Activar y desactivar el soporte de sonido para las notificaciones."
 
 #~ msgid "Slider"
 #~ msgstr "Deslizador"
@@ -90,9 +91,6 @@ msgstr "Notificación"
 
 #~ msgid "Error initializing libnotify"
 #~ msgstr "Error al iniciar libnotify"
-
-#~ msgid "Notification Test"
-#~ msgstr "Prueba de notificación"
 
 #~ msgid "Just a test"
 #~ msgstr "Simplemente una prueba"
