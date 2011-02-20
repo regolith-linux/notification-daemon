@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-10-29 23:04+0000\n"
-"PO-Revision-Date: 2010-10-30 08:14+0100\n"
-"Last-Translator: Andrej Žnidaršič <andrej.znidarsic@gmail.com>\n"
+"POT-Creation-Date: 2011-02-19 11:46+0000\n"
+"PO-Revision-Date: 2011-02-20 14:06+0100\n"
+"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -21,49 +21,17 @@ msgstr ""
 "X-Poedit-Country: SLOVENIA\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Trenutna tema"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Privzeti zvok"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid "Default popup location on the workspace for stack notifications. Allowed values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr "Privzeti položaj pojavnega obvestila na delovni površini za sklad obvestil. Dovoljene vrednosti:  \"top_left\",\"top_right\",\"bottom_left\" in \"bottom_right\""
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Položaj pojavnega obvestila"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Zvok je omogočen"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid "The default sound file used unless a notification supplies the 'sound-file' or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr "Uporabljena je privzeta zvočna datoteka, razen kadar obvestilo zajema tudi 'zvočno-datoteko' ali pa možnost 'prepreči-zvok'. Pustite prazno za onemogočenje privzetega zvoka."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "Tema za prikaz obvestil."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Vklopi in izklopi zvočno podporo obvestil."
-
-#: ../src/daemon.c:229
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Največje število obvestil je preseženo"
 
-#: ../src/daemon.c:292
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
-msgstr "Določilo obvestilnika je neveljavo "
+msgstr "Določilo obvestilnika je neveljavno "
 
 #: ../src/nd-queue.c:471
 msgid "Clear all notifications"
-msgstr "Počisti vsa opravila"
+msgstr "Počisti vsa obvestila"
 
 #: ../src/nd-queue.c:874
 msgid "Notifications"
@@ -73,14 +41,46 @@ msgstr "Obvestila"
 msgid "Notification"
 msgstr "Obvestilo"
 
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Prikaži obvestila"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Ozadnji program za prikazovanje obvestil"
+
+#~ msgid "Current theme"
+#~ msgstr "Trenutna tema"
+#~ msgid "Default Sound"
+#~ msgstr "Privzeti zvok"
+#~ msgid ""
+#~ "Default popup location on the workspace for stack notifications. Allowed "
+#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+#~ msgstr ""
+#~ "Privzeti položaj pojavnega obvestila na delovni površini za sklad "
+#~ "obvestil. Dovoljene vrednosti:  \"top_left\",\"top_right\",\"bottom_left"
+#~ "\" in \"bottom_right\""
+#~ msgid "Popup location"
+#~ msgstr "Položaj pojavnega obvestila"
+#~ msgid "Sound Enabled"
+#~ msgstr "Zvok je omogočen"
+#~ msgid ""
+#~ "The default sound file used unless a notification supplies the 'sound-"
+#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ msgstr ""
+#~ "Uporabljena je privzeta zvočna datoteka, razen kadar obvestilo zajema "
+#~ "tudi 'zvočno-datoteko' ali pa možnost 'prepreči-zvok'. Pustite prazno za "
+#~ "onemogočenje privzetega zvoka."
+#~ msgid "The theme used when displaying notifications."
+#~ msgstr "Tema za prikaz obvestil."
+#~ msgid "Turns on and off sound support for notifications."
+#~ msgstr "Vklopi in izklopi zvočno podporo obvestil."
 #~ msgid "Slider"
 #~ msgstr "Drsnik"
 #~ msgid "Standard theme"
 #~ msgstr "Običajna tema"
 #~ msgid "Error initializing libnotify"
 #~ msgstr "Napaka med zaganjanjem libnotify"
-#~ msgid "Notification Test"
-#~ msgstr "Preizkus obvestila"
 #~ msgid "Just a test"
 #~ msgstr "Samo preizkus"
 #~ msgid "Error while displaying notification: %s"
