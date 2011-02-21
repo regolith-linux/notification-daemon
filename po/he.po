@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-18 13:26+0200\n"
-"PO-Revision-Date: 2011-01-18 13:27+0200\n"
+"POT-Creation-Date: 2011-02-21 17:16+0200\n"
+"PO-Revision-Date: 2011-02-21 17:16+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew\n"
 "MIME-Version: 1.0\n"
@@ -19,51 +19,11 @@ msgstr ""
 "X-Poedit-Country: ISRAEL\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Current theme"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Default Sound"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Popup location"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Sound Enabled"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "The theme used when displaying notifications."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Turns on and off sound support for notifications."
-
-#: ../src/daemon.c:231
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "מספר ההתרעות המרבי נחרג"
 
-#: ../src/daemon.c:294
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "מזהה ההתרעה אינו תקני"
 
@@ -79,6 +39,46 @@ msgstr "התרעות"
 msgid "Notification"
 msgstr "התרעה"
 
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "הצגת התרעות"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "סוכן ההתרעות"
+
+#~ msgid "Current theme"
+#~ msgstr "Current theme"
+
+#~ msgid "Default Sound"
+#~ msgstr "Default Sound"
+
+#~ msgid ""
+#~ "Default popup location on the workspace for stack notifications. Allowed "
+#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+#~ msgstr ""
+#~ "Default popup location on the workspace for stack notifications. Allowed "
+#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+
+#~ msgid "Popup location"
+#~ msgstr "Popup location"
+
+#~ msgid "Sound Enabled"
+#~ msgstr "Sound Enabled"
+
+#~ msgid ""
+#~ "The default sound file used unless a notification supplies the 'sound-"
+#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ msgstr ""
+#~ "The default sound file used unless a notification supplies the 'sound-"
+#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+
+#~ msgid "The theme used when displaying notifications."
+#~ msgstr "The theme used when displaying notifications."
+
+#~ msgid "Turns on and off sound support for notifications."
+#~ msgstr "Turns on and off sound support for notifications."
+
 #~ msgid "Slider"
 #~ msgstr "פס גלילה"
 
@@ -87,9 +87,6 @@ msgstr "התרעה"
 
 #~ msgid "Error initializing libnotify"
 #~ msgstr "שגיאה בהפעלת libnotify"
-
-#~ msgid "Notification Test"
-#~ msgstr "בדיקת ההתרעות"
 
 #~ msgid "Just a test"
 #~ msgstr "סתם בדיקה"
