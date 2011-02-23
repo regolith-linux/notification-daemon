@@ -1,14 +1,14 @@
 # Swedish translation for notification-daemon.
-# Copyright (C) 2006-2010 Free Software Foundation
+# Copyright (C) 2006-2011 Free Software Foundation
 # This file is distributed under the same license as the notification-daemon package.
-# Daniel Nylander <po@danielnylander.se>, 2006, 2010.
+# Daniel Nylander <po@danielnylander.se>, 2006, 2010, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-29 15:04+0100\n"
-"PO-Revision-Date: 2010-12-29 18:47+0100\n"
+"POT-Creation-Date: 2011-02-23 10:11+0100\n"
+"PO-Revision-Date: 2011-02-23 10:12+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/daemon.c:229
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Översteg maximalt antal notifieringar"
 
-#: ../src/daemon.c:292
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Ogiltig notifieringsidentifierare"
 
@@ -35,6 +35,14 @@ msgstr "Notifieringar"
 #: ../src/sound.c:35
 msgid "Notification"
 msgstr "Notifiering"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Visa notifieringar"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Notifieringsdemon"
 
 #~ msgid "Current theme"
 #~ msgstr "Aktuellt tema"
@@ -67,8 +75,6 @@ msgstr "Notifiering"
 #~ msgstr "Standardtema"
 #~ msgid "Error initializing libnotify"
 #~ msgstr "Fel vid initiering av libnotify"
-#~ msgid "Notification Test"
-#~ msgstr "Notifieringstest"
 #~ msgid "Just a test"
 #~ msgstr "Bara ett test"
 #~ msgid "Error while displaying notification: %s"
