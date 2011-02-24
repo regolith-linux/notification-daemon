@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: notification-daemon\n"
+"Project-Id-Version: notification-daemon 0.7.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-17 15:08+0100\n"
-"PO-Revision-Date: 2011-02-17 15:08+0100\n"
+"POT-Creation-Date: 2011-02-24 10:28+0100\n"
+"PO-Revision-Date: 2011-02-24 10:28+0100\n"
 "Last-Translator: Kjartan Maraas <kmaraas@gnome.org>\n"
 "Language-Team: Norsk bokmal <i18n-nb@lister.ping.uio.no>\n"
 "Language: \n"
