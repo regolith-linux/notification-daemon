@@ -1,16 +1,16 @@
 # French translation for notification-daemon.
-# Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
+# Copyright (C) 2010-2011 Listed translators
 # This file is distributed under the same license as the notification-daemon package.
 #
-# Claude Paroz <claude@2xlibre.net>, 2010.
+# Claude Paroz <claude@2xlibre.net>, 2010-2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-12-22 18:24+0000\n"
-"PO-Revision-Date: 2010-12-27 22:25+0100\n"
+"POT-Creation-Date: 2011-02-16 16:53+0000\n"
+"PO-Revision-Date: 2011-02-28 15:20+0100\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../src/daemon.c:229
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Nombre maximum de notifications atteint"
 
-#: ../src/daemon.c:292
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Identifiant de notification non valable"
 
@@ -38,38 +38,10 @@ msgstr "Notifications"
 msgid "Notification"
 msgstr "Notification"
 
-#~ msgid "Current theme"
-#~ msgstr "Thème actuel"
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Afficher les notifications"
 
-#~ msgid "Default Sound"
-#~ msgstr "Son par défaut"
-
-#~ msgid ""
-#~ "Default popup location on the workspace for stack notifications. Allowed "
-#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-#~ msgstr ""
-#~ "Emplacement par défaut des bulles de notification sur l'espace de travail "
-#~ "pour l'empilement des notifications. Les valeurs possibles sont : "
-#~ "« top_left » (en haut à gauche), « top_right » (en haut à droite), "
-#~ "« bottom_left » (en bas à gauche) et « bottom_right » (en bas à droite)."
-
-#~ msgid "Popup location"
-#~ msgstr "Emplacement des bulles de notification"
-
-#~ msgid "Sound Enabled"
-#~ msgstr "Son activé"
-
-#~ msgid ""
-#~ "The default sound file used unless a notification supplies the 'sound-"
-#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
-#~ msgstr ""
-#~ "Le fichier son utilisé par défaut, pour autant que la notification ne "
-#~ "fournisse pas l'indication « sound-file » ou « suppress-sound ». Laisser "
-#~ "vide pour aucun son par défaut."
-
-#~ msgid "The theme used when displaying notifications."
-#~ msgstr "Le thème utilisé pour l'affichage des notifications."
-
-#~ msgid "Turns on and off sound support for notifications."
-#~ msgstr ""
-#~ "Active ou désactive la prise en charge du son pour les notifications."
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Service de notification"
