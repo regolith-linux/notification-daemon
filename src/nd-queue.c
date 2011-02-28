@@ -53,6 +53,7 @@ struct NdQueuePrivate
         GQueue        *queue;
 
         GtkStatusIcon *status_icon;
+        GIcon         *numerable_icon;
         GtkWidget     *dock;
         GtkWidget     *dock_scrolled_window;
 
@@ -536,6 +537,10 @@ nd_queue_finalize (GObject *object)
 
         destroy_screens (queue);
 
+        if (queue->priv->numerable_icon != NULL) {
+                g_object_unref (queue->priv->numerable_icon);
+        }
+
         G_OBJECT_CLASS (nd_queue_parent_class)->finalize (object);
 }
 
@@ -862,14 +867,18 @@ on_status_icon_visible_notify (GtkStatusIcon *icon,
 static gboolean
 update_idle (NdQueue *queue)
 {
+        int num;
+
+        num = g_hash_table_size (queue->priv->notifications);
+
         /* Show the status icon when their are stored notifications */
-        if (g_hash_table_size (queue->priv->notifications) > 0) {
+        if (num > 0) {
                 if (gtk_widget_get_visible (queue->priv->dock)) {
                         update_dock (queue);
                 }
 
                 if (queue->priv->status_icon == NULL) {
-                        queue->priv->status_icon = gtk_status_icon_new_from_icon_name ("mail-message-new");
+                        queue->priv->status_icon = gtk_status_icon_new ();
                         gtk_status_icon_set_title (GTK_STATUS_ICON (queue->priv->status_icon),
                                                    _("Notifications"));
                         g_signal_connect (queue->priv->status_icon,
@@ -885,6 +894,17 @@ update_idle (NdQueue *queue)
                                           G_CALLBACK (on_status_icon_visible_notify),
                                           queue);
                 }
+
+                if (queue->priv->numerable_icon == NULL) {
+                        GIcon *icon;
+                        /* FIXME: use a more appropriate icon here */
+                        icon = g_themed_icon_new ("mail-message-new");
+                        queue->priv->numerable_icon = gtk_numerable_icon_new (icon);
+                        g_object_unref (icon);
+                }
+                gtk_numerable_icon_set_count (GTK_NUMERABLE_ICON (queue->priv->numerable_icon), num);
+                gtk_status_icon_set_from_gicon (queue->priv->status_icon,
+                                                queue->priv->numerable_icon);
                 gtk_status_icon_set_visible (queue->priv->status_icon, TRUE);
 
                 maybe_show_notification (queue);
