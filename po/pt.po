@@ -1,151 +1,131 @@
 # Portuguese translation for notification-daemon.
 # Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
 # This file is distributed under the same license as the notification-daemon package.
-# António Lima <amrlima@gmail.com>, 2010.
+# António Lima <amrlima@gmail.com>, 2010, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-21 16:33+0100\n"
-"PO-Revision-Date: 2010-08-04 21:14+0000\n"
+"POT-Creation-Date: 2011-03-15 23:38+0000\n"
+"PO-Revision-Date: 2011-03-12 21:27+0000\n"
 "Last-Translator: António Lima <amrlima@gmail.com>\n"
 "Language-Team: gnome_pt@yahoogroups.com\n"
+"Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Virtaal 0.6.1\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Tema actual"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Som por Omissão"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
-"Localização de popup no ambiente de trabalho para notificações. Valores "
-"permitidos: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Localização de popup"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Som Activado"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr ""
-"O ficheiro de som por omissão utilizado, a menos que a notificação forneça a "
-"dica 'sound-file' ou 'suppress-sound'. Deixe em branco para nenhum som por "
-"omissão."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "O tema utilizado ao apresentar notificações."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Activa e desactiva suporte a som para notificações."
-
-#: ../src/capplet/notification-properties.c:293
-msgid "Slider"
-msgstr "Barra deslizante"
-
-#: ../src/capplet/notification-properties.c:295
-msgid "Standard theme"
-msgstr "Tema padrão"
-
-#: ../src/capplet/notification-properties.c:391
-msgid "Error initializing libnotify"
-msgstr "Erro ao inicializar libnotify"
-
-#: ../src/capplet/notification-properties.c:403
-msgid "Notification Test"
-msgstr "Teste de Notificação"
-
-#: ../src/capplet/notification-properties.c:404
-msgid "Just a test"
-msgstr "Apenas um teste"
-
-#: ../src/capplet/notification-properties.c:411
-#, c-format
-msgid "Error while displaying notification: %s"
-msgstr "Erro ao apresentar notificação: %s"
-
-#: ../src/capplet/notification-properties.c:472
-#, c-format
-msgid "Could not load user interface file: %s"
-msgstr "Não foi possível carregar ficheiro de interface de utilizador: %s"
-
-#: ../src/capplet/notification-properties.desktop.in.h:1
-msgid "Pop-Up Notifications"
-msgstr "Notificações Pop-up"
-
-#: ../src/capplet/notification-properties.desktop.in.h:2
-msgid "Set your pop-up notification preferences"
-msgstr "Definir suas preferências de notificação pop-up"
-
-#: ../src/capplet/notification-properties.ui.h:1
-msgid "      "
-msgstr "      "
-
-#: ../src/capplet/notification-properties.ui.h:2
-msgid "<b>General Options</b>"
-msgstr "<b>Opções Gerais</b>"
-
-#: ../src/capplet/notification-properties.ui.h:3
-msgid "Bottom Left"
-msgstr "Inferior Esquerdo"
-
-#: ../src/capplet/notification-properties.ui.h:4
-msgid "Bottom Right"
-msgstr "Inferior Direito"
-
-#: ../src/capplet/notification-properties.ui.h:5
-msgid "Notification Settings"
-msgstr "Definições de Notificações"
-
-#: ../src/capplet/notification-properties.ui.h:6
-msgid "P_osition:"
-msgstr "P_osição:"
-
-#: ../src/capplet/notification-properties.ui.h:7
-msgid "Top Left"
-msgstr "Superior esquerdo"
-
-#: ../src/capplet/notification-properties.ui.h:8
-msgid "Top Right"
-msgstr "Superior Direito"
-
-#: ../src/capplet/notification-properties.ui.h:9
-msgid "_Preview"
-msgstr "_Pré-visualizar"
-
-#: ../src/capplet/notification-properties.ui.h:10
-msgid "_Theme:"
-msgstr "_Tema:"
-
-#: ../src/daemon/daemon.c:1448
-#, c-format
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Número máximo de notificações excedido"
 
-#: ../src/daemon/daemon.c:1692
-#, c-format
-msgid "%u is not a valid notification ID"
-msgstr "%u não é uma ID de notificação válida"
+#: ../src/daemon.c:251
+msgid "Invalid notification identifier"
+msgstr "Identificador de notificação inválido"
 
-#: ../src/daemon/sound.c:35
+#: ../src/nd-queue.c:472
+msgid "Clear all notifications"
+msgstr "Limpar todas as notificações"
+
+#: ../src/nd-queue.c:883
+msgid "Notifications"
+msgstr "Notificações"
+
+#: ../src/sound.c:35
 msgid "Notification"
 msgstr "Notificação"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Apresentar notificações"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Daemon de Notificação"
+
+#~ msgid "Current theme"
+#~ msgstr "Tema actual"
+
+#~ msgid "Default Sound"
+#~ msgstr "Som por Omissão"
+
+#~ msgid ""
+#~ "Default popup location on the workspace for stack notifications. Allowed "
+#~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
+#~ msgstr ""
+#~ "Localização de popup no ambiente de trabalho para notificações. Valores "
+#~ "permitidos: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right"
+#~ "\""
+
+#~ msgid "Popup location"
+#~ msgstr "Localização de popup"
+
+#~ msgid "Sound Enabled"
+#~ msgstr "Som Activado"
+
+#~ msgid ""
+#~ "The default sound file used unless a notification supplies the 'sound-"
+#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ msgstr ""
+#~ "O ficheiro de som por omissão utilizado, a menos que a notificação "
+#~ "forneça a dica 'sound-file' ou 'suppress-sound'. Deixe em branco para "
+#~ "nenhum som por omissão."
+
+#~ msgid "The theme used when displaying notifications."
+#~ msgstr "O tema utilizado ao apresentar notificações."
+
+#~ msgid "Turns on and off sound support for notifications."
+#~ msgstr "Activa e desactiva suporte a som para notificações."
+
+#~ msgid "Slider"
+#~ msgstr "Barra deslizante"
+
+#~ msgid "Standard theme"
+#~ msgstr "Tema padrão"
+
+#~ msgid "Error initializing libnotify"
+#~ msgstr "Erro ao inicializar libnotify"
+
+#~ msgid "Just a test"
+#~ msgstr "Apenas um teste"
+
+#~ msgid "Error while displaying notification: %s"
+#~ msgstr "Erro ao apresentar notificação: %s"
+
+#~ msgid "Could not load user interface file: %s"
+#~ msgstr "Não foi possível carregar ficheiro de interface de utilizador: %s"
+
+#~ msgid "Set your pop-up notification preferences"
+#~ msgstr "Definir suas preferências de notificação pop-up"
+
+#~ msgid "      "
+#~ msgstr "      "
+
+#~ msgid "<b>General Options</b>"
+#~ msgstr "<b>Opções Gerais</b>"
+
+#~ msgid "Bottom Left"
+#~ msgstr "Inferior Esquerdo"
+
+#~ msgid "Bottom Right"
+#~ msgstr "Inferior Direito"
+
+#~ msgid "Notification Settings"
+#~ msgstr "Definições de Notificações"
+
+#~ msgid "P_osition:"
+#~ msgstr "P_osição:"
+
+#~ msgid "Top Left"
+#~ msgstr "Superior esquerdo"
+
+#~ msgid "Top Right"
+#~ msgstr "Superior Direito"
+
+#~ msgid "_Preview"
+#~ msgstr "_Pré-visualizar"
+
+#~ msgid "_Theme:"
+#~ msgstr "_Tema:"
