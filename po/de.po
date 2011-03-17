@@ -2,7 +2,7 @@
 # Copyright (C) 2006 Christian Hammond
 # This file is distributed under the same license as the notification-daemon package.
 # Florian Steinel <steinel@pootle.wordforge.org.flonet.net>, 2007.
-# Mario Blättermann <mariobl@gnome.org>, 2010.
+# Mario Blättermann <mariobl@gnome.org>, 2010, 2011.
 # Jakob Kramer <jakob.kramer@gmx.de>, 2010.
 #
 msgid ""
@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2010-10-28 23:01+0000\n"
-"PO-Revision-Date: 2010-10-30 21:25+0100\n"
+"POT-Creation-Date: 2011-02-16 16:53+0000\n"
+"PO-Revision-Date: 2011-02-17 15:25+0100\n"
 "Last-Translator: Mario Blättermann <mariobl@gnome.org>\n"
 "Language-Team: Deutsch <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,60 +19,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Aktuelles Thema"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Vorgegebener Klang"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
-"Vorgegebene Position auf der Arbeitsfläche für gestapelte Benachrichtigungen. "
-"Mögliche Werte: »top_left«, »top_right«, »bottom_left« und »bottom_right«"
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Pop-up-Position"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Klang aktiviert"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr ""
-"Die vorgegebene Klangdatei. Diese Einstellung wird überschrieben, wenn eine "
-"Anwendung die Hints »sound-file« oder »suppress-sound« verwendet. Leer "
-"lassen, wenn keine vorgegebene Klangdatei verwendet werden soll."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "Das Thema um Benachrichtigungen anzuzeigen."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Schaltet Klänge für Benachrichtigungen ein oder aus."
-
-#: ../src/daemon.c:226
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Maximale Anzahl an Benachrichtigungen wurde überschritten"
 
-#: ../src/daemon.c:289
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Ungültige Benachrichtigungskennung"
 
-#: ../src/nd-queue.c:472
+#: ../src/nd-queue.c:471
 msgid "Clear all notifications"
 msgstr "Alle Benachrichtigungen entfernen"
 
-#: ../src/nd-queue.c:1152
+#: ../src/nd-queue.c:874
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
@@ -80,62 +39,11 @@ msgstr "Benachrichtigungen"
 msgid "Notification"
 msgstr "Benachrichtigung"
 
-#~ msgid "Slider"
-#~ msgstr "Schieber"
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Benachrichtigungen anzeigen"
 
-#~ msgid "Standard theme"
-#~ msgstr "Standardthema"
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Benachrichtigungsdienst"
 
-#~ msgid "Error initializing libnotify"
-#~ msgstr "Fehler beim Initialisieren von libnotify"
-
-#~ msgid "Notification Test"
-#~ msgstr "Test für Benachrichtigungen"
-
-#~ msgid "Just a test"
-#~ msgstr "Nur ein Test"
-
-#~ msgid "Error while displaying notification: %s"
-#~ msgstr "Fehler bei der Anzeige der Benachrichtigung: %s"
-
-#~ msgid "Could not load user interface file: %s"
-#~ msgstr "Benutzerschnittstellendatei konnte nicht geladen werden: %s"
-
-#~ msgid "Pop-Up Notifications"
-#~ msgstr "Popup-Benachrichtigungen"
-
-#~ msgid "Set your pop-up notification preferences"
-#~ msgstr "Legen Sie Ihre Popup-Benachrichtigungseinstellungen fest"
-
-#~ msgid "Top Left"
-#~ msgstr "Links oben"
-
-#~ msgid "Top Right"
-#~ msgstr "Rechts oben"
-
-#~ msgid "Bottom Left"
-#~ msgstr "Links unten"
-
-#~ msgid "Bottom Right"
-#~ msgstr "Rechts unten"
-
-#~ msgid "Unable to locate glade file '%s'"
-#~ msgstr "Ort der Glade-Datei »%s« konnte nicht ermittelt werden"
-
-#~ msgid "      "
-#~ msgstr "      "
-
-#~ msgid "<b>General Options</b>"
-#~ msgstr "<b>Allgemeine Optionen</b>"
-
-#~ msgid "Notification Settings"
-#~ msgstr "Einstellungen für Benachrichtigungen"
-
-#~ msgid "P_osition:"
-#~ msgstr "P_osition:"
-
-#~ msgid "_Preview"
-#~ msgstr "_Vorschau"
-
-#~ msgid "_Theme:"
-#~ msgstr "_Thema:"
