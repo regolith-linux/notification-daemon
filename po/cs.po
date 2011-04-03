@@ -1,13 +1,13 @@
 # Czech translation for notification-daemon.
-# Copyright (C) 2010 the author(s) of notification-daemon.
+# Copyright (C) 2010, 2011 the author(s) of notification-daemon.
 # This file is distributed under the same license as the notification-daemon package.
-# Petr Kovar <pknbe@volny.cz>, 2010.
+# Petr Kovar <pknbe@volny.cz>, 2010, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-31 11:09+0100\n"
-"PO-Revision-Date: 2010-10-31 11:09+0100\n"
+"POT-Creation-Date: 2011-04-03 17:16+0200\n"
+"PO-Revision-Date: 2011-04-03 17:16+0200\n"
 "Last-Translator: Petr Kovar <pknbe@volny.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -17,61 +17,19 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Lokalize 1.1\n"
 
-#: ../data/notification-daemon.schemas.in.h:1
-msgid "Current theme"
-msgstr "Aktuální motiv"
-
-#: ../data/notification-daemon.schemas.in.h:2
-msgid "Default Sound"
-msgstr "Výchozí zvuk"
-
-#: ../data/notification-daemon.schemas.in.h:3
-msgid ""
-"Default popup location on the workspace for stack notifications. Allowed "
-"values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
-msgstr ""
-"Výchozí umístění automaticky otevíraného okna u vícenásobných oznámení. "
-"Povolené hodnoty: \"top_left\",\"top_right\",\"bottom_left\" a \"bottom_right"
-"\""
-
-#: ../data/notification-daemon.schemas.in.h:4
-msgid "Popup location"
-msgstr "Umístění automaticky otevíraného okna"
-
-#: ../data/notification-daemon.schemas.in.h:5
-msgid "Sound Enabled"
-msgstr "Zvuk povolen"
-
-#: ../data/notification-daemon.schemas.in.h:6
-msgid ""
-"The default sound file used unless a notification supplies the 'sound-file' "
-"or 'suppress-sound' hint. Leave empty for no default sound."
-msgstr ""
-"Výchozí zvukový soubor použitý v případě, kdy oznámením není poskytnuto "
-"\"sound-file\" nebo \"suppress-sound\". Ponechejte prázdné, nechcete-li "
-"žádný výchozí zvuk."
-
-#: ../data/notification-daemon.schemas.in.h:7
-msgid "The theme used when displaying notifications."
-msgstr "Motiv používaný k zobrazování oznámení."
-
-#: ../data/notification-daemon.schemas.in.h:8
-msgid "Turns on and off sound support for notifications."
-msgstr "Zapne a vypne zvukovou podporu u oznámení."
-
-#: ../src/daemon.c:229
+#: ../src/daemon.c:188
 msgid "Exceeded maximum number of notifications"
 msgstr "Překročen maximální počet oznámení"
 
-#: ../src/daemon.c:292
+#: ../src/daemon.c:251
 msgid "Invalid notification identifier"
 msgstr "Neplatný identifikátor oznámení"
 
-#: ../src/nd-queue.c:471
+#: ../src/nd-queue.c:472
 msgid "Clear all notifications"
 msgstr "Vymazat všechna oznámení"
 
-#: ../src/nd-queue.c:874
+#: ../src/nd-queue.c:883
 msgid "Notifications"
 msgstr "Oznámení"
 
@@ -79,65 +37,10 @@ msgstr "Oznámení"
 msgid "Notification"
 msgstr "Oznámení"
 
-#~ msgid "Slider"
-#~ msgstr "Táhlo"
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Display notifications"
+msgstr "Zobrazuje oznámení"
 
-#~ msgid "Standard theme"
-#~ msgstr "Standardní motiv"
-
-#~ msgid "Error initializing libnotify"
-#~ msgstr "Chyba během spouštění libnotify"
-
-#~ msgid "Notification Test"
-#~ msgstr "Text oznámení"
-
-#~ msgid "Just a test"
-#~ msgstr "Toliko test"
-
-#~ msgid "Error while displaying notification: %s"
-#~ msgstr "Chyba při zobrazování oznámení: %s"
-
-#~ msgid "Could not load user interface file: %s"
-#~ msgstr "Nelze načíst soubor rozložení uživatelského rozhraní: %s"
-
-#~ msgid "Pop-Up Notifications"
-#~ msgstr "Automaticky otevíraná oznámení"
-
-#~ msgid "Set your pop-up notification preferences"
-#~ msgstr "Nastaví předvolby automaticky otevíraných oznámení"
-
-#~ msgid "      "
-#~ msgstr "      "
-
-#~ msgid "<b>General Options</b>"
-#~ msgstr "<b>Obecné možnosti</b>"
-
-#~ msgid "Bottom Left"
-#~ msgstr "Vlevo dole"
-
-#~ msgid "Bottom Right"
-#~ msgstr "Vpravo dole"
-
-#~ msgid "Notification Settings"
-#~ msgstr "Nastavení oznámení"
-
-#~ msgid "P_osition:"
-#~ msgstr "_Umístění:"
-
-#~ msgid "Top Left"
-#~ msgstr "Vlevo nahoře"
-
-#~ msgid "Top Right"
-#~ msgstr "Vpravo nahoře"
-
-#~ msgid "_Preview"
-#~ msgstr "Ná_hled"
-
-#~ msgid "_Theme:"
-#~ msgstr "_Motiv:"
-
-#~ msgid "Ubuntu theme"
-#~ msgstr "Motiv Ubuntu"
-
-#~ msgid "Unable to locate glade file '%s'"
-#~ msgstr "Nelze nalézt soubor glade \"%s\""
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Notification Daemon"
+msgstr "Démon zprostředkující oznámení"
