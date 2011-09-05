@@ -1,3 +1,16 @@
+NEW in 0.7.2:
+==============
+- Remove vestigial dbus-glib requirement
+- Translation updates (Italian, Dutch, Gujarati, Ukrainian,
+  Norwegian bokmål, Bulgarian, Spanish, Slovenian, Kannada,
+  Hebrew, Swedish, Simplified Chinese, Greek, Korean, French,
+  Latvian, Vietnamese, Catalan, Oriya, Galician, British English,
+  Romanian, Polish, Estonian, Hungarian, Portuguese, Russian
+  German, Serbian, Indonesian, Afrikaans, Punjabi, Uighur,
+  Basque, Traditional Chinese, Tamil, Czech, Danish, Turkish,
+  Bengali, Persian, Japanese, Aragonese, Catalan (Valencian),
+  Finnish, Lithuanian, Belarusian, Zulu)
+
 NEW in 0.7.1:
 ==============
 - Don't use DBus activation
