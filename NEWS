@@ -1,3 +1,7 @@
+NEW in 0.7.3:
+==============
+- Translation updates (Asturian, Assamese, Thai, Telugu)
+
 NEW in 0.7.2:
 ==============
 - Remove vestigial dbus-glib requirement
