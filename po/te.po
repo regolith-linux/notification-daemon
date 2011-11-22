@@ -1,14 +1,15 @@
 # Telugu translation for notification-daemon.
-# Copyright (C) 2011 notification-daemon's COPYRIGHT HOLDER
+# Copyright (C) 2011 Gnome Telugu Contributors
 # This file is distributed under the same license as the notification-daemon package.
-# Praveen Illa <mail2ipn@gmail.com>, 2011.
+# Praveen Illa <mail2ipn@gmail.com>, 2011
+# Hari krishna <hari@swecha.net>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-09-22 11:20+0000\n"
+"POT-Creation-Date: 2011-10-08 16:36+0000\n"
 "PO-Revision-Date: 2011-09-23 11:16+0530\n"
 "Last-Translator: Praveen Illa <mail2ipn@gmail.com>\n"
 "Language-Team: తెలుగు <indlinux-telugu@lists.sourceforge.net>\n"
@@ -43,4 +44,4 @@ msgstr "ప్రకటనలను ప్రదర్శించు"
 
 #: ../data/notification-daemon.desktop.in.in.h:2
 msgid "Notification Daemon"
-msgstr "ప్రకటన డీమెన్"
+msgstr "ప్రకటన సూత్రధారి"
