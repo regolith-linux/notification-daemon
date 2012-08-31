@@ -507,7 +507,7 @@ destroy_screens (NdQueue *queue)
 
                 gdkwindow = gdk_screen_get_root_window (screen);
                 gdk_window_remove_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, queue->priv->screens[i]);
-                for (j = 0; i < queue->priv->screens[i]->n_stacks; j++) {
+                for (j = 0; j < queue->priv->screens[i]->n_stacks; j++) {
                         g_object_unref (queue->priv->screens[i]->stacks[j]);
                         queue->priv->screens[i]->stacks[j] = NULL;
                 }
