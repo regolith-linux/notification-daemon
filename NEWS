@@ -1,3 +1,8 @@
+NEW in 0.7.6:
+==============
+- Fix a wrong loop condition
+- Translation updates (Marathi)
+
 NEW in 0.7.5:
 ==============
 - Translation updates (Hindi, Catalan)
