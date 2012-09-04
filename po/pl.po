@@ -4,12 +4,14 @@
 # pomóc w jego rozwijaniu i pielęgnowaniu, napisz do nas:
 # gnomepl@aviary.pl
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# Piotr Drąg <piotrdrag@gmail.com>, 2007-2012.
+# Aviary.pl <gnomepl@aviary.pl>, 2010-2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: pl\n"
+"Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-13 16:30+0100\n"
-"PO-Revision-Date: 2011-03-13 16:31+0100\n"
+"POT-Creation-Date: 2012-09-04 20:22+0200\n"
+"PO-Revision-Date: 2012-09-04 20:23+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "Language: pl\n"
@@ -42,9 +44,9 @@ msgid "Notification"
 msgstr "Powiadomienie"
 
 #: ../data/notification-daemon.desktop.in.in.h:1
-msgid "Display notifications"
-msgstr "Wyświetlanie powiadomień"
-
-#: ../data/notification-daemon.desktop.in.in.h:2
 msgid "Notification Daemon"
 msgstr "Usługa powiadamiania"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Display notifications"
+msgstr "Wyświetlanie powiadomień"
