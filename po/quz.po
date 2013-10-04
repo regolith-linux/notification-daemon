@@ -1,0 +1,47 @@
+# Translation of notification-daemon in Quechua (Cuzco-Collao)
+# Copyright (C) 2013, Listed translators
+# This file is distributed under the same license as the notification-daemon package.
+# Z <yachaq@hotmail.co.nz>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: notification-daemon master\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product"
+"=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2012-12-29 00:15+0000\n"
+"PO-Revision-Date: 2013-10-04 10:17+0200\n"
+"Last-Translator: Z <yachaq@hotmail.co.nz>\n"
+"Language-Team: Quechua (Cuzco-Collao)\n"
+"Language: quz\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
+"X-Generator: Pootle 2.0.5\n"
+
+#: ../src/daemon.c:188
+msgid "Exceeded maximum number of notifications"
+msgstr "Ancha askha willanakuna"
+
+#: ../src/daemon.c:251
+msgid "Invalid notification identifier"
+msgstr "Mana allin willana t'uqsiq"
+
+#: ../src/nd-queue.c:472
+msgid "Clear all notifications"
+msgstr "Tukuy willanakunata chinkachiy"
+
+#: ../src/nd-queue.c:883
+msgid "Notifications"
+msgstr "Willanakuna"
+
+#: ../src/sound.c:35
+msgid "Notification"
+msgstr "Willana"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+msgid "Notification Daemon"
+msgstr "Willanapaq pakasqa prugrama"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+msgid "Display notifications"
+msgstr "Willanakunata rikuchiy"
