@@ -6,10 +6,11 @@
   <name xml:lang="en">Desktop Notification Daemon</name>
   <shortname>notification-daemon</shortname>
   <shortdesc xml:lang="en">notification-daemon is the server implementation of the freedesktop.org desktop notification specification</shortdesc>
-  <category rdf:resource="http://api.gnome.org/doap-extensions#deprecated" />
   <homepage rdf:resource="https://wiki.gnome.org/Projects/NotificationDaemon" />
   <download-page rdf:resource="http://download.gnome.org/sources/notification-daemon/" />
   <bug-database rdf:resource="https://bugzilla.gnome.org/browse.cgi?product=notification-daemon" />
+  <category rdf:resource="http://api.gnome.org/doap-extensions#deprecated" />
+  <programming-language>C</programming-language>
   <maintainer>
     <foaf:Person>
       <foaf:name>Christian Hammond</foaf:name>
