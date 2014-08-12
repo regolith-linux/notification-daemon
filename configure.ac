@@ -71,7 +71,6 @@ dnl ---------------------------------------------------------------------------
 IT_PROG_INTLTOOL([0.40.0])
 
 AC_SUBST([GETTEXT_PACKAGE], [notification-daemon])
-AM_GNU_GETTEXT_VERSION([0.11])
 AM_GLIB_GNU_GETTEXT
 AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [Define to the gettext package name.])
 
