@@ -420,6 +420,7 @@ nd_bubble_enter_notify_event (GtkWidget        *widget,
         NdBubble *bubble = ND_BUBBLE (widget);
         if (bubble->priv->timeout_id != 0) {
                 g_source_remove (bubble->priv->timeout_id);
+                bubble->priv->timeout_id = 0;
         }
 
         return FALSE;

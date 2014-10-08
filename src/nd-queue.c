@@ -532,6 +532,10 @@ nd_queue_finalize (GObject *object)
 
         g_return_if_fail (queue->priv != NULL);
 
+        if (queue->priv->update_id != 0) {
+                g_source_remove (queue->priv->update_id);
+        }
+
         g_hash_table_destroy (queue->priv->notifications);
         g_queue_free (queue->priv->queue);
 
@@ -919,6 +923,7 @@ update_idle (NdQueue *queue)
                 }
         }
 
+        queue->priv->update_id = 0;
         return FALSE;
 }
 
