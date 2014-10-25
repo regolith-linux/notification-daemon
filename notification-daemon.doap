@@ -9,7 +9,6 @@
   <homepage rdf:resource="https://wiki.gnome.org/Projects/NotificationDaemon" />
   <download-page rdf:resource="http://download.gnome.org/sources/notification-daemon/" />
   <bug-database rdf:resource="https://bugzilla.gnome.org/browse.cgi?product=notification-daemon" />
-  <category rdf:resource="http://api.gnome.org/doap-extensions#deprecated" />
   <programming-language>C</programming-language>
   <maintainer>
     <foaf:Person>
