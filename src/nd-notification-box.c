@@ -336,6 +336,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_box_pack_start (GTK_BOX (vbox), notification_box->priv->summary_label, TRUE, TRUE, 0);
         gtk_misc_set_alignment (GTK_MISC (notification_box->priv->summary_label), 0, 0);
         gtk_label_set_line_wrap (GTK_LABEL (notification_box->priv->summary_label), TRUE);
+        gtk_label_set_line_wrap_mode (GTK_LABEL (notification_box->priv->summary_label), PANGO_WRAP_WORD_CHAR);
 
         atkobj = gtk_widget_get_accessible (notification_box->priv->summary_label);
         atk_object_set_description (atkobj, "Notification summary text.");
@@ -354,6 +355,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_box_pack_start (GTK_BOX (vbox), notification_box->priv->body_label, TRUE, TRUE, 0);
         gtk_misc_set_alignment (GTK_MISC (notification_box->priv->body_label), 0, 0);
         gtk_label_set_line_wrap (GTK_LABEL (notification_box->priv->body_label), TRUE);
+        gtk_label_set_line_wrap_mode (GTK_LABEL (notification_box->priv->body_label), PANGO_WRAP_WORD_CHAR);
 
         atkobj = gtk_widget_get_accessible (notification_box->priv->body_label);
         atk_object_set_description (atkobj, "Notification body text.");

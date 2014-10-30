@@ -413,6 +413,16 @@ nd_bubble_realize (GtkWidget *widget)
         GTK_WIDGET_CLASS (nd_bubble_parent_class)->realize (widget);
 }
 
+static void
+nd_bubble_get_preferred_width (GtkWidget *widget,
+                               gint *min_width,
+                               gint *nat_width)
+{
+        if (nat_width != NULL) {
+                 *nat_width = WIDTH;
+        }
+}
+
 static gboolean
 nd_bubble_enter_notify_event (GtkWidget        *widget,
                               GdkEventCrossing *event)
@@ -451,6 +461,7 @@ nd_bubble_class_init (NdBubbleClass *klass)
         widget_class->enter_notify_event = nd_bubble_enter_notify_event;
         widget_class->leave_notify_event = nd_bubble_leave_notify_event;
         widget_class->realize = nd_bubble_realize;
+        widget_class->get_preferred_width = nd_bubble_get_preferred_width;
 
         g_type_class_add_private (klass, sizeof (NdBubblePrivate));
 }
@@ -623,6 +634,7 @@ nd_bubble_init (NdBubble *bubble)
         gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->summary_label, TRUE, TRUE, 0);
         gtk_misc_set_alignment (GTK_MISC (bubble->priv->summary_label), 0, 0);
         gtk_label_set_line_wrap (GTK_LABEL (bubble->priv->summary_label), TRUE);
+        gtk_label_set_line_wrap_mode (GTK_LABEL (bubble->priv->summary_label), PANGO_WRAP_WORD_CHAR);
 
         atkobj = gtk_widget_get_accessible (bubble->priv->summary_label);
         atk_object_set_description (atkobj, "Notification summary text.");
@@ -645,6 +657,7 @@ nd_bubble_init (NdBubble *bubble)
         gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->body_label, TRUE, TRUE, 0);
         gtk_misc_set_alignment (GTK_MISC (bubble->priv->body_label), 0, 0);
         gtk_label_set_line_wrap (GTK_LABEL (bubble->priv->body_label), TRUE);
+        gtk_label_set_line_wrap_mode (GTK_LABEL (bubble->priv->body_label), PANGO_WRAP_WORD_CHAR);
         g_signal_connect (bubble->priv->body_label,
                           "activate-link",
                           G_CALLBACK (on_activate_link),

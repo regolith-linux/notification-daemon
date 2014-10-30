@@ -360,7 +360,7 @@ nd_stack_shift_notifications (NdStack     *stack,
                 GtkRequisition  req;
 
                 if (bubble == NULL || nw2 != bubble) {
-                        gtk_widget_size_request (GTK_WIDGET (nw2), &req);
+                        gtk_widget_get_preferred_size (GTK_WIDGET (nw2), NULL, &req);
 
                         translate_coordinates (stack->priv->location,
                                                &workarea,
@@ -431,7 +431,7 @@ nd_stack_add_bubble (NdStack  *stack,
         GtkRequisition  req;
         int             x, y;
 
-        gtk_widget_size_request (GTK_WIDGET (bubble), &req);
+        gtk_widget_get_preferred_size (GTK_WIDGET (bubble), NULL, &req);
         nd_stack_shift_notifications (stack,
                                       bubble,
                                       NULL,
