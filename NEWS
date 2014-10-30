@@ -1,3 +1,18 @@
+Version 3.14.0
+==============
+- Desktop file moved to autostart. (Alberts Muktupāvels)
+- Fix notifications with long text. (Balló György)
+- Updated .doap file. (Alberts Muktupāvels, Olav Vitters, Piotr Drąg)
+- Fix crash with newer glib versions. (Balló György)
+- Fix crash in nd_notification_get_is_transient. (Alberts Muktupāvels)
+- Updated translations:
+  Ani Peter (ml), Claude Paroz (quz), MarMav (el), Pavol Klačanský (sk),
+  Piotr Drąg (pl), Runa Bhattacharjee (bn_IN), TmTFx (fur).
+
+NOTE: Notification Daemon now is maintained as part of GNOME Flashback. This is
+reason for version number change. This release also bumps GTK+ required version
+to 3.8.0.
+
 NEW in 0.7.6:
 ==============
 - Fix a wrong loop condition
