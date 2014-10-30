@@ -467,7 +467,7 @@ _notify_daemon_pixbuf_from_path (const char *path,
                                                            GTK_ICON_LOOKUP_USE_BUILTIN,
                                                            NULL);
 
-                        gtk_icon_info_free (icon_info);
+                        g_object_unref (icon_info);
                 }
         }
 
