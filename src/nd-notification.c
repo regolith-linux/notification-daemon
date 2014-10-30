@@ -223,55 +223,49 @@ nd_notification_get_is_closed (NdNotification *notification)
         return notification->is_closed;
 }
 
+static gboolean
+hint_to_boolean (NdNotification *notification,
+                 const gchar    *hint_name)
+{
+        GVariant *value;
+
+        g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
+
+        value = g_hash_table_lookup (notification->hints, hint_name);
+        if (value == NULL)
+                return FALSE;
+
+        if (g_variant_is_of_type (value, G_VARIANT_TYPE_INT32)) {
+                return (g_variant_get_int32 (value) != 0);
+        } else if (g_variant_is_of_type (value, G_VARIANT_TYPE_DOUBLE)) {
+                return (g_variant_get_double (value) != 0);
+        } else if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING)) {
+                return TRUE;
+        } else if (g_variant_is_of_type (value, G_VARIANT_TYPE_BYTE)) {
+                return (g_variant_get_byte (value) != 0);
+        } else {
+                g_assert_not_reached ();
+        }
+
+        return FALSE;
+}
+
 gboolean
 nd_notification_get_is_transient (NdNotification *notification)
 {
-        gboolean  ret;
-        GVariant *value;
-
-        ret = FALSE;
-        g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
-
-        value = g_hash_table_lookup (notification->hints, "transient");
-        if (value != NULL) {
-                ret = g_variant_get_boolean (value);
-        }
-
-        return ret;
+        return hint_to_boolean (notification, "transient");
 }
 
 gboolean
 nd_notification_get_is_resident (NdNotification *notification)
 {
-        gboolean  ret;
-        GVariant *value;
-
-        ret = FALSE;
-        g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
-
-        value = g_hash_table_lookup (notification->hints, "resident");
-        if (value != NULL) {
-                ret = g_variant_get_boolean (value);
-        }
-
-        return ret;
+        return hint_to_boolean (notification, "resident");
 }
 
 gboolean
 nd_notification_get_action_icons (NdNotification *notification)
 {
-        gboolean  ret;
-        GVariant *value;
-
-        ret = FALSE;
-        g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
-
-        value = g_hash_table_lookup (notification->hints, "action-icons");
-        if (value != NULL) {
-                ret = g_variant_get_boolean (value);
-        }
-
-        return ret;
+        return hint_to_boolean (notification, "action-icons");
 }
 
 guint32
