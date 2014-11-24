@@ -5,13 +5,21 @@ autostart_DATA        = $(autostart_in_files:.desktop.in=.desktop)
 
 @INTLTOOL_DESKTOP_RULE@
 
+desktopdir          = $(datadir)/applications
+desktop_in_in_files = notification-daemon.desktop.in.in
+desktop_in_files    = notification-daemon.desktop.in
+desktop_DATA        = $(desktop_in_files:.desktop.in=.desktop)
+
 EXTRA_DIST = \
-	$(autostart_in_in_files)
+	$(autostart_in_in_files) \
+	$(desktop_in_in_files)
 
 CLEANFILES = \
-	$(autostart_DATA)
+	$(autostart_DATA) \
+	$(desktop_DATA)
 
 DISTCLEANFILES = \
-	$(autostart_in_files)
+	$(autostart_in_files) \
+	$(desktop_in_files)
 
 -include $(top_srcdir)/git.mk

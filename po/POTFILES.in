@@ -1,4 +1,5 @@
 src/daemon.c
 src/nd-queue.c
 src/sound.c
+data/notification-daemon.desktop.in.in
 data/notification-daemon-autostart.desktop.in.in
