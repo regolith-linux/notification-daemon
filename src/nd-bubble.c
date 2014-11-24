@@ -632,7 +632,8 @@ nd_bubble_init (NdBubble *bubble)
                           bubble);
         gtk_widget_show (bubble->priv->summary_label);
         gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->summary_label, TRUE, TRUE, 0);
-        gtk_misc_set_alignment (GTK_MISC (bubble->priv->summary_label), 0, 0);
+        gtk_label_set_xalign (GTK_LABEL (bubble->priv->summary_label), 0.0);
+        gtk_label_set_yalign (GTK_LABEL (bubble->priv->summary_label), 0.0);
         gtk_label_set_line_wrap (GTK_LABEL (bubble->priv->summary_label), TRUE);
         gtk_label_set_line_wrap_mode (GTK_LABEL (bubble->priv->summary_label), PANGO_WRAP_WORD_CHAR);
 
@@ -655,7 +656,8 @@ nd_bubble_init (NdBubble *bubble)
                           bubble);
         gtk_widget_show (bubble->priv->body_label);
         gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->body_label, TRUE, TRUE, 0);
-        gtk_misc_set_alignment (GTK_MISC (bubble->priv->body_label), 0, 0);
+        gtk_label_set_xalign (GTK_LABEL (bubble->priv->body_label), 0.0);
+        gtk_label_set_yalign (GTK_LABEL (bubble->priv->body_label), 0.0);
         gtk_label_set_line_wrap (GTK_LABEL (bubble->priv->body_label), TRUE);
         gtk_label_set_line_wrap_mode (GTK_LABEL (bubble->priv->body_label), PANGO_WRAP_WORD_CHAR);
         g_signal_connect (bubble->priv->body_label,
@@ -904,7 +906,8 @@ add_notification_action (NdBubble       *bubble,
                                      text);
                 gtk_widget_show (image);
                 gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
-                gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0.5);
+                gtk_widget_set_halign (image, GTK_ALIGN_CENTER);
+                gtk_widget_set_valign (image, GTK_ALIGN_CENTER);
         } else {
                 GtkWidget *label;
 
@@ -915,7 +918,7 @@ add_notification_action (NdBubble       *bubble,
                                   bubble);
                 gtk_widget_show (label);
                 gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-                gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+                gtk_label_set_xalign (GTK_LABEL (label), 0.0);
                 buf = g_strdup_printf ("<small>%s</small>", text);
                 gtk_label_set_markup (GTK_LABEL (label), buf);
                 g_free (buf);

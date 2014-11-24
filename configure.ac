@@ -50,7 +50,7 @@ AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [Define to the gettext package n
 dnl ---------------------------------------------------------------------------
 dnl Requirements for the daemon
 dnl ---------------------------------------------------------------------------
-REQ_GTK_VERSION=3.8.0
+REQ_GTK_VERSION=3.15.2
 REQ_GLIB_VERSION=2.27.0
 REQ_LIBCANBERRA_GTK_VERSION=0.4
 pkg_modules="

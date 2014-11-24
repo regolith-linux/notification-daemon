@@ -143,14 +143,15 @@ create_notification_action (NdNotificationBox *box,
                                      text);
                 gtk_widget_show (image);
                 gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
-                gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0.5);
+                gtk_widget_set_halign (image, GTK_ALIGN_CENTER);
+                gtk_widget_set_valign (image, GTK_ALIGN_CENTER);
         } else {
                 GtkWidget *label;
 
                 label = gtk_label_new (NULL);
                 gtk_widget_show (label);
                 gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-                gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+                gtk_label_set_xalign (GTK_LABEL (label), 0.0);
                 buf = g_strdup_printf ("<small>%s</small>", text);
                 gtk_label_set_markup (GTK_LABEL (label), buf);
                 g_free (buf);
@@ -334,7 +335,8 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         notification_box->priv->summary_label = gtk_label_new (NULL);
         gtk_widget_show (notification_box->priv->summary_label);
         gtk_box_pack_start (GTK_BOX (vbox), notification_box->priv->summary_label, TRUE, TRUE, 0);
-        gtk_misc_set_alignment (GTK_MISC (notification_box->priv->summary_label), 0, 0);
+        gtk_label_set_xalign (GTK_LABEL (notification_box->priv->summary_label), 0.0);
+        gtk_label_set_yalign (GTK_LABEL (notification_box->priv->summary_label), 0.0);
         gtk_label_set_line_wrap (GTK_LABEL (notification_box->priv->summary_label), TRUE);
         gtk_label_set_line_wrap_mode (GTK_LABEL (notification_box->priv->summary_label), PANGO_WRAP_WORD_CHAR);
 
@@ -353,7 +355,8 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         notification_box->priv->body_label = gtk_label_new (NULL);
         gtk_widget_show (notification_box->priv->body_label);
         gtk_box_pack_start (GTK_BOX (vbox), notification_box->priv->body_label, TRUE, TRUE, 0);
-        gtk_misc_set_alignment (GTK_MISC (notification_box->priv->body_label), 0, 0);
+        gtk_label_set_xalign (GTK_LABEL (notification_box->priv->body_label), 0.0);
+        gtk_label_set_yalign (GTK_LABEL (notification_box->priv->body_label), 0.0);
         gtk_label_set_line_wrap (GTK_LABEL (notification_box->priv->body_label), TRUE);
         gtk_label_set_line_wrap_mode (GTK_LABEL (notification_box->priv->body_label), PANGO_WRAP_WORD_CHAR);
 
