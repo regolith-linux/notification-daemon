@@ -1,3 +1,8 @@
+Version 3.14.1
+==============
+- Rename existing .desktop file to notification-daemon-autostart.desktop and add
+  back regular .desktop file. (Alberts Muktupāvels)
+
 Version 3.14.0
 ==============
 - Desktop file moved to autostart. (Alberts Muktupāvels)
