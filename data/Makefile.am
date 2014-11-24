@@ -1,6 +1,6 @@
 autostartdir          = $(sysconfdir)/xdg/autostart
-autostart_in_in_files = notification-daemon.desktop.in.in
-autostart_in_files    = notification-daemon.desktop.in
+autostart_in_in_files = notification-daemon-autostart.desktop.in.in
+autostart_in_files    = notification-daemon-autostart.desktop.in
 autostart_DATA        = $(autostart_in_files:.desktop.in=.desktop)
 
 @INTLTOOL_DESKTOP_RULE@
