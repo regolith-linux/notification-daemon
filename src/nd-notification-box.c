@@ -120,7 +120,7 @@ create_notification_action (NdNotificationBox *box,
         gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
         gtk_container_set_border_width (GTK_CONTAINER (button), 0);
 
-        hbox = gtk_hbox_new (FALSE, 6);
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_show (hbox);
         gtk_container_add (GTK_CONTAINER (button), hbox);
 
@@ -278,7 +278,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         GtkRcStyle    *rcstyle;
 
         notification_box->priv = ND_NOTIFICATION_BOX_GET_PRIVATE (notification_box);
-        box = gtk_hbox_new (FALSE, 6);
+        box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_container_add (GTK_CONTAINER (notification_box), box);
         gtk_widget_show (box);
 
@@ -296,7 +296,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_widget_show (notification_box->priv->icon);
         gtk_container_add (GTK_CONTAINER (iconbox), notification_box->priv->icon);
 
-        vbox = gtk_vbox_new (FALSE, 6);
+        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
         gtk_widget_show (vbox);
         gtk_box_pack_start (GTK_BOX (box), vbox, TRUE, TRUE, 0);
         gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
@@ -343,11 +343,11 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         atkobj = gtk_widget_get_accessible (notification_box->priv->summary_label);
         atk_object_set_description (atkobj, "Notification summary text.");
 
-        notification_box->priv->content_hbox = gtk_hbox_new (FALSE, 6);
+        notification_box->priv->content_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_show (notification_box->priv->content_hbox);
         gtk_box_pack_start (GTK_BOX (vbox), notification_box->priv->content_hbox, FALSE, FALSE, 0);
 
-        vbox = gtk_vbox_new (FALSE, 6);
+        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
 
         gtk_widget_show (vbox);
         gtk_box_pack_start (GTK_BOX (notification_box->priv->content_hbox), vbox, TRUE, TRUE, 0);
@@ -367,7 +367,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_widget_show (alignment);
         gtk_box_pack_start (GTK_BOX (vbox), alignment, FALSE, TRUE, 0);
 
-        notification_box->priv->actions_box = gtk_hbox_new (FALSE, 6);
+        notification_box->priv->actions_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_show (notification_box->priv->actions_box);
         gtk_container_add (GTK_CONTAINER (alignment), notification_box->priv->actions_box);
 

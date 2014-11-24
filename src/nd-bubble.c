@@ -555,7 +555,7 @@ nd_bubble_init (NdBubble *bubble)
                 bubble->priv->composited = TRUE;
         }
 
-        main_vbox = gtk_vbox_new (FALSE, 0);
+        main_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
         g_signal_connect (G_OBJECT (main_vbox),
                           "style-set",
                           G_CALLBACK (on_style_set),
@@ -564,7 +564,7 @@ nd_bubble_init (NdBubble *bubble)
         gtk_container_add (GTK_CONTAINER (bubble), main_vbox);
         gtk_container_set_border_width (GTK_CONTAINER (main_vbox), 12);
 
-        bubble->priv->main_hbox = gtk_hbox_new (FALSE, 0);
+        bubble->priv->main_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_widget_show (bubble->priv->main_hbox);
         gtk_box_pack_start (GTK_BOX (main_vbox),
                             bubble->priv->main_hbox,
@@ -584,7 +584,7 @@ nd_bubble_init (NdBubble *bubble)
         gtk_widget_show (bubble->priv->icon);
         gtk_container_add (GTK_CONTAINER (bubble->priv->iconbox), bubble->priv->icon);
 
-        vbox = gtk_vbox_new (FALSE, 6);
+        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
         gtk_widget_show (vbox);
         gtk_box_pack_start (GTK_BOX (bubble->priv->main_hbox), vbox, TRUE, TRUE, 0);
         gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
@@ -640,12 +640,12 @@ nd_bubble_init (NdBubble *bubble)
         atkobj = gtk_widget_get_accessible (bubble->priv->summary_label);
         atk_object_set_description (atkobj, "Notification summary text.");
 
-        bubble->priv->content_hbox = gtk_hbox_new (FALSE, 6);
+        bubble->priv->content_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_show (bubble->priv->content_hbox);
         gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->content_hbox, FALSE, FALSE, 0);
 
 
-        vbox = gtk_vbox_new (FALSE, 6);
+        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
         gtk_widget_show (vbox);
         gtk_box_pack_start (GTK_BOX (bubble->priv->content_hbox), vbox, TRUE, TRUE, 0);
 
@@ -672,7 +672,7 @@ nd_bubble_init (NdBubble *bubble)
         gtk_widget_show (alignment);
         gtk_box_pack_start (GTK_BOX (vbox), alignment, FALSE, TRUE, 0);
 
-        bubble->priv->actions_box = gtk_hbox_new (FALSE, 6);
+        bubble->priv->actions_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_show (bubble->priv->actions_box);
         gtk_container_add (GTK_CONTAINER (alignment), bubble->priv->actions_box);
 }
@@ -879,7 +879,7 @@ add_notification_action (NdBubble       *bubble,
         gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
         gtk_container_set_border_width (GTK_CONTAINER (button), 0);
 
-        hbox = gtk_hbox_new (FALSE, 6);
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_show (hbox);
         gtk_container_add (GTK_CONTAINER (button), hbox);
 
