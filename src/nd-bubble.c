@@ -620,7 +620,7 @@ nd_bubble_init (NdBubble *bubble)
         atk_object_set_name (atkobj, "");
         atk_object_set_description (atkobj, "Closes the notification.");
 
-        image = gtk_image_new_from_stock (GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
+        image = gtk_image_new_from_icon_name ("window-close", GTK_ICON_SIZE_MENU);
         gtk_widget_show (image);
         gtk_container_add (GTK_CONTAINER (close_button), image);
 
