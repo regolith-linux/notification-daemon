@@ -57,8 +57,7 @@ struct NdQueuePrivate
         GtkWidget     *dock;
         GtkWidget     *dock_scrolled_window;
 
-        NotifyScreen **screens;
-        int            n_screens;
+        NotifyScreen  *screen;
 
         guint          update_id;
 };
@@ -88,10 +87,8 @@ create_stack_for_monitor (NdQueue    *queue,
                           int         monitor_num)
 {
         NotifyScreen *nscreen;
-        int           screen_num;
 
-        screen_num = gdk_screen_get_number (screen);
-        nscreen = queue->priv->screens[screen_num];
+        nscreen = queue->priv->screen;
 
         nscreen->stacks[monitor_num] = nd_stack_new (screen,
                                                      monitor_num);
@@ -102,12 +99,10 @@ on_screen_monitors_changed (GdkScreen *screen,
                             NdQueue   *queue)
 {
         NotifyScreen *nscreen;
-        int           screen_num;
         int           n_monitors;
         int           i;
 
-        screen_num = gdk_screen_get_number (screen);
-        nscreen = queue->priv->screens[screen_num];
+        nscreen = queue->priv->screen;
 
         n_monitors = gdk_screen_get_n_monitors (screen);
 
@@ -161,11 +156,9 @@ create_stacks_for_screen (NdQueue   *queue,
                           GdkScreen *screen)
 {
         NotifyScreen *nscreen;
-        int           screen_num;
         int           i;
 
-        screen_num = gdk_screen_get_number (screen);
-        nscreen = queue->priv->screens[screen_num];
+        nscreen = queue->priv->screen;
 
         nscreen->n_stacks = gdk_screen_get_n_monitors (screen);
 
@@ -200,37 +193,30 @@ screen_xevent_filter (GdkXEvent    *xevent,
 }
 
 static void
-create_screens (NdQueue *queue)
+create_screen (NdQueue *queue)
 {
-        GdkDisplay  *display;
-        int          i;
+        GdkDisplay *display;
+        GdkScreen  *screen;
+        GdkWindow  *gdkwindow;
 
-        g_assert (queue->priv->screens == NULL);
+        g_assert (queue->priv->screen == NULL);
 
         display = gdk_display_get_default ();
-        queue->priv->n_screens = gdk_display_get_n_screens (display);
+        screen = gdk_display_get_default_screen (display);
 
-        queue->priv->screens = g_new0 (NotifyScreen *, queue->priv->n_screens);
+        g_signal_connect (screen,
+                          "monitors-changed",
+                          G_CALLBACK (on_screen_monitors_changed),
+                          queue);
 
-        for (i = 0; i < queue->priv->n_screens; i++) {
-                GdkScreen *screen;
-                GdkWindow *gdkwindow;
+        queue->priv->screen = g_new0 (NotifyScreen, 1);
+        queue->priv->screen->workarea_atom = XInternAtom (GDK_DISPLAY_XDISPLAY (display), "_NET_WORKAREA", True);
 
-                screen = gdk_display_get_screen (display, i);
-                g_signal_connect (screen,
-                                  "monitors-changed",
-                                  G_CALLBACK (on_screen_monitors_changed),
-                                  queue);
+        gdkwindow = gdk_screen_get_root_window (screen);
+        gdk_window_add_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, queue->priv->screen);
+        gdk_window_set_events (gdkwindow, gdk_window_get_events (gdkwindow) | GDK_PROPERTY_CHANGE_MASK);
 
-                queue->priv->screens[i] = g_new0 (NotifyScreen, 1);
-
-                queue->priv->screens[i]->workarea_atom = XInternAtom (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), "_NET_WORKAREA", True);
-                gdkwindow = gdk_screen_get_root_window (screen);
-                gdk_window_add_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, queue->priv->screens[i]);
-                gdk_window_set_events (gdkwindow, gdk_window_get_events (gdkwindow) | GDK_PROPERTY_CHANGE_MASK);
-
-                create_stacks_for_screen (queue, gdk_display_get_screen (display, i));
-        }
+        create_stacks_for_screen (queue, screen);
 }
 
 static void
@@ -346,17 +332,14 @@ on_dock_key_release (GtkWidget   *widget,
 static void
 clear_stacks (NdQueue *queue)
 {
-        int i;
-        int j;
+        NotifyScreen *nscreen;
+        gint          i;
 
-        for (i = 0; i < queue->priv->n_screens; i++) {
-                NotifyScreen *nscreen;
-                nscreen = queue->priv->screens[i];
-                for (j = 0; j < nscreen->n_stacks; j++) {
-                       NdStack *stack;
-                       stack = nscreen->stacks[j];
-                       nd_stack_remove_all (stack);
-                }
+        nscreen = queue->priv->screen;
+        for (i = 0; i < nscreen->n_stacks; i++) {
+                NdStack *stack;
+                stack = nscreen->stacks[i];
+                nd_stack_remove_all (stack);
         }
 }
 
@@ -484,39 +467,35 @@ nd_queue_init (NdQueue *queue)
         queue->priv->status_icon = NULL;
 
         create_dock (queue);
-        create_screens (queue);
+        create_screen (queue);
 }
 
 static void
-destroy_screens (NdQueue *queue)
+destroy_screen (NdQueue *queue)
 {
-        GdkDisplay  *display;
-        int          i;
-        int          j;
+        GdkDisplay *display;
+        GdkScreen  *screen;
+        GdkWindow  *gdkwindow;
+        gint        i;
 
         display = gdk_display_get_default ();
+        screen = gdk_display_get_default_screen (display);
 
-        for (i = 0; i < queue->priv->n_screens; i++) {
-                GdkScreen *screen;
-                GdkWindow *gdkwindow;
+        g_signal_handlers_disconnect_by_func (screen,
+                                              G_CALLBACK (on_screen_monitors_changed),
+                                              queue);
 
-                screen = gdk_display_get_screen (display, i);
-                g_signal_handlers_disconnect_by_func (screen,
-                                                      G_CALLBACK (on_screen_monitors_changed),
-                                                      queue);
-
-                gdkwindow = gdk_screen_get_root_window (screen);
-                gdk_window_remove_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, queue->priv->screens[i]);
-                for (j = 0; j < queue->priv->screens[i]->n_stacks; j++) {
-                        g_object_unref (queue->priv->screens[i]->stacks[j]);
-                        queue->priv->screens[i]->stacks[j] = NULL;
-                }
-
-                g_free (queue->priv->screens[i]->stacks);
+        gdkwindow = gdk_screen_get_root_window (screen);
+        gdk_window_remove_filter (gdkwindow, (GdkFilterFunc) screen_xevent_filter, queue->priv->screen);
+        for (i = 0; i < queue->priv->screen->n_stacks; i++) {
+                g_clear_object (&queue->priv->screen->stacks[i]);
         }
 
-        g_free (queue->priv->screens);
-        queue->priv->screens = NULL;
+        g_free (queue->priv->screen->stacks);
+        queue->priv->screen->stacks = NULL;
+
+        g_free (queue->priv->screen);
+        queue->priv->screen = NULL;
 }
 
 
@@ -539,7 +518,7 @@ nd_queue_finalize (GObject *object)
         g_hash_table_destroy (queue->priv->notifications);
         g_queue_free (queue->priv->queue);
 
-        destroy_screens (queue);
+        destroy_screen (queue);
 
         if (queue->priv->numerable_icon != NULL) {
                 g_object_unref (queue->priv->numerable_icon);
@@ -574,7 +553,6 @@ get_stack_with_pointer (NdQueue *queue)
 {
         GdkScreen *screen;
         int        x, y;
-        int        screen_num;
         int        monitor_num;
 
         gdk_display_get_pointer (gdk_display_get_default (),
@@ -582,16 +560,15 @@ get_stack_with_pointer (NdQueue *queue)
                                  &x,
                                  &y,
                                  NULL);
-        screen_num = gdk_screen_get_number (screen);
         monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
 
-        if (monitor_num >= queue->priv->screens[screen_num]->n_stacks) {
+        if (monitor_num >= queue->priv->screen->n_stacks) {
                 /* screw it - dump it on the last one we'll get
                    a monitors-changed signal soon enough*/
-                monitor_num = queue->priv->screens[screen_num]->n_stacks - 1;
+                monitor_num = queue->priv->screen->n_stacks - 1;
         }
 
-        return queue->priv->screens[screen_num]->stacks[monitor_num];
+        return queue->priv->screen->stacks[monitor_num];
 }
 
 static void
