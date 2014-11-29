@@ -529,7 +529,6 @@ nd_bubble_init (NdBubble *bubble)
         GtkWidget   *image;
         GtkWidget   *alignment;
         AtkObject   *atkobj;
-        GtkRcStyle  *rcstyle;
         GdkScreen   *screen;
         GdkVisual   *visual;
 
@@ -608,11 +607,6 @@ nd_bubble_init (NdBubble *bubble)
                           "clicked",
                           G_CALLBACK (on_close_button_clicked),
                           bubble);
-
-        rcstyle = gtk_rc_style_new ();
-        rcstyle->xthickness = rcstyle->ythickness = 0;
-        gtk_widget_modify_style (close_button, rcstyle);
-        g_object_unref (rcstyle);
 
         atkobj = gtk_widget_get_accessible (close_button);
         atk_action_set_description (ATK_ACTION (atkobj), 0,

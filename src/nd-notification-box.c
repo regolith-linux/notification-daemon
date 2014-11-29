@@ -275,7 +275,6 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         GtkWidget     *vbox;
         GtkWidget     *alignment;
         AtkObject     *atkobj;
-        GtkRcStyle    *rcstyle;
 
         notification_box->priv = ND_NOTIFICATION_BOX_GET_PRIVATE (notification_box);
         box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
@@ -315,11 +314,6 @@ nd_notification_box_init (NdNotificationBox *notification_box)
                           "clicked",
                           G_CALLBACK (on_close_button_clicked),
                           notification_box);
-
-        rcstyle = gtk_rc_style_new ();
-        rcstyle->xthickness = rcstyle->ythickness = 0;
-        gtk_widget_modify_style (notification_box->priv->close_button, rcstyle);
-        g_object_unref (rcstyle);
 
         atkobj = gtk_widget_get_accessible (notification_box->priv->close_button);
         atk_action_set_description (ATK_ACTION (atkobj), 0,
