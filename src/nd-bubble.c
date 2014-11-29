@@ -741,7 +741,7 @@ set_notification_text (NdBubble   *bubble,
         }
         update_content_hbox_visibility (bubble);
 
-        gtk_widget_size_request (bubble->priv->close_button, &req);
+        gtk_widget_get_preferred_size (bubble->priv->close_button, NULL, &req);
         /* -1: main_vbox border width
            -10: vbox border width
            -6: spacing for hbox */

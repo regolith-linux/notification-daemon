@@ -211,7 +211,7 @@ update_notification_box (NdNotificationBox *notification_box)
         gtk_label_set_markup (GTK_LABEL (notification_box->priv->summary_label), str);
         g_free (str);
 
-        gtk_widget_size_request (notification_box->priv->close_button, &req);
+        gtk_widget_get_preferred_size (notification_box->priv->close_button, NULL, &req);
         /* -1: main_vbox border width
            -10: vbox border width
            -6: spacing for hbox */
