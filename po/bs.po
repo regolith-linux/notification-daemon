@@ -1,0 +1,45 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: notification-daemon\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-02-26 23:35+0000\n"
+"PO-Revision-Date: 2013-01-30 20:47+0000\n"
+"Last-Translator: Samir Ribić <Unknown>\n"
+"Language-Team: Bosnian <bs@li.org>\n"
+"Language: bs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2014-10-23 07:09+0000\n"
+"X-Generator: Launchpad (build 17203)\n"
+
+#: ../src/daemon.c:188
+msgid "Exceeded maximum number of notifications"
+msgstr "Pređen maksimalni broj obavijesti"
+
+#: ../src/daemon.c:251
+msgid "Invalid notification identifier"
+msgstr "Pogrešan identifikator obavještenja"
+
+#: ../src/nd-queue.c:455
+msgid "Clear all notifications"
+msgstr "Obriši sva obavještenja"
+
+#: ../src/nd-queue.c:864
+msgid "Notifications"
+msgstr "Obavještenja"
+
+#: ../src/sound.c:35
+msgid "Notification"
+msgstr "Obavijest"
+
+#: ../data/notification-daemon.desktop.in.in.h:1
+#: ../data/notification-daemon-autostart.desktop.in.in.h:1
+msgid "Notification Daemon"
+msgstr "Demon za obavještenja"
+
+#: ../data/notification-daemon.desktop.in.in.h:2
+#: ../data/notification-daemon-autostart.desktop.in.in.h:2
+msgid "Display notifications"
+msgstr "Prikaži obavještenja"
