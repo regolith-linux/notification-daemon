@@ -473,23 +473,25 @@ on_activate_link (GtkLabel *label,
 {
         char *escaped_uri;
         char *cmd = NULL;
+        char *found = NULL;
 
         /* Somewhat of a hack.. */
         bubble->priv->url_clicked_lock = TRUE;
 
         escaped_uri = g_shell_quote (uri);
 
-        if (g_find_program_in_path ("gvfs-open") != NULL) {
+        if ((found = g_find_program_in_path ("gvfs-open")) != NULL) {
                 cmd = g_strdup_printf ("gvfs-open %s", escaped_uri);
-        } else if (g_find_program_in_path ("xdg-open") != NULL) {
+        } else if ((found = g_find_program_in_path ("xdg-open")) != NULL) {
                 cmd = g_strdup_printf ("xdg-open %s", escaped_uri);
-        } else if (g_find_program_in_path ("firefox") != NULL) {
+        } else if ((found = g_find_program_in_path ("firefox")) != NULL) {
                 cmd = g_strdup_printf ("firefox %s", escaped_uri);
         } else {
                 g_warning ("Unable to find a browser.");
         }
 
         g_free (escaped_uri);
+        g_free (found);
 
         if (cmd != NULL) {
                 g_spawn_command_line_async (cmd, NULL);
