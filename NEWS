@@ -1,3 +1,9 @@
+Version 3.16.0
+==============
+- Free memory returned by g_find_program_in_path. (Dmitry Shachnev)
+- Updated translations:
+  Samir Ribic (bs).
+
 Version 3.15.2
 ==============
 - Fix few deprecation warnings. (Alberts Muktupāvels)
