@@ -29,6 +29,8 @@
 
 #define ND_BUBBLE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), ND_TYPE_BUBBLE, NdBubblePrivate))
 
+#define EXPIRATION_TIME_DEFAULT -1
+#define EXPIRATION_TIME_NEVER_EXPIRES 0
 #define TIMEOUT_SEC   5
 
 #define WIDTH         400
@@ -395,12 +397,22 @@ timeout_bubble (NdBubble *bubble)
 static void
 add_timeout (NdBubble *bubble)
 {
+        int timeout = nd_notification_get_timeout(bubble->priv->notification);
+
         if (bubble->priv->timeout_id != 0) {
                 g_source_remove (bubble->priv->timeout_id);
+                bubble->priv->timeout_id = 0;
         }
-        bubble->priv->timeout_id = g_timeout_add_seconds (TIMEOUT_SEC,
-                                                          (GSourceFunc)timeout_bubble,
-                                                          bubble);
+
+        if (timeout == EXPIRATION_TIME_NEVER_EXPIRES)
+                return;
+
+        if (timeout == EXPIRATION_TIME_DEFAULT)
+                timeout = TIMEOUT_SEC * 1000;
+
+        bubble->priv->timeout_id = g_timeout_add (timeout,
+                                                  (GSourceFunc) timeout_bubble,
+                                                  bubble);
 }
 
 static void

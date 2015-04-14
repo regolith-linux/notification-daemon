@@ -194,6 +194,8 @@ nd_notification_update (NdNotification *notification,
                                      value); /* steals value */
         }
 
+        notification->timeout = timeout;
+
         g_signal_emit (notification, signals[CHANGED], 0);
 
         g_get_current_time (&notification->update_time);
@@ -326,6 +328,13 @@ nd_notification_get_icon (NdNotification *notification)
         return notification->icon;
 }
 
+int
+nd_notification_get_timeout (NdNotification *notification)
+{
+        g_return_val_if_fail (ND_IS_NOTIFICATION (notification), -1);
+
+        return notification->timeout;
+}
 
 static GdkPixbuf *
 scale_pixbuf (GdkPixbuf *pixbuf,
