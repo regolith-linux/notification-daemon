@@ -104,85 +104,6 @@ nd_bubble_configure_event (GtkWidget         *widget,
 }
 
 static void
-color_reverse (const GdkColor *a,
-               GdkColor       *b)
-{
-        gdouble red;
-        gdouble green;
-        gdouble blue;
-        gdouble h;
-        gdouble s;
-        gdouble v;
-
-        red = (gdouble) a->red / 65535.0;
-        green = (gdouble) a->green / 65535.0;
-        blue = (gdouble) a->blue / 65535.0;
-
-        gtk_rgb_to_hsv (red, green, blue, &h, &s, &v);
-
-        /* pivot brightness around the center */
-        v = 0.5 + (0.5 - v);
-        if (v > 1.0)
-                v = 1.0;
-        else if (v < 0.0)
-                v = 0.0;
-
-        /* reduce saturation by 50% */
-        s *= 0.5;
-
-        gtk_hsv_to_rgb (h, s, v, &red, &green, &blue);
-
-        b->red = red * 65535.0;
-        b->green = green * 65535.0;
-        b->blue = blue * 65535.0;
-}
-
-static void
-override_style (GtkWidget *widget,
-                GtkStyle  *previous_style)
-{
-        GtkStateType state;
-        GtkStyle    *style;
-        GtkStyle    *old_style;
-        GdkColor     fg;
-        GdkColor     bg;
-
-        gtk_widget_ensure_style (widget);
-        old_style = gtk_widget_get_style (widget);
-        style = gtk_style_copy (old_style);
-        if (previous_style == NULL
-            || (previous_style != NULL
-                && (previous_style->bg[GTK_STATE_NORMAL].red != style->bg[GTK_STATE_NORMAL].red
-                    || previous_style->bg[GTK_STATE_NORMAL].green != style->bg[GTK_STATE_NORMAL].green
-                    || previous_style->bg[GTK_STATE_NORMAL].blue != style->bg[GTK_STATE_NORMAL].blue))) {
-
-                state = (GtkStateType) 0;
-                while (state < (GtkStateType) G_N_ELEMENTS (old_style->bg))  {
-                        color_reverse (&style->bg[state], &bg);
-                        gtk_widget_modify_bg (widget, state, &bg);
-                        state++;
-                }
-
-        }
-
-        if (previous_style == NULL
-            || (previous_style != NULL
-                && (previous_style->fg[GTK_STATE_NORMAL].red != style->fg[GTK_STATE_NORMAL].red
-                    || previous_style->fg[GTK_STATE_NORMAL].green != style->fg[GTK_STATE_NORMAL].green
-                    || previous_style->fg[GTK_STATE_NORMAL].blue != style->fg[GTK_STATE_NORMAL].blue))) {
-
-                state = (GtkStateType) 0;
-                while (state < (GtkStateType) G_N_ELEMENTS (old_style->fg)) {
-                        color_reverse (&style->fg[state], &fg);
-                        gtk_widget_modify_fg (widget, state, &fg);
-                        state++;
-                }
-        }
-
-        g_object_unref (style);
-}
-
-static void
 nd_bubble_composited_changed (GtkWidget *widget)
 {
         NdBubble  *bubble = ND_BUBBLE (widget);
@@ -522,19 +443,6 @@ on_close_button_clicked (GtkButton *button,
 }
 
 static void
-on_style_set (GtkWidget  *widget,
-              GtkStyle   *previous_style,
-              NdBubble  *bubble)
-{
-        g_signal_handlers_block_by_func (G_OBJECT (widget), on_style_set, bubble);
-        override_style (widget, previous_style);
-
-        gtk_widget_queue_draw (widget);
-
-        g_signal_handlers_unblock_by_func (G_OBJECT (widget), on_style_set, bubble);
-}
-
-static void
 nd_bubble_init (NdBubble *bubble)
 {
         GtkWidget   *main_vbox;
@@ -547,11 +455,6 @@ nd_bubble_init (NdBubble *bubble)
         GdkVisual   *visual;
 
         bubble->priv = ND_BUBBLE_GET_PRIVATE (bubble);
-
-        g_signal_connect (G_OBJECT (bubble),
-                          "style-set",
-                          G_CALLBACK (on_style_set),
-                          bubble);
 
         gtk_widget_add_events (GTK_WIDGET (bubble), GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
         atk_object_set_role (gtk_widget_get_accessible (GTK_WIDGET (bubble)), ATK_ROLE_ALERT);
@@ -569,10 +472,6 @@ nd_bubble_init (NdBubble *bubble)
         }
 
         main_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-        g_signal_connect (G_OBJECT (main_vbox),
-                          "style-set",
-                          G_CALLBACK (on_style_set),
-                          bubble);
         gtk_widget_show (main_vbox);
         gtk_container_add (GTK_CONTAINER (bubble), main_vbox);
         gtk_container_set_border_width (GTK_CONTAINER (main_vbox), 12);
@@ -608,10 +507,6 @@ nd_bubble_init (NdBubble *bubble)
         gtk_box_pack_start (GTK_BOX (bubble->priv->main_hbox), alignment, FALSE, FALSE, 0);
 
         close_button = gtk_button_new ();
-        g_signal_connect (G_OBJECT (close_button),
-                          "style-set",
-                          G_CALLBACK (on_style_set),
-                          bubble);
         gtk_widget_show (close_button);
         bubble->priv->close_button = close_button;
         gtk_container_add (GTK_CONTAINER (alignment), close_button);
@@ -634,10 +529,6 @@ nd_bubble_init (NdBubble *bubble)
 
         /* center vbox */
         bubble->priv->summary_label = gtk_label_new (NULL);
-        g_signal_connect (G_OBJECT (bubble->priv->summary_label),
-                          "style-set",
-                          G_CALLBACK (on_style_set),
-                          bubble);
         gtk_widget_show (bubble->priv->summary_label);
         gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->summary_label, TRUE, TRUE, 0);
         gtk_label_set_xalign (GTK_LABEL (bubble->priv->summary_label), 0.0);
@@ -658,10 +549,6 @@ nd_bubble_init (NdBubble *bubble)
         gtk_box_pack_start (GTK_BOX (bubble->priv->content_hbox), vbox, TRUE, TRUE, 0);
 
         bubble->priv->body_label = gtk_label_new (NULL);
-        g_signal_connect (G_OBJECT (bubble->priv->body_label),
-                          "style-set",
-                          G_CALLBACK (on_style_set),
-                          bubble);
         gtk_widget_show (bubble->priv->body_label);
         gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->body_label, TRUE, TRUE, 0);
         gtk_label_set_xalign (GTK_LABEL (bubble->priv->body_label), 0.0);
@@ -878,10 +765,6 @@ add_notification_action (NdBubble       *bubble,
         }
 
         button = gtk_button_new ();
-        g_signal_connect (G_OBJECT (button),
-                          "style-set",
-                          G_CALLBACK (on_style_set),
-                          bubble);
         gtk_widget_show (button);
         gtk_box_pack_start (GTK_BOX (bubble->priv->actions_box), button, FALSE, FALSE, 0);
         gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
@@ -906,10 +789,6 @@ add_notification_action (NdBubble       *bubble,
 
                 image = gtk_image_new_from_pixbuf (pixbuf);
                 g_object_unref (pixbuf);
-                g_signal_connect (G_OBJECT (image),
-                                  "style-set",
-                                  G_CALLBACK (on_style_set),
-                                  bubble);
                 atk_object_set_name (gtk_widget_get_accessible (GTK_WIDGET (button)),
                                      text);
                 gtk_widget_show (image);
@@ -920,10 +799,6 @@ add_notification_action (NdBubble       *bubble,
                 GtkWidget *label;
 
                 label = gtk_label_new (NULL);
-                g_signal_connect (G_OBJECT (label),
-                                  "style-set",
-                                  G_CALLBACK (on_style_set),
-                                  bubble);
                 gtk_widget_show (label);
                 gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
                 gtk_label_set_xalign (GTK_LABEL (label), 0.0);
