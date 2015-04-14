@@ -490,7 +490,7 @@ nd_notification_load_image (NdNotification *notification,
                 pixbuf = _notify_daemon_pixbuf_from_data_hint (data, size);
         } else if ((data = (GVariant *) g_hash_table_lookup (notification->hints, "image-path"))
                    || (data = (GVariant *) g_hash_table_lookup (notification->hints, "image_path"))) {
-                if (g_variant_is_of_type (data, G_VARIANT_TYPE ("(s)"))) {
+                if (g_variant_is_of_type (data, G_VARIANT_TYPE_STRING)) {
                         const char *path;
                         path = g_variant_get_string (data, NULL);
                         pixbuf = _notify_daemon_pixbuf_from_path (path, size);
