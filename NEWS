@@ -1,3 +1,9 @@
+Version 3.16.1
+==============
+- Fix timeout, based on patch by Jakub Adam. (Alberts Muktupāvels)
+- Properly check if GVariant is string. (Alberts Muktupāvels)
+- Fix crash in hint_to_boolean. (Alberts Muktupāvels)
+
 Version 3.16.0
 ==============
 - Free memory returned by g_find_program_in_path. (Dmitry Shachnev)
