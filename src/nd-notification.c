@@ -243,6 +243,8 @@ hint_to_boolean (NdNotification *notification,
                 return TRUE;
         } else if (g_variant_is_of_type (value, G_VARIANT_TYPE_BYTE)) {
                 return (g_variant_get_byte (value) != 0);
+        } else if (g_variant_is_of_type (value, G_VARIANT_TYPE_BOOLEAN)) {
+                return g_variant_get_boolean (value);
         } else {
                 g_assert_not_reached ();
         }
