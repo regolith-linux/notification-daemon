@@ -863,6 +863,8 @@ update_bubble (NdBubble *bubble)
         add_actions (bubble);
         update_image (bubble);
         update_content_hbox_visibility (bubble);
+
+        add_timeout (bubble);
 }
 
 static void
