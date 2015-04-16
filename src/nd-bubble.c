@@ -357,25 +357,13 @@ nd_bubble_get_preferred_width (GtkWidget *widget,
 }
 
 static gboolean
-nd_bubble_enter_notify_event (GtkWidget        *widget,
-                              GdkEventCrossing *event)
-{
-        NdBubble *bubble = ND_BUBBLE (widget);
-        if (bubble->priv->timeout_id != 0) {
-                g_source_remove (bubble->priv->timeout_id);
-                bubble->priv->timeout_id = 0;
-        }
-
-        return FALSE;
-}
-
-static gboolean
-nd_bubble_leave_notify_event (GtkWidget        *widget,
-                              GdkEventCrossing *event)
+nd_bubble_motion_notify_event (GtkWidget        *widget,
+                               GdkEventCrossing *event)
 {
         NdBubble *bubble = ND_BUBBLE (widget);
 
         add_timeout (bubble);
+
         return FALSE;
 }
 
@@ -391,8 +379,7 @@ nd_bubble_class_init (NdBubbleClass *klass)
         widget_class->configure_event = nd_bubble_configure_event;
         widget_class->composited_changed = nd_bubble_composited_changed;
         widget_class->button_release_event = nd_bubble_button_release_event;
-        widget_class->enter_notify_event = nd_bubble_enter_notify_event;
-        widget_class->leave_notify_event = nd_bubble_leave_notify_event;
+        widget_class->motion_notify_event = nd_bubble_motion_notify_event;
         widget_class->realize = nd_bubble_realize;
         widget_class->get_preferred_width = nd_bubble_get_preferred_width;
 
@@ -897,6 +884,9 @@ nd_bubble_new_for_notification (NdNotification *notification)
                                "resizable", FALSE,
                                "type-hint", GDK_WINDOW_TYPE_HINT_NOTIFICATION,
                                NULL);
+
+        gtk_widget_add_events (GTK_WIDGET (bubble), GDK_POINTER_MOTION_MASK);
+
         bubble->priv->notification = g_object_ref (notification);
         g_signal_connect (notification, "changed", G_CALLBACK (on_notification_changed), bubble);
         update_bubble (bubble);
