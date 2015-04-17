@@ -39,6 +39,7 @@ enum {
 struct _NdNotification {
         GObject       parent;
 
+        gboolean      is_queued;
         gboolean      is_closed;
 
         GTimeVal      update_time;
@@ -215,6 +216,23 @@ nd_notification_get_update_time (NdNotification *notification,
 
         tvp->tv_usec = notification->update_time.tv_usec;
         tvp->tv_sec = notification->update_time.tv_sec;
+}
+
+void
+nd_notification_set_is_queued (NdNotification *notification,
+                               gboolean        is_queued)
+{
+        g_return_if_fail (ND_IS_NOTIFICATION (notification));
+
+        notification->is_queued = is_queued;
+}
+
+gboolean
+nd_notification_get_is_queued (NdNotification *notification)
+{
+        g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
+
+        return notification->is_queued;
 }
 
 gboolean

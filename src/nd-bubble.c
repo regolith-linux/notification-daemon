@@ -722,10 +722,14 @@ on_action_clicked (GtkButton      *button,
                    NdBubble       *bubble)
 {
         const char *key = g_object_get_data (G_OBJECT (button), "_action_key");
+        gboolean resident = nd_notification_get_is_resident (bubble->priv->notification);
+        gboolean transient = nd_notification_get_is_transient (bubble->priv->notification);
 
         nd_notification_action_invoked (bubble->priv->notification,
                                         key);
-        gtk_widget_destroy (GTK_WIDGET (bubble));
+
+        if (transient || !resident)
+                gtk_widget_destroy (GTK_WIDGET (bubble));
 }
 
 static void

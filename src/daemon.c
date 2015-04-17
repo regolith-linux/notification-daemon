@@ -224,8 +224,9 @@ handle_notify (NotifyDaemon          *daemon,
                                 hints_iter,
                                 timeout);
 
-        if (id == 0) {
+        if (id == 0 || !nd_notification_get_is_queued (notification)) {
                 nd_queue_add (daemon->priv->queue, notification);
+                nd_notification_set_is_queued (notification, TRUE);
         }
 
         g_dbus_method_invocation_return_value (invocation,
