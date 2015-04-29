@@ -3,7 +3,7 @@ dnl Process this file with autoconf to create configure.
 dnl ################################################################
 dnl # Initialize autoconf
 dnl ################################################################
-AC_INIT([notification-daemon],[3.16.1],[https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon],[notification-daemon])
+AC_INIT([notification-daemon],[3.17.1],[https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon],[notification-daemon])
 AC_PREREQ(2.63)
 
 AC_CONFIG_HEADERS([config.h])

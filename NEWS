@@ -1,3 +1,9 @@
+Version 3.17.1
+==============
+- Fix resident notifications. (Alberts Muktupāvels)
+- Reset timeout when updating notification content. (Alberts Muktupāvels)
+- Style fixes, should look better with Adwaita theme. (Alberts Muktupāvels)
+
 Version 3.16.1
 ==============
 - Fix timeout, based on patch by Jakub Adam. (Alberts Muktupāvels)
