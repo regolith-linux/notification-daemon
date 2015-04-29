@@ -443,7 +443,7 @@ nd_bubble_init (NdBubble *bubble)
 
         bubble->priv = ND_BUBBLE_GET_PRIVATE (bubble);
 
-        gtk_widget_add_events (GTK_WIDGET (bubble), GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+        gtk_widget_add_events (GTK_WIDGET (bubble), GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
         atk_object_set_role (gtk_widget_get_accessible (GTK_WIDGET (bubble)), ATK_ROLE_ALERT);
 
         screen = gtk_window_get_screen (GTK_WINDOW (bubble));
@@ -890,8 +890,6 @@ nd_bubble_new_for_notification (NdNotification *notification)
                                "resizable", FALSE,
                                "type-hint", GDK_WINDOW_TYPE_HINT_NOTIFICATION,
                                NULL);
-
-        gtk_widget_add_events (GTK_WIDGET (bubble), GDK_POINTER_MOTION_MASK);
 
         bubble->priv->notification = g_object_ref (notification);
         g_signal_connect (notification, "changed", G_CALLBACK (on_notification_changed), bubble);
