@@ -371,6 +371,10 @@ main (int argc, char **argv)
         NotifyDaemon *daemon;
         guint         owner_id;
 
+        bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
+        bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+        textdomain (GETTEXT_PACKAGE);
+
         g_log_set_always_fatal (G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL);
 
         gtk_init (&argc, &argv);

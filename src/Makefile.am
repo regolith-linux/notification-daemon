@@ -1,3 +1,5 @@
+NULL =
+
 libexec_PROGRAMS = notification-daemon
 
 notification_daemon_SOURCES = \
@@ -14,14 +16,17 @@ notification_daemon_SOURCES = \
 	daemon.c \
 	daemon.h \
 	sound.c \
-	sound.h
+	sound.h \
+	$(NULL)
 
 notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir) \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
-	-DENGINES_DIR=\"$(libdir)/notification-daemon-1.0/engines\"
+	-DENGINES_DIR=\"$(libdir)/notification-daemon-1.0/engines\" \
+	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	$(NULL)
 
 EXTRA_DIST = notificationdaemon.xml
 
