@@ -73,8 +73,6 @@ struct NdBubblePrivate
         guint           timeout_id;
 };
 
-static void     nd_bubble_class_init  (NdBubbleClass *klass);
-static void     nd_bubble_init        (NdBubble      *bubble);
 static void     nd_bubble_finalize    (GObject       *object);
 static void     on_notification_changed (NdNotification *notification,
                                          NdBubble       *bubble);
