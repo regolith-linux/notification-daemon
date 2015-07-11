@@ -69,8 +69,6 @@ enum {
 
 static guint signals [LAST_SIGNAL] = { 0, };
 
-static void     nd_queue_class_init     (NdQueueClass   *klass);
-static void     nd_queue_init           (NdQueue        *queue);
 static void     nd_queue_finalize       (GObject        *object);
 static void     queue_update            (NdQueue        *queue);
 static void     on_notification_close   (NdNotification *notification,
