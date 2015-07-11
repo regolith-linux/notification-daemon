@@ -299,7 +299,8 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         /* Add the close button */
 
         notification_box->priv->close_button = gtk_button_new ();
-        gtk_widget_set_valign (notification_box->priv->icon, GTK_ALIGN_START);
+        gtk_widget_set_valign (notification_box->priv->close_button,
+                               GTK_ALIGN_START);
         gtk_widget_show (notification_box->priv->close_button);
 
         gtk_box_pack_start (GTK_BOX (box), notification_box->priv->close_button,
