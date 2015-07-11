@@ -658,6 +658,8 @@ update_dock (NdQueue *queue)
         int          monitor_num;
         GdkScreen   *screen;
         GdkRectangle area;
+        GtkStatusIcon *status_icon;
+        gboolean visible;
 
         g_return_if_fail (queue);
 
@@ -691,15 +693,22 @@ update_dock (NdQueue *queue)
         }
         gtk_widget_show (child);
 
-        if (queue->priv->status_icon != NULL
-            && gtk_status_icon_get_visible (GTK_STATUS_ICON (queue->priv->status_icon))) {
-                gtk_widget_get_preferred_height (child,
-                                                 &min_height,
-                                                 &height);
-                gtk_status_icon_get_geometry (GTK_STATUS_ICON (queue->priv->status_icon),
-                                              &screen,
-                                              &area,
-                                              NULL);
+        status_icon = queue->priv->status_icon;
+        visible = FALSE;
+
+        if (status_icon != NULL) {
+                G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+                visible = gtk_status_icon_get_visible (status_icon);
+                G_GNUC_END_IGNORE_DEPRECATIONS
+        }
+
+        if (visible) {
+                gtk_widget_get_preferred_height (child, &min_height, &height);
+
+                G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+                gtk_status_icon_get_geometry (status_icon, &screen, &area, NULL);
+                G_GNUC_END_IGNORE_DEPRECATIONS
+
                 monitor_num = gdk_screen_get_monitor_at_point (screen, area.x, area.y);
                 gdk_screen_get_monitor_geometry (screen, monitor_num, &area);
                 height = MIN (height, (area.height / 2));
@@ -725,13 +734,16 @@ popup_dock (NdQueue *queue,
         int            monitor_num;
         GdkRectangle   monitor;
         GtkRequisition dock_req;
+        GtkStatusIcon *status_icon;
 
         update_dock (queue);
 
-        res = gtk_status_icon_get_geometry (GTK_STATUS_ICON (queue->priv->status_icon),
-                                            &screen,
-                                            &area,
-                                            &orientation);
+        status_icon = queue->priv->status_icon;
+
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+        res = gtk_status_icon_get_geometry (status_icon, &screen, &area, &orientation);
+        G_GNUC_END_IGNORE_DEPRECATIONS
+
         if (! res) {
                 g_warning ("Unable to determine geometry of status icon");
                 return FALSE;
@@ -862,9 +874,12 @@ update_idle (NdQueue *queue)
                 }
 
                 if (queue->priv->status_icon == NULL) {
+                        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
                         queue->priv->status_icon = gtk_status_icon_new ();
-                        gtk_status_icon_set_title (GTK_STATUS_ICON (queue->priv->status_icon),
+                        gtk_status_icon_set_title (queue->priv->status_icon,
                                                    _("Notifications"));
+                        G_GNUC_END_IGNORE_DEPRECATIONS
+
                         g_signal_connect (queue->priv->status_icon,
                                           "activate",
                                           G_CALLBACK (on_status_icon_activate),
@@ -883,13 +898,20 @@ update_idle (NdQueue *queue)
                         GIcon *icon;
                         /* FIXME: use a more appropriate icon here */
                         icon = g_themed_icon_new ("mail-message-new");
+
+                        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
                         queue->priv->numerable_icon = gtk_numerable_icon_new (icon);
+                        G_GNUC_END_IGNORE_DEPRECATIONS
+
                         g_object_unref (icon);
                 }
+
+                G_GNUC_BEGIN_IGNORE_DEPRECATIONS
                 gtk_numerable_icon_set_count (GTK_NUMERABLE_ICON (queue->priv->numerable_icon), num);
                 gtk_status_icon_set_from_gicon (queue->priv->status_icon,
                                                 queue->priv->numerable_icon);
                 gtk_status_icon_set_visible (queue->priv->status_icon, TRUE);
+                G_GNUC_END_IGNORE_DEPRECATIONS
 
                 maybe_show_notification (queue);
         } else {
