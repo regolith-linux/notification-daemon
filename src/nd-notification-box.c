@@ -43,7 +43,6 @@ struct NdNotificationBoxPrivate
         GtkWidget      *body_label;
 
         GtkWidget      *main_hbox;
-        GtkWidget      *iconbox;
         GtkWidget      *content_hbox;
         GtkWidget      *actions_box;
         GtkWidget      *last_sep;
@@ -268,10 +267,8 @@ static void
 nd_notification_box_init (NdNotificationBox *notification_box)
 {
         GtkWidget     *box;
-        GtkWidget     *iconbox;
         GtkWidget     *image;
         GtkWidget     *vbox;
-        GtkWidget     *alignment;
         AtkObject     *atkobj;
 
         notification_box->priv = ND_NOTIFICATION_BOX_GET_PRIVATE (notification_box);
@@ -279,19 +276,19 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_container_add (GTK_CONTAINER (notification_box), box);
         gtk_widget_show (box);
 
-        /* First row (icon, vbox, close) */
-        iconbox = gtk_alignment_new (0.5, 0, 0, 0);
-        gtk_widget_show (iconbox);
-        gtk_alignment_set_padding (GTK_ALIGNMENT (iconbox),
-                                   5, 0, 0, 0);
-        gtk_box_pack_start (GTK_BOX (box),
-                            iconbox,
-                            FALSE, FALSE, 0);
-        gtk_widget_set_size_request (iconbox, BODY_X_OFFSET, -1);
+        /* Add icon */
 
         notification_box->priv->icon = gtk_image_new ();
+        gtk_widget_set_valign (notification_box->priv->icon, GTK_ALIGN_START);
+        gtk_widget_set_margin_top (notification_box->priv->icon, 5);
+        gtk_widget_set_size_request (notification_box->priv->icon,
+                                     BODY_X_OFFSET, -1);
         gtk_widget_show (notification_box->priv->icon);
-        gtk_container_add (GTK_CONTAINER (iconbox), notification_box->priv->icon);
+
+        gtk_box_pack_start (GTK_BOX (box), notification_box->priv->icon,
+                            FALSE, FALSE, 0);
+
+        /* Add vbox */
 
         vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
         gtk_widget_show (vbox);
@@ -299,13 +296,14 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
         /* Add the close button */
-        alignment = gtk_alignment_new (0.5, 0, 0, 0);
-        gtk_widget_show (alignment);
-        gtk_box_pack_start (GTK_BOX (box), alignment, FALSE, FALSE, 0);
 
         notification_box->priv->close_button = gtk_button_new ();
+        gtk_widget_set_valign (notification_box->priv->icon, GTK_ALIGN_START);
         gtk_widget_show (notification_box->priv->close_button);
-        gtk_container_add (GTK_CONTAINER (alignment), notification_box->priv->close_button);
+
+        gtk_box_pack_start (GTK_BOX (box), notification_box->priv->close_button,
+                            FALSE, FALSE, 0);
+
         gtk_button_set_relief (GTK_BUTTON (notification_box->priv->close_button), GTK_RELIEF_NONE);
         gtk_container_set_border_width (GTK_CONTAINER (notification_box->priv->close_button), 0);
         g_signal_connect (G_OBJECT (notification_box->priv->close_button),
@@ -355,14 +353,11 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         atkobj = gtk_widget_get_accessible (notification_box->priv->body_label);
         atk_object_set_description (atkobj, "Notification body text.");
 
-        alignment = gtk_alignment_new (1, 0.5, 0, 0);
-        gtk_widget_show (alignment);
-        gtk_box_pack_start (GTK_BOX (vbox), alignment, FALSE, TRUE, 0);
-
         notification_box->priv->actions_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+        gtk_widget_set_halign (notification_box->priv->actions_box, GTK_ALIGN_END);
         gtk_widget_show (notification_box->priv->actions_box);
-        gtk_container_add (GTK_CONTAINER (alignment), notification_box->priv->actions_box);
 
+        gtk_box_pack_start (GTK_BOX (vbox), notification_box->priv->actions_box, FALSE, TRUE, 0);
 }
 
 static void
