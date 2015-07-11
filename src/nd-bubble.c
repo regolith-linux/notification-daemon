@@ -48,7 +48,6 @@ struct NdBubblePrivate
         NdNotification *notification;
 
         GtkWidget      *main_hbox;
-        GtkWidget      *iconbox;
         GtkWidget      *icon;
         GtkWidget      *content_hbox;
         GtkWidget      *summary_label;
@@ -434,7 +433,6 @@ nd_bubble_init (NdBubble *bubble)
         GtkWidget   *vbox;
         GtkWidget   *close_button;
         GtkWidget   *image;
-        GtkWidget   *alignment;
         AtkObject   *atkobj;
         GdkScreen   *screen;
         GdkVisual   *visual;
@@ -467,19 +465,19 @@ nd_bubble_init (NdBubble *bubble)
                             bubble->priv->main_hbox,
                             FALSE, FALSE, 0);
 
-        /* First row (icon, vbox, close) */
-        bubble->priv->iconbox = gtk_alignment_new (0.5, 0, 0, 0);
-        gtk_widget_show (bubble->priv->iconbox);
-        gtk_alignment_set_padding (GTK_ALIGNMENT (bubble->priv->iconbox),
-                                   5, 0, 0, 0);
-        gtk_box_pack_start (GTK_BOX (bubble->priv->main_hbox),
-                            bubble->priv->iconbox,
-                            FALSE, FALSE, 0);
-        gtk_widget_set_size_request (bubble->priv->iconbox, BODY_X_OFFSET, -1);
+        /* Add icon */
 
         bubble->priv->icon = gtk_image_new ();
+        gtk_widget_set_valign (bubble->priv->icon, GTK_ALIGN_START);
+        gtk_widget_set_margin_top (bubble->priv->icon, 5);
+        gtk_widget_set_size_request (bubble->priv->icon, BODY_X_OFFSET, -1);
         gtk_widget_show (bubble->priv->icon);
-        gtk_container_add (GTK_CONTAINER (bubble->priv->iconbox), bubble->priv->icon);
+
+        gtk_box_pack_start (GTK_BOX (bubble->priv->main_hbox),
+                            bubble->priv->icon,
+                            FALSE, FALSE, 0);
+
+        /* Add vbox */
 
         vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
         gtk_widget_show (vbox);
@@ -487,14 +485,16 @@ nd_bubble_init (NdBubble *bubble)
         gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
 
         /* Add the close button */
-        alignment = gtk_alignment_new (0.5, 0, 0, 0);
-        gtk_widget_show (alignment);
-        gtk_box_pack_start (GTK_BOX (bubble->priv->main_hbox), alignment, FALSE, FALSE, 0);
 
         close_button = gtk_button_new ();
+        gtk_widget_set_valign (close_button, GTK_ALIGN_START);
         gtk_widget_show (close_button);
+
         bubble->priv->close_button = close_button;
-        gtk_container_add (GTK_CONTAINER (alignment), close_button);
+        gtk_box_pack_start (GTK_BOX (bubble->priv->main_hbox),
+                            bubble->priv->close_button,
+                            FALSE, FALSE, 0);
+
         gtk_button_set_relief (GTK_BUTTON (close_button), GTK_RELIEF_NONE);
         gtk_container_set_border_width (GTK_CONTAINER (close_button), 0);
         g_signal_connect (G_OBJECT (close_button),
@@ -548,13 +548,11 @@ nd_bubble_init (NdBubble *bubble)
         atkobj = gtk_widget_get_accessible (bubble->priv->body_label);
         atk_object_set_description (atkobj, "Notification body text.");
 
-        alignment = gtk_alignment_new (1, 0.5, 0, 0);
-        gtk_widget_show (alignment);
-        gtk_box_pack_start (GTK_BOX (vbox), alignment, FALSE, TRUE, 0);
-
         bubble->priv->actions_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+        gtk_widget_set_halign (bubble->priv->actions_box, GTK_ALIGN_END);
         gtk_widget_show (bubble->priv->actions_box);
-        gtk_container_add (GTK_CONTAINER (alignment), bubble->priv->actions_box);
+
+        gtk_box_pack_start (GTK_BOX (vbox), bubble->priv->actions_box, FALSE, TRUE, 0);
 }
 
 static void
@@ -699,13 +697,13 @@ set_notification_icon (NdBubble  *bubble,
                 int pixbuf_width = gdk_pixbuf_get_width (scaled);
 
                 gtk_widget_show (bubble->priv->icon);
-                gtk_widget_set_size_request (bubble->priv->iconbox,
+                gtk_widget_set_size_request (bubble->priv->icon,
                                              MAX (BODY_X_OFFSET, pixbuf_width), -1);
                 g_object_unref (scaled);
                 bubble->priv->have_icon = TRUE;
         } else {
                 gtk_widget_hide (bubble->priv->icon);
-                gtk_widget_set_size_request (bubble->priv->iconbox,
+                gtk_widget_set_size_request (bubble->priv->icon,
                                              BODY_X_OFFSET,
                                              -1);
                 bubble->priv->have_icon = FALSE;
@@ -741,16 +739,8 @@ add_notification_action (NdBubble       *bubble,
         char      *buf;
 
         if (!gtk_widget_get_visible (bubble->priv->actions_box)) {
-                GtkWidget *alignment;
-
                 gtk_widget_show (bubble->priv->actions_box);
                 update_content_hbox_visibility (bubble);
-
-                alignment = gtk_alignment_new (1, 0.5, 0, 0);
-                gtk_widget_show (alignment);
-                gtk_box_pack_end (GTK_BOX (bubble->priv->actions_box),
-                                  alignment,
-                                  FALSE, TRUE, 0);
         }
 
         button = gtk_button_new ();
