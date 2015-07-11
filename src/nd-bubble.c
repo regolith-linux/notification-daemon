@@ -188,15 +188,32 @@ draw_round_rect (cairo_t *cr,
 }
 
 static void
+get_background_color (GtkStyleContext *context,
+                      GtkStateFlags    state,
+                      GdkRGBA         *color)
+{
+        GdkRGBA *c;
+
+        g_return_if_fail (color != NULL);
+        g_return_if_fail (GTK_IS_STYLE_CONTEXT (context));
+
+        gtk_style_context_get (context, state,
+                               "background-color", &c,
+                               NULL);
+
+        *color = *c;
+        gdk_rgba_free (c);
+}
+
+static void
 paint_bubble (NdBubble *bubble,
               cairo_t  *cr)
 {
-        GdkColor         color;
-        double           r, g, b;
+        GtkStyleContext *context;
+        GdkRGBA          rgba;
         cairo_t         *cr2;
         cairo_surface_t *surface;
         cairo_region_t  *region;
-        GtkStyle        *style;
         GtkAllocation    allocation;
 
         gtk_widget_get_allocation (GTK_WIDGET (bubble), &allocation);
@@ -224,19 +241,16 @@ paint_bubble (NdBubble *bubble,
                          allocation.width - 2,
                          allocation.height - 2);
 
-        style = gtk_widget_get_style (GTK_WIDGET (bubble));
-        color = style->bg [GTK_STATE_NORMAL];
-        r = (float)color.red / 65535.0;
-        g = (float)color.green / 65535.0;
-        b = (float)color.blue / 65535.0;
-        cairo_set_source_rgba (cr2, r, g, b, BACKGROUND_ALPHA);
+        context = gtk_widget_get_style_context (GTK_WIDGET (bubble));
+
+        get_background_color (context, GTK_STATE_FLAG_NORMAL, &rgba);
+        cairo_set_source_rgba (cr2, rgba.red, rgba.green, rgba.blue,
+                               BACKGROUND_ALPHA);
         cairo_fill_preserve (cr2);
 
-        color = style->text_aa [GTK_STATE_NORMAL];
-        r = (float) color.red / 65535.0;
-        g = (float) color.green / 65535.0;
-        b = (float) color.blue / 65535.0;
-        cairo_set_source_rgba (cr2, r, g, b, BACKGROUND_ALPHA / 2);
+        gtk_style_context_get_color (context, GTK_STATE_FLAG_NORMAL, &rgba);
+        cairo_set_source_rgba (cr2, rgba.red, rgba.green, rgba.blue,
+                               BACKGROUND_ALPHA / 2);
         cairo_set_line_width (cr2, 2);
         cairo_stroke (cr2);
 
