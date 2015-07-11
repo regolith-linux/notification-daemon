@@ -570,15 +570,18 @@ nd_queue_length (NdQueue *queue)
 static NdStack *
 get_stack_with_pointer (NdQueue *queue)
 {
+        GdkDisplay *display;
+        GdkDeviceManager *device_manager;
+        GdkDevice *pointer;
         GdkScreen *screen;
         int        x, y;
         int        monitor_num;
 
-        gdk_display_get_pointer (gdk_display_get_default (),
-                                 &screen,
-                                 &x,
-                                 &y,
-                                 NULL);
+        display = gdk_display_get_default ();
+        device_manager = gdk_display_get_device_manager (display);
+        pointer = gdk_device_manager_get_client_pointer (device_manager);
+
+        gdk_device_get_position (pointer, &screen, &x, &y);
         monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
 
         if (monitor_num >= queue->priv->screen->n_stacks) {
