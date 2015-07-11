@@ -49,8 +49,6 @@ struct NdNotificationBoxPrivate
         GtkWidget      *last_sep;
 };
 
-static void     nd_notification_box_class_init  (NdNotificationBoxClass *klass);
-static void     nd_notification_box_init        (NdNotificationBox      *notification_box);
 static void     nd_notification_box_finalize    (GObject                *object);
 
 G_DEFINE_TYPE (NdNotificationBox, nd_notification_box, GTK_TYPE_EVENT_BOX)
