@@ -188,6 +188,7 @@ get_origin_coordinates (NdStackLocation stack_location,
                 *y = workarea->y + workarea->height - height;
                 break;
 
+        case ND_STACK_LOCATION_UNKNOWN:
         default:
                 g_assert_not_reached ();
         }
@@ -226,6 +227,7 @@ translate_coordinates (NdStackLocation stack_location,
                 *y -= height;
                 break;
 
+        case ND_STACK_LOCATION_UNKNOWN:
         default:
                 g_assert_not_reached ();
         }
