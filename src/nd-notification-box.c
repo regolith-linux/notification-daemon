@@ -23,6 +23,7 @@
 #include <string.h>
 #include <strings.h>
 #include <glib.h>
+#include <glib/gi18n.h>
 
 #include "nd-notification.h"
 #include "nd-notification-box.h"
@@ -313,9 +314,9 @@ nd_notification_box_init (NdNotificationBox *notification_box)
 
         atkobj = gtk_widget_get_accessible (notification_box->priv->close_button);
         atk_action_set_description (ATK_ACTION (atkobj), 0,
-                                    "Closes the notification.");
+                                    _("Closes the notification."));
         atk_object_set_name (atkobj, "");
-        atk_object_set_description (atkobj, "Closes the notification.");
+        atk_object_set_description (atkobj, _("Closes the notification."));
 
         image = gtk_image_new_from_icon_name ("window-close", GTK_ICON_SIZE_MENU);
         gtk_widget_show (image);
@@ -331,7 +332,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_label_set_line_wrap_mode (GTK_LABEL (notification_box->priv->summary_label), PANGO_WRAP_WORD_CHAR);
 
         atkobj = gtk_widget_get_accessible (notification_box->priv->summary_label);
-        atk_object_set_description (atkobj, "Notification summary text.");
+        atk_object_set_description (atkobj, _("Notification summary text."));
 
         notification_box->priv->content_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_show (notification_box->priv->content_hbox);
@@ -351,7 +352,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         gtk_label_set_line_wrap_mode (GTK_LABEL (notification_box->priv->body_label), PANGO_WRAP_WORD_CHAR);
 
         atkobj = gtk_widget_get_accessible (notification_box->priv->body_label);
-        atk_object_set_description (atkobj, "Notification body text.");
+        atk_object_set_description (atkobj, _("Notification body text."));
 
         notification_box->priv->actions_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_widget_set_halign (notification_box->priv->actions_box, GTK_ALIGN_END);
