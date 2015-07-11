@@ -355,8 +355,8 @@ nd_bubble_get_preferred_width (GtkWidget *widget,
 }
 
 static gboolean
-nd_bubble_motion_notify_event (GtkWidget        *widget,
-                               GdkEventCrossing *event)
+nd_bubble_motion_notify_event (GtkWidget      *widget,
+                               GdkEventMotion *event)
 {
         NdBubble *bubble = ND_BUBBLE (widget);
 
