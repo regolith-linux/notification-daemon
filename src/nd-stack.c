@@ -46,8 +46,6 @@ struct NdStackPrivate
         guint           update_id;
 };
 
-static void     nd_stack_class_init  (NdStackClass *klass);
-static void     nd_stack_init        (NdStack      *stack);
 static void     nd_stack_finalize    (GObject       *object);
 
 G_DEFINE_TYPE (NdStack, nd_stack, G_TYPE_OBJECT)
