@@ -21,10 +21,17 @@ notification_daemon_SOURCES = \
 
 notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 
-AM_CPPFLAGS = \
+notification_daemon_CFLAGS = \
 	-I$(top_srcdir) \
-	$(NOTIFICATION_DAEMON_CFLAGS) \
 	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	$(NOTIFICATION_DAEMON_CFLAGS) \
+	$(WARN_CFLAGS) \
+	$(AM_CFLAGS) \
+	$(NULL)
+
+notification_daemon_LDFLAGS = \
+	$(WARN_LDFLAGS) \
+	$(AM_LDFLAGS) \
 	$(NULL)
 
 EXTRA_DIST = notificationdaemon.xml

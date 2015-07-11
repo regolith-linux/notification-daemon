@@ -1,25 +1,22 @@
-dnl Process this file with autoconf to create configure.
+m4_define([nd_major_version], [3])
+m4_define([nd_minor_version], [17])
+m4_define([nd_micro_version], [2])
 
-dnl ################################################################
-dnl # Initialize autoconf
-dnl ################################################################
-AC_INIT([notification-daemon],[3.17.2],[https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon],[notification-daemon])
-AC_PREREQ(2.63)
+AC_INIT([notification-daemon], [nd_major_version.nd_minor_version.nd_micro_version],
+        [https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon])
+
+AX_IS_RELEASE([git-directory])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([config.h.in])
-AC_CONFIG_MACRO_DIR([macros])
+AC_CONFIG_MACRO_DIR([m4])
 
-dnl ################################################################
-dnl # Initialize automake
-dnl ################################################################
-AM_INIT_AUTOMAKE([1.10 no-dist-gzip dist-bzip2])
-AM_MAINTAINER_MODE
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz tar-ustar -Wno-portability])
+AM_MAINTAINER_MODE([[enable]])
+AM_SILENT_RULES([yes])
 
-dnl ################################################################
-dnl # Check for some standard stuff.
-dnl ################################################################
+AX_CHECK_ENABLE_DEBUG([yes])
+
 # Checks for programs
 AC_PROG_CC
 AC_PROG_CPP
@@ -29,6 +26,8 @@ AC_PROG_INSTALL
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
+
+AX_COMPILER_FLAGS([WARN_CFLAGS], [WARN_LDFLAGS])
 
 dnl ---------------------------------------------------------------------------
 dnl Initialize Libtool
@@ -65,56 +64,6 @@ AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
 
 AS_AC_EXPAND(LIBEXECDIR, $libexecdir)
-
-dnl ---------------------------------------------------------------------------
-dnl Turn on the additional warnings last
-dnl ---------------------------------------------------------------------------
-GNOME_COMPILE_WARNINGS([maximum])
-GNOME_CXX_WARNINGS([yes])
-GNOME_MAINTAINER_MODE_DEFINES
-
-AC_ARG_ENABLE(more-warnings,
-              AS_HELP_STRING([--enable-more-warnings],
-                             [Maximum compiler warnings]),
-              set_more_warnings="$enableval",[
-	      if test -d $srcdir/.git; then
-	        set_more_warnings=yes
-	      else
-	        set_more_warnings=no
-              fi])
-
-AC_MSG_CHECKING(for more warnings)
-if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
-        AC_MSG_RESULT(yes)
-        WARNINGCFLAGS="\
-        -Wchar-subscripts -Wmissing-declarations \
-        -Wcast-align -Wsign-compare -Wp,-D_FORTIFY_SOURCE=2 \
-        $WARNINGCFLAGS"
-
-        for option in -Wno-strict-aliasing; do
-                SAVE_CFLAGS="$WARNINGCFLAGS"
-                WARNINGCFLAGS="$WARNINGCFLAGS $option"
-                AC_MSG_CHECKING([whether gcc understands $option])
-                AC_TRY_COMPILE([], [],
-                        has_option=yes,
-                        has_option=no,)
-                if test $has_option = no; then
-                        WARNINGCFLAGS="$SAVE_CFLAGS"
-                fi
-                AC_MSG_RESULT($has_option)
-                unset has_option
-                unset SAVE_CFLAGS
-        done
-        unset option
-else
-        AC_MSG_RESULT(no)
-fi
-
-AM_CFLAGS="$AM_CFLAGS $WARN_CFLAGS $WARNINGCFLAGS"
-AM_CXXFLAGS="$AM_CXXFLAGS $WARN_CXXFLAGS"
-
-AC_SUBST([AM_CFLAGS])
-AC_SUBST([AM_CXXFLAGS])
 
 AC_CONFIG_FILES([
 Makefile
