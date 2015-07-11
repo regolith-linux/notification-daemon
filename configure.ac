@@ -128,17 +128,16 @@ src/Makefile
 AC_OUTPUT
 
 echo "
-                    $PACKAGE_NAME $PACKAGE_VERSION
-                    =========================
+    notification-daemon $VERSION
+    `echo notification-daemon $VERSION | sed "s/./=/g"`
 
-	prefix:                   ${prefix}
-	exec_prefix:              ${exec_prefix}
-        bindir:                   ${bindir}
-        datadir:                  ${datadir}
-	source code location:	  ${srcdir}
-	cflags:		          ${AM_CFLAGS}
+    prefix:               ${prefix}
+    exec_prefix:          ${exec_prefix}
 
-        dbus-1 system.d           $DBUS_SYS_DIR
-        dbus-1 services           $DBUS_SERVICES_DIR
+    bindir:               ${bindir}
+    datadir:              ${datadir}
+
+    source code location: ${srcdir}
+    compiler:             ${CC}
 
 "
