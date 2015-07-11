@@ -60,6 +60,9 @@ struct NdQueuePrivate
         NotifyScreen  *screen;
 
         guint          update_id;
+
+        GdkDevice     *grabbed_pointer;
+        GdkDevice     *grabbed_keyboard;
 };
 
 enum {
@@ -69,6 +72,7 @@ enum {
 
 static guint signals [LAST_SIGNAL] = { 0, };
 
+static void     nd_queue_dispose        (GObject        *object);
 static void     nd_queue_finalize       (GObject        *object);
 static void     queue_update            (NdQueue        *queue);
 static void     on_notification_close   (NdNotification *notification,
@@ -222,6 +226,7 @@ nd_queue_class_init (NdQueueClass *klass)
 {
         GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
+        object_class->dispose = nd_queue_dispose;
         object_class->finalize = nd_queue_finalize;
 
         signals [CHANGED] =
@@ -239,36 +244,37 @@ nd_queue_class_init (NdQueueClass *klass)
 }
 
 static void
-popdown_dock (NdQueue *queue)
+ungrab (NdQueue *queue,
+        guint    time)
 {
-        GdkDisplay *display;
+        if (queue->priv->grabbed_pointer != NULL) {
+                gdk_device_ungrab (queue->priv->grabbed_pointer, time);
+                g_clear_object (&queue->priv->grabbed_pointer);
+        }
 
-        /* ungrab focus */
-        display = gtk_widget_get_display (queue->priv->dock);
-        gdk_display_keyboard_ungrab (display, GDK_CURRENT_TIME);
-        gdk_display_pointer_ungrab (display, GDK_CURRENT_TIME);
+        if (queue->priv->grabbed_keyboard != NULL) {
+                gdk_device_ungrab (queue->priv->grabbed_keyboard, time);
+                g_clear_object (&queue->priv->grabbed_keyboard);
+        }
+
         gtk_grab_remove (queue->priv->dock);
 
         /* hide again */
         gtk_widget_hide (queue->priv->dock);
+}
 
+static void
+popdown_dock (NdQueue *queue)
+{
+        ungrab (queue, GDK_CURRENT_TIME);
         queue_update (queue);
 }
 
 static void
-release_grab (GtkWidget      *widget,
+release_grab (NdQueue        *queue,
               GdkEventButton *event)
 {
-        GdkDisplay *display;
-
-        /* ungrab focus */
-        display = gtk_widget_get_display (widget);
-        gdk_display_keyboard_ungrab (display, event->time);
-        gdk_display_pointer_ungrab (display, event->time);
-        gtk_grab_remove (widget);
-
-        /* hide again */
-        gtk_widget_hide (widget);
+        ungrab (queue, event->time);
 }
 
 /* This is called when the grab is broken for
@@ -390,7 +396,7 @@ on_dock_button_press (GtkWidget      *widget,
         event_widget = gtk_get_event_widget ((GdkEvent *)event);
         g_debug ("Button press: %p dock=%p", event_widget, widget);
         if (event_widget == widget) {
-                release_grab (widget, event);
+                release_grab (queue, event);
                 return TRUE;
         }
 
@@ -464,6 +470,9 @@ nd_queue_init (NdQueue *queue)
         queue->priv->queue = g_queue_new ();
         queue->priv->status_icon = NULL;
 
+        queue->priv->grabbed_pointer = NULL;
+        queue->priv->grabbed_keyboard = NULL;
+
         create_dock (queue);
         create_screen (queue);
 }
@@ -496,6 +505,18 @@ destroy_screen (NdQueue *queue)
         queue->priv->screen = NULL;
 }
 
+static void
+nd_queue_dispose (GObject *object)
+{
+        NdQueue *queue;
+
+        queue = ND_QUEUE (object);
+
+        g_clear_object (&queue->priv->grabbed_pointer);
+        g_clear_object (&queue->priv->grabbed_keyboard);
+
+        G_OBJECT_CLASS (nd_queue_parent_class)->dispose (object);
+}
 
 static void
 nd_queue_finalize (GObject *object)
@@ -734,6 +755,11 @@ popup_dock (NdQueue *queue,
         GdkRectangle   monitor;
         GtkRequisition dock_req;
         GtkStatusIcon *status_icon;
+        GdkWindow *window;
+        GdkDeviceManager *device_manager;
+        GList *list;
+        GList *link;
+        gboolean grabbed;
 
         update_dock (queue);
 
@@ -794,21 +820,52 @@ popup_dock (NdQueue *queue,
         /* grab focus */
         gtk_grab_add (queue->priv->dock);
 
-        if (gdk_pointer_grab (gtk_widget_get_window (queue->priv->dock), TRUE,
-                              GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-                              GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK, NULL, NULL,
-                              time)
-            != GDK_GRAB_SUCCESS) {
-                gtk_grab_remove (queue->priv->dock);
-                gtk_widget_hide (queue->priv->dock);
+        display = gtk_widget_get_display (queue->priv->dock);
+        window = gtk_widget_get_window (queue->priv->dock);
+        device_manager = gdk_display_get_device_manager (display);
+
+        grabbed = FALSE;
+        list = gdk_device_manager_list_devices (device_manager, GDK_DEVICE_TYPE_MASTER);
+        for (link = list; link != NULL; link = g_list_next (link)) {
+                GdkDevice *device = GDK_DEVICE (link->data);
+                if (gdk_device_get_source (device) == GDK_SOURCE_KEYBOARD)
+                        continue;
+                if (gdk_device_grab (device, window,
+                                     GDK_OWNERSHIP_NONE, TRUE,
+                                     GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+                                     GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK,
+                                     NULL, time) == GDK_GRAB_SUCCESS) {
+                        queue->priv->grabbed_pointer = g_object_ref (device);
+                        grabbed = TRUE;
+                        break;
+                }
+        }
+        g_list_free (list);
+
+        if (grabbed == FALSE) {
+                ungrab (queue, time);
                 return FALSE;
         }
 
-        if (gdk_keyboard_grab (gtk_widget_get_window (queue->priv->dock), TRUE, time) != GDK_GRAB_SUCCESS) {
-                display = gtk_widget_get_display (queue->priv->dock);
-                gdk_display_pointer_ungrab (display, time);
-                gtk_grab_remove (queue->priv->dock);
-                gtk_widget_hide (queue->priv->dock);
+        grabbed = FALSE;
+        list = gdk_device_manager_list_devices (device_manager, GDK_DEVICE_TYPE_MASTER);
+        for (link = list; link != NULL; link = g_list_next (link)) {
+                GdkDevice *device = GDK_DEVICE (link->data);
+                if (gdk_device_get_source (device) != GDK_SOURCE_KEYBOARD)
+                        continue;
+                if (gdk_device_grab (device, window,
+                                     GDK_OWNERSHIP_NONE, TRUE,
+                                     GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK,
+                                     NULL, time) == GDK_GRAB_SUCCESS) {
+                        queue->priv->grabbed_keyboard = g_object_ref (device);
+                        grabbed = TRUE;
+                        break;
+                }
+        }
+        g_list_free (list);
+
+        if (grabbed == FALSE) {
+                ungrab (queue, time);
                 return FALSE;
         }
 
