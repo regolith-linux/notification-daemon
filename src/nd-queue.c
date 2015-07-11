@@ -686,7 +686,7 @@ update_dock (NdQueue *queue)
                 gtk_widget_show (GTK_WIDGET (box));
                 gtk_box_pack_start (GTK_BOX (child), GTK_WIDGET (box), FALSE, FALSE, 0);
 
-                sep = gtk_hseparator_new ();
+                sep = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
                 gtk_widget_show (sep);
                 gtk_box_pack_start (GTK_BOX (child), sep, FALSE, FALSE, 0);
         }
