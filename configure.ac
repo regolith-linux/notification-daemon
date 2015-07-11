@@ -64,30 +64,7 @@ PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
 AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
 AC_SUBST(NOTIFICATION_DAEMON_LIBS)
 
-AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
-AS_AC_EXPAND(LIBDIR, $libdir)
-AS_AC_EXPAND(DATADIR, $datadir)
 AS_AC_EXPAND(LIBEXECDIR, $libexecdir)
-
-AC_ARG_WITH(dbus-sys, [  --with-dbus-sys=<dir>   where D-BUS system.d directory is])
-AC_ARG_WITH(dbus-services, [  --with-dbus-services=<dir>   where D-BUS services directory is])
-
-if ! test -z "$with_dbus_sys" ; then
-	DBUS_SYS_DIR="$with_dbus_sys"
-else
-	DBUS_SYS_DIR="$SYSCONFDIR/dbus-1/system.d"
-fi
-
-if ! test -z "$with_dbus_services" ; then
-	DBUS_SERVICES_DIR="$with_dbus_services"
-else
-	DBUS_SERVICES_DIR="$DATADIR/dbus-1/services"
-fi
-
-AC_SUBST(DBUS_SYS_DIR)
-AC_SUBST(DBUS_SERVICES_DIR)
-AC_DEFINE_UNQUOTED(DBUS_SYSTEMD_DIR, "$DBUS_SYS_DIR", [Where system.d dir for DBUS is])
-AC_DEFINE_UNQUOTED(DBUS_SERVICES_DIR, "$DBUS_SERVICES_DIR", [Where services dir for DBUS is])
 
 dnl ---------------------------------------------------------------------------
 dnl Turn on the additional warnings last

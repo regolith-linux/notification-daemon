@@ -24,7 +24,6 @@ notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 AM_CPPFLAGS = \
 	-I$(top_srcdir) \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
-	-DENGINES_DIR=\"$(libdir)/notification-daemon-1.0/engines\" \
 	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	$(NULL)
 
