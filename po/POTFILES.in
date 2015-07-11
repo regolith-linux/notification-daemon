@@ -1,5 +1,6 @@
 src/daemon.c
-src/notification-box.c
+src/nd-bubble.c
+src/nd-notification-box.c
 src/nd-queue.c
 src/sound.c
 data/notification-daemon.desktop.in.in
