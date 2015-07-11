@@ -666,8 +666,9 @@ update_dock (NdQueue *queue)
                 gtk_container_remove (GTK_CONTAINER (queue->priv->dock_scrolled_window), child);
 
         child = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-        gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (queue->priv->dock_scrolled_window),
-                                               child);
+        gtk_container_add (GTK_CONTAINER (queue->priv->dock_scrolled_window),
+                           child);
+
         gtk_container_set_focus_hadjustment (GTK_CONTAINER (child),
                                              gtk_scrolled_window_get_hadjustment (GTK_SCROLLED_WINDOW (queue->priv->dock_scrolled_window)));
         gtk_container_set_focus_vadjustment (GTK_CONTAINER (child),
