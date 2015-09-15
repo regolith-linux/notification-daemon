@@ -6,8 +6,6 @@ SUBDIRS = \
 	po \
 	$(NULL)
 
-ACLOCAL_AMFLAGS = --install -I m4 ${ACLOCAL_FLAGS}
-
 EXTRA_DIST = \
 	AUTHORS \
 	NEWS \
