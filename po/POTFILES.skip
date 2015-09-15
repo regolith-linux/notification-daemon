@@ -1,2 +1,2 @@
-data/notification-daemon.desktop.in
-data/notification-daemon-autostart.desktop.in
+# List of source files that should *not* be translated.
+# Please keep this file sorted alphabetically.

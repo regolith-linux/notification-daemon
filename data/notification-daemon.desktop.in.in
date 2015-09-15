@@ -1,6 +1,6 @@
 [Desktop Entry]
-_Name=Notification Daemon
-_Comment=Display notifications
+Name=Notification Daemon
+Comment=Display notifications
 Exec=@LIBEXECDIR@/notification-daemon
 Terminal=false
 Type=Application
