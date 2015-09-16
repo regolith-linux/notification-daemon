@@ -23,7 +23,7 @@ notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
 
 notification_daemon_CFLAGS = \
 	-I$(top_srcdir) \
-	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	-DLOCALE_DIR=\""$(datadir)/locale"\" \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
 	$(WARN_CFLAGS) \
 	$(AM_CFLAGS) \
