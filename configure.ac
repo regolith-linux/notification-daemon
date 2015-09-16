@@ -1,91 +1,129 @@
+dnl **************************************************************************
+dnl Define version info
+dnl **************************************************************************
+
 m4_define([nd_major_version], [3])
 m4_define([nd_minor_version], [17])
 m4_define([nd_micro_version], [2])
+m4_define([nd_version], [nd_major_version.nd_minor_version.nd_micro_version])
 
-AC_INIT([notification-daemon], [nd_major_version.nd_minor_version.nd_micro_version],
-        [https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon])
+dnl **************************************************************************
+dnl Define bugzilla address
+dnl **************************************************************************
 
-AX_IS_RELEASE([git-directory])
+m4_define([nd_bugzilla_url],
+          [https://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon])
 
+dnl **************************************************************************
+dnl Initialize autoconf
+dnl **************************************************************************
+
+AC_INIT([notification-daemon], [nd_version], [nd_bugzilla_url])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz tar-ustar -Wno-portability])
-AM_MAINTAINER_MODE([[enable]])
-AM_SILENT_RULES([yes])
+dnl **************************************************************************
+dnl Set release policy
+dnl **************************************************************************
+
+AX_IS_RELEASE([git-directory])
+
+dnl **************************************************************************
+dnl Enable debug
+dnl **************************************************************************
 
 AX_CHECK_ENABLE_DEBUG([yes])
 
-# Checks for programs
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_MAKE_SET
-AC_PROG_LN_S
-AC_PROG_INSTALL
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_SIZE_T
+dnl **************************************************************************
+dnl Add warning flags
+dnl **************************************************************************
 
 AX_COMPILER_FLAGS([WARN_CFLAGS], [WARN_LDFLAGS])
 
-dnl ---------------------------------------------------------------------------
-dnl Initialize Libtool
-dnl ---------------------------------------------------------------------------
+dnl **************************************************************************
+dnl Initialize automake
+dnl **************************************************************************
+
+AM_INIT_AUTOMAKE([1.13 no-dist-gzip dist-xz tar-ustar -Wno-portability])
+AM_MAINTAINER_MODE([enable])
+AM_SILENT_RULES([yes])
+
+dnl **************************************************************************
+dnl Check for required programs
+dnl **************************************************************************
+
+AC_PROG_CC
+
+dnl **************************************************************************
+dnl Initialize libtool
+dnl **************************************************************************
+
 LT_PREREQ([2.2.6])
 LT_INIT
 
+dnl **************************************************************************
+dnl Internationalization
+dnl **************************************************************************
 
-dnl ---------------------------------------------------------------------------
-dnl i18n stuff
-dnl ---------------------------------------------------------------------------
-AM_GNU_GETTEXT_VERSION([0.19.4])
 AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.19.4])
 
-AC_SUBST([GETTEXT_PACKAGE], [notification-daemon])
-AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [Define to the gettext package name.])
+GETTEXT_PACKAGE=notification-daemon
+AC_SUBST([GETTEXT_PACKAGE])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
+                   [Define the gettext package to be used])
 
+dnl **************************************************************************
+dnl Check forrequired packages
+dnl **************************************************************************
 
-dnl ---------------------------------------------------------------------------
-dnl Requirements for the daemon
-dnl ---------------------------------------------------------------------------
-REQ_GTK_VERSION=3.15.2
-REQ_GLIB_VERSION=2.27.0
-REQ_LIBCANBERRA_GTK_VERSION=0.4
-pkg_modules="
-	gtk+-3.0 >= $REQ_GTK_VERSION, \
-	glib-2.0 >= $REQ_GLIB_VERSION, \
-        gio-2.0 >= $REQ_GLIB_VERSION, \
-        libcanberra-gtk3 >= $REQ_LIBCANBERRA_GTK_VERSION, \
-        x11 \
-"
-PKG_CHECK_MODULES(NOTIFICATION_DAEMON, $pkg_modules)
-AC_SUBST(NOTIFICATION_DAEMON_CFLAGS)
-AC_SUBST(NOTIFICATION_DAEMON_LIBS)
+GTK_REQUIRED=3.15.2
+GLIB_REQUIRED=2.27.0
+CANBERRA_REQUIRED=0.4
+
+PKG_CHECK_MODULES([NOTIFICATION_DAEMON], [
+  gtk+-3.0 >= $GTK_REQUIRED
+  glib-2.0 >= $GLIB_REQUIRED
+  gio-2.0 >= $GLIB_REQUIRED
+  libcanberra-gtk3 >= $CANBERRA_REQUIRED
+  x11
+])
+
+dnl **************************************************************************
+dnl Process .in files
+dnl **************************************************************************
 
 AC_CONFIG_FILES([
-Makefile
-data/Makefile
-data/notification-daemon.desktop.in
-data/notification-daemon-autostart.desktop.in
-po/Makefile.in
-src/Makefile
+  Makefile
+
+  data/Makefile
+  data/notification-daemon.desktop.in
+  data/notification-daemon-autostart.desktop.in
+
+  po/Makefile.in
+
+  src/Makefile
 ])
 
 AC_OUTPUT
 
-echo "
-    notification-daemon $VERSION
-    `echo notification-daemon $VERSION | sed "s/./=/g"`
+dnl **************************************************************************
+dnl Show build info
+dnl **************************************************************************
 
-    prefix:               ${prefix}
-    exec_prefix:          ${exec_prefix}
-
-    bindir:               ${bindir}
-    datadir:              ${datadir}
-
-    source code location: ${srcdir}
-    compiler:             ${CC}
-
-"
+echo ""
+echo "  Notification Daemon $VERSION"
+echo "  `echo Notification Daemon $VERSION | sed "s/./=/g"`"
+echo ""
+echo "  srcdir ......................: ${srcdir}"
+echo ""
+echo "  compiler ....................: ${CC}"
+echo "  cflags ......................: ${CFLAGS}"
+echo ""
+echo "  prefix ......................: ${prefix}"
+echo "  exec_prefix .................: ${exec_prefix}"
+echo "  bindir ......................: ${bindir}"
+echo "  datadir .....................: ${datadir}"
+echo ""
