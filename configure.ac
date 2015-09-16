@@ -81,13 +81,11 @@ dnl **************************************************************************
 
 GTK_REQUIRED=3.15.2
 GLIB_REQUIRED=2.27.0
-CANBERRA_REQUIRED=0.4
 
 PKG_CHECK_MODULES([NOTIFICATION_DAEMON], [
   gtk+-3.0 >= $GTK_REQUIRED
   glib-2.0 >= $GLIB_REQUIRED
   gio-2.0 >= $GLIB_REQUIRED
-  libcanberra-gtk3 >= $CANBERRA_REQUIRED
   x11
 ])
 

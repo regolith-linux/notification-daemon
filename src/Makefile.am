@@ -5,20 +5,18 @@ libexec_PROGRAMS = \
 	$(NULL)
 
 notification_daemon_SOURCES = \
+	nd-bubble.c \
+	nd-bubble.h \
 	nd-daemon.c \
 	nd-daemon.h \
 	nd-notification.c \
 	nd-notification.h \
 	nd-notification-box.c \
 	nd-notification-box.h \
-	nd-bubble.c \
-	nd-bubble.h \
-	nd-stack.c \
-	nd-stack.h \
 	nd-queue.c \
 	nd-queue.h \
-	sound.c \
-	sound.h \
+	nd-stack.c \
+	nd-stack.h \
 	$(BUILT_SOURCES) \
 	$(NULL)
 

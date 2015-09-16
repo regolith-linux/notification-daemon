@@ -6,4 +6,3 @@ src/nd-bubble.c
 src/nd-daemon.c
 src/nd-notification-box.c
 src/nd-queue.c
-src/sound.c
