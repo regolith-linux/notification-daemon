@@ -99,8 +99,6 @@ AC_CONFIG_FILES([
   Makefile
 
   data/Makefile
-  data/notification-daemon.desktop.in
-  data/notification-daemon-autostart.desktop.in
 
   po/Makefile.in
 
