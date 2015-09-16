@@ -4,5 +4,6 @@ data/notification-daemon.desktop.in.in
 data/notification-daemon-autostart.desktop.in.in
 src/nd-bubble.c
 src/nd-daemon.c
+src/nd-main.c
 src/nd-notification-box.c
 src/nd-queue.c

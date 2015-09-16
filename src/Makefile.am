@@ -9,6 +9,7 @@ notification_daemon_SOURCES = \
 	nd-bubble.h \
 	nd-daemon.c \
 	nd-daemon.h \
+	nd-main.c \
 	nd-notification.c \
 	nd-notification.h \
 	nd-notification-box.c \

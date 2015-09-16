@@ -47,14 +47,14 @@ typedef enum
 GType                 nd_notification_get_type            (void) G_GNUC_CONST;
 
 NdNotification *      nd_notification_new                 (const char     *sender);
-gboolean              nd_notification_update              (NdNotification *notification,
-                                                           const char     *app_name,
-                                                           const char     *icon,
-                                                           const char     *summary,
-                                                           const char     *body,
-                                                           const char    **actions,
-                                                           GVariantIter   *hints_iter,
-                                                           int             timeout);
+gboolean              nd_notification_update              (NdNotification     *notification,
+                                                           const gchar        *app_name,
+                                                           const gchar        *icon,
+                                                           const gchar        *summary,
+                                                           const gchar        *body,
+                                                           const gchar *const *actions,
+                                                           GVariant           *hints,
+                                                           gint                timeout);
 
 void                  nd_notification_set_is_queued       (NdNotification *notification,
                                                            gboolean        is_queued);

@@ -151,16 +151,17 @@ nd_notification_finalize (GObject *object)
 }
 
 gboolean
-nd_notification_update (NdNotification *notification,
-                        const char     *app_name,
-                        const char     *icon,
-                        const char     *summary,
-                        const char     *body,
-                        const char    **actions,
-                        GVariantIter   *hints_iter,
-                        int             timeout)
+nd_notification_update (NdNotification     *notification,
+                        const gchar        *app_name,
+                        const gchar        *icon,
+                        const gchar        *summary,
+                        const gchar        *body,
+                        const gchar *const *actions,
+                        GVariant           *hints,
+                        gint                timeout)
 {
         GVariant *item;
+        GVariantIter iter;
 
         g_return_val_if_fail (ND_IS_NOTIFICATION (notification), FALSE);
 
@@ -181,7 +182,8 @@ nd_notification_update (NdNotification *notification,
 
         g_hash_table_remove_all (notification->hints);
 
-        while ((item = g_variant_iter_next_value (hints_iter))) {
+        g_variant_iter_init (&iter, hints);
+        while ((item = g_variant_iter_next_value (&iter))) {
                 const char *key;
                 GVariant   *value;
 
