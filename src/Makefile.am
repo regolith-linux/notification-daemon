@@ -1,6 +1,8 @@
 NULL =
 
-libexec_PROGRAMS = notification-daemon
+libexec_PROGRAMS = \
+	notification-daemon \
+	$(NULL)
 
 notification_daemon_SOURCES = \
 	nd-notification.c \
@@ -17,13 +19,12 @@ notification_daemon_SOURCES = \
 	daemon.h \
 	sound.c \
 	sound.h \
+	$(BUILT_SOURCES) \
 	$(NULL)
 
-notification_daemon_LDADD = $(NOTIFICATION_DAEMON_LIBS)
-
 notification_daemon_CFLAGS = \
-	-I$(top_srcdir) \
 	-DLOCALE_DIR=\""$(datadir)/locale"\" \
+	-I$(top_builddir)/src \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
 	$(WARN_CFLAGS) \
 	$(AM_CFLAGS) \
@@ -34,6 +35,29 @@ notification_daemon_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	$(NULL)
 
-EXTRA_DIST = notificationdaemon.xml
+notification_daemon_LDADD = \
+	$(NOTIFICATION_DAEMON_LIBS) \
+	$(NULL)
+
+nd-fd-notifications.h:
+nd-fd-notifications.c: org.freedesktop.Notifications.xml
+	$(AM_V_GEN) gdbus-codegen \
+		--interface-prefix org.freedesktop.Notifications \
+		--c-namespace Nd \
+		--generate-c-code nd-fd-notifications \
+		$(srcdir)/org.freedesktop.Notifications.xml
+
+BUILT_SOURCES = \
+	nd-fd-notifications.c \
+	nd-fd-notifications.h \
+	$(NULL)
+
+EXTRA_DIST = \
+	org.freedesktop.Notifications.xml \
+	$(NULL)
+
+CLEANFILES = \
+	$(BUILT_SOURCES) \
+	$(NULL)
 
 -include $(top_srcdir)/git.mk
