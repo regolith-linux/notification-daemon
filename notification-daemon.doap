@@ -10,21 +10,9 @@
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gnome-flashback-list" />
   <download-page rdf:resource="http://download.gnome.org/sources/notification-daemon/" />
   <bug-database rdf:resource="https://bugzilla.gnome.org/browse.cgi?product=notification-daemon" />
+
   <programming-language>C</programming-language>
-  <maintainer>
-    <foaf:Person>
-      <foaf:name>Christian Hammond</foaf:name>
-      <foaf:mbox rdf:resource="mailto:chipx86@chipx86.com" />
-      <gnome:userid>chammond</gnome:userid>
-    </foaf:Person>
-  </maintainer>
-  <maintainer>
-    <foaf:Person>
-      <foaf:name>William Jon McCann</foaf:name>
-      <foaf:mbox rdf:resource="mailto:william.jon.mccann@gmail.com" />
-      <gnome:userid>mccann</gnome:userid>
-    </foaf:Person>
-  </maintainer>
+
   <maintainer>
     <foaf:Person>
       <foaf:name>Alberts Muktupāvels</foaf:name>
@@ -33,4 +21,3 @@
     </foaf:Person>
   </maintainer>
 </Project>
-
