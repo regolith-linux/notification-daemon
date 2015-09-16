@@ -40,7 +40,7 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 
-#include "daemon.h"
+#include "nd-daemon.h"
 #include "nd-notification.h"
 #include "nd-queue.h"
 
