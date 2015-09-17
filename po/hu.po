@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-07-11 16:48+0000\n"
-"PO-Revision-Date: 2015-07-12 11:54+0200\n"
+"POT-Creation-Date: 2015-09-17 11:36+0000\n"
+"PO-Revision-Date: 2015-09-17 16:28+0200\n"
 "Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
 "Language-Team: Hungarian <openscope at gmail dot com>\n"
 "Language: \n"
@@ -21,28 +21,29 @@ msgstr ""
 "X-Generator: Lokalize 1.2\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Az értesítések maximális száma túllépve"
-
-#: ../src/daemon.c:252
-msgid "Invalid notification identifier"
-msgstr "Érvénytelen értesítésazonosító"
-
 #: ../src/nd-bubble.c:522 ../src/nd-bubble.c:524
 #: ../src/nd-notification-box.c:318 ../src/nd-notification-box.c:320
-#| msgid "Clear all notifications"
 msgid "Closes the notification."
 msgstr "Bezárja az értesítést."
 
 #: ../src/nd-bubble.c:540 ../src/nd-bubble.c:564
 #: ../src/nd-notification-box.c:336
-#| msgid "Notification Daemon"
 msgid "Notification summary text."
 msgstr "Értesítés összegzőszöveg."
 
+#: ../src/nd-daemon.c:113 ../src/nd-daemon.c:193
+msgid "Invalid notification identifier"
+msgstr "Érvénytelen értesítésazonosító"
+
+#: ../src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Hibakereső kód engedélyezése"
+
+#: ../src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Egy jelenleg futó alkalmazás cseréje"
+
 #: ../src/nd-notification-box.c:356
-#| msgid "Notification"
 msgid "Notification body text."
 msgstr "Értesítés törzsszöveg."
 
@@ -54,17 +55,14 @@ msgstr "Minden értesítés törlése"
 msgid "Notifications"
 msgstr "Értesítések"
 
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Értesítés"
+#~ msgid "Exceeded maximum number of notifications"
+#~ msgstr "Az értesítések maximális száma túllépve"
 
-#: ../data/notification-daemon.desktop.in.in.h:1
-#: ../data/notification-daemon-autostart.desktop.in.in.h:1
-msgid "Notification Daemon"
-msgstr "Értesítésdémon"
+#~ msgid "Notification"
+#~ msgstr "Értesítés"
 
-#: ../data/notification-daemon.desktop.in.in.h:2
-#: ../data/notification-daemon-autostart.desktop.in.in.h:2
-msgid "Display notifications"
-msgstr "Értesítések megjelenítése"
+#~ msgid "Notification Daemon"
+#~ msgstr "Értesítésdémon"
 
+#~ msgid "Display notifications"
+#~ msgstr "Értesítések megjelenítése"
