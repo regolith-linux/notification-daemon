@@ -189,8 +189,8 @@ handle_notify_cb (NdFdNotifications     *object,
 
   if (nd_queue_length (daemon->queue) > MAX_NOTIFICATIONS)
     {
-      error_name = "org.freedesktop.Notifications.InvalidId";
-      error_message = _("Invalid notification identifier");
+      error_name = "org.freedesktop.Notifications.MaxNotificationsExceeded";
+      error_message = _("Exceeded maximum number of notifications");
 
       g_dbus_method_invocation_return_dbus_error (invocation, error_name,
                                                   error_message);
