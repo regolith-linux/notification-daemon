@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-11 20:35+0200\n"
-"PO-Revision-Date: 2015-07-11 20:37+0200\n"
+"POT-Creation-Date: 2015-09-19 09:59+0200\n"
+"PO-Revision-Date: 2015-09-19 10:00+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <gnomepl@aviary.pl>\n"
 "Language: pl\n"
@@ -23,46 +23,49 @@ msgstr ""
 "X-Poedit-Language: Polish\n"
 "X-Poedit-Country: Poland\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Przekroczono maksymalną liczbę powiadomień"
-
-#: ../src/daemon.c:252
-msgid "Invalid notification identifier"
-msgstr "Nieprawidłowy identyfikator powiadomienia"
-
-#: ../src/nd-bubble.c:522 ../src/nd-bubble.c:524
-#: ../src/nd-notification-box.c:318 ../src/nd-notification-box.c:320
-msgid "Closes the notification."
-msgstr "Zamyka powiadomienie."
-
-#: ../src/nd-bubble.c:540 ../src/nd-bubble.c:564
-#: ../src/nd-notification-box.c:336
-msgid "Notification summary text."
-msgstr "Tekst podsumowania powiadomienia."
-
-#: ../src/nd-notification-box.c:356
-msgid "Notification body text."
-msgstr "Tekst treści powiadomienia."
-
-#: ../src/nd-queue.c:459
-msgid "Clear all notifications"
-msgstr "Wyczyść wszystkie powiadomienia"
-
-#: ../src/nd-queue.c:939
-msgid "Notifications"
-msgstr "Powiadomienia"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Powiadomienie"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-#: ../data/notification-daemon-autostart.desktop.in.in.h:1
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
 msgid "Notification Daemon"
 msgstr "Usługa powiadamiania"
 
-#: ../data/notification-daemon.desktop.in.in.h:2
-#: ../data/notification-daemon-autostart.desktop.in.in.h:2
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Wyświetlanie powiadomień"
+
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:318
+#: src/nd-notification-box.c:320
+msgid "Closes the notification."
+msgstr "Zamyka powiadomienie."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:336
+msgid "Notification summary text."
+msgstr "Tekst podsumowania powiadomienia."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Nieprawidłowy identyfikator powiadomienia"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Przekroczono maksymalną liczbę powiadomień"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Włącza kod debugowania"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Zastępuje obecnie uruchomiony program"
+
+#: src/nd-notification-box.c:356
+msgid "Notification body text."
+msgstr "Tekst treści powiadomienia."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Wyczyść wszystkie powiadomienia"
+
+#: src/nd-queue.c:939
+msgid "Notifications"
+msgstr "Powiadomienia"
