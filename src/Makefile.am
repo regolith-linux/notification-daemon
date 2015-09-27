@@ -22,7 +22,7 @@ notification_daemon_SOURCES = \
 	$(NULL)
 
 notification_daemon_CFLAGS = \
-	-DLOCALE_DIR=\""$(datadir)/locale"\" \
+	-DLOCALE_DIR=\""$(localedir)"\" \
 	-I$(top_builddir)/src \
 	$(NOTIFICATION_DAEMON_CFLAGS) \
 	$(WARN_CFLAGS) \
