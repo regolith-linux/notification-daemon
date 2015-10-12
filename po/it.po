@@ -1,48 +1,70 @@
 # Italian translation for notification-daemon package.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2015 Free Software Foundation, Inc.
 # This file is distributed under the same license as the notification-daemon package.
 # Luca Ferretti <elle.uca@libero.it>, 2007, 2008, 2009, 2010, 2011.
+# Milo Casagrande <milo@milo.name>, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-16 20:13+0100\n"
-"PO-Revision-Date: 2011-02-16 20:14+0100\n"
-"Last-Translator: Luca Ferretti <lferrett@gnome.org>\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-"
+"daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-10-03 13:09+0000\n"
+"PO-Revision-Date: 2015-10-12 21:32+0200\n"
+"Last-Translator: Milo Casagrande <milo@milo.name>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.5\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Superato il numero massimo di notifiche"
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
+msgid "Notification Daemon"
+msgstr "Demone notifiche"
 
-#: ../src/daemon.c:251
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
+msgid "Display notifications"
+msgstr "Mostra le notifiche"
+
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:318
+#: src/nd-notification-box.c:320
+msgid "Closes the notification."
+msgstr "Chiude la notifica."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:336
+msgid "Notification summary text."
+msgstr "Testo riepilogo notifica."
+
+#: src/nd-daemon.c:113
 msgid "Invalid notification identifier"
 msgstr "Identificatore notifica non valido"
 
-#: ../src/nd-queue.c:471
-msgid "Clear all notifications"
-msgstr "Cancella tutte notifiche"
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Superato il numero massimo di notifiche"
 
-#: ../src/nd-queue.c:874
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Abilita codice di debug"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Sostituire un’applicazione attualmente in esecuzione"
+
+#: src/nd-notification-box.c:356
+msgid "Notification body text."
+msgstr "Testo della notifica."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Cancella notifiche"
+
+#: src/nd-queue.c:939
 msgid "Notifications"
 msgstr "Notifiche"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Notifica"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-msgid "Display notifications"
-msgstr "Mostre le notifiche"
-
-#: ../data/notification-daemon.desktop.in.in.h:2
-msgid "Notification Daemon"
-msgstr "Demone notifiche"
 
 #~ msgid "Current theme"
 #~ msgstr "Tema attuale"
@@ -65,12 +87,12 @@ msgstr "Demone notifiche"
 #~ msgstr "Suono abilitato"
 
 #~ msgid ""
-#~ "The default sound file used unless a notification supplies the 'sound-"
-#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ "The default sound file used unless a notification supplies the 'sound-file' or "
+#~ "'suppress-sound' hint. Leave empty for no default sound."
 #~ msgstr ""
-#~ "Il file audio predefinito usato, a meno che una notifica non fornisca "
-#~ "l'hint 'sound-file' o 'suppress-sound'. Lasciare in bianco per non usare "
-#~ "alcun suono predefinito."
+#~ "Il file audio predefinito usato, a meno che una notifica non fornisca l'hint "
+#~ "'sound-file' o 'suppress-sound'. Lasciare in bianco per non usare alcun suono "
+#~ "predefinito."
 
 #~ msgid "The theme used when displaying notifications."
 #~ msgstr "Il tema usato nel mostrare le notifiche."
