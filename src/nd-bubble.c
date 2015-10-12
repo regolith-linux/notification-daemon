@@ -623,7 +623,16 @@ set_notification_text (NdBubble   *bubble,
 
         g_free (str);
         gtk_widget_show_all (GTK_WIDGET (bubble));
-        gtk_label_set_markup (GTK_LABEL (bubble->priv->body_label), body);
+
+        if (pango_parse_markup (body, -1, 0, NULL, NULL, NULL, NULL))
+                gtk_label_set_markup (GTK_LABEL (bubble->priv->body_label), body);
+        else {
+                gchar *tmp;
+
+                tmp = g_markup_escape_text (body, -1);
+                gtk_label_set_text (GTK_LABEL (bubble->priv->body_label), body);
+                g_free (tmp);
+        }
 
         if (body == NULL || *body == '\0') {
                 bubble->priv->have_body = FALSE;
