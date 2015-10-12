@@ -177,6 +177,7 @@ update_notification_box (NdNotificationBox *notification_box)
 {
         gboolean       have_icon;
         gboolean       have_body;
+        const char    *body;
         gboolean       have_actions;
         GdkPixbuf     *pixbuf;
         char         **actions;
@@ -220,9 +221,10 @@ update_notification_box (NdNotificationBox *notification_box)
                                      -1);
 
         /* body */
-        gtk_label_set_markup (GTK_LABEL (notification_box->priv->body_label), nd_notification_get_body (notification_box->priv->notification));
+        body = nd_notification_get_body (notification_box->priv->notification);
+        gtk_label_set_markup (GTK_LABEL (notification_box->priv->body_label), body);
 
-        if (str != NULL && *str != '\0') {
+        if (body != NULL && *body != '\0') {
                 gtk_widget_set_size_request (notification_box->priv->body_label,
                                              summary_width,
                                              -1);
