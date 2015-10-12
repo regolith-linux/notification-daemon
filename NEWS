@@ -1,3 +1,9 @@
+Version 3.18.1
+==============
+- Fix empty body text with invalid pango markup.
+- Updated translations:
+  Tom Tryfonidis (el).
+
 Version 3.18.0
 ==============
 - Deprecation warning fixes. (Alberts Muktupāvels)
