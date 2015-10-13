@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: notification-daemon\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-07-11 16:48+0000\n"
-"PO-Revision-Date: 2015-07-22 02:13+0200\n"
+"POT-Creation-Date: 2015-10-13 00:29+0000\n"
+"PO-Revision-Date: 2015-10-13 12:18+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -20,46 +20,52 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Překročen maximální počet upozornění"
-
-#: ../src/daemon.c:252
-msgid "Invalid notification identifier"
-msgstr "Neplatný identifikátor upozornění"
-
-#: ../src/nd-bubble.c:522 ../src/nd-bubble.c:524
-#: ../src/nd-notification-box.c:318 ../src/nd-notification-box.c:320
-msgid "Closes the notification."
-msgstr "Zavírá upozornění."
-
-#: ../src/nd-bubble.c:540 ../src/nd-bubble.c:564
-#: ../src/nd-notification-box.c:336
-msgid "Notification summary text."
-msgstr "Souhrnný text upozornění."
-
-#: ../src/nd-notification-box.c:356
-msgid "Notification body text."
-msgstr "Text v těle upozornění."
-
-#: ../src/nd-queue.c:459
-msgid "Clear all notifications"
-msgstr "Vymazat všechna upozornění"
-
-#: ../src/nd-queue.c:939
-msgid "Notifications"
-msgstr "Upozornění"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Upozornění"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-#: ../data/notification-daemon-autostart.desktop.in.in.h:1
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
 msgid "Notification Daemon"
 msgstr "Démon zprostředkující upozornění"
 
-#: ../data/notification-daemon.desktop.in.in.h:2
-#: ../data/notification-daemon-autostart.desktop.in.in.h:2
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Zobrazuje upozornění"
+
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+msgid "Closes the notification."
+msgstr "Zavírá upozornění."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:346
+msgid "Notification summary text."
+msgstr "Souhrnný text upozornění."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Neplatný identifikátor upozornění"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Překročen maximální počet upozornění"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Povolit ladicí kód"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Nahradit právě běžící aplikaci"
+
+#: src/nd-notification-box.c:366
+msgid "Notification body text."
+msgstr "Text v těle upozornění."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Vymazat všechna upozornění"
+
+#: src/nd-queue.c:939
+msgid "Notifications"
+msgstr "Upozornění"
+
+#~ msgid "Notification"
+#~ msgstr "Upozornění"
