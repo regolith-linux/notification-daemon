@@ -1,47 +1,67 @@
 # French translation for notification-daemon.
-# Copyright (C) 2010-2011 Listed translators
+# Copyright (C) 2010-2015 Listed translators
 # This file is distributed under the same license as the notification-daemon package.
 #
-# Claude Paroz <claude@2xlibre.net>, 2010-2011.
+# Claude Paroz <claude@2xlibre.net>, 2010-2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2011-02-16 16:53+0000\n"
-"PO-Revision-Date: 2011-02-28 15:20+0100\n"
+"product=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-10-12 19:10+0000\n"
+"PO-Revision-Date: 2015-10-17 17:50+0200\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Nombre maximum de notifications atteint"
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
+msgid "Notification Daemon"
+msgstr "Service de notification"
 
-#: ../src/daemon.c:251
-msgid "Invalid notification identifier"
-msgstr "Identifiant de notification non valable"
-
-#: ../src/nd-queue.c:471
-msgid "Clear all notifications"
-msgstr "Effacer toutes les notifications"
-
-#: ../src/nd-queue.c:874
-msgid "Notifications"
-msgstr "Notifications"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Notification"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Afficher les notifications"
 
-#: ../data/notification-daemon.desktop.in.in.h:2
-msgid "Notification Daemon"
-msgstr "Service de notification"
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+msgid "Closes the notification."
+msgstr "Ferme la notification."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:346
+msgid "Notification summary text."
+msgstr "Texte de résumé de la notification."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Identifiant de notification non valable"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Nombre maximum de notifications atteint"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Activer le code de débogage"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Remplacer une application en cours de fonctionnement"
+
+#: src/nd-notification-box.c:366
+msgid "Notification body text."
+msgstr "Texte principal de la notification."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Effacer toutes les notifications"
+
+#: src/nd-queue.c:939
+msgid "Notifications"
+msgstr "Notifications"
