@@ -1,66 +1,73 @@
 # Swedish translation for notification-daemon.
-# Copyright (C) 2006-2011 Free Software Foundation
+# Copyright © 2006-2015 Free Software Foundation
 # This file is distributed under the same license as the notification-daemon package.
 # Daniel Nylander <po@danielnylander.se>, 2006, 2010, 2011.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=notification-daemon&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-08-22 23:19+0000\n"
-"PO-Revision-Date: 2015-08-22 00:12+0100\n"
-"Last-Translator: Josef Andersson <josef.andersson@fripost.org>\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-"
+"daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-10-07 12:09+0000\n"
+"PO-Revision-Date: 2015-10-07 23:15+0200\n"
+"Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.5\n"
+"X-Generator: Poedit 1.8.5\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Översteg maximalt antal aviseringar"
-
-#: ../src/daemon.c:252
-msgid "Invalid notification identifier"
-msgstr "Ogiltig aviseringsidentifierare"
-
-#: ../src/nd-bubble.c:522 ../src/nd-bubble.c:524
-#: ../src/nd-notification-box.c:318 ../src/nd-notification-box.c:320
-msgid "Closes the notification."
-msgstr "Stänger aviseringen."
-
-#: ../src/nd-bubble.c:540 ../src/nd-bubble.c:564
-#: ../src/nd-notification-box.c:336
-msgid "Notification summary text."
-msgstr "Sammanfattningstext för avisering."
-
-#: ../src/nd-notification-box.c:356
-msgid "Notification body text."
-msgstr "Huvudtext för avisering."
-
-#: ../src/nd-queue.c:459
-msgid "Clear all notifications"
-msgstr "Töm alla aviseringar"
-
-#: ../src/nd-queue.c:939
-msgid "Notifications"
-msgstr "Aviseringar"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Avisering"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-#: ../data/notification-daemon-autostart.desktop.in.in.h:1
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
 msgid "Notification Daemon"
 msgstr "Aviseringsdemon"
 
-#: ../data/notification-daemon.desktop.in.in.h:2
-#: ../data/notification-daemon-autostart.desktop.in.in.h:2
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Visa aviseringar"
+
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:318
+#: src/nd-notification-box.c:320
+msgid "Closes the notification."
+msgstr "Stänger aviseringen."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:336
+msgid "Notification summary text."
+msgstr "Sammanfattningstext för avisering."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Ogiltig aviseringsidentifierare"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Översteg maximalt antal aviseringar"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Aktivera felsökningskod"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Ersätt ett för närvarande körande program"
+
+#: src/nd-notification-box.c:356
+msgid "Notification body text."
+msgstr "Huvudtext för avisering."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Töm alla aviseringar"
+
+#: src/nd-queue.c:939
+msgid "Notifications"
+msgstr "Aviseringar"
+
+#~ msgid "Notification"
+#~ msgstr "Avisering"
 
 #~ msgid "Current theme"
 #~ msgstr "Aktuellt tema"
@@ -72,9 +79,8 @@ msgstr "Visa aviseringar"
 #~ "Default popup location on the workspace for stack notifications. Allowed "
 #~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
 #~ msgstr ""
-#~ "Standardposition för popup-rutor på arbetsutan för notifieringar. "
-#~ "Tillåtna värden: \"top_left\",\"top_right\",\"bottom_left\" och "
-#~ "\"bottom_right\""
+#~ "Standardposition för popup-rutor på arbetsutan för notifieringar. Tillåtna "
+#~ "värden: \"top_left\",\"top_right\",\"bottom_left\" och \"bottom_right\""
 
 #~ msgid "Popup location"
 #~ msgstr "Popup-position"
@@ -83,11 +89,11 @@ msgstr "Visa aviseringar"
 #~ msgstr "Ljud aktiverat"
 
 #~ msgid ""
-#~ "The default sound file used unless a notification supplies the 'sound-"
-#~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
+#~ "The default sound file used unless a notification supplies the 'sound-file' or "
+#~ "'suppress-sound' hint. Leave empty for no default sound."
 #~ msgstr ""
-#~ "Standardljudfilen som används såvida inte en notifiering anger \"sound-"
-#~ "file\" eller \"suppress-sound\". Lämna tom för inget standardljud."
+#~ "Standardljudfilen som används såvida inte en notifiering anger \"sound-file\" "
+#~ "eller \"suppress-sound\". Lämna tom för inget standardljud."
 
 #~ msgid "The theme used when displaying notifications."
 #~ msgstr "Temat som används för visning av notifieringar."
