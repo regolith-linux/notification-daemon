@@ -210,7 +210,8 @@ paint_bubble (NdBubble *bubble,
               cairo_t  *cr)
 {
         GtkStyleContext *context;
-        GdkRGBA          rgba;
+        GdkRGBA          bg;
+        GdkRGBA          fg;
         cairo_t         *cr2;
         cairo_surface_t *surface;
         cairo_region_t  *region;
@@ -243,13 +244,19 @@ paint_bubble (NdBubble *bubble,
 
         context = gtk_widget_get_style_context (GTK_WIDGET (bubble));
 
-        get_background_color (context, GTK_STATE_FLAG_NORMAL, &rgba);
-        cairo_set_source_rgba (cr2, rgba.red, rgba.green, rgba.blue,
+        gtk_style_context_save (context);
+        gtk_style_context_set_state (context, GTK_STATE_FLAG_NORMAL);
+
+        get_background_color (context, GTK_STATE_FLAG_NORMAL, &bg);
+        gtk_style_context_get_color (context, GTK_STATE_FLAG_NORMAL, &fg);
+
+        gtk_style_context_restore (context);
+
+        cairo_set_source_rgba (cr2, bg.red, bg.green, bg.blue,
                                BACKGROUND_ALPHA);
         cairo_fill_preserve (cr2);
 
-        gtk_style_context_get_color (context, GTK_STATE_FLAG_NORMAL, &rgba);
-        cairo_set_source_rgba (cr2, rgba.red, rgba.green, rgba.blue,
+        cairo_set_source_rgba (cr2, fg.red, fg.green, fg.blue,
                                BACKGROUND_ALPHA / 2);
         cairo_set_line_width (cr2, 2);
         cairo_stroke (cr2);
