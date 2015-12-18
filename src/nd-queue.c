@@ -60,9 +60,6 @@ struct NdQueuePrivate
         NotifyScreen  *screen;
 
         guint          update_id;
-
-        GdkDevice     *grabbed_pointer;
-        GdkDevice     *grabbed_keyboard;
 };
 
 enum {
@@ -72,7 +69,6 @@ enum {
 
 static guint signals [LAST_SIGNAL] = { 0, };
 
-static void     nd_queue_dispose        (GObject        *object);
 static void     nd_queue_finalize       (GObject        *object);
 static void     queue_update            (NdQueue        *queue);
 static void     on_notification_close   (NdNotification *notification,
@@ -226,7 +222,6 @@ nd_queue_class_init (NdQueueClass *klass)
 {
         GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
-        object_class->dispose = nd_queue_dispose;
         object_class->finalize = nd_queue_finalize;
 
         signals [CHANGED] =
@@ -247,15 +242,13 @@ static void
 ungrab (NdQueue *queue,
         guint    time)
 {
-        if (queue->priv->grabbed_pointer != NULL) {
-                gdk_device_ungrab (queue->priv->grabbed_pointer, time);
-                g_clear_object (&queue->priv->grabbed_pointer);
-        }
+        GdkDisplay *display;
+        GdkSeat *seat;
 
-        if (queue->priv->grabbed_keyboard != NULL) {
-                gdk_device_ungrab (queue->priv->grabbed_keyboard, time);
-                g_clear_object (&queue->priv->grabbed_keyboard);
-        }
+        display = gtk_widget_get_display (queue->priv->dock);
+        seat = gdk_display_get_default_seat (display);
+
+        gdk_seat_ungrab (seat);
 
         gtk_grab_remove (queue->priv->dock);
 
@@ -470,9 +463,6 @@ nd_queue_init (NdQueue *queue)
         queue->priv->queue = g_queue_new ();
         queue->priv->status_icon = NULL;
 
-        queue->priv->grabbed_pointer = NULL;
-        queue->priv->grabbed_keyboard = NULL;
-
         create_dock (queue);
         create_screen (queue);
 }
@@ -503,19 +493,6 @@ destroy_screen (NdQueue *queue)
 
         g_free (queue->priv->screen);
         queue->priv->screen = NULL;
-}
-
-static void
-nd_queue_dispose (GObject *object)
-{
-        NdQueue *queue;
-
-        queue = ND_QUEUE (object);
-
-        g_clear_object (&queue->priv->grabbed_pointer);
-        g_clear_object (&queue->priv->grabbed_keyboard);
-
-        G_OBJECT_CLASS (nd_queue_parent_class)->dispose (object);
 }
 
 static void
@@ -571,15 +548,15 @@ static NdStack *
 get_stack_with_pointer (NdQueue *queue)
 {
         GdkDisplay *display;
-        GdkDeviceManager *device_manager;
+        GdkSeat *seat;
         GdkDevice *pointer;
         GdkScreen *screen;
         int        x, y;
         int        monitor_num;
 
         display = gdk_display_get_default ();
-        device_manager = gdk_display_get_device_manager (display);
-        pointer = gdk_device_manager_get_client_pointer (device_manager);
+        seat = gdk_display_get_default_seat (display);
+        pointer = gdk_seat_get_pointer (seat);
 
         gdk_device_get_position (pointer, &screen, &x, &y);
         monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
@@ -759,10 +736,9 @@ popup_dock (NdQueue *queue,
         GtkRequisition dock_req;
         GtkStatusIcon *status_icon;
         GdkWindow *window;
-        GdkDeviceManager *device_manager;
-        GList *list;
-        GList *link;
-        gboolean grabbed;
+        GdkSeat *seat;
+        GdkSeatCapabilities capabilities;
+        GdkGrabStatus status;
 
         update_dock (queue);
 
@@ -825,52 +801,16 @@ popup_dock (NdQueue *queue,
 
         display = gtk_widget_get_display (queue->priv->dock);
         window = gtk_widget_get_window (queue->priv->dock);
-        device_manager = gdk_display_get_device_manager (display);
+        seat = gdk_display_get_default_seat (display);
 
-        grabbed = FALSE;
-        list = gdk_device_manager_list_devices (device_manager, GDK_DEVICE_TYPE_MASTER);
-        for (link = list; link != NULL; link = g_list_next (link)) {
-                GdkDevice *device = GDK_DEVICE (link->data);
-                if (gdk_device_get_source (device) == GDK_SOURCE_KEYBOARD)
-                        continue;
-                if (gdk_device_grab (device, window,
-                                     GDK_OWNERSHIP_NONE, TRUE,
-                                     GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-                                     GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK,
-                                     NULL, time) == GDK_GRAB_SUCCESS) {
-                        queue->priv->grabbed_pointer = g_object_ref (device);
-                        grabbed = TRUE;
-                        break;
-                }
-        }
-        g_list_free (list);
+        capabilities = GDK_SEAT_CAPABILITY_POINTER |
+                       GDK_SEAT_CAPABILITY_KEYBOARD;
 
-        if (grabbed == FALSE) {
-                ungrab (queue, time);
+        status = gdk_seat_grab (seat, window, capabilities, TRUE, NULL,
+                                NULL, NULL, NULL);
+
+        if (status != GDK_GRAB_SUCCESS)
                 return FALSE;
-        }
-
-        grabbed = FALSE;
-        list = gdk_device_manager_list_devices (device_manager, GDK_DEVICE_TYPE_MASTER);
-        for (link = list; link != NULL; link = g_list_next (link)) {
-                GdkDevice *device = GDK_DEVICE (link->data);
-                if (gdk_device_get_source (device) != GDK_SOURCE_KEYBOARD)
-                        continue;
-                if (gdk_device_grab (device, window,
-                                     GDK_OWNERSHIP_NONE, TRUE,
-                                     GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK,
-                                     NULL, time) == GDK_GRAB_SUCCESS) {
-                        queue->priv->grabbed_keyboard = g_object_ref (device);
-                        grabbed = TRUE;
-                        break;
-                }
-        }
-        g_list_free (list);
-
-        if (grabbed == FALSE) {
-                ungrab (queue, time);
-                return FALSE;
-        }
 
         gtk_widget_grab_focus (queue->priv->dock);
 

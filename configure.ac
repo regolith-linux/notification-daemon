@@ -79,7 +79,7 @@ dnl **************************************************************************
 dnl Check forrequired packages
 dnl **************************************************************************
 
-GTK_REQUIRED=3.15.2
+GTK_REQUIRED=3.19.5
 GLIB_REQUIRED=2.27.0
 
 PKG_CHECK_MODULES([NOTIFICATION_DAEMON], [
