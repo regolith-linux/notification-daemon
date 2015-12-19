@@ -809,8 +809,10 @@ popup_dock (NdQueue *queue,
         status = gdk_seat_grab (seat, window, capabilities, TRUE, NULL,
                                 NULL, NULL, NULL);
 
-        if (status != GDK_GRAB_SUCCESS)
+        if (status != GDK_GRAB_SUCCESS) {
+                ungrab (queue, time);
                 return FALSE;
+        }
 
         gtk_widget_grab_focus (queue->priv->dock);
 
