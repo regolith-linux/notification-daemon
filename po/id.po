@@ -6,46 +6,63 @@
 # Dirgita <dirgitadevina@yahoo.co.id>, 2011.
 msgid ""
 msgstr ""
-"Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=notification-daemon&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-03-12 01:52+0000\n"
-"PO-Revision-Date: 2011-02-18 18:38+0700\n"
-"Last-Translator: Dirgita <dirgitadevina@yahoo.co.id>\n"
+"Project-Id-Version: notification-daemon gnome-3-18\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-"
+"daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2015-10-12 19:10+0000\n"
+"PO-Revision-Date: 2016-01-02 22:12+0700\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: GNOME Indonesian Translation Team <gnome@i15n.org>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: id\n"
-"X-Poedit-Language: Indonesian\n"
-"X-Poedit-Country: Indonesia\n"
-"X-Generator: Lokalize 1.1\n"
+"X-Generator: Poedit 1.8.4\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Melampaui jumlah maksimal notifikasi"
-
-#: ../src/daemon.c:251
-msgid "Invalid notification identifier"
-msgstr "Identifair notifikasi tidak sah"
-
-#: ../src/nd-queue.c:472
-msgid "Clear all notifications"
-msgstr "Membersihkan semua notifikasi"
-
-#: ../src/nd-queue.c:883
-msgid "Notifications"
-msgstr "Notifikasi"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Notifikasi"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-msgid "Display notifications"
-msgstr "Menampilkan notifikasi"
-
-#: ../data/notification-daemon.desktop.in.in.h:2
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
 msgid "Notification Daemon"
-msgstr "Daemon Notifikasi"
+msgstr "Daemon Pemberitahuan"
+
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
+msgid "Display notifications"
+msgstr "Tampilkan pemberitahuan"
+
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+msgid "Closes the notification."
+msgstr "Menutup pemberitahuan."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:346
+msgid "Notification summary text."
+msgstr "Teks ringkasan pemberitahuan."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Identifair pemberitahuan tidak valid"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Melampaui jumlah maksimal pemberitahuan"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Fungsikan kode pengawakutuan"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Gantikan sebuah aplikasi yang saat ini sedang berjalan"
+
+#: src/nd-notification-box.c:366
+msgid "Notification body text."
+msgstr "Teks tubuh pemberitahuan."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Bersihkan semua pemberitahuan"
+
+#: src/nd-queue.c:939
+msgid "Notifications"
+msgstr "Pemberitahuan"
