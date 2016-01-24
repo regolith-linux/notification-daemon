@@ -5,48 +5,66 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2011-02-16 16:53+0000\n"
-"PO-Revision-Date: 2011-07-16 21:59+0300\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2016-01-08 14:02+0000\n"
+"PO-Revision-Date: 2016-01-09 00:10+0200\n"
 "Last-Translator: Aurimas Černius <aurisc4@gmail.com>\n"
 "Language-Team: Lietuvių <gnome-lt@lists.akl.lt>\n"
+"Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.8.6\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Viršytas leistinų pranešimų kiekis"
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
+msgid "Notification Daemon"
+msgstr "Pranešimų tarnyba"
 
-#: ../src/daemon.c:251
-#| msgid "%u is not a valid notification ID"
-msgid "Invalid notification identifier"
-msgstr "Netinkamas pranešimo identifikatorius"
-
-#: ../src/nd-queue.c:471
-#| msgid "Notification"
-msgid "Clear all notifications"
-msgstr "Išvalyti visus pranešimus"
-
-#: ../src/nd-queue.c:874
-#| msgid "Notification"
-msgid "Notifications"
-msgstr "Pranešimai"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Pranešimas"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-#| msgid "Pop-Up Notifications"
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Rodyti pranešimus"
 
-#: ../data/notification-daemon.desktop.in.in.h:2
-#| msgid "Notification Test"
-msgid "Notification Daemon"
-msgstr "Pranešimų tarnyba"
+#: src/nd-bubble.c:529 src/nd-bubble.c:531 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+msgid "Closes the notification."
+msgstr "Užveria pranešimą"
+
+#: src/nd-bubble.c:547 src/nd-bubble.c:571 src/nd-notification-box.c:346
+msgid "Notification summary text."
+msgstr "Pranešimo santraukos tekstas."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Netinkamas pranešimo identifikatorius"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Viršytas leistinų pranešimų kiekis"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Įjungti derinimo kodą"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Pakeisti šiuo metu vykdomą programą"
+
+#: src/nd-notification-box.c:366
+msgid "Notification body text."
+msgstr "Pranešimo pagrindinės dalies tekstas."
+
+#: src/nd-queue.c:452
+msgid "Clear all notifications"
+msgstr "Išvalyti visus pranešimus"
+
+#: src/nd-queue.c:881
+msgid "Notifications"
+msgstr "Pranešimai"
 
 #~ msgid "Current theme"
 #~ msgstr "Dabartinė tema"
