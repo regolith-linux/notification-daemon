@@ -4,7 +4,7 @@ dnl **************************************************************************
 
 m4_define([nd_major_version], [3])
 m4_define([nd_minor_version], [18])
-m4_define([nd_micro_version], [1])
+m4_define([nd_micro_version], [2])
 m4_define([nd_version], [nd_major_version.nd_minor_version.nd_micro_version])
 
 dnl **************************************************************************

@@ -1,3 +1,10 @@
+Version 3.18.2
+==============
+- Updated translations:
+  Anders Jonsson (sv), Andika Triwidada (id), Claude Paroz (fr),
+  Marek Černocký (cs), Mario Blättermann (de), Pedro Albuquerque (pt),
+  Rafael Fontenelle (pt_BR).
+
 Version 3.18.1
 ==============
 - Fix empty body text with invalid pango markup.
