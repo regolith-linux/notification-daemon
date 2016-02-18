@@ -1,7 +1,6 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
 data/notification-daemon.desktop.in.in
-data/notification-daemon-autostart.desktop.in.in
 src/nd-bubble.c
 src/nd-daemon.c
 src/nd-main.c

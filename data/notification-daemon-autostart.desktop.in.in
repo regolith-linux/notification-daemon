@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Notification Daemon
-Comment=Display notifications
-Exec=@libexecdir@/notification-daemon
-Terminal=false
-Type=Application
-OnlyShowIn=GNOME-Flashback;
-NoDisplay=true
