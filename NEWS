@@ -1,3 +1,13 @@
+Version 3.20.0
+==============
+- Remove GNOME-Flashback autostart file. (Alberts Muktupāvels)
+- Stop using deprecated GdkDeviceManager. (Alberts Muktupāvels)
+- Updated translations:
+  Anders Jonsson (sv), Andika Triwidada (id), Aurimas Černius (it),
+  Claude Paroz (fr), Dušan Kazik (sk), Marek Černocký (cs),
+  Mario Blättermann (de), Milo Casagrande (it), Мирослав Николић (sr, sr@latin),
+  Pedro Albuquerque (pt), Rafael Fontenelle (pt_BR).
+
 Version 3.18.1
 ==============
 - Fix empty body text with invalid pango markup.
