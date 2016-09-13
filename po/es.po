@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: notification-daemon.po.master\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=notification-daemon&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2015-12-07 01:58+0000\n"
+"POT-Creation-Date: 2016-07-24 23:48+0000\n"
 "PO-Revision-Date: 2015-12-07 12:42+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Español; Castellano <gnome-es-list@gnome.org>\n"
@@ -23,21 +23,19 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.6\n"
 
 #: data/notification-daemon.desktop.in.in:3
-#: data/notification-daemon-autostart.desktop.in.in:3
 msgid "Notification Daemon"
 msgstr "Demonio de notificación"
 
 #: data/notification-daemon.desktop.in.in:4
-#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Mostrar notificaciones"
 
-#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:328
+#: src/nd-bubble.c:529 src/nd-bubble.c:531 src/nd-notification-box.c:328
 #: src/nd-notification-box.c:330
 msgid "Closes the notification."
 msgstr "Cierra la notificación."
 
-#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:346
+#: src/nd-bubble.c:547 src/nd-bubble.c:571 src/nd-notification-box.c:346
 msgid "Notification summary text."
 msgstr "Texto del resumen de la notificación."
 
@@ -61,11 +59,11 @@ msgstr "Reemplazar una aplicación en ejecución actualmente"
 msgid "Notification body text."
 msgstr "Texto del cuerpo de la notificación."
 
-#: src/nd-queue.c:459
+#: src/nd-queue.c:452
 msgid "Clear all notifications"
 msgstr "Limpiar todas las notificaciones"
 
-#: src/nd-queue.c:939
+#: src/nd-queue.c:881
 msgid "Notifications"
 msgstr "Notificaciones"
 
