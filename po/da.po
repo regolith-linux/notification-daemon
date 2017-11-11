@@ -1,14 +1,15 @@
 # Danish translation for notification-daemon.
-# Copyright (C) 2010 notification-daemon's COPYRIGHT HOLDER
+# Copyright (C) 2016 notification-daemon's COPYRIGHT HOLDER
 # This file is distributed under the same license as the notification-daemon package.
-# Joe Hansen (joedalton2@yahoo.dk), 2010, 2011.
+# Joe Hansen (joedalton2@yahoo.dk), 2010, 2011, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-03 18:19+0200\n"
-"PO-Revision-Date: 2011-04-01 23:52+0100\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2017-04-10 18:17+0000\n"
+"PO-Revision-Date: 2016-12-04 23:52+0100\n"
 "Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -17,30 +18,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Overskred maksimalt antal påmindelser"
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
+msgid "Notification Daemon"
+msgstr "Påmindelsesdæmon"
 
-#: ../src/daemon.c:251
-msgid "Invalid notification identifier"
-msgstr "Ugyldigt påmindelses-id"
-
-#: ../src/nd-queue.c:472
-msgid "Clear all notifications"
-msgstr "Ryd alle påmindelser"
-
-#: ../src/nd-queue.c:883
-msgid "Notifications"
-msgstr "Påmindelser"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Påmindelse"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Vis påmindelser"
 
-#: ../data/notification-daemon.desktop.in.in.h:2
-msgid "Notification Daemon"
-msgstr "Påmindelsesdæmon"
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+msgid "Closes the notification."
+msgstr "Lukker påmindelsen."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:346
+msgid "Notification summary text."
+msgstr "Påmindelsesresume."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Ugyldigt påmindelses-id"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Overskred maksimalt antal påmindelser"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Aktiver fejlsøgningskode"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Erstat et aktuelt kørende program"
+
+#: src/nd-notification-box.c:366
+msgid "Notification body text."
+msgstr "Tekst for påmindelser."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Ryd alle påmindelser"
+
+#: src/nd-queue.c:939
+msgid "Notifications"
+msgstr "Påmindelser"
