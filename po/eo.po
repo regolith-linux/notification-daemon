@@ -2,48 +2,69 @@
 # Copyright (C) 2011 Free Software Foundation, Inc.
 # This file is distributed under the same license as the notification-daemon package.
 # Denizo PRISKORN <tradukado@riseup.net>, 2011.
-# Kristjan SCHMIDT <kristjan.schmidt@googlemail.com>, 2011.
+# Kristjan SCHMIDT <kristjan.schmidt@googlemail.com>, 2011, 2017.
 # Tiffany ANTOPOLSKI <tiffany.antopolski@googlemail.com>, 2012.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
-"product=notification-daemon&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-03-10 12:26+0000\n"
-"PO-Revision-Date: 2011-02-06 18:41+0100\n"
-"Last-Translator: Tiffany ANTOPOLSKI <tiffany.antopolski@googlemail.com>\n"
-"Language-Team: Esperanto\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?product"
+"=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2017-04-27 15:40+0000\n"
+"PO-Revision-Date: 2017-12-23 23:03+0200\n"
+"Last-Translator: Kristjan SCHMIDT <kristjan.schmidt@googlemail.com>\n"
+"Language-Team: Esperanto <gnome-eo-list@gnome.org>\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Project-Style: gnome\n"
 
-#: ../src/daemon.c:188
+#: data/notification-daemon.desktop.in.in:3
+msgid "Notification Daemon"
+msgstr "Sciigila servo"
+
+#: data/notification-daemon.desktop.in.in:4
+msgid "Display notifications"
+msgstr "Montri sciigojn"
+
+#: src/nd-bubble.c:529 src/nd-bubble.c:531 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+#| msgid "Clear all notifications"
+msgid "Closes the notification."
+msgstr "Fermas la sciigon."
+
+#: src/nd-bubble.c:547 src/nd-bubble.c:571 src/nd-notification-box.c:346
+#| msgid "Notification Daemon"
+msgid "Notification summary text."
+msgstr "Resuma teksto de la sciigo."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Nevalida identigilo de la sciigo"
+
+#: src/nd-daemon.c:193
 msgid "Exceeded maximum number of notifications"
 msgstr "La maksimuma nombro de sciigoj superiĝis"
 
-#: ../src/daemon.c:251
-msgid "Invalid notification identifier"
-msgstr "Nevalida sciigoidentigilo"
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Enŝalti sencimigan kodon"
 
-#: ../src/nd-queue.c:472
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Anstataŭigi nun rulantan aplikaĵon"
+
+#: src/nd-notification-box.c:366
+#| msgid "Notification"
+msgid "Notification body text."
+msgstr "Teksto de la sciigo."
+
+#: src/nd-queue.c:452
 msgid "Clear all notifications"
 msgstr "Forigi ĉiujn sciigojn"
 
-#: ../src/nd-queue.c:883
+#: src/nd-queue.c:881
 msgid "Notifications"
 msgstr "Sciigoj"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Sciigo"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-msgid "Notification Daemon"
-msgstr "Sciiga Demono"
-
-#: ../data/notification-daemon.desktop.in.in.h:2
-msgid "Display notifications"
-msgstr "Montri sciigojn"
