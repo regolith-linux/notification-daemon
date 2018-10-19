@@ -3,56 +3,79 @@
 # This file is distributed under the same license as the notification-daemon package.
 #
 # Andrej Žnidaršič <andrej.znidarsic@gmail.com>, 2010.
+# Matej Urbančič <mateju@svn.gnome.org>, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=notification-daemon&component=general\n"
-"POT-Creation-Date: 2011-02-19 11:46+0000\n"
-"PO-Revision-Date: 2011-02-20 14:06+0100\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2017-11-11 19:40+0000\n"
+"PO-Revision-Date: 2018-10-19 18:55+0200\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n%100==4 ? 3 : 0);\n"
-"X-Poedit-Language: Slovenian\n"
-"X-Poedit-Country: SLOVENIA\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 2.1.1\n"
 
-#: ../src/daemon.c:188
-msgid "Exceeded maximum number of notifications"
-msgstr "Največje število obvestil je preseženo"
-
-#: ../src/daemon.c:251
-msgid "Invalid notification identifier"
-msgstr "Določilo obvestilnika je neveljavno "
-
-#: ../src/nd-queue.c:471
-msgid "Clear all notifications"
-msgstr "Počisti vsa obvestila"
-
-#: ../src/nd-queue.c:874
-msgid "Notifications"
-msgstr "Obvestila"
-
-#: ../src/sound.c:35
-msgid "Notification"
-msgstr "Obvestilo"
-
-#: ../data/notification-daemon.desktop.in.in.h:1
-msgid "Display notifications"
-msgstr "Prikaži obvestila"
-
-#: ../data/notification-daemon.desktop.in.in.h:2
+#: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
 msgid "Notification Daemon"
 msgstr "Ozadnji program za prikazovanje obvestil"
 
+#: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
+msgid "Display notifications"
+msgstr "Prikaži obvestila"
+
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+msgid "Closes the notification."
+msgstr "Zapre obvestilo."
+
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:346
+msgid "Notification summary text."
+msgstr "Besedilo povzetka obvestila."
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr "Določilo obvestilnika je neveljavno"
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr "Največje število obvestil je preseženo"
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr "Omogoči razhroščevalno kodo"
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr "Zamenjaj trenutno zagnan program"
+
+#: src/nd-notification-box.c:366
+msgid "Notification body text."
+msgstr "Besedilo obvestila."
+
+#: src/nd-queue.c:459
+msgid "Clear all notifications"
+msgstr "Počisti vsa obvestila"
+
+#: src/nd-queue.c:939
+msgid "Notifications"
+msgstr "Obvestila"
+
 #~ msgid "Current theme"
 #~ msgstr "Trenutna tema"
+
 #~ msgid "Default Sound"
 #~ msgstr "Privzeti zvok"
+
 #~ msgid ""
 #~ "Default popup location on the workspace for stack notifications. Allowed "
 #~ "values: \"top_left\",\"top_right\",\"bottom_left\" and \"bottom_right\""
@@ -60,10 +83,13 @@ msgstr "Ozadnji program za prikazovanje obvestil"
 #~ "Privzeti položaj pojavnega obvestila na delovni površini za sklad "
 #~ "obvestil. Dovoljene vrednosti:  \"top_left\",\"top_right\",\"bottom_left"
 #~ "\" in \"bottom_right\""
+
 #~ msgid "Popup location"
 #~ msgstr "Položaj pojavnega obvestila"
+
 #~ msgid "Sound Enabled"
 #~ msgstr "Zvok je omogočen"
+
 #~ msgid ""
 #~ "The default sound file used unless a notification supplies the 'sound-"
 #~ "file' or 'suppress-sound' hint. Leave empty for no default sound."
@@ -71,48 +97,69 @@ msgstr "Ozadnji program za prikazovanje obvestil"
 #~ "Uporabljena je privzeta zvočna datoteka, razen kadar obvestilo zajema "
 #~ "tudi 'zvočno-datoteko' ali pa možnost 'prepreči-zvok'. Pustite prazno za "
 #~ "onemogočenje privzetega zvoka."
+
 #~ msgid "The theme used when displaying notifications."
 #~ msgstr "Tema za prikaz obvestil."
+
 #~ msgid "Turns on and off sound support for notifications."
 #~ msgstr "Vklopi in izklopi zvočno podporo obvestil."
+
 #~ msgid "Slider"
 #~ msgstr "Drsnik"
+
 #~ msgid "Standard theme"
 #~ msgstr "Običajna tema"
+
 #~ msgid "Error initializing libnotify"
 #~ msgstr "Napaka med zaganjanjem libnotify"
+
 #~ msgid "Just a test"
 #~ msgstr "Samo preizkus"
+
 #~ msgid "Error while displaying notification: %s"
 #~ msgstr "Napaka med prikazovanjem obvestila: %s"
+
 #~ msgid "Could not load user interface file: %s"
 #~ msgstr "Ni mogoče naložiti datoteke uporabniškega vmesnika: %s"
+
 #~ msgid "Pop-Up Notifications"
 #~ msgstr "Pojavna obvestila"
+
 #~ msgid "Set your pop-up notification preferences"
 #~ msgstr "Nastavitev možnosti pojavnih obvestil "
+
 #~ msgid "Top Left"
 #~ msgstr "Zgoraj levo"
+
 #~ msgid "Top Right"
 #~ msgstr "Zgoraj desno"
+
 #~ msgid "Bottom Left"
 #~ msgstr "Spodaj levo"
+
 #~ msgid "Bottom Right"
 #~ msgstr "Spodaj desno"
+
 #~ msgid "Unable to locate glade file '%s'"
 #~ msgstr "Glade datoteke '%s' ni mogoče najti"
+
 #~ msgid "      "
 #~ msgstr "      "
+
 #~ msgid "<b>General Options</b>"
 #~ msgstr "<b>Splošne možnosti</b>"
+
 #~ msgid "Notification Settings"
 #~ msgstr "Nastavitve obvestil"
+
 #~ msgid "P_osition:"
 #~ msgstr "P_oložaj:"
+
 #~ msgid "_Preview"
 #~ msgstr "_Predogled"
+
 #~ msgid "_Theme:"
 #~ msgstr "_Tema:"
+
 #~ msgid "Ubuntu theme"
 #~ msgstr "Tema Ubuntu"
-
