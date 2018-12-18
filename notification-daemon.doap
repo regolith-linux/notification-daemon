@@ -8,7 +8,7 @@
   <shortdesc xml:lang="en">Notification Daemon is the server implementation of the freedesktop.org desktop notification specification</shortdesc>
   <homepage rdf:resource="https://wiki.gnome.org/Projects/NotificationDaemon" />
   <download-page rdf:resource="http://download.gnome.org/sources/notification-daemon/" />
-  <bug-database rdf:resource="https://bugzilla.gnome.org/browse.cgi?product=notification-daemon" />
+  <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/notification-daemon/issues/" />
 
   <programming-language>C</programming-language>
 
