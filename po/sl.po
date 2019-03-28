@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the notification-daemon package.
 #
 # Andrej Žnidaršič <andrej.znidarsic@gmail.com>, 2010.
-# Matej Urbančič <mateju@svn.gnome.org>, 2018.
+# Matej Urbančič <mateju@svn.gnome.org>, + 2018–2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: notification-daemon master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/notification-daemon/"
-"issues\n"
-"POT-Creation-Date: 2018-10-04 20:30+0000\n"
-"PO-Revision-Date: 2018-10-19 18:07+0200\n"
+"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+"product=notification-daemon&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2017-11-11 19:40+0000\n"
+"PO-Revision-Date: 2019-03-28 22:03+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian <gnome-si@googlegroups.com>\n"
 "Language: sl\n"
@@ -21,22 +21,24 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2.1\n"
 
 #: data/notification-daemon.desktop.in.in:3
+#: data/notification-daemon-autostart.desktop.in.in:3
 msgid "Notification Daemon"
 msgstr "Ozadnji program za prikazovanje obvestil"
 
 #: data/notification-daemon.desktop.in.in:4
+#: data/notification-daemon-autostart.desktop.in.in:4
 msgid "Display notifications"
 msgstr "Prikaži obvestila"
 
-#: src/nd-bubble.c:529 src/nd-bubble.c:531 src/nd-notification-box.c:328
+#: src/nd-bubble.c:522 src/nd-bubble.c:524 src/nd-notification-box.c:328
 #: src/nd-notification-box.c:330
 msgid "Closes the notification."
 msgstr "Zapre obvestilo."
 
-#: src/nd-bubble.c:547 src/nd-bubble.c:571 src/nd-notification-box.c:346
+#: src/nd-bubble.c:540 src/nd-bubble.c:564 src/nd-notification-box.c:346
 msgid "Notification summary text."
 msgstr "Besedilo povzetka obvestila."
 
@@ -60,11 +62,11 @@ msgstr "Zamenjaj trenutno zagnan program"
 msgid "Notification body text."
 msgstr "Besedilo obvestila."
 
-#: src/nd-queue.c:452
+#: src/nd-queue.c:459
 msgid "Clear all notifications"
 msgstr "Počisti vsa obvestila"
 
-#: src/nd-queue.c:881
+#: src/nd-queue.c:939
 msgid "Notifications"
 msgstr "Obvestila"
 
