@@ -1,0 +1,63 @@
+# Karbi translation for notification-daemon.
+# Copyright (C) 2019 notification-daemon's Free Software Foundation, Inc.
+# This file is distributed under the same license as the notification-daemon package.
+# Jor Teron <jor.teron@gmail.com>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: notification-daemon master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/notification-daemon/"
+"issues\n"
+"POT-Creation-Date: 2019-03-28 21:06+0000\n"
+"PO-Revision-Date: 2019-07-20 02:00+0530\n"
+"Last-Translator: Jor Teron <jor.teron@gmail.com>\n"
+"Language-Team: Karbi <karbi.translation@gmail.com>\n"
+"Language: mjw\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/notification-daemon.desktop.in.in:3
+msgid "Notification Daemon"
+msgstr ""
+
+#: data/notification-daemon.desktop.in.in:4
+msgid "Display notifications"
+msgstr "Notifications paklang"
+
+#: src/nd-bubble.c:529 src/nd-bubble.c:531 src/nd-notification-box.c:328
+#: src/nd-notification-box.c:330
+msgid "Closes the notification."
+msgstr "Notifications inghap noi"
+
+#: src/nd-bubble.c:547 src/nd-bubble.c:571 src/nd-notification-box.c:346
+msgid "Notification summary text."
+msgstr "Notifications thi-hek amek"
+
+#: src/nd-daemon.c:113
+msgid "Invalid notification identifier"
+msgstr ""
+
+#: src/nd-daemon.c:193
+msgid "Exceeded maximum number of notifications"
+msgstr ""
+
+#: src/nd-main.c:34
+msgid "Enable debugging code"
+msgstr ""
+
+#: src/nd-main.c:40
+msgid "Replace a currently running application"
+msgstr ""
+
+#: src/nd-notification-box.c:366
+msgid "Notification body text."
+msgstr "Notifications amek"
+
+#: src/nd-queue.c:452
+msgid "Clear all notifications"
+msgstr "Notifications musi ed"
+
+#: src/nd-queue.c:881
+msgid "Notifications"
+msgstr "Notifications"
