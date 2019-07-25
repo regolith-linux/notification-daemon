@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/notification-daemon/"
 "issues\n"
 "POT-Creation-Date: 2019-03-28 21:06+0000\n"
-"PO-Revision-Date: 2019-07-20 02:00+0530\n"
+"PO-Revision-Date: 2019-07-25 04:43+0530\n"
 "Last-Translator: Jor Teron <jor.teron@gmail.com>\n"
 "Language-Team: Karbi <karbi.translation@gmail.com>\n"
 "Language: mjw\n"
@@ -28,11 +28,11 @@ msgstr "Notifications paklang"
 #: src/nd-bubble.c:529 src/nd-bubble.c:531 src/nd-notification-box.c:328
 #: src/nd-notification-box.c:330
 msgid "Closes the notification."
-msgstr "Notifications inghap noi"
+msgstr "Notifications inghap"
 
 #: src/nd-bubble.c:547 src/nd-bubble.c:571 src/nd-notification-box.c:346
 msgid "Notification summary text."
-msgstr "Notifications thi-hek amek"
+msgstr "Notifications thi-hek lamthe amek"
 
 #: src/nd-daemon.c:113
 msgid "Invalid notification identifier"
@@ -40,7 +40,7 @@ msgstr ""
 
 #: src/nd-daemon.c:193
 msgid "Exceeded maximum number of notifications"
-msgstr ""
+msgstr "Notifications ke ong lit lo"
 
 #: src/nd-main.c:34
 msgid "Enable debugging code"
@@ -52,7 +52,7 @@ msgstr ""
 
 #: src/nd-notification-box.c:366
 msgid "Notification body text."
-msgstr "Notifications amek"
+msgstr "Notifications lamthe amek"
 
 #: src/nd-queue.c:452
 msgid "Clear all notifications"
