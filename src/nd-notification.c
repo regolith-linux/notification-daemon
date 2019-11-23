@@ -42,7 +42,7 @@ struct _NdNotification {
         gboolean      is_queued;
         gboolean      is_closed;
 
-        GTimeVal      update_time;
+        gint64     update_time;
 
         char         *sender;
         guint32       id;
@@ -201,23 +201,9 @@ nd_notification_update (NdNotification     *notification,
 
         g_signal_emit (notification, signals[CHANGED], 0);
 
-        g_get_current_time (&notification->update_time);
+        notification->update_time = g_get_real_time();
 
         return TRUE;
-}
-
-void
-nd_notification_get_update_time (NdNotification *notification,
-                                 GTimeVal       *tvp)
-{
-        g_return_if_fail (ND_IS_NOTIFICATION (notification));
-
-        if (tvp == NULL) {
-                return;
-        }
-
-        tvp->tv_usec = notification->update_time.tv_usec;
-        tvp->tv_sec = notification->update_time.tv_sec;
 }
 
 void
@@ -382,7 +368,7 @@ scale_pixbuf (GdkPixbuf *pixbuf,
         }
 
         /* always scale down, allow to disable scaling up */
-        if (scale_factor < 1.0 || !no_stretch_hint) {
+        if (scale_factor < 1.0f || !no_stretch_hint) {
                 int scale_x;
                 int scale_y;
 
@@ -443,7 +429,7 @@ _notify_daemon_pixbuf_from_data_hint (GVariant *icon_data,
                                            width,
                                            height,
                                            rowstride,
-                                           (GdkPixbufDestroyNotify) g_free,
+                                           (void *) g_free,
                                            NULL);
         if (pixbuf != NULL && size > 0) {
                 GdkPixbuf *scaled;

@@ -51,7 +51,7 @@ struct NdNotificationBoxPrivate
 
 static void     nd_notification_box_finalize    (GObject                *object);
 
-G_DEFINE_TYPE (NdNotificationBox, nd_notification_box, GTK_TYPE_EVENT_BOX)
+G_DEFINE_TYPE_WITH_PRIVATE (NdNotificationBox, nd_notification_box, GTK_TYPE_EVENT_BOX)
 
 NdNotification *
 nd_notification_box_get_notification (NdNotificationBox *notification_box)
@@ -81,7 +81,7 @@ nd_notification_box_class_init (NdNotificationBoxClass *klass)
         object_class->finalize = nd_notification_box_finalize;
         widget_class->button_release_event = nd_notification_box_button_release_event;
 
-        g_type_class_add_private (klass, sizeof (NdNotificationBoxPrivate));
+        //g_type_class_add_private (klass, sizeof (NdNotificationBoxPrivate));
 }
 
 static void
@@ -282,7 +282,7 @@ nd_notification_box_init (NdNotificationBox *notification_box)
         GtkWidget     *vbox;
         AtkObject     *atkobj;
 
-        notification_box->priv = ND_NOTIFICATION_BOX_GET_PRIVATE (notification_box);
+        notification_box->priv = nd_notification_box_get_instance_private (notification_box);
         box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
         gtk_container_add (GTK_CONTAINER (notification_box), box);
         gtk_widget_show (box);

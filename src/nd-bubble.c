@@ -77,7 +77,7 @@ static void     nd_bubble_finalize    (GObject       *object);
 static void     on_notification_changed (NdNotification *notification,
                                          NdBubble       *bubble);
 
-G_DEFINE_TYPE (NdBubble, nd_bubble, GTK_TYPE_WINDOW)
+G_DEFINE_TYPE_WITH_PRIVATE (NdBubble, nd_bubble, GTK_TYPE_WINDOW)
 
 NdNotification *
 nd_bubble_get_notification (NdBubble *bubble)
@@ -144,8 +144,8 @@ draw_round_rect (cairo_t *cr,
                    x + width - radius,
                    y + radius,
                    radius,
-                   -90.0f * G_PI / 180.0f,
-                   0.0f * G_PI / 180.0f);
+                   -90.0f * (float) G_PI / 180.0f,
+                   0.0f * (float) G_PI / 180.0f);
 
         // bottom-right, above the corner
         cairo_line_to (cr,
@@ -157,8 +157,8 @@ draw_round_rect (cairo_t *cr,
                    x + width - radius,
                    y + height - radius,
                    radius,
-                   0.0f * G_PI / 180.0f,
-                   90.0f * G_PI / 180.0f);
+                   0.0f * (float) G_PI / 180.0f,
+                   90.0f * (float) G_PI / 180.0f);
 
         // bottom-left, right of the corner
         cairo_line_to (cr,
@@ -170,8 +170,8 @@ draw_round_rect (cairo_t *cr,
                    x + radius,
                    y + height - radius,
                    radius,
-                   90.0f * G_PI / 180.0f,
-                   180.0f * G_PI / 180.0f);
+                   90.0f * (float) G_PI / 180.0f,
+                   180.0f * (float) G_PI / 180.0f);
 
         // top-left, below the corner
         cairo_line_to (cr,
@@ -183,8 +183,8 @@ draw_round_rect (cairo_t *cr,
                    x + radius,
                    y + radius,
                    radius,
-                   180.0f * G_PI / 180.0f,
-                   270.0f * G_PI / 180.0f);
+                   180.0f * (float) G_PI / 180.0f,
+                   270.0f * (float) G_PI / 180.0f);
 }
 
 static void
@@ -401,8 +401,6 @@ nd_bubble_class_init (NdBubbleClass *klass)
         widget_class->motion_notify_event = nd_bubble_motion_notify_event;
         widget_class->realize = nd_bubble_realize;
         widget_class->get_preferred_width = nd_bubble_get_preferred_width;
-
-        g_type_class_add_private (klass, sizeof (NdBubblePrivate));
 }
 
 static gboolean
@@ -459,7 +457,7 @@ nd_bubble_init (NdBubble *bubble)
         GdkScreen   *screen;
         GdkVisual   *visual;
 
-        bubble->priv = ND_BUBBLE_GET_PRIVATE (bubble);
+        bubble->priv = nd_bubble_get_instance_private (bubble);
 
         gtk_widget_add_events (GTK_WIDGET (bubble), GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
         atk_object_set_role (gtk_widget_get_accessible (GTK_WIDGET (bubble)), ATK_ROLE_ALERT);
@@ -693,7 +691,7 @@ scale_pixbuf (GdkPixbuf *pixbuf,
         }
 
         /* always scale down, allow to disable scaling up */
-        if (scale_factor < 1.0 || !no_stretch_hint) {
+        if (scale_factor < 1.0f || !no_stretch_hint) {
                 int scale_x;
                 int scale_y;
 
@@ -828,9 +826,13 @@ add_notification_action (NdBubble       *bubble,
 static void
 clear_actions (NdBubble *bubble)
 {
+        GtkCallback callback;
+
+        callback = (void *)gtk_widget_destroy;
+
         gtk_widget_hide (bubble->priv->actions_box);
         gtk_container_foreach (GTK_CONTAINER (bubble->priv->actions_box),
-                               (GtkCallback)gtk_widget_destroy,
+                               callback,
                                NULL);
         bubble->priv->have_actions = FALSE;
 }

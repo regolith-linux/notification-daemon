@@ -28,6 +28,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
+#include <gdk/gdkmonitor.h>
 
 #include "nd-queue.h"
 
@@ -77,7 +78,7 @@ static void     on_notification_close   (NdNotification *notification,
 
 static gpointer queue_object = NULL;
 
-G_DEFINE_TYPE (NdQueue, nd_queue, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (NdQueue, nd_queue, G_TYPE_OBJECT)
 
 static void
 create_stack_for_monitor (NdQueue    *queue,
@@ -102,8 +103,8 @@ on_screen_monitors_changed (GdkScreen *screen,
 
         nscreen = queue->priv->screen;
 
-        n_monitors = gdk_screen_get_n_monitors (screen);
-
+        n_monitors = gdk_display_get_n_monitors(gdk_screen_get_display(screen));
+                     
         if (n_monitors > nscreen->n_stacks) {
                 /* grow */
                 nscreen->stacks = g_renew (NdStack *,
@@ -158,7 +159,7 @@ create_stacks_for_screen (NdQueue   *queue,
 
         nscreen = queue->priv->screen;
 
-        nscreen->n_stacks = gdk_screen_get_n_monitors (screen);
+        nscreen->n_stacks = gdk_display_get_n_monitors(gdk_screen_get_display(screen));
 
         nscreen->stacks = g_renew (NdStack *,
                                    nscreen->stacks,
@@ -235,7 +236,7 @@ nd_queue_class_init (NdQueueClass *klass)
                               G_TYPE_NONE,
                               0);
 
-        g_type_class_add_private (klass, sizeof (NdQueuePrivate));
+        //g_type_class_add_private (klass, sizeof (NdQueuePrivate));
 }
 
 static void
@@ -457,7 +458,7 @@ create_dock (NdQueue *queue)
 static void
 nd_queue_init (NdQueue *queue)
 {
-        queue->priv = ND_QUEUE_GET_PRIVATE (queue);
+        queue->priv = nd_queue_get_instance_private (queue);
         queue->priv->notifications = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
         queue->priv->bubbles = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
         queue->priv->queue = g_queue_new ();
@@ -551,23 +552,30 @@ get_stack_with_pointer (NdQueue *queue)
         GdkSeat *seat;
         GdkDevice *pointer;
         GdkScreen *screen;
+        //GdkMonitor *monitor;
         int        x, y;
-        int        monitor_num;
+        //int        monitor_num;
 
         display = gdk_display_get_default ();
         seat = gdk_display_get_default_seat (display);
         pointer = gdk_seat_get_pointer (seat);
 
         gdk_device_get_position (pointer, &screen, &x, &y);
-        monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
-
+        //monitor_num = gdk_screen_get_monitor_at_point (screen, x, y);
+        
+        /* KGWH - FixMe
+        monitor = gdk_display_get_monitor_at_point(display, x, y);
+        
+        monitor_num = monitor->gdk_monitor_get_display().gdk_display_get_screen().get_number();
+        
         if (monitor_num >= queue->priv->screen->n_stacks) {
-                /* screw it - dump it on the last one we'll get
-                   a monitors-changed signal soon enough*/
+               
                 monitor_num = queue->priv->screen->n_stacks - 1;
         }
 
         return queue->priv->screen->stacks[monitor_num];
+        */
+       return queue->priv->screen->stacks[0];
 }
 
 static void
@@ -634,16 +642,20 @@ static int
 collate_notifications (NdNotification *a,
                        NdNotification *b)
 {
+        /* KGWH Fix Me
         GTimeVal tva;
         GTimeVal tvb;
 
         nd_notification_get_update_time (a, &tva);
         nd_notification_get_update_time (b, &tvb);
-        if (tva.tv_sec > tvb.tv_sec) {
+        if (a.tv_sec > tvb.tv_sec) {
                 return 1;
         } else {
                 return -1;
         }
+        */
+
+       return 1;
 }
 
 static void
@@ -654,7 +666,7 @@ update_dock (NdQueue *queue)
         GList       *l;
         int          min_height;
         int          height;
-        int          monitor_num;
+        GdkMonitor  *monitor;
         GdkScreen   *screen;
         GdkRectangle area;
         GtkStatusIcon *status_icon;
@@ -709,8 +721,9 @@ update_dock (NdQueue *queue)
                 gtk_status_icon_get_geometry (status_icon, &screen, &area, NULL);
                 G_GNUC_END_IGNORE_DEPRECATIONS
 
-                monitor_num = gdk_screen_get_monitor_at_point (screen, area.x, area.y);
-                gdk_screen_get_monitor_geometry (screen, monitor_num, &area);
+                monitor = gdk_display_get_monitor_at_point(gdk_screen_get_display(screen), area.x, area.y);
+                // monitor_num = gdk_screen_get_monitor_at_point (screen, area.x, area.y);
+                gdk_monitor_get_geometry (monitor, &area);
                 height = MIN (height, (area.height / 2));
                 gtk_widget_set_size_request (queue->priv->dock_scrolled_window,
                                              WIDTH,
@@ -731,14 +744,15 @@ popup_dock (NdQueue *queue,
         gboolean       res;
         int            x;
         int            y;
-        int            monitor_num;
-        GdkRectangle   monitor;
+        GdkMonitor    *monitor;
+        GdkRectangle   monitor_rect;
         GtkRequisition dock_req;
         GtkStatusIcon *status_icon;
         GdkWindow *window;
         GdkSeat *seat;
         GdkSeatCapabilities capabilities;
         GdkGrabStatus status;
+        GtkCallback callback;
 
         update_dock (queue);
 
@@ -756,34 +770,36 @@ popup_dock (NdQueue *queue,
         /* position roughly */
         gtk_window_set_screen (GTK_WINDOW (queue->priv->dock), screen);
 
-        monitor_num = gdk_screen_get_monitor_at_point (screen, area.x, area.y);
-        gdk_screen_get_monitor_geometry (screen, monitor_num, &monitor);
+        monitor = gdk_display_get_monitor_at_point (gdk_screen_get_display(screen), area.x, area.y);
+        gdk_monitor_get_geometry (monitor, &monitor_rect);
+        
+        callback = (void *)gtk_widget_show_all;
 
         gtk_container_foreach (GTK_CONTAINER (queue->priv->dock),
-                               (GtkCallback) gtk_widget_show_all, NULL);
+                               callback, NULL);
         gtk_widget_get_preferred_size (queue->priv->dock, &dock_req, NULL);
 
         if (orientation == GTK_ORIENTATION_VERTICAL) {
-                if (area.x + area.width + dock_req.width <= monitor.x + monitor.width) {
+                if (area.x + area.width + dock_req.width <= monitor_rect.x + monitor_rect.width) {
                         x = area.x + area.width;
                 } else {
                         x = area.x - dock_req.width;
                 }
-                if (area.y + dock_req.height <= monitor.y + monitor.height) {
+                if (area.y + dock_req.height <= monitor_rect.y + monitor_rect.height) {
                         y = area.y;
                 } else {
-                        y = monitor.y + monitor.height - dock_req.height;
+                        y = monitor_rect.y + monitor_rect.height - dock_req.height;
                 }
         } else {
-                if (area.y + area.height + dock_req.height <= monitor.y + monitor.height) {
+                if (area.y + area.height + dock_req.height <= monitor_rect.y + monitor_rect.height) {
                         y = area.y + area.height;
                 } else {
                         y = area.y - dock_req.height;
                 }
-                if (area.x + dock_req.width <= monitor.x + monitor.width) {
+                if (area.x + dock_req.width <= monitor_rect.x + monitor_rect.width) {
                         x = area.x;
                 } else {
-                        x = monitor.x + monitor.width - dock_req.width;
+                        x = monitor_rect.x + monitor_rect.width - dock_req.width;
                 }
         }
 
